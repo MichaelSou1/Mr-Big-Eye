@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mr. Big-Eye</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <h1>Mr. Big-Eye</h1>
+        <span id="user-tag" class="user-tag"></span>
+      </header>
+
+      <section id="upload-section" class="upload-section">
+        <div class="upload-row">
+          <input id="video-file" type="file" accept="video/*" />
+          <button id="upload-button" type="button">Upload</button>
+        </div>
+        <progress id="upload-progress" value="0" max="100"></progress>
+        <div id="upload-status" class="status-line"></div>
+      </section>
+
+      <section id="chat-section" class="chat-section hidden">
+        <div id="messages" class="messages"></div>
+        <form id="chat-form" class="composer">
+          <input id="question-input" type="text" autocomplete="off" />
+          <button id="send-button" type="submit">Send</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
