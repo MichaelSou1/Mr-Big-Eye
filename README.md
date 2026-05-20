@@ -325,6 +325,9 @@ frames=12
 | `SIGLIP2_DTYPE` | SigLIP2 dtype | `float16` | `auto` |
 | `DENSE_FPS` | 稠密抽帧帧率 | `1.0` | `1.0` 或更高 |
 | `TOP_K_FRAMES` | 问答关键帧数 | `12` | `12` |
+| `VQA_MAX_FRAMES` | 实际送入 Qwen3-VL 的证据帧上限 | `6` | `12` |
+| `VQA_MAX_IMAGE_SIDE` | VQA 输入图片最长边 | `448` | `768` |
+| `VQA_IMAGE_QUALITY` | VQA 输入 JPEG 质量 | `75` | `85` |
 
 服务器迁移时建议从 `.env.server.example` 开始，而不是复用本地 `.env`。
 

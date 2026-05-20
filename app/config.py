@@ -33,6 +33,9 @@ class Settings(BaseSettings):
 
     top_n_scenes: int = 5
     top_k_frames: int = 12
+    vqa_max_frames: int = 6
+    vqa_max_image_side: int = 448
+    vqa_image_quality: int = 75
     scene_detect_threshold: float = 27.0
     dense_fps: float = 1.0
 
