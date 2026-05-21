@@ -8,6 +8,10 @@ if [[ -f .env ]]; then
   set +a
 fi
 
+if [[ -n "${SGLANG_CUDA_VISIBLE_DEVICES:-}" ]]; then
+  export CUDA_VISIBLE_DEVICES="${SGLANG_CUDA_VISIBLE_DEVICES}"
+fi
+
 if [[ -z "${CUDA_HOME:-}" && -n "${CONDA_PREFIX:-}" ]]; then
   export CUDA_HOME="${CONDA_PREFIX}"
 fi
@@ -37,7 +41,7 @@ ARGS=(
   serve
   --model-path "${MODEL_PATH}"
   --served-model-name "${SGLANG_SERVED_MODEL_NAME:-${MODEL_NAME}}"
-  --host 127.0.0.1
+  --host "${SGLANG_HOST:-127.0.0.1}"
   --port "${SGLANG_PORT:-30000}"
   --tp-size "${SGLANG_TP_SIZE:-1}"
   --mem-fraction-static "${SGLANG_MEM_FRACTION_STATIC:-0.72}"

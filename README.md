@@ -2,7 +2,7 @@
 
 Mr. Big-Eye 是一个面向长视频理解的浏览器端问答系统。用户上传视频后，系统会先离线构建视频索引，再在提问时通过“两阶段检索 + 多模态大模型推理”返回答案和相关关键帧。
 
-当前 Phase 1 MVP 已在 WSL Ubuntu + RTX 4060 Laptop GPU 上跑通，本地推理模型为 `Qwen/Qwen3-VL-2B-Instruct`。服务器迁移时可切换到 `Qwen/Qwen3-VL-8B-Instruct`，并将检索模型改为 GPU 常驻。
+当前 Phase 2 已在 `mbe-phase2` conda 环境中完成基础验证：SGLang 独立托管 Qwen3-VL，FastAPI 负责上传、预处理、检索和会话编排，LangGraph + LangMem 负责可恢复对话和 per-user 长期记忆，前端通过 SSE 展示预处理进度、关键帧和流式回答。本地推理模型默认为 `Qwen/Qwen3-VL-2B-Instruct`；服务器迁移时可切换到 `Qwen/Qwen3-VL-8B-Instruct`，并将检索模型改为 GPU 常驻。
 
 ## 技术亮点
 
@@ -48,12 +48,17 @@ flowchart TB
         API[上传 / 状态 / 问答 API]
         PRE[视频预处理任务]
         RET[两阶段检索]
+        GRAPH[LangGraph 会话编排]
+        MEM[LangMem 记忆写入]
     end
 
     subgraph Store["本地持久化"]
         UP[(data/uploads)]
         CACHE[(data/cache)]
         CHROMA[(ChromaDB)]
+        DB[(SQLite users/sessions/videos)]
+        CKPT[(SQLite graph checkpoints)]
+        LM[(LangMem SQLite store)]
     end
 
     subgraph Inference["模型服务"]
@@ -65,16 +70,21 @@ flowchart TB
 
     UI --> API
     API --> PRE
-    API --> RET
+    API --> GRAPH
+    GRAPH --> RET
+    GRAPH --> MEM
     PRE --> UP
     PRE --> CACHE
     PRE --> CHROMA
     RET --> CHROMA
     RET --> CACHE
+    API --> DB
+    GRAPH --> CKPT
+    MEM --> LM
     PRE --> SGL
     RET --> BGE
     RET --> SIG
-    API --> SGL
+    GRAPH --> SGL
     SGL --> QWEN
 ```
 
@@ -84,6 +94,7 @@ flowchart TB
 - App 进程只负责业务编排、状态管理、缓存和检索，不直接承担 VLM 显存生命周期。
 - 本地开发用 2B 模型，服务器部署用 8B 模型，接口保持一致。
 - 可以保留兼容 OpenAI SDK 的调用方式，后续替换推理后端成本低。
+- LangMem 默认复用 SGLang 的 OpenAI-compatible endpoint；服务器上也可以通过 `LANGMEM_ENDPOINT` 指到单独的小模型服务。
 
 ### 3. 视频预处理流水线可缓存、可复用、可观测
 
@@ -109,12 +120,12 @@ flowchart TD
 - 使用 `PySceneDetect` 进行内容变化检测；场景过少时自动 fallback 到固定时间切片。
 - 场景 caption 存成 `captions.jsonl`，方便离线分析和排错。
 - ChromaDB 使用 persistent client，索引随视频缓存持久化。
-- 状态由 `running / done / failed:*` 管理，前端可轮询展示进度。
+- 状态由 `running / done / failed:*` 管理，前端通过 SSE 实时展示阶段进度。
 - CPU/GPU 大模型加载有可配置策略，适配 laptop 与 server 两类环境。
 
 ### 4. 本地资源受限场景下的工程适配
 
-本项目是在 WSL Ubuntu + RTX 4060 Laptop GPU + 16GB RAM 的约束下完成 MVP 跑通的。这个环境有两个典型限制：GPU 显存只有 8GB，系统内存也不足以同时常驻 Qwen3-VL、bge-m3 和 SigLIP2。
+本项目是在 WSL Ubuntu + RTX 4060 Laptop GPU + 16GB RAM 的约束下跑通本地验证的。这个环境有两个典型限制：GPU 显存只有 8GB，系统内存也不足以同时常驻 Qwen3-VL、bge-m3 和 SigLIP2。
 
 因此项目支持低内存本地运行模式：
 
@@ -154,55 +165,67 @@ SGLang 在 WSL 中还涉及 FlashInfer JIT 编译问题。项目启动脚本 `sc
 
 这些处理解决了 `libnuma.so.1`、`nvcc`、`curand.h`、`-lcuda` 等本地运行问题。它们不是算法本身，但非常体现端到端工程能力：模型能不能真正跑起来，往往就差这些细节。
 
-### 6. 面向后续扩展的模块边界
+### 6. LangGraph + LangMem 会话层
 
-Phase 1 暂时没有实现 LangGraph 记忆、多用户权限、SSE 流式输出和复杂任务编排，但代码边界已经为这些能力留出了位置。
+Phase 2 已经接入 LangGraph 会话状态机、LangMem 长期记忆、SSE 流式输出和 session restore，底层预处理和检索模块仍保持独立。业务 SQLite 只保存 users / sessions / videos；对话 checkpoint 和长期记忆分别由 LangGraph SQLite checkpointer 和 LangMem SQLite store 管理。
 
 ```mermaid
 flowchart LR
-    CFG[config.py<br/>环境配置] --> MAIN[main.py<br/>API 编排]
-    VQA[vqa.py<br/>SGLang Client] --> MAIN
-    PRE[preprocess.py<br/>视频预处理] --> MAIN
-    RET[retrieval.py<br/>两阶段检索] --> MAIN
-    MOD[models.py<br/>Embedding 模型封装] --> PRE
-    MOD --> RET
-    CACHE[cache.py<br/>缓存与状态] --> PRE
-    CACHE --> MAIN
-    SCH[schemas.py<br/>请求响应模型] --> MAIN
+    MAIN[main.py<br/>FastAPI API] --> GRAPH[graph.py<br/>LangGraph]
+    GRAPH --> RET[retrieval.py<br/>两阶段检索]
+    GRAPH --> VQA[vqa.py<br/>SGLang Client]
+    GRAPH --> MEM[memory.py<br/>LangMem]
+    MEM --> LMSTORE[(langmem_store.sqlite3)]
+    GRAPH --> CKPT[(graph_checkpoints.sqlite3)]
+    MAIN --> DB[db.py<br/>users/sessions/videos]
+    MAIN --> PROG[progress.py<br/>SSE pub/sub]
+    PRE[preprocess.py<br/>视频预处理] --> CACHE[cache.py<br/>文件缓存]
+    PRE --> VQA
+    PRE --> MOD[models.py<br/>bge-m3 / SigLIP2]
+    RET --> MOD
 ```
 
-模块职责相对清晰：
+模块职责：
 
 - `app/vqa.py`：只负责 Qwen3-VL caption / QA 调用。
 - `app/models.py`：只负责 bge-m3 / SigLIP2 加载、编码、释放。
 - `app/preprocess.py`：只负责视频到索引的离线构建。
 - `app/retrieval.py`：只负责问题到关键帧的检索。
+- `app/graph.py`：只负责 LangGraph 会话状态机、检索路由和 checkpoint 恢复。
+- `app/memory.py`：只负责 LangMem manager、LangGraph store 和记忆上下文格式化。
+- `app/db.py`：只负责 users / sessions / videos 的业务持久化。
+- `app/progress.py`：只负责预处理进度的 SSE pub/sub。
 - `app/cache.py`：只负责文件缓存、状态缓存和目录结构。
 - `app/main.py`：只负责 API、后台任务和错误处理。
 
-后续如果引入 LangGraph，可以把 `retrieval -> answer_question -> memory update` 封装成 graph node，而不需要重写底层预处理和索引逻辑。
+Phase 2 已经把 `retrieval -> answer_question -> LangMem memory update` 封装进 LangGraph 会话状态机，并用 SQLite checkpointer 做 session restore。
 
 ## 当前能力
 
-Phase 1 MVP 已支持：
+Phase 2 当前支持：
 
 - 浏览器上传 MP4 视频。
 - 视频时长和上传大小限制。
-- 后台预处理视频。
+- 后台预处理视频，并通过 SSE 推送阶段进度。
 - 场景 caption 索引。
 - 稠密关键帧视觉索引。
 - 提问后召回 8-12 张相关关键帧。
 - 使用 Qwen3-VL 基于关键帧回答问题。
-- 返回答案、关键帧和场景命中信息。
-- 本地 smoke test 端到端验证。
+- SSE 流式返回回答 token，关键帧先于文本送达。
+- `[FRAME:t=29.7]` 标记会在前端替换为内联缩略图。
+- Witch/Queen 风格用户名池，支持切换用户。
+- SQLite 持久化 users、sessions、videos。
+- LangMem + LangGraph SQLite store 持久化 per-user 长期记忆。
+- LangGraph checkpoint 支持会话列表与历史消息恢复。
+- 返回答案、关键帧、场景命中信息和 session_id。
+- 单元测试、启动检查和轻量 HTTP smoke 已通过。
 
-当前本地 smoke test 结果：
+当前基础验证：
 
 ```text
-video_id=f5008677c4d7e66b status=done
-status=done
-A yellow box moves across the frame.
-frames=12
+pytest: 10 passed, 1 skipped
+startup: AsyncSqliteSaver + AsyncSqliteStore + MemoryStoreManager + CompiledStateGraph
+HTTP smoke: /, /api/login, /api/sessions, /api/sessions/{id}/messages, /api/preprocess_stream/{id}
 ```
 
 ## 快速开始
@@ -210,8 +233,8 @@ frames=12
 建议使用 conda 环境：
 
 ```bash
-conda create -n mbe-mvp python=3.10 -y
-conda activate mbe-mvp
+conda create -n mbe-phase2 python=3.10 -y
+conda activate mbe-phase2
 ```
 
 配置国内 PyPI 源：
@@ -221,11 +244,23 @@ pip config set global.index-url https://mirrors.ustc.edu.cn/pypi/simple
 pip config set global.trusted-host mirrors.ustc.edu.cn
 ```
 
-安装 App 依赖：
+先安装 SGLang。这个顺序很重要：`sglang[all]==0.5.12` 会带入它验证过的 `torch/openai/transformers` 组合，后续 App 依赖按约束安装，避免 pip 重新替换 PyTorch。
+
+```bash
+pip install 'sglang[all]==0.5.12' \
+  -i https://mirrors.aliyun.com/pypi/simple/ \
+  --trusted-host mirrors.aliyun.com \
+  --timeout 300 \
+  --retries 10
+```
+
+再安装 App、LangGraph 和 LangMem 依赖：
 
 ```bash
 pip install -r requirements.txt
 ```
+
+也可以用 `requirements-sglang.txt` 安装同一个 SGLang 钉版本；关键是它必须先于 `requirements.txt` 安装。
 
 复制配置：
 
@@ -251,16 +286,6 @@ SGLANG_DISABLE_OVERLAP_SCHEDULE=true
 python scripts/download_models.py
 ```
 
-安装 SGLang：
-
-```bash
-pip install -r requirements-sglang.txt \
-  -i https://mirrors.aliyun.com/pypi/simple/ \
-  --trusted-host mirrors.aliyun.com \
-  --timeout 300 \
-  --retries 10
-```
-
 安装 WSL + SGLang 所需 CUDA 辅助包：
 
 ```bash
@@ -278,7 +303,7 @@ bash scripts/launch_sglang.sh
 另开一个终端启动 App：
 
 ```bash
-conda activate mbe-mvp
+conda activate mbe-phase2
 bash scripts/launch_app.sh
 ```
 
@@ -328,8 +353,36 @@ frames=12
 | `VQA_MAX_FRAMES` | 实际送入 Qwen3-VL 的证据帧上限 | `6` | `12` |
 | `VQA_MAX_IMAGE_SIDE` | VQA 输入图片最长边 | `448` | `768` |
 | `VQA_IMAGE_QUALITY` | VQA 输入 JPEG 质量 | `75` | `85` |
+| `DATABASE_PATH` | SQLite 业务库路径 | 空，默认 `DATA_DIR/mr_big_eye.sqlite3` | 独立高速盘路径 |
+| `GRAPH_CHECKPOINT_PATH` | LangGraph checkpoint 库路径 | 空，默认 `DATA_DIR/graph_checkpoints.sqlite3` | 独立高速盘路径 |
+| `LANGMEM_STORE_PATH` | LangMem SQLite store 路径 | 空，默认 `DATA_DIR/langmem_store.sqlite3` | 独立高速盘路径 |
+| `LANGMEM_ENDPOINT` | LangMem 抽取模型 endpoint | 空，默认复用 `SGLANG_ENDPOINT/v1` | 可指向单独的小模型服务 |
+| `LANGMEM_MODEL_NAME` | LangMem 抽取模型名 | 空，默认复用 `SGLANG_SERVED_MODEL_NAME` | 可用独立文本模型 |
+| `PROGRESS_LANG` | 预处理 SSE 文案语言 | `zh` | `zh` 或 `en` |
+| `APP_CUDA_VISIBLE_DEVICES` | App/检索进程可见 GPU | 空或 `0` | `0` |
+| `SGLANG_CUDA_VISIBLE_DEVICES` | SGLang 进程可见 GPU | 空 | `1` 或 `1,2` |
+| `SGLANG_TP_SIZE` | SGLang tensor parallel size | `1` | 按可见 GPU 数设置 |
 
 服务器迁移时建议从 `.env.server.example` 开始，而不是复用本地 `.env`。
+
+四卡 RTX 3080 20GB 服务器的推荐起点：
+
+```env
+APP_CUDA_VISIBLE_DEVICES=0
+MODELS_DEVICE=cuda:0
+SGLANG_CUDA_VISIBLE_DEVICES=1
+SGLANG_TP_SIZE=1
+VLM_MODEL_NAME=Qwen/Qwen3-VL-8B-Instruct
+VQA_MAX_FRAMES=12
+VQA_MAX_IMAGE_SIDE=768
+```
+
+如果要让 SGLang 横跨两张卡，可改为：
+
+```env
+SGLANG_CUDA_VISIBLE_DEVICES=1,2
+SGLANG_TP_SIZE=2
+```
 
 ## 目录结构
 
@@ -342,6 +395,11 @@ frames=12
 │   ├── models.py        # bge-m3 / SigLIP2 wrappers
 │   ├── preprocess.py    # 视频预处理与索引构建
 │   ├── retrieval.py     # 两阶段检索
+│   ├── graph.py         # LangGraph 会话状态机
+│   ├── memory.py        # LangMem manager + LangGraph SQLite store
+│   ├── db.py            # SQLite users/sessions/videos
+│   ├── progress.py      # SSE progress pub/sub
+│   ├── usernames.py     # Witch/Queen 风格用户名池
 │   ├── cache.py         # 文件缓存与状态
 │   ├── schemas.py       # API schema
 │   └── static/          # 浏览器 UI
@@ -352,7 +410,10 @@ frames=12
 │   └── smoke_test.py
 ├── tests/
 │   ├── test_cache.py
+│   ├── test_db.py
+│   ├── test_memory.py
 │   ├── test_retrieval.py
+│   ├── test_usernames.py
 │   └── fixtures/short_clip.mp4
 ├── .env.example
 ├── .env.server.example
@@ -365,6 +426,9 @@ frames=12
 ```text
 data/
 ├── uploads/
+├── mr_big_eye.sqlite3
+├── graph_checkpoints.sqlite3
+├── langmem_store.sqlite3
 └── cache/{video_id}/
     ├── meta.json
     ├── frames_scene/
@@ -387,8 +451,10 @@ python -m pytest -q
 结果：
 
 ```text
-3 passed, 1 skipped
+10 passed, 1 skipped
 ```
+
+当前 `trustcall` 会在测试中输出一个 LangGraph deprecation warning，来自第三方包内部导入，不影响运行。
 
 SGLang OpenAI-compatible API 已验证：
 
@@ -397,7 +463,18 @@ GET  /v1/models
 POST /v1/chat/completions
 ```
 
-端到端 smoke test 已验证：
+轻量 HTTP smoke 已验证：
+
+```text
+GET  /
+POST /api/login
+POST /api/sessions
+GET  /api/sessions
+GET  /api/sessions/{id}/messages
+GET  /api/preprocess_stream/{video_id}
+```
+
+完整视频链路仍需要先启动 SGLang：
 
 ```text
 upload -> preprocess -> retrieve -> answer -> keyframes
@@ -405,25 +482,30 @@ upload -> preprocess -> retrieve -> answer -> keyframes
 
 ## 已知限制
 
-Phase 1 仍是 MVP，有意没有把范围扩得过大：
+Phase 2 已经补齐会话、SSE 和内联帧，但仍保留一些刻意简化：
 
-- 前端用 polling 查询状态，还没有 SSE / WebSocket。
-- 状态管理目前是轻量文件 + 内存状态组合，不是生产级任务队列。
-- 没有用户认证和多租户隔离。
-- 没有 LangGraph 长期记忆编排，当前仅保留 history 参数入口。
+- 用户身份是本地 name-tag，不是认证系统。
+- 预处理仍使用 FastAPI 后台任务，不是生产级任务队列。
+- 当前在 Python 3.10 下对 LangMem 做了 `typing.NotRequired` 兼容补丁；升级到 Python 3.11+ 后可以移除这层兼容。
+- `pip check` 可能报告 `decord 0.6.0 is not supported on this platform`，但当前环境中 `import decord` 和 `VideoReader` 已验证可用。
 - 本地 laptop 模式下检索模型按需加载，速度不代表服务器表现。
-- README 中的 demo 图仍待录制。
+- Demo GIF 仍待录制。
 
 ## 后续方向
 
 可继续扩展的方向：
 
-- 使用 LangGraph 管理多轮视频问答、用户偏好和长期记忆。
 - 引入 Redis / Celery / Dramatiq 等任务队列替代当前后台任务。
-- 改造为 SSE 流式回答，前端实时展示推理过程。
 - 加入片段级时间轴 UI，点击关键帧跳转到视频时间点。
-- 在服务器上使用 Qwen3-VL-8B-Instruct，并让 bge-m3 / SigLIP2 常驻 GPU。
+- 在服务器上压测 Qwen3-VL-8B-Instruct，并让 bge-m3 / SigLIP2 常驻 GPU。
 - 对 caption index 和 frame index 增加版本号，支持模型升级后的缓存失效。
+
+## Project Highlights
+
+- Two-stage retrieval with bge-m3 caption filtering and SigLIP2 visual reranking reduces long-video QA to a small set of high-value frames.
+- LangGraph + LangMem powers per-user persistent sessions and long-term memory with human-readable user IDs.
+- SSE streams preprocessing progress and token-by-token answers for lower perceived latency.
+- FastAPI + SGLang + Chroma + SigLIP2 + bge-m3, with config boundaries ready for a 4x RTX 3080 20GB server.
 
 ## Demo
 

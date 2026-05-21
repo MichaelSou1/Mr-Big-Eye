@@ -4,7 +4,7 @@ import logging
 import shutil
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import chromadb
 import decord
@@ -15,6 +15,7 @@ from scenedetect import ContentDetector, detect
 from app.cache import ensure_cache_dirs, save_meta
 from app.config import settings
 from app.models import get_bge, get_siglip, release_bge, release_siglip
+from app.progress import stage_label
 from app.vqa import generate_caption
 
 logger = logging.getLogger(__name__)
@@ -24,16 +25,25 @@ def dense_frame_filename(timestamp: float) -> str:
     return f"t{timestamp:06.1f}.jpg"
 
 
-async def preprocess_video(video_id: str, video_path: Path) -> dict[str, Any]:
+ProgressCallback = Callable[[str, str | None, float | None], None]
+
+
+async def preprocess_video(
+    video_id: str,
+    video_path: Path,
+    progress_callback: ProgressCallback | None = None,
+) -> dict[str, Any]:
     """Run all preprocessing stages and return the saved metadata."""
     cache_dir = ensure_cache_dirs(video_id)
     _clear_previous_artifacts(cache_dir)
 
+    _emit(progress_callback, "probe", 0.02)
     meta = _timed("probe", lambda: _probe(video_path))
     meta["video_id"] = video_id
     meta["source_path"] = str(video_path)
     save_meta(video_id, meta)
 
+    _emit(progress_callback, "scenes", 0.12)
     scenes = _timed(
         "scene detection",
         lambda: _detect_scenes(video_path, float(meta["fps"]), float(meta["duration"])),
@@ -59,13 +69,20 @@ async def preprocess_video(video_id: str, video_path: Path) -> dict[str, Any]:
                 "frame": image,
             }
         )
+        if scenes:
+            _emit(progress_callback, "scenes", 0.12 + 0.18 * ((scene_id + 1) / len(scenes)))
 
-    captions = await _timed_async("caption scenes", lambda: _caption_scenes(scene_items))
+    captions = await _timed_async(
+        "caption scenes",
+        lambda: _caption_scenes(scene_items, progress_callback),
+    )
     with (cache_dir / "captions.jsonl").open("w", encoding="utf-8") as handle:
         for item in captions:
             handle.write(json.dumps(item, ensure_ascii=False) + "\n")
 
+    _emit(progress_callback, "indexing", 0.68)
     _timed("caption index", lambda: _build_caption_index(cache_dir, captions))
+    _emit(progress_callback, "embed", 0.76)
     dense_count = _timed(
         "dense frame index",
         lambda: _extract_and_index_dense_frames(
@@ -73,10 +90,12 @@ async def preprocess_video(video_id: str, video_path: Path) -> dict[str, Any]:
             float(meta["fps"]),
             float(meta["duration"]),
             cache_dir,
+            progress_callback,
         ),
     )
     meta["dense_frame_count"] = dense_count
     save_meta(video_id, meta)
+    _emit(progress_callback, "done", 1.0)
     return meta
 
 
@@ -125,10 +144,15 @@ def _extract_scene_frame(vr: decord.VideoReader, fps: float, t_mid: float) -> Im
     return Image.fromarray(vr[idx].asnumpy()).convert("RGB")
 
 
-async def _caption_scenes(scenes_with_frames: list[dict[str, Any]]) -> list[dict[str, Any]]:
+async def _caption_scenes(
+    scenes_with_frames: list[dict[str, Any]],
+    progress_callback: ProgressCallback | None = None,
+) -> list[dict[str, Any]]:
     results: list[dict[str, Any]] = []
+    total = len(scenes_with_frames)
     for start in range(0, len(scenes_with_frames), 8):
         batch = scenes_with_frames[start : start + 8]
+        _emit(progress_callback, "captions", 0.30 + 0.36 * (start / max(total, 1)))
         captions = await asyncio.gather(
             *(generate_caption(item["frame"]) for item in batch)
         )
@@ -143,6 +167,11 @@ async def _caption_scenes(scenes_with_frames: list[dict[str, Any]]) -> list[dict
                     "caption": caption,
                 }
             )
+        _emit(
+            progress_callback,
+            "captions",
+            0.30 + 0.36 * (min(start + len(batch), total) / max(total, 1)),
+        )
     return results
 
 
@@ -184,6 +213,7 @@ def _extract_and_index_dense_frames(
     fps: float,
     duration: float,
     cache_dir: Path,
+    progress_callback: ProgressCallback | None = None,
 ) -> int:
     client = chromadb.PersistentClient(path=str(cache_dir / "frame_index"))
     _recreate_collection(client, "frames")
@@ -198,9 +228,11 @@ def _extract_and_index_dense_frames(
     interval = 1.0 / settings.dense_fps
     timestamps = [round(float(t), 1) for t in np.arange(0.0, duration, interval)]
     count = 0
+    total = len(timestamps)
     try:
         for start in range(0, len(timestamps), 32):
             batch_times = timestamps[start : start + 32]
+            _emit(progress_callback, "embed", 0.76 + 0.20 * (start / max(total, 1)))
             images: list[Image.Image] = []
             metadatas: list[dict[str, Any]] = []
             ids: list[str] = []
@@ -215,6 +247,7 @@ def _extract_and_index_dense_frames(
             embeddings = get_siglip().encode_image(images)
             collection.add(ids=ids, embeddings=embeddings.tolist(), metadatas=metadatas)
             count += len(images)
+            _emit(progress_callback, "embed", 0.76 + 0.20 * (count / max(total, 1)))
     finally:
         if settings.unload_models_after_use:
             release_siglip()
@@ -272,3 +305,12 @@ async def _timed_async(label: str, fn):
     result = await fn()
     logger.info("Finished %s in %.2fs", label, time.perf_counter() - start)
     return result
+
+
+def _emit(
+    progress_callback: ProgressCallback | None,
+    stage: str,
+    progress: float | None,
+) -> None:
+    if progress_callback is not None:
+        progress_callback(stage, stage_label(stage), progress)

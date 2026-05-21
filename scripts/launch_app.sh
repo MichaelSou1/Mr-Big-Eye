@@ -8,6 +8,10 @@ if [[ -f .env ]]; then
   set +a
 fi
 
+if [[ -n "${APP_CUDA_VISIBLE_DEVICES:-}" ]]; then
+  export CUDA_VISIBLE_DEVICES="${APP_CUDA_VISIBLE_DEVICES}"
+fi
+
 uvicorn app.main:app \
   --host "${APP_HOST:-0.0.0.0}" \
   --port "${APP_PORT:-8000}" \

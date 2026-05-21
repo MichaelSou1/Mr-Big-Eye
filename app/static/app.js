@@ -1,6 +1,7 @@
 const userTag = document.getElementById('user-tag');
-const uploadSection = document.getElementById('upload-section');
-const chatSection = document.getElementById('chat-section');
+const switchUserButton = document.getElementById('switch-user-button');
+const newSessionButton = document.getElementById('new-session-button');
+const sessionList = document.getElementById('session-list');
 const uploadButton = document.getElementById('upload-button');
 const videoFile = document.getElementById('video-file');
 const uploadProgress = document.getElementById('upload-progress');
@@ -10,16 +11,37 @@ const chatForm = document.getElementById('chat-form');
 const questionInput = document.getElementById('question-input');
 const sendButton = document.getElementById('send-button');
 
-let userId = localStorage.getItem('mbe_userId');
-if (!userId) {
-  userId = crypto.randomUUID().slice(0, 8);
-  localStorage.setItem('mbe_userId', userId);
-}
-userTag.textContent = userId;
+const USER_KEY = 'mbe_user';
+const SESSION_KEY = 'mbe_session_id';
 
+let currentUser = null;
+let currentSessionId = localStorage.getItem(SESSION_KEY);
 let currentVideoId = null;
-const history = [];
-let pollTimer = null;
+let currentFrames = [];
+let chatSource = null;
+let progressSource = null;
+
+init();
+
+async function init() {
+  currentUser = await ensureUser();
+  userTag.textContent = currentUser.username;
+  await refreshSessions();
+  if (currentSessionId) {
+    await restoreSession(currentSessionId);
+  }
+  questionInput.focus();
+}
+
+switchUserButton.addEventListener('click', () => {
+  localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(SESSION_KEY);
+  window.location.reload();
+});
+
+newSessionButton.addEventListener('click', async () => {
+  await createSession(null, true);
+});
 
 uploadButton.addEventListener('click', () => {
   const file = videoFile.files[0];
@@ -36,13 +58,14 @@ uploadButton.addEventListener('click', () => {
   form.append('file', file);
 
   const xhr = new XMLHttpRequest();
-  xhr.open('POST', '/upload');
+  const userParam = currentUser ? `?user_id=${encodeURIComponent(currentUser.user_id)}` : '';
+  xhr.open('POST', `/upload${userParam}`);
   xhr.upload.onprogress = (event) => {
     if (event.lengthComputable) {
-      uploadProgress.value = Math.round((event.loaded / event.total) * 100);
+      uploadProgress.value = Math.round((event.loaded / event.total) * 35);
     }
   };
-  xhr.onload = () => {
+  xhr.onload = async () => {
     uploadButton.disabled = false;
     if (xhr.status >= 400) {
       setUploadStatus(readError(xhr.responseText));
@@ -50,11 +73,15 @@ uploadButton.addEventListener('click', () => {
     }
     const payload = JSON.parse(xhr.responseText);
     currentVideoId = payload.video_id;
+    if (!currentSessionId) {
+      await createSession(currentVideoId, false);
+    } else {
+      await updateSessionVideo(currentSessionId, currentVideoId);
+    }
     if (payload.status === 'done') {
       onVideoReady();
     } else {
-      setUploadStatus('Preprocessing...');
-      pollStatus(payload.video_id);
+      subscribePreprocess(payload.stream_url || `/api/preprocess_stream/${payload.video_id}`);
     }
   };
   xhr.onerror = () => {
@@ -64,67 +91,203 @@ uploadButton.addEventListener('click', () => {
   xhr.send(form);
 });
 
-chatForm.addEventListener('submit', async (event) => {
+chatForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const question = questionInput.value.trim();
-  if (!question || !currentVideoId) return;
+  if (!question || !currentUser) return;
 
   questionInput.value = '';
   appendMessage('user', question);
-  history.push({ role: 'user', content: question });
+  const assistant = appendMessage('assistant', '', []);
   sendButton.disabled = true;
 
-  try {
-    const response = await fetch('/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        video_id: currentVideoId,
-        question,
-        history: history.slice(-8),
-      }),
-    });
-    if (!response.ok) {
-      const payload = await response.json().catch(() => ({}));
-      throw new Error(payload.detail || 'Chat failed.');
+  const params = new URLSearchParams({
+    user_id: currentUser.user_id,
+    question,
+  });
+  if (currentSessionId) params.set('session_id', currentSessionId);
+  if (currentVideoId) params.set('video_id', currentVideoId);
+
+  closeChatSource();
+  chatSource = new EventSource(`/api/chat_stream?${params.toString()}`);
+
+  chatSource.addEventListener('frames', (event) => {
+    const payload = JSON.parse(event.data);
+    if (payload.session_id) {
+      currentSessionId = payload.session_id;
+      localStorage.setItem(SESSION_KEY, currentSessionId);
     }
-    const payload = await response.json();
-    appendMessage('assistant', payload.answer, payload.frames || []);
-    history.push({ role: 'assistant', content: payload.answer });
-  } catch (error) {
-    appendMessage('assistant', error.message);
-  } finally {
+    currentFrames = payload.frames || [];
+    renderGallery(assistant.article, currentFrames);
+    refreshSessions();
+  });
+
+  chatSource.addEventListener('token', (event) => {
+    const payload = JSON.parse(event.data);
+    assistant.text += payload.text || '';
+    renderAnswer(assistant.bubble, assistant.text, currentFrames);
+    scrollMessages();
+  });
+
+  chatSource.addEventListener('done', (event) => {
+    const payload = JSON.parse(event.data);
+    if (payload.session_id) {
+      currentSessionId = payload.session_id;
+      localStorage.setItem(SESSION_KEY, currentSessionId);
+    }
     sendButton.disabled = false;
+    closeChatSource();
+    refreshSessions();
     questionInput.focus();
-  }
+  });
+
+  chatSource.addEventListener('error', (event) => {
+    let detail = 'Chat failed.';
+    if (event.data) {
+      detail = JSON.parse(event.data).detail || detail;
+    }
+    assistant.bubble.textContent = detail;
+    sendButton.disabled = false;
+    closeChatSource();
+  });
 });
 
-function pollStatus(videoId) {
-  clearInterval(pollTimer);
-  pollTimer = setInterval(async () => {
+async function ensureUser() {
+  const cached = localStorage.getItem(USER_KEY);
+  if (cached) {
     try {
-      const response = await fetch(`/status/${videoId}`);
-      const payload = await response.json();
-      if (payload.status === 'done') {
-        clearInterval(pollTimer);
-        onVideoReady();
-      } else if (payload.status.startsWith('failed:')) {
-        clearInterval(pollTimer);
-        setUploadStatus(payload.status);
-      } else {
-        setUploadStatus('Preprocessing...');
-      }
+      return JSON.parse(cached);
     } catch {
-      clearInterval(pollTimer);
-      setUploadStatus('Status check failed.');
+      localStorage.removeItem(USER_KEY);
     }
-  }, 2000);
+  }
+  const response = await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: null }),
+  });
+  if (!response.ok) throw new Error('Login failed.');
+  const user = await response.json();
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  return user;
+}
+
+async function createSession(videoId = null, clear = true) {
+  const response = await fetch('/api/sessions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_id: currentUser.user_id,
+      video_id: videoId,
+      title: null,
+    }),
+  });
+  if (!response.ok) throw new Error('Could not create session.');
+  const payload = await response.json();
+  currentSessionId = payload.session_id;
+  currentVideoId = videoId;
+  currentFrames = [];
+  localStorage.setItem(SESSION_KEY, currentSessionId);
+  if (clear) messages.textContent = '';
+  await refreshSessions();
+}
+
+async function updateSessionVideo(sessionId, videoId) {
+  await fetch(`/api/sessions/${sessionId}?user_id=${encodeURIComponent(currentUser.user_id)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ video_id: videoId }),
+  });
+  await refreshSessions();
+}
+
+async function refreshSessions() {
+  if (!currentUser) return;
+  const response = await fetch(`/api/sessions?user_id=${encodeURIComponent(currentUser.user_id)}`);
+  if (!response.ok) return;
+  const sessions = await response.json();
+  renderSessions(sessions);
+}
+
+function renderSessions(sessions) {
+  sessionList.textContent = '';
+  if (!sessions.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = 'No sessions yet.';
+    sessionList.appendChild(empty);
+    return;
+  }
+
+  let currentDate = '';
+  for (const session of sessions) {
+    const date = new Date(session.updated_at.replace(' ', 'T')).toLocaleDateString();
+    if (date !== currentDate) {
+      currentDate = date;
+      const group = document.createElement('div');
+      group.className = 'session-date';
+      group.textContent = date;
+      sessionList.appendChild(group);
+    }
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = `session-item ${session.session_id === currentSessionId ? 'active' : ''}`;
+    item.innerHTML = `
+      <span>${escapeHtml(session.title || 'New session')}</span>
+      <small>${escapeHtml(session.video_filename || session.video_id || 'No video')}</small>
+    `;
+    item.addEventListener('click', () => restoreSession(session.session_id));
+    sessionList.appendChild(item);
+  }
+}
+
+async function restoreSession(sessionId) {
+  const response = await fetch(
+    `/api/sessions/${sessionId}/messages?user_id=${encodeURIComponent(currentUser.user_id)}`,
+  );
+  if (!response.ok) {
+    localStorage.removeItem(SESSION_KEY);
+    return;
+  }
+  const payload = await response.json();
+  currentSessionId = sessionId;
+  currentVideoId = payload.video_id || null;
+  currentFrames = [];
+  localStorage.setItem(SESSION_KEY, sessionId);
+  messages.textContent = '';
+  for (const message of payload.messages || []) {
+    appendMessage(message.role === 'assistant' ? 'assistant' : 'user', message.content);
+  }
+  await refreshSessions();
+}
+
+function subscribePreprocess(url) {
+  closeProgressSource();
+  setUploadStatus('Preprocessing...');
+  progressSource = new EventSource(url);
+  progressSource.addEventListener('stage', (event) => {
+    const payload = JSON.parse(event.data);
+    const progress = payload.progress == null ? uploadProgress.value / 100 : payload.progress;
+    uploadProgress.value = Math.max(uploadProgress.value, Math.round(progress * 100));
+    setUploadStatus(payload.label);
+  });
+  progressSource.addEventListener('done', () => {
+    onVideoReady();
+    closeProgressSource();
+  });
+  progressSource.addEventListener('error', (event) => {
+    let detail = 'Preprocessing failed.';
+    if (event.data) {
+      detail = JSON.parse(event.data).detail || detail;
+    }
+    setUploadStatus(detail);
+    closeProgressSource();
+  });
 }
 
 function onVideoReady() {
+  uploadProgress.value = 100;
   setUploadStatus('Video ready.');
-  uploadSection.classList.add('hidden');
-  chatSection.classList.remove('hidden');
   questionInput.focus();
 }
 
@@ -134,32 +297,109 @@ function appendMessage(role, text, frames = []) {
 
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-  bubble.textContent = text;
+  if (role === 'assistant') {
+    renderAnswer(bubble, text, frames);
+  } else {
+    bubble.textContent = text;
+  }
   article.appendChild(bubble);
+  messages.appendChild(article);
 
   if (frames.length) {
-    const gallery = document.createElement('div');
-    gallery.className = 'gallery';
-    for (const frame of frames) {
-      const item = document.createElement('figure');
-      const img = document.createElement('img');
-      const caption = document.createElement('figcaption');
-      img.src = `data:image/jpeg;base64,${frame.image_b64}`;
-      img.alt = `${frame.timestamp.toFixed(1)}s`;
-      caption.textContent = `${frame.timestamp.toFixed(1)}s`;
-      item.appendChild(img);
-      item.appendChild(caption);
-      gallery.appendChild(item);
-    }
-    article.appendChild(gallery);
+    renderGallery(article, frames);
   }
+  scrollMessages();
+  return { article, bubble, text };
+}
 
-  messages.appendChild(article);
-  messages.scrollTop = messages.scrollHeight;
+function renderAnswer(container, text, frames) {
+  container.textContent = '';
+  const marker = /\[FRAME:t=([0-9]+(?:\.[0-9]+)?)\]/g;
+  let lastIndex = 0;
+  let match;
+  while ((match = marker.exec(text)) !== null) {
+    appendText(container, text.slice(lastIndex, match.index));
+    const frame = closestFrame(Number(match[1]), frames);
+    if (frame) {
+      container.appendChild(inlineFrame(frame));
+    } else {
+      appendText(container, match[0]);
+    }
+    lastIndex = marker.lastIndex;
+  }
+  appendText(container, text.slice(lastIndex));
+}
+
+function appendText(container, text) {
+  if (!text) return;
+  container.appendChild(document.createTextNode(text));
+}
+
+function inlineFrame(frame) {
+  const wrapper = document.createElement('span');
+  wrapper.className = 'inline-frame';
+  const img = document.createElement('img');
+  img.src = `data:image/jpeg;base64,${frame.image_b64}`;
+  img.alt = `${frame.timestamp.toFixed(1)}s`;
+  const label = document.createElement('span');
+  label.textContent = `${frame.timestamp.toFixed(1)}s`;
+  wrapper.appendChild(img);
+  wrapper.appendChild(label);
+  return wrapper;
+}
+
+function renderGallery(article, frames) {
+  const existing = article.querySelector('.gallery');
+  if (existing) existing.remove();
+  if (!frames.length) return;
+
+  const gallery = document.createElement('div');
+  gallery.className = 'gallery';
+  for (const frame of frames) {
+    const item = document.createElement('figure');
+    const img = document.createElement('img');
+    const caption = document.createElement('figcaption');
+    img.src = `data:image/jpeg;base64,${frame.image_b64}`;
+    img.alt = `${frame.timestamp.toFixed(1)}s`;
+    caption.textContent = `${frame.timestamp.toFixed(1)}s`;
+    item.appendChild(img);
+    item.appendChild(caption);
+    gallery.appendChild(item);
+  }
+  article.appendChild(gallery);
+  scrollMessages();
+}
+
+function closestFrame(timestamp, frames) {
+  if (!frames.length || Number.isNaN(timestamp)) return null;
+  return frames.reduce((best, frame) => {
+    if (!best) return frame;
+    return Math.abs(frame.timestamp - timestamp) < Math.abs(best.timestamp - timestamp)
+      ? frame
+      : best;
+  }, null);
 }
 
 function setUploadStatus(text) {
   uploadStatus.textContent = text;
+}
+
+function scrollMessages() {
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function closeChatSource() {
+  if (chatSource) {
+    chatSource.close();
+    chatSource = null;
+  }
+}
+
+function closeProgressSource() {
+  if (progressSource) {
+    progressSource.close();
+    progressSource = null;
+  }
 }
 
 function readError(text) {
@@ -169,4 +409,17 @@ function readError(text) {
   } catch {
     return text || 'Request failed.';
   }
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+    return map[char];
+  });
 }

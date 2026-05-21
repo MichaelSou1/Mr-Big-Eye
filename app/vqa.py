@@ -1,8 +1,9 @@
 import base64
 import io
 import logging
-from typing import Any
+from typing import Any, Iterable
 
+from langchain_core.messages import BaseMessage
 from openai import AsyncOpenAI, BadRequestError
 from PIL import Image
 
@@ -21,7 +22,9 @@ QA_SYSTEM_PROMPT = (
     "You are Mr. Big-Eye, a careful video analyst. You will be shown K still "
     "frames sampled from a video, each labeled with its timestamp in seconds. "
     "Answer the user's question using only what is visible in these frames. "
-    "When you reference a specific moment, cite the timestamp like [t=29.7s]. "
+    "When you cite a moment, insert a marker like [FRAME:t=29.7] on its own. "
+    "The renderer will replace it with the corresponding thumbnail. Use this "
+    "sparingly, 1-3 times per answer. "
     "If the frames are insufficient, say so plainly. Match the user's language."
 )
 
@@ -223,3 +226,76 @@ async def answer_question(
             frame_limit = next_frame_limit
             image_side = next_image_side
             attempt += 1
+
+
+async def stream_answer_question(
+    question: str,
+    frames: list[Image.Image],
+    timestamps: list[float],
+    history: list[dict[str, Any]] | None = None,
+):
+    """Yield VQA answer tokens using sampled keyframes."""
+    frame_limit = settings.vqa_max_frames if settings.vqa_max_frames > 0 else len(frames)
+    image_side = settings.vqa_max_image_side
+    stream = await _client().chat.completions.create(
+        model=settings.sglang_served_model_name,
+        messages=_build_qa_messages(
+            question,
+            frames,
+            timestamps,
+            history,
+            max_frames=frame_limit,
+            max_image_side=image_side,
+            image_quality=settings.vqa_image_quality,
+        ),
+        temperature=0.2,
+        max_tokens=512,
+        stream=True,
+    )
+    async for chunk in stream:
+        if not chunk.choices:
+            continue
+        delta = chunk.choices[0].delta.content
+        if delta:
+            yield delta
+
+
+async def chat_text(messages: Iterable[BaseMessage | dict[str, Any]]) -> str:
+    """Generate a plain text assistant response for non-video chat turns."""
+    response = await _client().chat.completions.create(
+        model=settings.sglang_served_model_name,
+        messages=[_message_to_openai(message) for message in messages],
+        temperature=0.4,
+        max_tokens=512,
+    )
+    content = response.choices[0].message.content or ""
+    return content.strip()
+
+
+async def stream_text(messages: Iterable[BaseMessage | dict[str, Any]]):
+    """Yield text deltas from SGLang's OpenAI-compatible streaming API."""
+    stream = await _client().chat.completions.create(
+        model=settings.sglang_served_model_name,
+        messages=[_message_to_openai(message) for message in messages],
+        temperature=0.4,
+        max_tokens=512,
+        stream=True,
+    )
+    async for chunk in stream:
+        if not chunk.choices:
+            continue
+        delta = chunk.choices[0].delta.content
+        if delta:
+            yield delta
+
+
+def _message_to_openai(message: BaseMessage | dict[str, Any]) -> dict[str, Any]:
+    if isinstance(message, dict):
+        return message
+    role = "assistant"
+    msg_type = getattr(message, "type", "")
+    if msg_type == "human":
+        role = "user"
+    elif msg_type == "system":
+        role = "system"
+    return {"role": role, "content": message.content}

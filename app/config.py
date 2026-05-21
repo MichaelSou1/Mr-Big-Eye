@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -12,6 +13,8 @@ class Settings(BaseSettings):
     sglang_tp_size: int = 1
     sglang_mem_fraction_static: float = 0.72
     sglang_served_model_name: str = "Qwen/Qwen3-VL-2B-Instruct"
+    sglang_host: str = "127.0.0.1"
+    sglang_cuda_visible_devices: str = ""
     sglang_disable_cuda_graph: bool = False
     sglang_attention_backend: str = ""
     sglang_disable_overlap_schedule: bool = False
@@ -22,6 +25,8 @@ class Settings(BaseSettings):
     max_upload_size_mb: int = 2048
     load_models_on_startup: bool = True
     unload_models_after_use: bool = False
+    app_cuda_visible_devices: str = ""
+    session_title_max_chars: int = 48
 
     bge_m3_model: str = "BAAI/bge-m3"
     bge_m3_local_dir: Path = Path("./models/bge-m3")
@@ -40,6 +45,14 @@ class Settings(BaseSettings):
     dense_fps: float = 1.0
 
     data_dir: Path = Path("./data")
+    database_path: Path | None = None
+    graph_checkpoint_path: Path | None = None
+    langmem_store_path: Path | None = None
+    langmem_endpoint: str = ""
+    langmem_model_name: str = ""
+    langmem_api_key: str = "EMPTY"
+    langmem_query_limit: int = 6
+    progress_lang: Literal["zh", "en"] = "zh"
     log_level: str = "INFO"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")

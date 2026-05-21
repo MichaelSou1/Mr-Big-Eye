@@ -1,7 +1,6 @@
 import pytest
 
 from app.config import settings
-from app.retrieval import two_stage_retrieve
 
 
 @pytest.mark.skipif(
@@ -9,6 +8,8 @@ from app.retrieval import two_stage_retrieve
     reason="requires a preprocessed test001 video cache",
 )
 def test_two_stage_retrieve_returns_sorted_frames():
+    from app.retrieval import two_stage_retrieve
+
     result = two_stage_retrieve("test001", "what is happening")
 
     assert len(result.frames) == settings.top_k_frames
