@@ -104,6 +104,12 @@ async def main_async() -> int:
         default=None,
         help="Seed for --sample. Omit for non-deterministic sampling each run.",
     )
+    parser.add_argument(
+        "--per-case-delay-sec",
+        type=float,
+        default=0.0,
+        help="Sleep this many seconds between cases. Use to stay under a provider's RPM (e.g. NIM = 40 RPM).",
+    )
     args = parser.parse_args()
 
     cases = load_cases(args.cases)
@@ -138,7 +144,9 @@ async def main_async() -> int:
         prediction_cache: PredictionCache | None = None
         if args.prediction_cache:
             prediction_cache = PredictionCache(args.prediction_cache)
-        predictions = await _run_predictions(cases, prediction_cache)
+        predictions = await _run_predictions(
+            cases, prediction_cache, per_case_delay_sec=args.per_case_delay_sec
+        )
 
     judge: JudgeClient | None = None
     judge_cache: JudgeCache | None = None
@@ -199,6 +207,7 @@ async def main_async() -> int:
 async def _run_predictions(
     cases,
     prediction_cache: PredictionCache | None = None,
+    per_case_delay_sec: float = 0.0,
 ) -> dict[str, EvalPrediction]:
     from langgraph.checkpoint.memory import InMemorySaver
     from langgraph.store.memory import InMemoryStore
@@ -270,6 +279,9 @@ async def _run_predictions(
         predictions[case.case_id] = prediction
         if prediction_cache is not None:
             prediction_cache.put(key, PredictionCache.prediction_to_dict(prediction))
+        if per_case_delay_sec > 0:
+            import asyncio as _asyncio
+            await _asyncio.sleep(per_case_delay_sec)
     return predictions
 
 

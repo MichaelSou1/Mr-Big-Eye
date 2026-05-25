@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import math
 import re
 from dataclasses import dataclass
 from typing import Annotated, Any
@@ -18,7 +19,12 @@ from pydantic import BeforeValidator, Field
 from app import memory
 from app.cache import load_meta, video_cache_dir
 from app.config import settings
-from app.vqa import answer_question
+from app.vqa import (
+    ANSWER_WITH_EVIDENCE_PROMPT,
+    SEGMENT_FOCUS_PROMPT,
+    STITCHED_VERIFY_PROMPT,
+    answer_question,
+)
 
 
 QUESTION_TYPES = {
@@ -109,6 +115,10 @@ VISUAL_CLAIM_MARKERS = (
 )
 FRAME_MARKER_RE = re.compile(r"\[FRAME:t=([0-9]+(?:\.[0-9]+)?)\]")
 DENSE_FRAME_RE = re.compile(r"^t([0-9]+(?:\.[0-9]+)?)\.jpg$")
+SUBJECT_REGISTRY_MAX = 15
+SEGMENT_FOCUS_MAX_FRAMES = 12
+STITCHED_VERIFY_MAX_WINDOWS = 4
+STITCHED_VERIFY_MAX_FRAMES = 24
 
 
 def _coerce_float_list(value: Any) -> list[float] | None:
@@ -138,6 +148,142 @@ def _coerce_float_list(value: Any) -> list[float] | None:
 
 
 TimestampList = Annotated[list[float] | None, BeforeValidator(_coerce_float_list)]
+
+
+def merge_subject_deltas(
+    registry: list[dict[str, Any]],
+    deltas: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    by_id: dict[str, dict[str, Any]] = {}
+    for subject in registry or []:
+        if not isinstance(subject, dict) or not subject.get("id"):
+            continue
+        sid = str(subject["id"])
+        by_id[sid] = {
+            **subject,
+            "id": sid,
+            "label": subject.get("label") or sid,
+            "attributes": list(subject.get("attributes") or []),
+            "evidence_frames": list(subject.get("evidence_frames") or []),
+        }
+
+    for delta in deltas or []:
+        if not isinstance(delta, dict):
+            continue
+        op = str(delta.get("op") or "").strip().lower()
+        sid = str(delta.get("id") or "").strip()
+        if not sid:
+            continue
+        if op == "add":
+            first_seen = _optional_float(delta.get("first_seen_t"))
+            if sid not in by_id:
+                by_id[sid] = {
+                    "id": sid,
+                    "label": delta.get("label") or sid,
+                    "first_seen_t": first_seen,
+                    "last_seen_t": _optional_float(delta.get("last_seen_t")) or first_seen,
+                    "attributes": _string_list(delta.get("attributes")),
+                    "evidence_frames": _float_list(delta.get("evidence_frames")),
+                }
+            else:
+                entry = by_id[sid]
+                _merge_subject_entry(
+                    entry,
+                    attributes=_string_list(delta.get("attributes")),
+                    evidence_frames=_float_list(delta.get("evidence_frames")),
+                    last_seen_t=_optional_float(delta.get("last_seen_t")) or first_seen,
+                )
+                if first_seen is not None:
+                    current_first = _optional_float(entry.get("first_seen_t"))
+                    entry["first_seen_t"] = (
+                        min(current_first, first_seen) if current_first is not None else first_seen
+                    )
+        elif op == "update" and sid in by_id:
+            _merge_subject_entry(
+                by_id[sid],
+                attributes=_string_list(delta.get("attributes_add")),
+                evidence_frames=_float_list(delta.get("evidence_frames_add")),
+                last_seen_t=_optional_float(delta.get("last_seen_t")),
+            )
+
+    merged = list(by_id.values())
+    merged.sort(key=lambda subject: _optional_float(subject.get("last_seen_t")) or 0.0, reverse=True)
+    return merged[:SUBJECT_REGISTRY_MAX]
+
+
+def parse_subject_deltas(answer_text: str) -> tuple[str, list[dict[str, Any]]]:
+    lines = (answer_text or "").splitlines()
+    delta_index: int | None = None
+    prefix = "SUBJECT_DELTAS:"
+    for index in range(len(lines) - 1, -1, -1):
+        if lines[index].strip().startswith(prefix):
+            delta_index = index
+            break
+    if delta_index is None:
+        return (answer_text or "").strip(), []
+
+    raw_json = lines[delta_index].strip()[len(prefix) :].strip()
+    parsed: Any | None = None
+    remove_from_index = False
+    for candidate, remove_rest in (
+        (raw_json, False),
+        ("\n".join([raw_json, *lines[delta_index + 1 :]]).strip(), True),
+    ):
+        try:
+            parsed = json.loads(candidate)
+            remove_from_index = remove_rest
+            break
+        except (TypeError, ValueError, json.JSONDecodeError):
+            continue
+    if parsed is None:
+        return (answer_text or "").strip(), []
+    deltas = parsed.get("deltas") if isinstance(parsed, dict) else None
+    if not isinstance(deltas, list):
+        return (answer_text or "").strip(), []
+
+    if remove_from_index:
+        clean_lines = lines[:delta_index]
+    else:
+        clean_lines = [line for index, line in enumerate(lines) if index != delta_index]
+    return "\n".join(clean_lines).strip(), [delta for delta in deltas if isinstance(delta, dict)]
+
+
+def _merge_subject_entry(
+    entry: dict[str, Any],
+    *,
+    attributes: list[str],
+    evidence_frames: list[float],
+    last_seen_t: float | None,
+) -> None:
+    entry["attributes"] = sorted(set(_string_list(entry.get("attributes"))) | set(attributes))
+    entry["evidence_frames"] = sorted(set(_float_list(entry.get("evidence_frames"))) | set(evidence_frames))
+    if last_seen_t is not None:
+        current_last = _optional_float(entry.get("last_seen_t"))
+        entry["last_seen_t"] = max(current_last or 0.0, last_seen_t)
+
+
+def _optional_float(value: Any) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _float_list(value: Any) -> list[float]:
+    if not isinstance(value, (list, tuple)):
+        return []
+    out: list[float] = []
+    for item in value:
+        number = _optional_float(item)
+        if number is not None:
+            out.append(round(number, 1))
+    return out
+
+
+def _string_list(value: Any) -> list[str]:
+    if not isinstance(value, (list, tuple)):
+        return []
+    return [str(item).strip() for item in value if str(item).strip()]
 
 
 @dataclass(frozen=True)
@@ -332,6 +478,77 @@ async def retrieve_hypothesis_evidence(
 
 
 @tool
+async def segment_focus(
+    state: Annotated[dict[str, Any], InjectedState],
+    tool_call_id: Annotated[str, InjectedToolCallId],
+    question: Annotated[str, Field(description="原始用户问题。")],
+    center_t: Annotated[float, Field(description="窗口中心时间（秒）。")],
+    half_window_sec: Annotated[float, Field(description="窗口半宽，默认 4 秒。")] = 4.0,
+    fps: Annotated[float, Field(description="抽帧 fps，默认 1.0；最多 12 帧。")] = 1.0,
+) -> Command:
+    """Densely sample one short window for fine visual detail (≤12 frames)."""
+    video_id = state.get("video_id")
+    if not video_id:
+        return _command(tool_call_id, {"error": "No video is attached to this session."})
+
+    window = _segment_focus_window(str(video_id), center_t, half_window_sec)
+    duration = max(0.0, window["end"] - window["start"])
+    frame_cap = min(
+        SEGMENT_FOCUS_MAX_FRAMES,
+        max(1, math.ceil(duration * max(0.1, float(fps or 1.0))) + 1),
+    )
+    added = _load_dense_payloads(
+        str(video_id),
+        [(window["start"] + window["end"]) / 2.0],
+        window_sec=duration / 2.0,
+        max_frames=frame_cap,
+        source="segment_focus",
+    )
+    added = _merge_frame_payloads([], added, limit=SEGMENT_FOCUS_MAX_FRAMES)
+    if not added:
+        return _command(
+            tool_call_id,
+            {
+                "tool": "segment_focus",
+                "window": {**window, "frame_count": 0},
+                "answer": "I could not load dense frames for the requested window.",
+                "subject_deltas": [],
+                "next": "retrieve_video_evidence",
+            },
+        )
+
+    frames, timestamps = _payloads_as_images(added)
+    registry = state.get("subject_registry", []) or []
+    answer = await answer_question(
+        question,
+        frames,
+        timestamps,
+        history=None,
+        system_prompt=SEGMENT_FOCUS_PROMPT,
+        subject_registry=registry,
+    )
+    clean_answer, deltas = parse_subject_deltas(answer)
+    merged_registry = merge_subject_deltas(registry, deltas)
+    all_frames = _merge_frame_payloads(state.get("retrieved_frames", []), added)
+    payload = {
+        "tool": "segment_focus",
+        "window": {**window, "frame_count": len(added)},
+        "answer": clean_answer,
+        "subject_deltas": deltas,
+        "next": "verify_grounding",
+    }
+    return _command(
+        tool_call_id,
+        payload,
+        update={
+            "retrieved_frames": all_frames,
+            "draft_answer": clean_answer,
+            "subject_registry": merged_registry,
+        },
+    )
+
+
+@tool
 async def expand_temporal_evidence(
     state: Annotated[dict[str, Any], InjectedState],
     tool_call_id: Annotated[str, InjectedToolCallId],
@@ -345,7 +562,7 @@ async def expand_temporal_evidence(
     ] = 4.0,
     max_frames: Annotated[int | None, Field(description="Maximum frames to add.")] = None,
 ) -> Command:
-    """Add nearby dense frames around candidate moments."""
+    """(legacy; prefer segment_focus) Add nearby dense frames around candidate moments."""
     video_id = state.get("video_id")
     if not video_id:
         return _command(tool_call_id, {"error": "No video is attached to this session."})
@@ -370,6 +587,93 @@ async def expand_temporal_evidence(
         "next": "assess_evidence_sufficiency",
     }
     return _command(tool_call_id, payload, update={"retrieved_frames": frames})
+
+
+@tool
+async def stitched_verify(
+    state: Annotated[dict[str, Any], InjectedState],
+    tool_call_id: Annotated[str, InjectedToolCallId],
+    question: Annotated[str, Field(description="原始用户问题。")],
+    windows: Annotated[
+        list[dict[str, float]],
+        Field(
+            description=(
+                "待对比的时间窗列表，例如 "
+                '[{"start":10.0,"end":15.0}, {"start":30.0,"end":34.0}]。最多 4 段。'
+            )
+        ),
+    ],
+    fps_per_window: Annotated[
+        float, Field(description="每段抽帧 fps，默认 1.0；总帧数自动 cap 在 24。")
+    ] = 1.0,
+) -> Command:
+    """Compare/synthesize evidence across 2-4 disjoint time windows."""
+    video_id = state.get("video_id")
+    if not video_id:
+        return _command(tool_call_id, {"error": "No video is attached to this session."})
+
+    normalized_windows, warning = _normalize_stitched_windows(windows)
+    if not normalized_windows:
+        return _command(
+            tool_call_id,
+            {
+                "tool": "stitched_verify",
+                "windows": [],
+                "answer": "No valid time windows were provided.",
+                "subject_deltas": [],
+                "next": "retrieve_video_evidence",
+            },
+        )
+
+    added, window_summaries = _load_stitched_window_payloads(
+        str(video_id),
+        normalized_windows,
+        fps_per_window=max(0.1, float(fps_per_window or 1.0)),
+        max_frames=STITCHED_VERIFY_MAX_FRAMES,
+    )
+    if not added:
+        payload = {
+            "tool": "stitched_verify",
+            "windows": window_summaries,
+            "answer": "I could not load dense frames for the requested windows.",
+            "subject_deltas": [],
+            "next": "retrieve_video_evidence",
+        }
+        if warning:
+            payload["warning"] = warning
+        return _command(tool_call_id, payload)
+
+    frames, timestamps = _payloads_as_images(added)
+    registry = state.get("subject_registry", []) or []
+    answer = await answer_question(
+        question,
+        frames,
+        timestamps,
+        history=None,
+        system_prompt=STITCHED_VERIFY_PROMPT,
+        subject_registry=registry,
+    )
+    clean_answer, deltas = parse_subject_deltas(answer)
+    merged_registry = merge_subject_deltas(registry, deltas)
+    all_frames = _merge_frame_payloads(state.get("retrieved_frames", []), added)
+    payload = {
+        "tool": "stitched_verify",
+        "windows": window_summaries,
+        "answer": clean_answer,
+        "subject_deltas": deltas,
+        "next": "verify_grounding",
+    }
+    if warning:
+        payload["warning"] = warning
+    return _command(
+        tool_call_id,
+        payload,
+        update={
+            "retrieved_frames": all_frames,
+            "draft_answer": clean_answer,
+            "subject_registry": merged_registry,
+        },
+    )
 
 
 @tool
@@ -429,8 +733,17 @@ async def answer_with_evidence(
 
     history = _history_for_vqa(state.get("messages", []))
     protocol_question = _question_with_answer_protocol(question, answer_mode, state)
-    answer = await answer_question(protocol_question, frames, timestamps, history)
-    cleaned = (answer or "").strip()
+    registry = state.get("subject_registry", []) or []
+    answer = await answer_question(
+        protocol_question,
+        frames,
+        timestamps,
+        history,
+        system_prompt=ANSWER_WITH_EVIDENCE_PROMPT,
+        subject_registry=registry,
+    )
+    clean_answer, deltas = parse_subject_deltas(answer)
+    cleaned = (clean_answer or "").strip()
     # Reject answers that look truncated mid-byte by the VLM (typical "length" finish):
     # they end with the Unicode replacement character. Keeping such garbage would
     # overwrite a longer, well-formed prior draft.
@@ -457,13 +770,18 @@ async def answer_with_evidence(
     payload = {
         "tool": "answer_with_evidence",
         "answer": cleaned,
+        "subject_deltas": deltas,
         "grounding_report": report,
         "next": "verify_grounding",
     }
     return _command(
         tool_call_id,
         payload,
-        update={"draft_answer": cleaned, "grounding_report": report},
+        update={
+            "draft_answer": cleaned,
+            "grounding_report": report,
+            "subject_registry": merge_subject_deltas(registry, deltas),
+        },
     )
 
 
@@ -577,7 +895,9 @@ TOOLS = [
     retrieve_video_evidence,
     build_timeline,
     retrieve_hypothesis_evidence,
+    segment_focus,
     expand_temporal_evidence,
+    stitched_verify,
     assess_evidence_sufficiency,
     answer_with_evidence,
     verify_grounding,
@@ -812,6 +1132,98 @@ def _load_dense_payloads(
     return payloads
 
 
+def _normalize_stitched_windows(
+    windows: list[dict[str, float]],
+) -> tuple[list[dict[str, float]], str | None]:
+    normalized: list[dict[str, float]] = []
+    for window in windows or []:
+        if not isinstance(window, dict):
+            continue
+        start = _optional_float(window.get("start"))
+        end = _optional_float(window.get("end"))
+        if start is None or end is None:
+            continue
+        start = max(0.0, start)
+        end = max(0.0, end)
+        if end < start:
+            start, end = end, start
+        normalized.append({"start": round(start, 2), "end": round(end, 2)})
+    normalized.sort(key=lambda item: (item["start"], item["end"]))
+    warning = None
+    if len(normalized) > STITCHED_VERIFY_MAX_WINDOWS:
+        normalized = normalized[:STITCHED_VERIFY_MAX_WINDOWS]
+        warning = "truncated to 4 windows"
+    return normalized, warning
+
+
+def _segment_focus_window(
+    video_id: str,
+    center_t: float,
+    half_window_sec: float,
+) -> dict[str, float]:
+    half = max(0.0, float(half_window_sec or 0.0))
+    center = max(0.0, float(center_t or 0.0))
+    start = max(0.0, center - half)
+    end = center + half
+    meta = _safe_meta(video_id)
+    duration = _optional_float(meta.get("duration"))
+    if duration is not None and duration > 0:
+        end = min(duration, end)
+        start = min(start, end)
+    return {
+        "start": round(start, 2),
+        "end": round(end, 2),
+        "center_t": round((start + end) / 2.0, 2),
+    }
+
+
+def _load_stitched_window_payloads(
+    video_id: str,
+    windows: list[dict[str, float]],
+    *,
+    fps_per_window: float,
+    max_frames: int,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    all_payloads: list[dict[str, Any]] = []
+    for window in windows:
+        start = float(window["start"])
+        end = float(window["end"])
+        duration = max(0.0, end - start)
+        per_window_cap = max(1, math.ceil(duration * fps_per_window) + 1)
+        center = (start + end) / 2.0
+        half_window = duration / 2.0
+        all_payloads.extend(
+            _load_dense_payloads(
+                video_id,
+                [center],
+                window_sec=half_window,
+                max_frames=min(max_frames, per_window_cap),
+                source="stitched_verify",
+            )
+        )
+
+    selected = _merge_frame_payloads([], all_payloads, limit=max_frames)
+    selected_timestamps = [
+        float(item["timestamp"])
+        for item in selected
+        if "timestamp" in item
+    ]
+    summaries = []
+    for window in windows:
+        start = float(window["start"])
+        end = float(window["end"])
+        summaries.append(
+            {
+                "start": start,
+                "end": end,
+                "frame_count": sum(
+                    1 for timestamp in selected_timestamps if start <= timestamp <= end
+                ),
+            }
+        )
+    return selected, summaries
+
+
 def _available_dense_timestamps(frames_dir) -> list[float]:
     if not frames_dir.exists():
         return []
@@ -928,6 +1340,21 @@ def _is_negative_question(question: str, question_type: str) -> bool:
 def _state_frames_as_images(state: dict[str, Any]) -> tuple[list[Image.Image], list[float]]:
     pairs = []
     for item in state.get("retrieved_frames", []):
+        encoded = item.get("image_b64")
+        if not encoded or "timestamp" not in item:
+            continue
+        try:
+            image = Image.open(io.BytesIO(base64.b64decode(encoded))).convert("RGB")
+        except Exception:
+            continue
+        pairs.append((float(item["timestamp"]), image))
+    pairs.sort(key=lambda pair: pair[0])
+    return [image for _, image in pairs], [timestamp for timestamp, _ in pairs]
+
+
+def _payloads_as_images(payloads: list[dict[str, Any]]) -> tuple[list[Image.Image], list[float]]:
+    pairs = []
+    for item in payloads:
         encoded = item.get("image_b64")
         if not encoded or "timestamp" not in item:
             continue

@@ -528,6 +528,7 @@ async def _seed_graph_session(session_id: str, user_id: str, video_id: str | Non
             "evidence_sufficiency": {},
             "draft_answer": "",
             "grounding_report": {},
+            "subject_registry": [],
         },
         as_node="memory_write_node",
     )

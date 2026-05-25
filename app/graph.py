@@ -45,6 +45,7 @@ class GraphState(TypedDict):
     evidence_sufficiency: Annotated[dict[str, Any], _last_write]
     draft_answer: Annotated[str, _last_write]
     grounding_report: Annotated[dict[str, Any], _last_write]
+    subject_registry: Annotated[list[dict[str, Any]], _last_write]
     agent_terminated: str | None
 
 
@@ -271,6 +272,11 @@ def _orchestrator_model() -> ChatOpenAI:
     api_key = settings.orchestrator_api_key or settings.vlm_api_key or "EMPTY"
     model_name = settings.orchestrator_model_name or settings.vlm_model_name
     timeout = settings.orchestrator_api_timeout or settings.vlm_api_timeout
+    kwargs: dict[str, Any] = {}
+    if "api.deepseek.com" in base_url:
+        # DeepSeek V4 defaults to thinking mode; multi-turn tool calls then 400
+        # because reasoning_content must be threaded back. Disable explicitly.
+        kwargs["extra_body"] = {"thinking": {"type": "disabled"}}
     return ChatOpenAI(
         model=model_name,
         base_url=base_url,
@@ -279,6 +285,7 @@ def _orchestrator_model() -> ChatOpenAI:
         temperature=settings.orchestrator_temperature,
         streaming=settings.orchestrator_streaming,
         max_retries=5,
+        **kwargs,
     )
 
 
@@ -300,6 +307,47 @@ def _orchestrator_prompt(*, has_video: bool) -> str:
         if has_video
         else ""
     )
+    stitched_guidance = (
+        " 当问题聚焦某一短窗口内的细节（动作识别、计数、文字识别），调用 "
+        "`segment_focus` 在该窗口密采 ≤12 帧；优先于 `expand_temporal_evidence`。"
+        " 【stitched_verify 触发器，命中任一就直接调用，不要再多轮 retrieve】"
+        "(1) 题面含'before/after/先/后/then/接着/then again/再次/又/起初/最后'等"
+        "跨时间比较词；(2) 含'why does X ... after Y'、'in between'、'between'、"
+        "'compare/differ/change/区别/变化';(3) why-型问题，已经定位到≥2 个不连续"
+        "候选时刻；(4) order/order_of/sequence/排序问题。\n"
+        "示例：question='why does the boy in white stop rolling and start again "
+        "in between'，已知第一次停在 17s、再次开始在 24s 附近 → 立即调用 "
+        "`stitched_verify(question=..., windows=[{start:15,end:19},{start:22,end:26}], "
+        "fps_per_window=1.0)`，不要再次 retrieve_video_evidence。"
+        " `expand_temporal_evidence` 是 legacy 工具；只有在需要单纯补附近帧且其他"
+        "工具不合适时才使用。 "
+        if has_video
+        else ""
+    )
+    plan_observe_guidance = (
+        " 每次调用工具之前，先用一句中文写出 PLAN：要解决什么子问题（goal）、"
+        "用哪个工具（tool）、看哪段时间（time_range）、抽帧策略（sampling）。"
+        "工具返回后，写一句 OBSERVE：这次拿到了什么、还差什么。不要重复同样参数的"
+        "工具调用。verify_grounding 返回 grounded=true 时立即输出 draft 作为最终回答。 "
+        if has_video
+        else ""
+    )
+    final_answer_protocol = (
+        " 【FINAL ANSWER PROTOCOL — 不可省略】"
+        "无论你之前调用了 segment_focus / stitched_verify / build_timeline / "
+        "retrieve_video_evidence / retrieve_hypothesis_evidence / expand_temporal_evidence "
+        "中的哪些工具，**最终面向用户的答案必须由 `answer_with_evidence` 工具产生**，"
+        "再由 `verify_grounding` 校验通过后才能 emit。"
+        "禁止：把任何 sub-tool 返回的 `answer` 字段当成给用户的最终回复直接 emit —— "
+        "那只是 Observer 子模块的中间观察，未经过 MCQ 强制选项规则和 grounding 校验，"
+        "用作最终答案会直接判 0 分。"
+        "正确流程：retrieve/segment_focus/stitched_verify 等探查 → "
+        "`answer_with_evidence`（套用 MCQ HARD RULE 输出 'The correct answer is X) ...' 格式）"
+        " → `verify_grounding` → grounded=true 时把 draft_answer 原样 emit。"
+        "唯一例外：纯闲聊或无视频内容问题，可直接回复。 "
+        if has_video
+        else ""
+    )
     return (
         "You are Mr. Big-Eye, a warm and concise video-analysis assistant. "
         "Match the user's language. Use tools when they help, then write the final answer "
@@ -313,7 +361,8 @@ def _orchestrator_prompt(*, has_video: bool) -> str:
         "retrieve_video_evidence, then call assess_evidence_sufficiency before answering. "
         "If evidence is insufficient, follow the recommended_next_action. For temporal, "
         "counting, order, or comparison questions, call build_timeline or "
-        "expand_temporal_evidence before answering. When you have competing explanations, "
+        "stitched_verify before answering. For short-window detail, action recognition, "
+        "counting, or OCR questions, call segment_focus. When you have competing explanations, "
         "call retrieve_hypothesis_evidence for the concrete hypothesis you need to test. "
         "Only set explicit "
         "top_n_scenes or top_k_frames when the question clearly needs a non-default "
@@ -328,7 +377,10 @@ def _orchestrator_prompt(*, has_video: bool) -> str:
         "Every concrete visual claim should have frame evidence. For absence or negative "
         "answers, use negative_check retrieval and scope the answer to checked evidence "
         "unless the evidence truly covers the whole video. "
+        f"{final_answer_protocol}"
         f"{mcq_rule}"
+        f"{stitched_guidance}"
+        f"{plan_observe_guidance}"
         "Use search_user_memories only when prior user preferences or context would "
         "materially improve the answer. "
         f"{video_guidance}"

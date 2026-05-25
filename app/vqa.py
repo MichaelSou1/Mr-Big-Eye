@@ -40,15 +40,84 @@ CAPTION_SYSTEM_PROMPT = (
 )
 
 QA_SYSTEM_PROMPT = (
-    "You are Mr. Big-Eye, a careful video analyst. You will be shown K still "
-    "frames sampled from a video, each labeled with its timestamp in seconds. "
-    "Answer the user's question using only what is visible in these frames. "
-    "When you cite a moment, insert a marker like [FRAME:t=29.7] on its own. "
-    "The renderer will replace it with the corresponding thumbnail. "
-    "Insert at least one [FRAME:t=...] marker for every concrete visual claim. "
-    "Two to four markers per answer is typical; only omit them when the answer "
-    "is purely conversational (e.g. \"I don't see X in the checked evidence.\"). "
-    "If the frames are insufficient, say so plainly. Match the user's language."
+    "You are Mr. Big-Eye, a warm, concise, and careful video analyst. You will "
+    "be shown K still frames sampled from a video, each labeled with its "
+    "timestamp in seconds. Match the user's language.\n"
+    "\n"
+    "═══ MCQ HARD RULE — read first, applies whenever the question lists "
+    "'Candidates: A) ... B) ... C) ... D) ... E) ...' ═══\n"
+    "You MUST pick exactly one letter from the listed options and start your "
+    "answer with `The correct answer is X) <option text>` (X ∈ A/B/C/D/E). "
+    "This is **mandatory even when the visual evidence is weak, partial, "
+    "ambiguous, indirect, or seems to contradict every option**. Pick the "
+    "**least implausible** option and cite frames for it. A 30%-confident guess "
+    "always scores higher than refusing to commit.\n"
+    "BANNED on MCQs — using any of the following on an MCQ counts as a failed "
+    "answer (zero score):\n"
+    "  • \"I cannot determine ...\" / \"I do not see ...\" / \"cannot be "
+    "confirmed\" / \"do not show\" / \"not visible in ...\"\n"
+    "  • \"insufficient evidence\" / \"the provided frames do not\" / "
+    "\"based on the frames I cannot\"\n"
+    "  • \"证据不足\" / \"无法确定\" / \"看不到\" / \"看不清\"\n"
+    "  • \"the premise is incorrect\" / \"none of the options match\" / "
+    "\"none of the above\"\n"
+    "Decision procedure for ambiguous MCQs: (1) list which 1-2 options have "
+    "*any* visual support, however weak; (2) eliminate the clearly contradicted "
+    "ones; (3) among the survivors, commit to the most consistent one; "
+    "(4) emit the answer in the mandated format.\n"
+    "═══ End MCQ HARD RULE ═══\n"
+    "\n"
+    "For non-MCQ (open-ended) questions: answer strictly from the provided "
+    "frames; do not speculate about content outside the frames or between them; "
+    "if evidence is truly insufficient, say \"证据不足\" plainly — but again, "
+    "this exception does NOT apply to MCQs.\n"
+    "Every concrete visual claim must carry a [FRAME:t=X.X] citation; 2-4 "
+    "markers per answer is typical.\n"
+    "The renderer will replace valid [FRAME:t=...] markers with thumbnails."
+)
+
+SUBJECT_DELTA_PROTOCOL = (
+    "\n\n在答案末尾追加一行 JSON（不要任何 markdown 围栏），格式：\n"
+    'SUBJECT_DELTAS: {"deltas": [\n'
+    '  {"op": "add", "id": "person_A", "label": "红衣男子", '
+    '"first_seen_t": 12.3, "attributes": ["持有背包"], '
+    '"evidence_frames": [12.3]},\n'
+    '  {"op": "update", "id": "person_B", '
+    '"attributes_add": ["在跑步"], "last_seen_t": 45.0, '
+    '"evidence_frames_add": [45.0]}\n'
+    "]}\n"
+    '若无主体变化，输出 SUBJECT_DELTAS: {"deltas": []}。'
+)
+
+ANSWER_WITH_EVIDENCE_PROMPT = QA_SYSTEM_PROMPT + SUBJECT_DELTA_PROTOCOL
+
+SEGMENT_FOCUS_PROMPT = (
+    "你是 Observer 子模块（细致严谨的视频分析助手），**不是最终回答者**。\n"
+    "你的输出会作为中间观察传给上游 orchestrator，由它再调 `answer_with_evidence` "
+    "产生面向用户的最终答案。**不要尝试直接回答用户的原始问题**（特别是 MCQ 不要选选项，"
+    "不要写 'The correct answer is X)' 这种最终答案格式）；只描述本次窗口内看到的视觉细节。\n"
+    "你看到的是同一片段内按时间顺序均匀抽取的若干帧，每帧带 [t=Xs] 时间戳。\n"
+    "任务：\n"
+    "1. 聚焦用户问题所关心的视觉细节，按帧描述变化。\n"
+    "2. 严格基于所给帧；不要推断该窗口之外发生的事，也不要想象帧之间的内容。\n"
+    "3. 如果细节模糊或证据不足，明确说\"该窗口内看不清/看不到\"。\n"
+    "4. 所有可视事实必须给出 [FRAME:t=X.X] 引用；典型 2-4 个。"
+    f"{SUBJECT_DELTA_PROTOCOL}"
+)
+
+STITCHED_VERIFY_PROMPT = (
+    "你是 Observer 子模块（多时刻综合分析专家），**不是最终回答者**。\n"
+    "你的输出会作为中间观察传给上游 orchestrator，由它再调 `answer_with_evidence` "
+    "产生面向用户的最终答案。**不要尝试直接回答用户的原始问题**（特别是 MCQ 不要选选项，"
+    "不要写 'The correct answer is X)' 这种最终答案格式）；只描述各窗口的观察与对比。\n"
+    "你看到的是从同一视频不同时间段抽取的若干帧，每帧带 [t=Xs] 时间戳。\n"
+    "任务：\n"
+    "1. 简要描述每个时间段呈现的内容（按时间顺序）。\n"
+    "2. 指出不同时刻之间的联系、变化或对比。\n"
+    "3. 严格基于所给帧回答；不要推测帧之间时间间隔内发生了什么。\n"
+    "4. 不要做超出帧内容的推断；如果证据不足以回答问题，明确说出来。\n"
+    "5. 所有可视事实必须给出 [FRAME:t=X.X] 引用；典型 2-4 个。"
+    f"{SUBJECT_DELTA_PROTOCOL}"
 )
 
 
@@ -222,6 +291,8 @@ def _build_qa_payload(
     max_image_side: int | None = None,
     image_quality: int | None = None,
     stream: bool = False,
+    system_prompt: str | None = None,
+    subject_registry: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     evidence_frames, evidence_timestamps = _select_evidence_frames(
         frames,
@@ -230,10 +301,12 @@ def _build_qa_payload(
     )
     image_side = settings.vqa_max_image_side if max_image_side is None else max_image_side
     quality = settings.vqa_image_quality if image_quality is None else image_quality
+    prompt = system_prompt or QA_SYSTEM_PROMPT
+    rendered_question = _question_with_subject_registry(question, subject_registry or [])
 
     user_content: list[dict[str, Any]] = [
         _text_part(
-            f"Question: {question}\n"
+            f"Question: {rendered_question}\n"
             "Relevant sampled frames follow. Each image is preceded by its timestamp."
         )
     ]
@@ -249,7 +322,7 @@ def _build_qa_payload(
         return {
             "model": settings.vlm_model_name,
             "input": [
-                {"role": "system", "content": [_text_part(QA_SYSTEM_PROMPT)]},
+                {"role": "system", "content": [_text_part(prompt)]},
                 *history_messages,
                 {"role": "user", "content": user_content},
             ],
@@ -260,7 +333,7 @@ def _build_qa_payload(
     return {
         "model": settings.vlm_model_name,
         "messages": [
-            {"role": "system", "content": QA_SYSTEM_PROMPT},
+            {"role": "system", "content": prompt},
             *history_messages,
             {"role": "user", "content": user_content},
         ],
@@ -268,6 +341,40 @@ def _build_qa_payload(
         "max_tokens": settings.vqa_max_output_tokens,
         "stream": stream,
     }
+
+
+def _question_with_subject_registry(
+    question: str,
+    subject_registry: list[dict[str, Any]],
+) -> str:
+    entries = [
+        entry
+        for entry in subject_registry
+        if isinstance(entry, dict) and entry.get("id")
+    ]
+    if not entries:
+        return question
+
+    lines = ["【已知主体登记表】（来自此前观察，可直接引用其 id/label 进行消歧）"]
+    for entry in entries:
+        sid = str(entry.get("id") or "").strip()
+        label = str(entry.get("label") or sid).strip()
+        first_seen = _format_registry_time(entry.get("first_seen_t"))
+        last_seen = _format_registry_time(entry.get("last_seen_t"))
+        attributes = ", ".join(str(item) for item in entry.get("attributes") or [])
+        if not attributes:
+            attributes = "暂无稳定属性"
+        lines.append(
+            f"- {sid} ({label}, 首次见于 {first_seen}, 最近 {last_seen}): {attributes}"
+        )
+    return "\n".join([*lines, "", "【用户问题】", question])
+
+
+def _format_registry_time(value: Any) -> str:
+    try:
+        return f"{float(value):.1f}s"
+    except (TypeError, ValueError):
+        return "未知"
 
 
 # ---------------------------------------------------------------------------
@@ -457,6 +564,9 @@ async def answer_question(
     frames: list[Image.Image],
     timestamps: list[float],
     history: list[dict[str, Any]] | None = None,
+    *,
+    system_prompt: str | None = None,
+    subject_registry: list[dict[str, Any]] | None = None,
 ) -> str:
     """Answer a question using sampled keyframes sorted by timestamp."""
     frame_limit = settings.vqa_max_frames if settings.vqa_max_frames > 0 else len(frames)
@@ -473,6 +583,8 @@ async def answer_question(
                 max_image_side=image_side,
                 image_quality=settings.vqa_image_quality,
                 stream=False,
+                system_prompt=system_prompt,
+                subject_registry=subject_registry,
             )
             data = await _post_json(payload)
             text = _extract_text(data)
@@ -509,6 +621,9 @@ async def stream_answer_question(
     frames: list[Image.Image],
     timestamps: list[float],
     history: list[dict[str, Any]] | None = None,
+    *,
+    system_prompt: str | None = None,
+    subject_registry: list[dict[str, Any]] | None = None,
 ) -> AsyncIterator[str]:
     """Yield VQA answer tokens using sampled keyframes."""
     payload = _build_qa_payload(
@@ -520,6 +635,8 @@ async def stream_answer_question(
         max_image_side=settings.vqa_max_image_side,
         image_quality=settings.vqa_image_quality,
         stream=True,
+        system_prompt=system_prompt,
+        subject_registry=subject_registry,
     )
     async for delta in _stream_sse(payload):
         yield delta

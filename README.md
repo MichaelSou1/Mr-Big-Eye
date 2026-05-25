@@ -1,9 +1,10 @@
 # Mr. Big-Eye
 
 > 面向长视频理解的浏览器端问答系统：离线把视频压成可检索索引，在线由 LangGraph
-> agent 规划多步检索/扩证/假设/验证，最终生成带 `[FRAME:t=...]` 引用的回答。
-> 业务侧零 VLM 权重，VLM 推理全部走云端 OpenAI-Compatible API；本地常驻只有
-> BGE-M3（文本→场景召回）与 SigLIP2（文本→关键帧精排）两个轻量编码器。
+> agent 规划多步检索 / Observer 子模块探查 / 跨段对比 / 假设排除 / grounding 校验，
+> 最终生成带 `[FRAME:t=...]` 引用、严守 MCQ 强制选项规则的回答。业务侧零 VLM
+> 权重，VLM 推理全部走云端 OpenAI-Compatible API；本地常驻只有 BGE-M3（文本→
+> 场景召回）与 SigLIP2（文本→关键帧精排）两个轻量编码器。
 
 ## 核心定位
 
@@ -13,30 +14,34 @@
 | --- | --- |
 | 视频压缩 | PySceneDetect 切场景 + decord 稠密抽帧 → 双索引（Caption + Frame） |
 | 检索 | BGE-M3 caption→scene 召回 + SigLIP2 frame 精排，**配额混合**抗 BGE 路由失败 |
-| 推理 | LangGraph 9 工具 agent loop：query planner → retrieve → assess → expand/timeline/hypothesis → answer → verify |
-| 鲁棒性 | 工具调用去重、verify-stall 短路、空回复 salvage、tool-call 上限兜底 |
-| 评测 | 规则指标 + LLM judge + **Soft-Waive**（结果对即过，路径对错只留 forensic 字段）；prompt+code fingerprint 自动失效预测缓存 |
+| 推理 | LangGraph **10 工具** agent loop：query planner → retrieve → assess → Observer 子模块（`segment_focus` / `stitched_verify` / `expand_temporal_evidence` / `build_timeline`）→ `answer_with_evidence` → `verify_grounding` |
+| LensWalk-inspired | Observer 子模块严格"非最终回答者"角色 + `subject_registry` 跨 turn 实体追踪 + 嵌入式 `SUBJECT_DELTAS` 协议（单次 VLM 调用拿状态更新，零额外推理开销） |
+| 鲁棒性 | 6 道护栏：FINAL ANSWER PROTOCOL（强制走 `answer_with_evidence`）/ MCQ HARD RULE + banned-phrase / 工具调用去重 / verify-stall 短路 / 空回复 salvage / tool-call 上限兜底 |
+| 评测 | 规则指标 + LLM judge + **Soft-Waive**（结果对即过，路径对错只留 forensic 字段）；prompt + orchestrator + VLM + code 四维度 fingerprint 自动失效预测缓存 |
 | 可重复 | 每次 run 写 `run_meta` 块 + 追加 `runs_index.csv`，VLM/orchestrator 互换可量化对比 |
-| 记忆 | LangGraph SQLite checkpointer（thread 级会话状态） + LangMem SQLite store（user 级长期记忆） |
+| 记忆 | LangGraph SQLite checkpointer（thread 级会话状态，含 `subject_registry`） + LangMem SQLite store（user 级长期记忆） |
 
 ## NExT-GQA 当前成绩
 
-NExT-GQA 20-case 固定抽样（`--sample 20 --sample-seed 0`），同一 fingerprint 下交叉对比不同 VLM × Orchestrator 组合（来自 `data/eval/runs_index.csv`）：
+NExT-GQA 20-case 固定抽样（`--sample 20 --sample-seed 0`，除标注外），按 LensWalk-inspired 改造阶段排序，全部来自 `data/eval/runs_index.csv` 与 `data/eval/runs/*.json`：
 
-| # | VLM | Orchestrator | Pass | Judge | Recall@K | TS Dist | 备注 |
-|:-:|:----|:-------------|:----:|:-----:|:--------:|:-------:|:-----|
-| 1 | MiMo-v2.5 | GLM-4.7-flash | 0.55 | 0.50 | 0.625 | 2.85s | v4 baseline |
-| 2 | Doubao-Seed-Lite | GLM-4.7-flash | 0.40 | 0.40 | 0.700 | 1.91s | VLM 偏弱 |
-| 3 | Qwen3-VL-30B-A3B | GLM-4.7-flash | 0.35 | 0.35 | 0.525 | 3.42s | orchestrator 偏弱 |
-| 4 | Qwen3-VL-30B-A3B | GLM-4.7-flash | 0.45 | 0.40 | 0.700 | 2.67s | v5 prompt+guard 修复 |
-| **5** | **Qwen3-VL-30B-A3B** | **Doubao-Seed-Pro** | **0.70** | **0.70** | **0.800** | **2.08s** | **当前最佳** |
-| 6 | Qwen3-VL-30B-A3B | *(无检索控制组：均匀抽 6 帧 + VLM)* | 0.70 | 0.70 | 0.675 | 2.01s | 检索召回 +18%，但 VLM 上限把 pass 锁住了 |
+| # | 阶段 | VLM | Orchestrator | Code | Sample | Pass | Judge | 备注 |
+|:-:|:----|:----|:-------------|:----:|:----:|:----:|:----:|:-----|
+| 1 | baseline | Qwen3-VL-30B-A3B | Doubao-Pro | v5 | seed=0 | 14/20 (70%) | 3.45 | LensWalk 改造前 |
+| 1' | no-retrieval 控制组 | Qwen3-VL-30B-A3B | *(均匀抽 6 帧 + 单次 VLM)* | v5 | seed=0 | 14/20 (70%) | — | 检索召回 +18% 但 pass 持平 → VLM 视觉识别成瓶颈 |
+| 2 | LensWalk v1 | Qwen3-VL-30B-A3B | Doubao-Pro | v7 | seed=0 | **12/20 (60%)** | — | 加 `segment_focus` + `stitched_verify` + Subject Registry；但 LensWalk "证据不足"指令引入 3 个 MCQ 拒答 regression |
+| 3 | MCQ commit 修复 | Qwen3-VL-30B-A3B | Doubao-Pro | v8 | seed=1 | 15/19 (~79%)* | — | 加 MCQ 强制选项规则；3 个 regression 全部救回。*1 case quota 卡掉，pro-rated ~15.8/20 |
+| 4 | VLM 升级 | Qwen3.5-122B-A10B | Doubao-Pro | v9 | seed=0 | 14/20 (70%) | 3.50 | 平 baseline 但内部 5 救 / 3 跌 churn；新 VLM 拒答倾向更强 |
+| 5 | MCQ hardening | Qwen3.5-122B-A10B | Doubao-Pro | v10 | seed=0 | 14/20 (70%) | 3.50 | 加 banned-phrase 列表 + 决策模板；拒答 2 → 1，救回 1 跌回 1 |
+| 6 | DeepSeek orchestrator | Qwen3.5-122B-A10B | DeepSeek-v4-flash | v11 | seed=0 | 6/12 (50%)* | 2.58 | *只完成 12/20（quota）。发现 ds-v4-flash **跳过 `answer_with_evidence` 直接 emit segment_focus 输出**：`segment_focus` 调用从 1 → 37，MCQ 规则失效 |
+| 7 | Observer 角色防御 | Qwen3.5-122B-A10B | DeepSeek-v4-flash | **v12** | — | **TBD** | — | 加 FINAL ANSWER PROTOCOL + sub-tool prompt 自己拒答 MCQ；等 quota 重置后跑 |
 
-可读出的结论：
+**可读出的核心经验**：
 
-- **Orchestrator 比 VLM 更敏感**：同一 VLM，把 GLM-4.7-flash 换 Doubao-Pro，pass_rate 0.45 → 0.70。
-- **Pass == Judge**：Soft-Waive 让最终判分完全由 LLM judge 主导，规则 gate 只在 judge 错杀时降权。
-- **检索召回 0.80 vs 0.675**：检索栈把对的帧多送了 18%，但在这 20 题样本上 VLM 视觉识别成了瓶颈——下一步重点是 LensWalk-inspired 的 multi-segment Observer 工具，详见 [paper_references/paper_reference_plan.md](paper_references/paper_reference_plan.md)。
+- **Orchestrator 与 VLM 不可独立优化**：v11 → v12 教训证明，**换 orchestrator 时必须重新审视 sub-tool prompt 的角色边界**——doubao 习惯调 `segment_focus` 探查后再 `answer_with_evidence` 出答案，但 DeepSeek-v4-flash 倾向把 sub-tool 输出当最终答案 emit，导致全部 MCQ 规则失效。
+- **n=20 噪声很大**：同套 agent (v7) 在 seed=0/seed=1 之间能跑出 60% vs 79%。**单 seed 数字不可靠，需要 multi-seed 聚合**（详见后续方向）。
+- **VLM 视觉识别仍是上限**：v9 升级到 Qwen3.5-122B（4× 激活参数）后总分平 baseline，5 个救回 + 3 个跌回，证明大模型解锁了某些 case 同时也带来新的失败模式（更保守 / 倾向拒答）。
+- **Soft-Waive 让 judge 主导分数**：`pass_rate ≈ judge_correct_rate`，规则 gate 只在 judge 明显错杀时降权。
 
 ---
 
@@ -64,7 +69,7 @@ flowchart TB
 
     CHAT_STREAM --> GRAPH["LangGraph orchestrator (app/graph.py)"]
     GRAPH --> ORCH_LLM["Orchestrator LLM (OpenAI-compatible chat)"]
-    GRAPH --> TOOLS["9 evidence tools (app/tools.py)"]
+    GRAPH --> TOOLS["10 evidence tools (app/tools.py)"]
     TOOLS --> RET["two_stage_retrieve (app/retrieval.py)"]
     RET --> CIDX
     RET --> FIDX
@@ -134,7 +139,7 @@ data/cache/<video_id>/
 
 ---
 
-### 2. LangGraph Agent Loop with 9-Tool Toolbox
+### 2. LangGraph Agent Loop with 10-Tool Toolbox
 
 #### 2.1 控制流
 
@@ -154,19 +159,33 @@ flowchart TB
 
 #### 2.2 工具清单（[app/tools.py](app/tools.py)）
 
-| 工具 | 作用 | 何时调用 |
-| --- | --- | --- |
-| `retrieve_video_evidence` | 按 question_type + retrieval_profile 检索证据帧 | 总是第一个 |
-| `assess_evidence_sufficiency` | 给出 sufficient/insufficient + recommended_next_action | 检索后、回答前 |
-| `build_timeline` | 围绕 retrieved_frames 生成时间线 | temporal_order / counting / comparison |
-| `expand_temporal_evidence` | 围绕给定时间戳扩展前后窗口 | 证据局部稀疏时 |
-| `retrieve_hypothesis_evidence` | 针对具体视觉假设做二次检索 | 候选答案要互相排除时 |
-| `answer_with_evidence` | 仅基于当前 frame set 出 draft 答案 | 证据足够 |
-| `verify_grounding` | 检查 `[FRAME:t=...]` 是否匹配已检索帧、visual claim 是否缺 citation、negative answer 是否限定作用域 | 出 draft 后 |
-| `search_user_memories` | 读取 LangMem 中的 user 偏好/历史 | 与用户偏好相关时 |
-| `multimodal_vqa` | （legacy 兼容快捷工具，prompt 中明确建议不优先用） | 极端 fallback |
+工具按"agent 典型调用顺序"列出，注册在 `TOOLS` 列表（[app/tools.py:894](app/tools.py#L894)）的有 10 个；`multimodal_vqa` 已 deprecated，不在注册列表里。
 
-#### 2.3 7 种 question_type × 6 种 retrieval_profile
+| # | 工具 | 角色 | 作用 | 状态写入 |
+| :-: | --- | --- | --- | --- |
+| 1 | `retrieve_video_evidence` | **检索** | 按 question_type + retrieval_profile 调用 [two_stage_retrieve](app/retrieval.py)（BGE caption → SigLIP frame，配额混合），返回 top-K 关键帧 base64 | `retrieved_frames`, `retrieved_scene_hits`, `retrieval_plan` |
+| 2 | `assess_evidence_sufficiency` | **元判断** | 用规则启发式判 sufficient/insufficient 并给 `recommended_next_action`（"call segment_focus"/"call retrieve_hypothesis_evidence"/...） | `evidence_sufficiency` |
+| 3 | `build_timeline` | **时序综合** | 把已检索帧按时间排序生成简版 timeline（含 caption），供 temporal_order / counting / comparison 类问题参考 | `timeline` |
+| 4 | `segment_focus` ⭐ | **Observer 子模块** | 在指定中心时刻 `center_t` 周围密采 ≤12 帧（默认 1 fps），调 VLM 用 `SEGMENT_FOCUS_PROMPT`（**显式声明"非最终回答者"**）描述窗口内视觉细节；同时通过 `SUBJECT_DELTAS` 协议回传实体增量 | `retrieved_frames` 合并新帧、`subject_registry`、`draft_answer`（中间观察，会被后续 `answer_with_evidence` 覆盖） |
+| 5 | `expand_temporal_evidence` | **legacy 扩窗** | 围绕给定时间戳列表扩前后窗口；prompt 明确标 "(legacy; prefer segment_focus)"，仅 fallback 用 | `retrieved_frames` 合并新帧 |
+| 6 | `stitched_verify` ⭐ | **Observer 子模块（多窗口）** | 接受 2-4 个不连续时间窗（含 LensWalk-style 触发器：题面有 before/after/in between/比较词时优先），从每段密采，总帧数 cap 24；调 VLM 用 `STITCHED_VERIFY_PROMPT` 综合对比；同样通过 `SUBJECT_DELTAS` 回传增量 | `retrieved_frames` 合并新帧、`subject_registry`、`draft_answer`（中间观察） |
+| 7 | `retrieve_hypothesis_evidence` | **假设排除** | 针对一个具体视觉 hypothesis（如 "is the man wearing a hat"）做二次定向检索；MCQ 题型在 candidates 互排时常用 | `hypotheses`, `retrieved_frames` 合并 |
+| 8 | `answer_with_evidence` | **最终回答** | 用全部已积累的 frames + `subject_registry` + 用户原问题，调 VLM 用 `ANSWER_WITH_EVIDENCE_PROMPT`（= `QA_SYSTEM_PROMPT` + `SUBJECT_DELTA_PROTOCOL`，**应用 MCQ HARD RULE**）产出 draft 答案；带 `[FRAME:t=...]` 引用 | `draft_answer`, `grounding_report`, `subject_registry` |
+| 9 | `verify_grounding` | **校验** | 检查 `[FRAME:t=...]` 是否匹配已检索帧、每条视觉论断是否带 citation、否定回答是否走过 `negative_check` profile 且作用域限定在已检查证据 | `grounding_report` |
+| 10 | `search_user_memories` | **跨 session 记忆** | 读取 LangMem store 中该 `user_id` 下的偏好/历史 fact，按 query 相似度返 top-K | （无 GraphState 写入，只产生 ToolMessage 文本） |
+| — | `multimodal_vqa` | *(legacy)* | 一次性"frames + question → answer" 快捷调用，prompt 明确告诫不优先用 | 不在 `TOOLS`，仅保留 import |
+
+#### 2.3 LensWalk-inspired 改造的核心：Observer 子模块 + Subject Registry
+
+`segment_focus` 和 `stitched_verify` 是从 LensWalk 论文（[paper_references/LensWalk.pdf](paper_references/LensWalk.pdf)）迁移的"密采单段" / "跨段对比"两种 Observer 模式。我们的实现做了 3 个本地化改动：
+
+- **Token 预算适配**：LensWalk 用 GPT-4 级 token 预算，我们桥到 1/3——`segment_focus` cap 12 帧，`stitched_verify` cap 24 帧 + 最多 4 段窗口。
+- **Observer 角色硬约束**（[app/vqa.py:70-92](app/vqa.py#L70-L92)）：每个 sub-tool prompt 开头第一段就声明"**你是 Observer 子模块，不是最终回答者**"，明令禁止写 "The correct answer is X)" 这种最终答案格式。这一条配合 [app/graph.py](app/graph.py) 里的 FINAL ANSWER PROTOCOL（见 §3）是双保险。
+- **Subject Registry inline 协议**：避免独立的 memory-update LLM 调用（LensWalk 原方案），我们让 Observer prompt 在答案末尾追加一行 `SUBJECT_DELTAS: {"deltas":[...]}` JSON；[app/tools.py:parse_subject_deltas](app/tools.py) 解析并通过 [app/tools.py:merge_subject_deltas](app/tools.py) merge 进 `subject_registry`，pruned 到 15 个最近实体。下一轮 `answer_with_evidence` 调用时，`subject_registry` 会渲染成"【已知主体登记表】..."注入 VLM user message 头部，模型可以用 `person_A` 这类 id 跨 turn 消歧。
+
+为什么 Subject Registry **不** 存进 LangMem：实体是 intra-video 的，跨 session 复用会污染（同 user 看不同视频，"person_A" 概念完全不同）。Subject Registry 只走 LangGraph SQLite checkpointer，scope 是 `thread_id`（= 一个视频对话）。
+
+#### 2.4 7 种 question_type × 6 种 retrieval_profile
 
 Query planner 在 prompt 里强制 orchestrator 先分类、再选 profile。每个 profile 影响 `top_n_scenes` / `top_k_frames` 默认值：
 
@@ -179,7 +198,7 @@ Query planner 在 prompt 里强制 orchestrator 先分类、再选 profile。每
 
 详见 [app/tools.py](app/tools.py) `_profile_defaults` 与 `_resolve_retrieval_plan`。
 
-#### 2.4 GraphState（持久化在 SQLite checkpointer）
+#### 2.5 GraphState（持久化在 SQLite checkpointer）
 
 ```python
 class GraphState(TypedDict):
@@ -194,25 +213,45 @@ class GraphState(TypedDict):
     evidence_sufficiency: Annotated[dict, _last_write]
     draft_answer: Annotated[str, _last_write]
     grounding_report: Annotated[dict, _last_write]
+    subject_registry: Annotated[list[dict], _last_write]  # ⭐ Subject Registry
     agent_terminated: str | None
 ```
 
 `_last_write` 是自定义 reducer——一轮中如果 orchestrator 并发触发多个改同一字段的工具（LangGraph 多写冲突），保留最新非 None 的值，避免节点报错。
 
+`subject_registry` 每项形如：
+
+```python
+{
+    "id": "person_A",
+    "label": "红衣男子",
+    "first_seen_t": 12.3,
+    "last_seen_t": 45.6,
+    "attributes": ["持有背包", "在跑步"],
+    "evidence_frames": [12.3, 30.1, 45.6],
+}
+```
+
+整个列表通过 LangGraph checkpointer 持久化在 `data/graph_checkpoints.sqlite3`，scope 是 `thread_id`（= 单个视频对话）。跨对话/跨视频不复用，跨 turn 复用。
+
 ---
 
-### 3. Orchestrator 鲁棒性护栏
+### 3. Orchestrator 鲁棒性护栏（6 道）
 
-实际 production 调用中，LLM 会产生各种"语法上合法但语义死循环"的输出。`app/graph.py` 加了 4 道护栏：
+实际 production 调用中，LLM 会产生各种"语法上合法但语义死循环 / 跳步 / 拒答"的输出。护栏分两类：**prompt-level**（在 prompt 里写硬规则）和 **runtime-level**（python 代码强制干预）。
 
-| 护栏 | 触发条件 | 行为 |
-| --- | --- | --- |
-| **工具调用去重** ([_dedup_tool_calls](app/graph.py#L182)) | 同一 `(name, args)` 签名在历史里出现过 | 合成 `ToolMessage`（用上次缓存内容），不再 fire 真实工具；如果全是 dup 且有 draft，直接 emit draft 终止 |
-| **verify_grounding 停滞** ([_verify_grounding_stalled](app/graph.py#L244)) | 倒数两次 `verify_grounding` 返回相同 answer | 短路出 draft，不再调模型 |
-| **空回复 salvage** ([_make_orchestrator](app/graph.py#L84)) | 模型返回 `tool_calls=[]` 且 `content=""` | 从历史里捞最长 non-truncated `answer_with_evidence` payload；若仍无，注入 coercion HumanMessage 重试一次 |
-| **Tool-call 上限** ([orchestrator_max_tool_calls=8](app/config.py)) | 一轮工具调用数 ≥ 8 | salvage draft；无 draft 则置 `agent_terminated="cap"` |
+| # | 护栏 | 类型 | 触发条件 | 行为 |
+| :-: | --- | --- | --- | --- |
+| 1 | **FINAL ANSWER PROTOCOL** ⭐ | prompt | orchestrator 想直接 emit `segment_focus` / `stitched_verify` 等 sub-tool 的输出当最终答案 | [_orchestrator_prompt](app/graph.py#L292) 顶部硬规则：最终答案必须由 `answer_with_evidence` 产生 + `verify_grounding` 校验；sub-tool 输出仅作为中间观察。双保险：[SEGMENT_FOCUS_PROMPT](app/vqa.py#L70) / [STITCHED_VERIFY_PROMPT](app/vqa.py#L84) 自己也声明"Observer 子模块，**不是最终回答者**"，明令禁止写 `The correct answer is X)` |
+| 2 | **MCQ HARD RULE + banned-phrase** ⭐ | prompt | VLM 在 MCQ 题面前想用 "证据不足/cannot determine/do not show" 等措辞拒答 | [QA_SYSTEM_PROMPT](app/vqa.py#L42) 把 MCQ 规则放在最前面 `═══ MCQ HARD RULE ═══` 区块；列出 12 条 banned phrase（"I cannot determine"/"insufficient evidence"/"证据不足" 等）+ 4 步决策模板（列候选→排除→提交→按 'The correct answer is X) ...' 格式输出）。明确"30%-confident guess > refusing to commit" |
+| 3 | **工具调用去重** | runtime | 同一 `(name, args)` 签名在历史里出现过（[_dedup_tool_calls](app/graph.py#L183)） | 合成 `ToolMessage`（用上次缓存内容），不再 fire 真实工具；若全是 dup 且有 draft，直接 emit draft 终止 |
+| 4 | **verify_grounding 停滞** | runtime | 倒数两次 `verify_grounding` 返回相同 answer（[_verify_grounding_stalled](app/graph.py#L245)） | 短路出 draft，不再调模型 |
+| 5 | **空回复 salvage** | runtime | 模型返回 `tool_calls=[]` 且 `content=""`（[_make_orchestrator](app/graph.py#L82)） | 从历史里捞最长 non-truncated `answer_with_evidence` payload；若仍无，注入 coercion HumanMessage 重试一次 |
+| 6 | **Tool-call 上限** | runtime | 一轮工具调用数 ≥ `orchestrator_max_tool_calls`（默认 8） | salvage draft；无 draft 则置 `agent_terminated="cap"` |
 
-每个护栏对应 [tests/test_graph_orchestrator.py](tests/test_graph_orchestrator.py) 里的一个回归测试。
+每个 runtime 护栏（#3-#6）对应 [tests/test_graph_orchestrator.py](tests/test_graph_orchestrator.py) 里的一个回归测试。prompt 护栏（#1-#2）的核心 invariants 在 [tests/test_vqa.py](tests/test_vqa.py)（`证据不足` 关键词存在）和 [tests/test_graph_orchestrator.py](tests/test_graph_orchestrator.py)（`stitched_verify`/`segment_focus`/`PLAN`/`OBSERVE` 关键词存在）里被守护。
+
+**护栏 #1 的来源**：v11 在 DeepSeek-v4-flash orchestrator 上跑 eval 时发现的真实 failure mode——doubao 习惯调 `segment_focus` 探查后再 `answer_with_evidence`，DeepSeek-v4-flash 倾向把 `segment_focus` 的描述输出当最终答案 emit，导致 `segment_focus` 调用从 ~1 次/case 飙到 37 次，且 MCQ 规则完全失效。v12 加这条护栏修复。
 
 ---
 
@@ -239,22 +278,31 @@ passed = retrieval_ok and answer["passed"] and agent_ok
 
 ---
 
-### 5. Prediction Cache + Prompt-Aware Fingerprint
+### 5. Prediction Cache + 四维度 Fingerprint
 
-跑 harness 时直接调本地 agent 是 token-密集型操作。[app/eval_fingerprint.py](app/eval_fingerprint.py) 把 cache key 设计成：
+跑 harness 时直接调本地 agent 是 token-密集型操作。Cache key 由两层组成：
 
 ```python
-key = sha1(QA_SYSTEM_PROMPT ‖ _orchestrator_prompt(has_video=True) ‖
-           _orchestrator_prompt(has_video=False) ‖ AGENT_CODE_VERSION)[:12]
+# Layer 1: prompt fingerprint (app/eval_fingerprint.py)
+prompt_fp = sha1(QA_SYSTEM_PROMPT ‖ _orchestrator_prompt(has_video=True) ‖
+                 _orchestrator_prompt(has_video=False) ‖ AGENT_CODE_VERSION)[:12]
+
+# Layer 2: full cache key (app/eval_harness.py:PredictionCache.make_key)
+key = sha1(case_id ‖ f"{orchestrator}|vlm={vlm}" ‖ prompt_fp ‖
+           video_id ‖ AGENT_CODE_VERSION)
 ```
 
-含义：
+四维度自动失效规则：
 
 - **改 prompt**：fingerprint 自动变，受影响的缓存条目失效，未变的继续命中。
-- **改 agent 运行时行为**（dedup 逻辑、salvage 逻辑等不动 prompt 的改动）：手动 bump `AGENT_CODE_VERSION`（当前 `v5`），全量重跑。
+- **改 orchestrator 模型**（doubao → ds-v4-flash）：`f"{orchestrator}|..."` 段变，key 变，cache miss → 重跑。
+- **改 VLM 模型**（Qwen3-VL-30B → Qwen3.5-122B）：`vlm={vlm}` 段变，key 变，cache miss → 重跑。
+- **改 agent 运行时行为**（dedup 逻辑、新加护栏、改 `extra_body` 等不动 prompt 文本的改动）：必须**手动** bump `AGENT_CODE_VERSION`（当前 **`v12`**），否则历史 cache 仍命中导致结果污染。
 - **改打分逻辑**（如 Phase B 的 soft citation gate）：完全不动 prediction，只在已有缓存上重算指标，秒级出报告。
 
-`data/eval/prediction_cache.jsonl` 是 append-only JSONL（类似 [app/eval_harness.py](app/eval_harness.py) 的 JudgeCache 模式）。
+> **⚠️ 历史坑**：早期 fingerprint **只**含 prompts + version，不含 model name。改 VLM 而不 bump version 会沉默命中旧模型 prediction。已修：`make_key` 在 [app/eval_harness.py:222-226](app/eval_harness.py#L222-L226) 把 orchestrator + VLM model name 都打进 key 第二段（"compose both orchestrator and VLM into the cache key so swapping either one invalidates affected entries"）。但**改 model 时仍建议 bump version 双保险**，因为 `extra_body` 等其他 model-specific 参数不在 key 里。
+
+`data/eval/prediction_cache.jsonl` 是 append-only JSONL（同 `JudgeCache` 模式）。
 
 ---
 
@@ -341,40 +389,53 @@ sequenceDiagram
     participant T as Tools
     participant R as two_stage_retrieve
     participant V as VLM API
+    participant SR as subject_registry<br/>(GraphState)
     participant LM as LangMem
 
     UI->>API: GET /api/chat_stream?session=X&q=...
-    API->>G: ainvoke(state with video_id, user_id, q)
-    G->>O: SystemPrompt + history
+    API->>G: ainvoke(state with video_id, user_id, q,<br/>prior subject_registry)
+    G->>O: SystemPrompt(含 FINAL ANSWER PROTOCOL +<br/>MCQ HARD RULE) + history
+    note over O: PLAN: 先 retrieve 拿粗候选
+
     O-->>G: tool_calls=[retrieve_video_evidence(...)]
     G->>T: ToolNode dispatch
-    T->>R: two_stage_retrieve(video_id, q)
+    T->>R: two_stage_retrieve(video_id, q)<br/>(BGE caption + SigLIP frame，配额混合)
     R-->>T: frames, timestamps, scene_hits
-    T-->>G: ToolMessage + state update
-    G->>O: append ToolMessage
+    T-->>G: ToolMessage + state.retrieved_frames
+
     O-->>G: tool_calls=[assess_evidence_sufficiency(...)]
     G->>T: dispatch
-    T-->>G: {sufficient: false, recommended_next_action: "expand_temporal_evidence"}
-    O-->>G: tool_calls=[expand_temporal_evidence(...)]
+    T-->>G: {sufficient: false,<br/>recommended_next_action: "segment_focus"}
+    note over O: OBSERVE: 中段视觉细节不清<br/>PLAN: segment_focus 在 t≈12s 密采
+
+    O-->>G: tool_calls=[segment_focus(center_t=12, half=4)]
     G->>T: dispatch
-    T->>R: dense frame window
-    R-->>T: more frames
-    T-->>G: state update
+    T->>R: 拉 frames_dense/ 窗口内 ≤12 帧
+    R-->>T: dense frames
+    T->>V: POST chat/completions<br/>(SEGMENT_FOCUS_PROMPT + frames + subject_registry header)
+    V-->>T: 中间观察 + [FRAME:t=...] + SUBJECT_DELTAS JSON
+    T->>SR: merge_subject_deltas → registry 更新
+    T-->>G: ToolMessage（中间观察，不是最终答案）
+    note over O: OBSERVE: 拿到 person_A=红衣男子<br/>PLAN: 调 answer_with_evidence 出最终答
+
     O-->>G: tool_calls=[answer_with_evidence(...)]
     G->>T: dispatch
-    T->>V: POST chat/completions (images + question)
-    V-->>T: draft answer + [FRAME:t=...]
-    T-->>G: ToolMessage(draft)
+    T->>V: POST chat/completions<br/>(ANSWER_WITH_EVIDENCE_PROMPT + MCQ HARD RULE +<br/>所有 frames + subject_registry 头部)
+    V-->>T: "The correct answer is C) ... [FRAME:t=12.0]"
+    T->>SR: 再次 merge subject_deltas
+    T-->>G: ToolMessage(draft) + state.draft_answer
+
     O-->>G: tool_calls=[verify_grounding(draft)]
     G->>T: dispatch
     T-->>G: {grounded: true}
     O-->>G: AIMessage(content=draft, tool_calls=[])
     G->>LM: write_memories(visible messages)
+    note over SR: subject_registry 通过<br/>SQLite checkpointer 持久化<br/>下一 turn 仍可见
     G-->>API: stream tokens
     API-->>UI: SSE chunks
 ```
 
-虚线护栏（dedup / verify-stall / salvage / cap）随时可能介入并提前 emit 最终回答。
+**6 道护栏随时可能介入提前 emit**：FINAL ANSWER PROTOCOL（禁止把 sub-tool 输出当最终答案）、MCQ HARD RULE（禁止对 MCQ 拒答）、dedup（同 args 工具调用）、verify-stall（两次同答短路）、salvage（空回复捞 draft）、cap（≥8 工具调用强制收尾）。
 
 ---
 
@@ -399,23 +460,40 @@ cp .env.example .env
 # 填 VLM_API_KEY / ORCHESTRATOR_API_KEY，详见 .env.example
 ```
 
-ModelScope（推荐，国内免代理）+ Volcengine 组合：
+**当前推荐配置**（ModelScope VLM + DeepSeek 官方 API orchestrator）：
 
 ```env
-# VLM
+# VLM (Qwen3.5-122B-A10B，多模态早融合)
 VLM_API_PROVIDER=modelscope
 VLM_API_FORMAT=chat_completions
 VLM_API_BASE_URL=https://api-inference.modelscope.cn/v1
 VLM_API_KEY=<MODELSCOPE_KEY>
-VLM_MODEL_NAME=Qwen/Qwen3-VL-30B-A3B-Instruct
+VLM_MODEL_NAME=Qwen/Qwen3.5-122B-A10B
 
-# Orchestrator
+# Orchestrator (DeepSeek-v4-flash，1元/M 输入，cache hit 0.02元/M)
+ORCHESTRATOR_API_BASE_URL=https://api.deepseek.com
+ORCHESTRATOR_API_KEY=<DEEPSEEK_KEY>
+ORCHESTRATOR_MODEL_NAME=deepseek-v4-flash
+ORCHESTRATOR_TEMPERATURE=0.2
+ORCHESTRATOR_MAX_TOOL_CALLS=8
+```
+
+> **⚠️ DeepSeek 必备**：[app/graph.py:_orchestrator_model](app/graph.py#L270) 在检测到 `api.deepseek.com` 时自动注入 `extra_body={"thinking": {"type": "disabled"}}`。不关 thinking 模式的话，multi-turn tool call 会触发 HTTP 400 (`reasoning_content must be passed back`)。
+
+**备选 1**：ModelScope VLM + Volcengine ARK orchestrator（doubao）：
+
+```env
+VLM_API_PROVIDER=modelscope
+VLM_API_BASE_URL=https://api-inference.modelscope.cn/v1
+VLM_API_KEY=<MODELSCOPE_KEY>
+VLM_MODEL_NAME=Qwen/Qwen3.5-122B-A10B
+
 ORCHESTRATOR_API_BASE_URL=https://ark.cn-beijing.volces.com/api/v3/
 ORCHESTRATOR_API_KEY=<ARK_KEY>
 ORCHESTRATOR_MODEL_NAME=doubao-seed-2-0-pro-260215
 ```
 
-火山方舟单独跑 VLM：
+**备选 2**：火山方舟单独跑 VLM（无独立 orchestrator，VLM 自己当 orchestrator，不推荐）：
 
 ```env
 VLM_API_FORMAT=responses
@@ -651,14 +729,22 @@ python -m pytest -q
 - Grounding 是规则型 + LLM judge 混合；细粒度语义对齐还可继续加强。
 - caption_index / frame_index 没有版本号，升级 BGE / SigLIP 模型需手动清缓存。
 
+## 已完成的里程碑
+
+- **LensWalk-inspired agent 升级 (v6-v12)**（计划见 [paper_references/paper_reference_plan.md](paper_references/paper_reference_plan.md)）：
+  - ✅ `stitched_verify` 工具：跨多窗口对比，对应 temporal_order / comparison
+  - ✅ `segment_focus` 工具：单窗口 1fps 密采，对应 visual_detail
+  - ✅ VQA prompt LensWalk-style 严格 scope 约束（防 Evidence Dilution）
+  - ✅ Orchestrator THINK→PLAN→OBSERVE 显式声明
+  - ✅ Subject Registry：单视频跨 turn 实体追踪（GraphState 字段，per thread_id 持久化，**不**进 LangMem）
+  - ✅ MCQ HARD RULE + banned-phrase 列表（v8/v10 两次硬化）
+  - ✅ FINAL ANSWER PROTOCOL + Observer 角色防御（v12，修 DeepSeek-v4-flash 跳过 `answer_with_evidence` 问题）
+
 ## 后续方向
 
-- **LensWalk-inspired agent 升级**（详见 [paper_references/paper_reference_plan.md](paper_references/paper_reference_plan.md)）：
-  - `stitched_verify` 工具：跨多窗口对比，对应 temporal_order / comparison
-  - `segment_focus` 工具：单窗口 1fps 密采，对应 visual_detail
-  - VQA prompt LensWalk-style 严格 scope 约束（防 Evidence Dilution）
-  - Orchestrator THINK→PLAN→OBSERVE 显式声明
-  - Subject Registry：单视频跨 turn 实体追踪（GraphState 字段，per thread_id 持久化，**不**进 LangMem）
+- **`/eval-multiseed` skill（最高 ROI）**：当前 n=20 的方差天花板太高（同套代码不同 seed 能跑出 60%/79%），prompt hill-climbing 在追噪声。需要 multi-seed 聚合脚本，输出 mean ± stdev + 标注 seed 间 flip 的不稳定 case。
+- **Orchestrator-VLM 协调审计**：v11→v12 教训显示换 orchestrator 时 sub-tool prompt 的角色边界必须重审。考虑写一个 `/orchestrator-behavior-check` smoke test：用 ds-v4-flash / doubao / Qwen3 三套 orchestrator 各跑 3-case，统计每个 tool 的调用比例，自动 flag 异常分布。
+- **`segment_focus` 采用率监控**：v12 之后期望 `segment_focus` 调用回归 ~1 次/case；若仍频繁，说明 orchestrator prompt 对 sub-tool vs 最终答案的边界仍不够清晰。
 - 索引产物加版本号，模型升级自动失效缓存。
 - 引入 Redis / Celery 等任务队列替代后台任务。
 - 时间轴 UI：点击关键帧跳转视频时间点。
@@ -668,10 +754,11 @@ python -m pytest -q
 ## Highlights (English TL;DR)
 
 - Long-video QA via PySceneDetect + BGE-M3 caption retrieval + SigLIP2 frame reranking with **quota-blended fallback** against BGE routing failures.
-- Remote VLM API only (Doubao Responses / OpenAI-compat Chat); zero local VLM serving stack.
-- LangGraph agent loop with 9 tools, 4 production-grade guards (tool-call dedup, verify-grounding stall short-circuit, empty-content salvage, tool-call cap).
+- Remote VLM API only (Doubao Responses / OpenAI-compat Chat / ModelScope / DeepSeek); zero local VLM serving stack.
+- LangGraph agent loop with **10 tools** including LensWalk-inspired Observer sub-modules (`segment_focus` for dense single-window sampling, `stitched_verify` for cross-window comparison) and a `subject_registry` for intra-video entity tracking via embedded `SUBJECT_DELTAS` protocol (no extra LLM call).
+- **6 production-grade guards**: FINAL ANSWER PROTOCOL (forces `answer_with_evidence` as the only path to final answer), MCQ HARD RULE + banned-phrase list (forbids "cannot determine"/"insufficient" on multiple-choice questions), tool-call dedup, verify-grounding stall short-circuit, empty-content salvage, tool-call cap.
 - **Soft-Waive scoring**: when LLM judge accepts, citation/agent/retrieval gates soft-waive but keep strict signal in JSON for forensics.
-- **Prompt-aware prediction cache**: SHA1(prompts ‖ AGENT_CODE_VERSION) auto-invalidates affected entries on prompt edits.
+- **Four-dimension prediction cache**: SHA1(case_id ‖ orchestrator|vlm ‖ prompts ‖ AGENT_CODE_VERSION); changing orchestrator or VLM auto-invalidates affected entries.
 - **Run-level footprint**: per-run `run_meta` + append-only `runs_index.csv` for reproducible VLM/orchestrator comparison.
-- Two-layer memory: LangGraph SQLite checkpointer for thread state + LangMem SQLite store for cross-session user memory.
+- Two-layer memory: LangGraph SQLite checkpointer for thread state (incl. `subject_registry`) + LangMem SQLite store for cross-session user memory.
 - Reproducible quality harness over NExT-GQA with a no-retrieval control-group baseline.

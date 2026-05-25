@@ -41,6 +41,38 @@ class FakeMemoryManager:
         self.calls.append((payload, config))
 
 
+class FakeStitchedOrchestrator:
+    def __init__(self):
+        self.invocations = 0
+
+    def bind_tools(self, tools):
+        return self
+
+    async def ainvoke(self, messages):
+        self.invocations += 1
+        if any(getattr(message, "type", "") == "tool" for message in messages):
+            return AIMessage(content="Final stitched answer [FRAME:t=1.0]")
+        if self.invocations > 2:
+            return AIMessage(content="Follow-up answer")
+        return AIMessage(
+            content="",
+            tool_calls=[
+                {
+                    "name": "stitched_verify",
+                    "args": {
+                        "question": "Compare the two moments.",
+                        "windows": [
+                            {"start": 0.0, "end": 2.0},
+                            {"start": 4.0, "end": 6.0},
+                        ],
+                        "fps_per_window": 1.0,
+                    },
+                    "id": "call_stitched",
+                }
+            ],
+        )
+
+
 @pytest.mark.asyncio
 async def test_graph_orchestrator_tool_loop_updates_frames(monkeypatch):
     async def fake_answer_question(question, frames, timestamps, history=None):
@@ -101,6 +133,83 @@ async def test_graph_orchestrator_tool_loop_updates_frames(monkeypatch):
         "top_k_frames": 18,
     }
     assert manager.calls
+
+
+@pytest.mark.asyncio
+async def test_graph_orchestrator_stitched_verify_updates_registry_checkpoint(monkeypatch):
+    import base64
+    import io
+
+    from PIL import Image
+
+    buf = io.BytesIO()
+    Image.new("RGB", (8, 8), "white").save(buf, format="JPEG")
+    image_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+
+    def fake_load_dense_payloads(video_id, timestamps, *, window_sec, max_frames, source):
+        center = float(timestamps[0])
+        return [
+            {"timestamp": round(center, 1), "image_b64": image_b64, "source": source}
+        ]
+
+    async def fake_answer_question(question, frames, timestamps, history=None, **kwargs):
+        return (
+            "The moments differ. [FRAME:t=1.0]\n"
+            'SUBJECT_DELTAS: {"deltas": [{"op": "add", "id": "person_A", '
+            '"label": "红衣男子", "first_seen_t": 1.0, '
+            '"attributes": ["转身"], "evidence_frames": [1.0]}]}'
+        )
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: FakeStitchedOrchestrator())
+    monkeypatch.setattr(tools, "_load_dense_payloads", fake_load_dense_payloads)
+    monkeypatch.setattr("app.tools.answer_question", fake_answer_question)
+
+    manager = FakeMemoryManager()
+    app = graph.build_graph(InMemorySaver(), InMemoryStore(), manager)
+    config = {"configurable": {"thread_id": "thread-stitched"}}
+    state = await app.ainvoke(
+        {
+            "messages": [HumanMessage(content="Compare the two moments.")],
+            "video_id": "vid001",
+            "user_id": "user001",
+            "retrieved_frames": [],
+            "retrieved_scene_hits": [],
+            "retrieval_plan": {},
+            "timeline": [],
+            "hypotheses": [],
+            "evidence_sufficiency": {},
+            "draft_answer": "",
+            "grounding_report": {},
+            "subject_registry": [],
+        },
+        config=config,
+    )
+    snapshot = await app.aget_state(config)
+
+    assert graph._last_ai_text(state["messages"]) == "Final stitched answer [FRAME:t=1.0]"
+    assert [item["timestamp"] for item in state["retrieved_frames"]] == [1.0, 5.0]
+    assert state["subject_registry"][0]["id"] == "person_A"
+    assert snapshot.values["subject_registry"][0]["attributes"] == ["转身"]
+
+    state2 = await app.ainvoke(
+        {
+            "messages": [HumanMessage(content="Who was that person?")],
+            "video_id": "vid001",
+            "user_id": "user001",
+            "retrieved_frames": [],
+            "retrieved_scene_hits": [],
+            "retrieval_plan": {},
+            "timeline": [],
+            "hypotheses": [],
+            "evidence_sufficiency": {},
+            "draft_answer": "",
+            "grounding_report": {},
+        },
+        config=config,
+    )
+
+    assert graph._last_ai_text(state2["messages"]) == "Follow-up answer"
+    assert state2["subject_registry"][0]["id"] == "person_A"
 
 
 def test_graph_keeps_compatibility_symbols():
@@ -189,6 +298,10 @@ def test_orchestrator_prompt_mcq_and_dedup_rules():
     video_prompt = graph._orchestrator_prompt(has_video=True)
     no_video_prompt = graph._orchestrator_prompt(has_video=False)
     assert "MUST commit" in video_prompt
+    assert "stitched_verify" in video_prompt
+    assert "segment_focus" in video_prompt
+    assert "PLAN" in video_prompt
+    assert "OBSERVE" in video_prompt
     assert "Do not call the same tool with the same arguments twice" in video_prompt
     assert "Do not call the same tool with the same arguments twice" in no_video_prompt
     # MCQ rule does not apply when there is no video
