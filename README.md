@@ -1,327 +1,444 @@
 # Mr. Big-Eye
 
-Mr. Big-Eye 是一个面向长视频理解的浏览器端问答系统。用户上传视频后，系统会先离线构建视频索引，再在提问时通过“两阶段检索 + 多模态大模型推理”返回答案和相关关键帧。
+> 面向长视频理解的浏览器端问答系统：离线把视频压成可检索索引，在线由 LangGraph
+> agent 规划多步检索/扩证/假设/验证，最终生成带 `[FRAME:t=...]` 引用的回答。
+> 业务侧零 VLM 权重，VLM 推理全部走云端 OpenAI-Compatible API；本地常驻只有
+> BGE-M3（文本→场景召回）与 SigLIP2（文本→关键帧精排）两个轻量编码器。
 
-当前 Phase 2 已在 `mbe-phase2` conda 环境中完成基础验证：SGLang 独立托管 Qwen3-VL，FastAPI 负责上传、预处理、检索和会话编排，LangGraph + LangMem 负责可恢复对话和 per-user 长期记忆，前端通过 SSE 展示预处理进度、关键帧和流式回答。本地推理模型默认为 `Qwen/Qwen3-VL-2B-Instruct`；服务器迁移时可切换到 `Qwen/Qwen3-VL-8B-Instruct`，并将检索模型改为 GPU 常驻。
+## 核心定位
 
-## 技术亮点
+把"看长视频→回答任意问题"拆成 **预处理 / 检索 / 推理 / 评测** 四条独立可演进的流水线，并且每条流水线都有可量化的指标和可替换的 provider。结果：
 
-### 1. 面向长视频的分层检索架构
+| 维度 | 实现 |
+| --- | --- |
+| 视频压缩 | PySceneDetect 切场景 + decord 稠密抽帧 → 双索引（Caption + Frame） |
+| 检索 | BGE-M3 caption→scene 召回 + SigLIP2 frame 精排，**配额混合**抗 BGE 路由失败 |
+| 推理 | LangGraph 9 工具 agent loop：query planner → retrieve → assess → expand/timeline/hypothesis → answer → verify |
+| 鲁棒性 | 工具调用去重、verify-stall 短路、空回复 salvage、tool-call 上限兜底 |
+| 评测 | 规则指标 + LLM judge + **Soft-Waive**（结果对即过，路径对错只留 forensic 字段）；prompt+code fingerprint 自动失效预测缓存 |
+| 可重复 | 每次 run 写 `run_meta` 块 + 追加 `runs_index.csv`，VLM/orchestrator 互换可量化对比 |
+| 记忆 | LangGraph SQLite checkpointer（thread 级会话状态） + LangMem SQLite store（user 级长期记忆） |
 
-直接把长视频所有帧塞给 VLM 既不现实，也不稳定：上下文窗口、图像 token、显存、延迟都会迅速失控。Mr. Big-Eye 采用了“先压缩语义，再精排视觉”的两阶段检索方案，把长视频问答拆成可控的工程问题。
+## NExT-GQA 当前成绩
 
-第一阶段使用场景检测把视频切成语义片段，并调用 Qwen3-VL 为每个场景中间帧生成 caption。随后使用 bge-m3 将 caption 建成文本向量索引。用户提问时，系统先用问题文本召回最相关的场景片段。
+NExT-GQA 20-case 固定抽样（`--sample 20 --sample-seed 0`），同一 fingerprint 下交叉对比不同 VLM × Orchestrator 组合（来自 `data/eval/runs_index.csv`）：
 
-第二阶段在召回到的时间范围内，用 SigLIP2 的图文对齐能力对稠密抽帧进行视觉检索，筛出最相关的 8-12 张关键帧。这样最终交给 Qwen3-VL 的不是冗长视频，而是一组带时间戳的高价值图像证据。
+| # | VLM | Orchestrator | Pass | Judge | Recall@K | TS Dist | 备注 |
+|:-:|:----|:-------------|:----:|:-----:|:--------:|:-------:|:-----|
+| 1 | MiMo-v2.5 | GLM-4.7-flash | 0.55 | 0.50 | 0.625 | 2.85s | v4 baseline |
+| 2 | Doubao-Seed-Lite | GLM-4.7-flash | 0.40 | 0.40 | 0.700 | 1.91s | VLM 偏弱 |
+| 3 | Qwen3-VL-30B-A3B | GLM-4.7-flash | 0.35 | 0.35 | 0.525 | 3.42s | orchestrator 偏弱 |
+| 4 | Qwen3-VL-30B-A3B | GLM-4.7-flash | 0.45 | 0.40 | 0.700 | 2.67s | v5 prompt+guard 修复 |
+| **5** | **Qwen3-VL-30B-A3B** | **Doubao-Seed-Pro** | **0.70** | **0.70** | **0.800** | **2.08s** | **当前最佳** |
+| 6 | Qwen3-VL-30B-A3B | *(无检索控制组：均匀抽 6 帧 + VLM)* | 0.70 | 0.70 | 0.675 | 2.01s | 检索召回 +18%，但 VLM 上限把 pass 锁住了 |
 
-```mermaid
-flowchart LR
-    Q[用户问题] --> BGEQ[bge-m3 文本向量]
-    BGEQ --> CIDX[(Caption Index)]
-    CIDX --> SCENES[Top-N 相关场景]
-    SCENES --> RANGE[候选时间范围]
-    Q --> SIGTXT[SigLIP2 文本向量]
-    SIGTXT --> FIDX[(Frame Index)]
-    RANGE --> FIDX
-    FIDX --> FRAMES[Top-K 关键帧]
-    FRAMES --> VLM[Qwen3-VL 多帧问答]
-    VLM --> A[答案 + 时间戳引用]
-```
+可读出的结论：
 
-这个设计的核心收益是：
+- **Orchestrator 比 VLM 更敏感**：同一 VLM，把 GLM-4.7-flash 换 Doubao-Pro，pass_rate 0.45 → 0.70。
+- **Pass == Judge**：Soft-Waive 让最终判分完全由 LLM judge 主导，规则 gate 只在 judge 错杀时降权。
+- **检索召回 0.80 vs 0.675**：检索栈把对的帧多送了 18%，但在这 20 题样本上 VLM 视觉识别成了瓶颈——下一步重点是 LensWalk-inspired 的 multi-segment Observer 工具，详见 [paper_references/paper_reference_plan.md](paper_references/paper_reference_plan.md)。
 
-- 将长视频问题转化为小规模多图问答，显著降低 VLM 输入压力。
-- 文本 caption 召回负责“语义粗筛”，视觉 embedding 负责“画面精排”，两类信号互补。
-- 每个答案都能返回关键帧，便于用户核验模型依据，避免黑盒式回答。
-- 索引结果落盘缓存，重复上传相同视频可以复用预处理结果。
+---
 
-### 2. 多模态推理服务与业务服务解耦
-
-项目没有把 Qwen3-VL 直接塞进 FastAPI 进程，而是通过 SGLang 独立启动 OpenAI-compatible 推理服务。业务层只依赖 `SGLANG_ENDPOINT`，通过 `openai.AsyncOpenAI` 调用 `/v1/chat/completions`。
-
-这种架构让推理服务和 Web 服务可以独立伸缩、独立部署、独立调参。迁移服务器时，FastAPI 业务代码不需要感知底层模型从 2B 切换到 8B，也不需要关心 SGLang 的 CUDA graph、attention backend、FlashInfer JIT 等细节。
+## 架构总览
 
 ```mermaid
 flowchart TB
-    subgraph Web["FastAPI 应用层"]
-        UI[浏览器 UI]
-        API[上传 / 状态 / 问答 API]
-        PRE[视频预处理任务]
-        RET[两阶段检索]
-        GRAPH[LangGraph 会话编排]
-        MEM[LangMem 记忆写入]
-    end
+    UI["Browser UI (app/static)"] --> API["FastAPI (app/main.py)"]
+    API --> UPLOAD["POST /upload + SSE /api/preprocess_stream"]
+    API --> CHAT_STREAM["GET /api/chat_stream (登录会话, SSE)"]
+    API --> CHAT_DIRECT["POST /chat (匿名直答)"]
+    API --> SESSION["sessions / videos / login API"]
+    API --> DB[("SQLite: users / sessions / videos")]
 
-    subgraph Store["本地持久化"]
-        UP[(data/uploads)]
-        CACHE[(data/cache)]
-        CHROMA[(ChromaDB)]
-        DB[(SQLite users/sessions/videos)]
-        CKPT[(SQLite graph checkpoints)]
-        LM[(LangMem SQLite store)]
-    end
+    UPLOAD --> PRE["preprocess_video (app/preprocess.py)"]
+    PRE --> PROBE["decord probe + PySceneDetect"]
+    PROBE --> SCENE_FRAMES["frames_scene/ (场景中间帧)"]
+    PROBE --> DENSE_FRAMES["frames_dense/ (DENSE_FPS 抽帧)"]
+    SCENE_FRAMES --> CAPTION["VLM API: scene caption"]
+    CAPTION --> BGE_BUILD["BGE-M3 caption embeddings"]
+    DENSE_FRAMES --> SIG_BUILD["SigLIP2 image embeddings"]
+    BGE_BUILD --> CIDX[("Chroma: caption_index")]
+    SIG_BUILD --> FIDX[("Chroma: frame_index")]
+    PRE --> CACHE[("data/cache/<video_id>/")]
 
-    subgraph Inference["模型服务"]
-        SGL[SGLang Server]
-        QWEN[Qwen3-VL]
-        BGE[bge-m3]
-        SIG[SigLIP2]
-    end
-
-    UI --> API
-    API --> PRE
-    API --> GRAPH
-    GRAPH --> RET
-    GRAPH --> MEM
-    PRE --> UP
-    PRE --> CACHE
-    PRE --> CHROMA
-    RET --> CHROMA
-    RET --> CACHE
-    API --> DB
-    GRAPH --> CKPT
-    MEM --> LM
-    PRE --> SGL
-    RET --> BGE
-    RET --> SIG
-    GRAPH --> SGL
-    SGL --> QWEN
+    CHAT_STREAM --> GRAPH["LangGraph orchestrator (app/graph.py)"]
+    GRAPH --> ORCH_LLM["Orchestrator LLM (OpenAI-compatible chat)"]
+    GRAPH --> TOOLS["9 evidence tools (app/tools.py)"]
+    TOOLS --> RET["two_stage_retrieve (app/retrieval.py)"]
+    RET --> CIDX
+    RET --> FIDX
+    TOOLS --> VQA["VLM client (app/vqa.py)"]
+    VQA --> REMOTE["Doubao Responses / OpenAI-compat Chat"]
+    GRAPH --> CKPT[("SQLite: graph_checkpoints")]
+    GRAPH --> MEM["LangMem manager (app/memory.py)"]
+    MEM --> LM[("SQLite: langmem_store")]
+    CHAT_DIRECT --> RET
+    CHAT_DIRECT --> VQA
 ```
 
-工程上，这带来了几个很重要的好处：
+---
 
-- 推理模型可以独立由 SGLang 托管，便于利用高性能 serving 框架。
-- App 进程只负责业务编排、状态管理、缓存和检索，不直接承担 VLM 显存生命周期。
-- 本地开发用 2B 模型，服务器部署用 8B 模型，接口保持一致。
-- 可以保留兼容 OpenAI SDK 的调用方式，后续替换推理后端成本低。
-- LangMem 默认复用 SGLang 的 OpenAI-compatible endpoint；服务器上也可以通过 `LANGMEM_ENDPOINT` 指到单独的小模型服务。
+## 技术深度与亮点
 
-### 3. 视频预处理流水线可缓存、可复用、可观测
+### 1. 两阶段检索 + 配额混合（抗 BGE 路由失败）
 
-视频上传后，系统会计算文件 hash 作为 `video_id`，并将预处理产物写入 `data/cache/{video_id}`。缓存目录包含元数据、场景帧、稠密帧、caption JSONL、caption index 和 frame index。这样设计的好处是预处理结果天然可复用，也方便调试每一个阶段。
-
-```mermaid
-flowchart TD
-    V[上传视频] --> HASH[SHA256 生成 video_id]
-    HASH --> PROBE[decord 读取 fps / 时长 / 分辨率]
-    PROBE --> SCENE[PySceneDetect 场景检测]
-    SCENE --> MID[提取场景中间帧]
-    MID --> CAP[Qwen3-VL 生成场景 caption]
-    CAP --> BGEIDX[bge-m3 构建 caption index]
-    PROBE --> DENSE[按 DENSE_FPS 稠密抽帧]
-    DENSE --> SIGIDX[SigLIP2 构建 frame index]
-    BGEIDX --> DONE[状态 done]
-    SIGIDX --> DONE
-```
-
-预处理链路中的关键工程点：
-
-- 使用 `decord` 做视频 probe 和帧读取，避免依赖外部 ffmpeg CLI。
-- 使用 `PySceneDetect` 进行内容变化检测；场景过少时自动 fallback 到固定时间切片。
-- 场景 caption 存成 `captions.jsonl`，方便离线分析和排错。
-- ChromaDB 使用 persistent client，索引随视频缓存持久化。
-- 状态由 `running / done / failed:*` 管理，前端通过 SSE 实时展示阶段进度。
-- CPU/GPU 大模型加载有可配置策略，适配 laptop 与 server 两类环境。
-
-### 4. 本地资源受限场景下的工程适配
-
-本项目是在 WSL Ubuntu + RTX 4060 Laptop GPU + 16GB RAM 的约束下跑通本地验证的。这个环境有两个典型限制：GPU 显存只有 8GB，系统内存也不足以同时常驻 Qwen3-VL、bge-m3 和 SigLIP2。
-
-因此项目支持低内存本地运行模式：
-
-```env
-LOAD_MODELS_ON_STARTUP=false
-UNLOAD_MODELS_AFTER_USE=true
-MODELS_DEVICE=cpu
-SIGLIP2_DTYPE=float16
-```
-
-这套配置会让检索模型按需加载，用完释放；Qwen3-VL 仍由 SGLang 占用 GPU。虽然本地速度不如服务器，但能在笔记本上完整跑通上传、预处理、索引、检索、问答全链路。
-
-同时，服务器配置单独放在 `.env.server.example`，默认关闭低内存模式：
-
-```env
-LOAD_MODELS_ON_STARTUP=true
-UNLOAD_MODELS_AFTER_USE=false
-MODELS_DEVICE=cuda:0
-SIGLIP2_DTYPE=auto
-```
-
-这意味着低内存模式不是架构限制，而是本地开发策略。服务器上可以让 bge-m3 和 SigLIP2 常驻 GPU，减少重复加载开销。
-
-### 5. 针对中国大陆网络与 WSL CUDA 的落地优化
-
-项目没有只停留在算法 demo，而是把实际落地中经常踩的环境问题做了工程化处理。
-
-模型下载使用 ModelScope，避免 Hugging Face 在中国大陆网络下不稳定。Python 包安装支持 USTC / Aliyun 镜像，CUDA 相关 conda 包使用清华 conda-forge 镜像。
-
-SGLang 在 WSL 中还涉及 FlashInfer JIT 编译问题。项目启动脚本 `scripts/launch_sglang.sh` 会自动处理：
-
-- `CUDA_HOME=$CONDA_PREFIX`
-- conda CUDA target include path
-- conda CUDA library path
-- CUDA driver stub 链接
-- WSL/laptop 上更稳的 SGLang 开关
-
-这些处理解决了 `libnuma.so.1`、`nvcc`、`curand.h`、`-lcuda` 等本地运行问题。它们不是算法本身，但非常体现端到端工程能力：模型能不能真正跑起来，往往就差这些细节。
-
-### 6. LangGraph + LangMem 会话层
-
-Phase 2 已经接入 LangGraph 会话状态机、LangMem 长期记忆、SSE 流式输出和 session restore，底层预处理和检索模块仍保持独立。业务 SQLite 只保存 users / sessions / videos；对话 checkpoint 和长期记忆分别由 LangGraph SQLite checkpointer 和 LangMem SQLite store 管理。
+#### 1.1 离线索引构建
 
 ```mermaid
 flowchart LR
-    MAIN[main.py<br/>FastAPI API] --> GRAPH[graph.py<br/>LangGraph]
-    GRAPH --> RET[retrieval.py<br/>两阶段检索]
-    GRAPH --> VQA[vqa.py<br/>SGLang Client]
-    GRAPH --> MEM[memory.py<br/>LangMem]
-    MEM --> LMSTORE[(langmem_store.sqlite3)]
-    GRAPH --> CKPT[(graph_checkpoints.sqlite3)]
-    MAIN --> DB[db.py<br/>users/sessions/videos]
-    MAIN --> PROG[progress.py<br/>SSE pub/sub]
-    PRE[preprocess.py<br/>视频预处理] --> CACHE[cache.py<br/>文件缓存]
-    PRE --> VQA
-    PRE --> MOD[models.py<br/>bge-m3 / SigLIP2]
-    RET --> MOD
+    V[上传 MP4] --> HASH[SHA256 → video_id]
+    HASH --> PROBE[decord probe]
+    PROBE --> SCENE[PySceneDetect<br/>threshold=27.0]
+    SCENE --> MID[场景中间帧<br/>frames_scene/]
+    MID --> CAP[VLM API<br/>scene caption]
+    CAP --> BGEIDX[BGE-M3<br/>caption_index]
+    PROBE --> DENSE[按 DENSE_FPS<br/>稠密抽帧]
+    DENSE --> SIGIDX[SigLIP2<br/>frame_index]
+    BGEIDX --> DONE[set_video_status=done]
+    SIGIDX --> DONE
 ```
 
-模块职责：
+#### 1.2 在线检索（配额混合是关键）
 
-- `app/vqa.py`：只负责 Qwen3-VL caption / QA 调用。
-- `app/models.py`：只负责 bge-m3 / SigLIP2 加载、编码、释放。
-- `app/preprocess.py`：只负责视频到索引的离线构建。
-- `app/retrieval.py`：只负责问题到关键帧的检索。
-- `app/graph.py`：只负责 LangGraph 会话状态机、检索路由和 checkpoint 恢复。
-- `app/memory.py`：只负责 LangMem manager、LangGraph store 和记忆上下文格式化。
-- `app/db.py`：只负责 users / sessions / videos 的业务持久化。
-- `app/progress.py`：只负责预处理进度的 SSE pub/sub。
-- `app/cache.py`：只负责文件缓存、状态缓存和目录结构。
-- `app/main.py`：只负责 API、后台任务和错误处理。
-
-Phase 2 已经把 `retrieval -> answer_question -> LangMem memory update` 封装进 LangGraph 会话状态机，并用 SQLite checkpointer 做 session restore。
-
-## 当前能力
-
-Phase 2 当前支持：
-
-- 浏览器上传 MP4 视频。
-- 视频时长和上传大小限制。
-- 后台预处理视频，并通过 SSE 推送阶段进度。
-- 场景 caption 索引。
-- 稠密关键帧视觉索引。
-- 提问后召回 8-12 张相关关键帧。
-- 使用 Qwen3-VL 基于关键帧回答问题。
-- SSE 流式返回回答 token，关键帧先于文本送达。
-- `[FRAME:t=29.7]` 标记会在前端替换为内联缩略图。
-- Witch/Queen 风格用户名池，支持切换用户。
-- SQLite 持久化 users、sessions、videos。
-- LangMem + LangGraph SQLite store 持久化 per-user 长期记忆。
-- LangGraph checkpoint 支持会话列表与历史消息恢复。
-- 返回答案、关键帧、场景命中信息和 session_id。
-- 单元测试、启动检查和轻量 HTTP smoke 已通过。
-
-当前基础验证：
-
-```text
-pytest: 10 passed, 1 skipped
-startup: AsyncSqliteSaver + AsyncSqliteStore + MemoryStoreManager + CompiledStateGraph
-HTTP smoke: /, /api/login, /api/sessions, /api/sessions/{id}/messages, /api/preprocess_stream/{id}
+```mermaid
+flowchart LR
+    Q[用户问题] --> BGEQ[BGE-M3 文本向量]
+    BGEQ --> CIDX[(Caption Index)]
+    CIDX --> SCENES[Top-N 场景<br/>+ 时间区间]
+    Q --> SIGQ[SigLIP2 文本向量]
+    SIGQ --> SCENED[Scene-Gated 检索<br/>quota = 2/3 · K]
+    SIGQ --> GLOBAL[全局 Un-Gated 检索<br/>quota = 1/3 · K]
+    SCENES --> SCENED
+    SCENED --> MERGE{合并去重}
+    GLOBAL --> MERGE
+    MERGE --> TOPK[Top-K 关键帧<br/>送给 Agent]
 ```
+
+**配额混合的动机**：BGE caption→scene 是有失败率的（场景文字描述 ≠ 用户语义问题）。如果 frame 检索完全被 BGE 选中的场景时间窗 gate 住，BGE 一旦路由错，整轮就死。代码在 [app/retrieval.py:84-111](app/retrieval.py#L84-L111)：默认把 2/3 配额留给 scene-gated SigLIP（精度），剩下 1/3 留给全局 un-gated SigLIP（召回兜底）。总帧数和 VLM token 成本不变。
+
+#### 1.3 缓存目录契约
+
+```
+data/cache/<video_id>/
+├── meta.json              # duration / fps / scene 列表
+├── frames_scene/          # 场景中间帧
+├── frames_dense/          # tNNNN.N.jpg，按 DENSE_FPS
+├── captions.jsonl         # 每场景 caption + meta
+├── caption_index/         # Chroma persistent
+├── frame_index/           # Chroma persistent
+└── .done                  # set_video_status 写入
+```
+
+`POST /upload` 用 SHA256 算 `video_id`，相同视频复传秒级命中缓存。
+
+---
+
+### 2. LangGraph Agent Loop with 9-Tool Toolbox
+
+#### 2.1 控制流
+
+```mermaid
+flowchart TB
+    START([START]) --> ORCH[orchestrator<br/>LLM with bind_tools]
+    ORCH -->|tools_condition=tools| TOOL[tool_node<br/>ToolNode TOOLS]
+    ORCH -->|no tool_calls| MEM[memory_write_node]
+    TOOL --> ORCH
+    MEM --> END([END])
+
+    ORCH -.->|tool-call cap hit| SALVAGE[_salvage_draft_answer]
+    SALVAGE -.-> ORCH
+    ORCH -.->|verify_grounding 两次同答| STALL_BREAK[_verify_grounding_stalled<br/>→ emit draft]
+    STALL_BREAK -.-> ORCH
+```
+
+#### 2.2 工具清单（[app/tools.py](app/tools.py)）
+
+| 工具 | 作用 | 何时调用 |
+| --- | --- | --- |
+| `retrieve_video_evidence` | 按 question_type + retrieval_profile 检索证据帧 | 总是第一个 |
+| `assess_evidence_sufficiency` | 给出 sufficient/insufficient + recommended_next_action | 检索后、回答前 |
+| `build_timeline` | 围绕 retrieved_frames 生成时间线 | temporal_order / counting / comparison |
+| `expand_temporal_evidence` | 围绕给定时间戳扩展前后窗口 | 证据局部稀疏时 |
+| `retrieve_hypothesis_evidence` | 针对具体视觉假设做二次检索 | 候选答案要互相排除时 |
+| `answer_with_evidence` | 仅基于当前 frame set 出 draft 答案 | 证据足够 |
+| `verify_grounding` | 检查 `[FRAME:t=...]` 是否匹配已检索帧、visual claim 是否缺 citation、negative answer 是否限定作用域 | 出 draft 后 |
+| `search_user_memories` | 读取 LangMem 中的 user 偏好/历史 | 与用户偏好相关时 |
+| `multimodal_vqa` | （legacy 兼容快捷工具，prompt 中明确建议不优先用） | 极端 fallback |
+
+#### 2.3 7 种 question_type × 6 种 retrieval_profile
+
+Query planner 在 prompt 里强制 orchestrator 先分类、再选 profile。每个 profile 影响 `top_n_scenes` / `top_k_frames` 默认值：
+
+- `focused`：单点细节（top_n=3, top_k=8）
+- `balanced`：默认
+- `broad`：综述/摘要（top_n=10, top_k=20）
+- `temporal`：时序/计数/比较（top_n=8, top_k=18）
+- `detail`：高分辨率视觉/OCR（top_k=18）
+- `negative_check`：否定回答前的兜底扫荡（top_n=12, top_k=24）
+
+详见 [app/tools.py](app/tools.py) `_profile_defaults` 与 `_resolve_retrieval_plan`。
+
+#### 2.4 GraphState（持久化在 SQLite checkpointer）
+
+```python
+class GraphState(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
+    video_id: str | None
+    user_id: str
+    retrieved_frames: Annotated[list[dict], _last_write]
+    retrieved_scene_hits: Annotated[list[dict], _last_write]
+    retrieval_plan: Annotated[dict, _last_write]
+    timeline: Annotated[list[dict], _last_write]
+    hypotheses: Annotated[list[dict], _last_write]
+    evidence_sufficiency: Annotated[dict, _last_write]
+    draft_answer: Annotated[str, _last_write]
+    grounding_report: Annotated[dict, _last_write]
+    agent_terminated: str | None
+```
+
+`_last_write` 是自定义 reducer——一轮中如果 orchestrator 并发触发多个改同一字段的工具（LangGraph 多写冲突），保留最新非 None 的值，避免节点报错。
+
+---
+
+### 3. Orchestrator 鲁棒性护栏
+
+实际 production 调用中，LLM 会产生各种"语法上合法但语义死循环"的输出。`app/graph.py` 加了 4 道护栏：
+
+| 护栏 | 触发条件 | 行为 |
+| --- | --- | --- |
+| **工具调用去重** ([_dedup_tool_calls](app/graph.py#L182)) | 同一 `(name, args)` 签名在历史里出现过 | 合成 `ToolMessage`（用上次缓存内容），不再 fire 真实工具；如果全是 dup 且有 draft，直接 emit draft 终止 |
+| **verify_grounding 停滞** ([_verify_grounding_stalled](app/graph.py#L244)) | 倒数两次 `verify_grounding` 返回相同 answer | 短路出 draft，不再调模型 |
+| **空回复 salvage** ([_make_orchestrator](app/graph.py#L84)) | 模型返回 `tool_calls=[]` 且 `content=""` | 从历史里捞最长 non-truncated `answer_with_evidence` payload；若仍无，注入 coercion HumanMessage 重试一次 |
+| **Tool-call 上限** ([orchestrator_max_tool_calls=8](app/config.py)) | 一轮工具调用数 ≥ 8 | salvage draft；无 draft 则置 `agent_terminated="cap"` |
+
+每个护栏对应 [tests/test_graph_orchestrator.py](tests/test_graph_orchestrator.py) 里的一个回归测试。
+
+---
+
+### 4. Soft-Waive 评测哲学：结果对就过，路径对错留 forensic
+
+传统 harness：retrieval / answer / agent_loop 三段都 strict gate，AND。问题：LLM judge 已经判答案正确，但 retrieval 召回因 tolerance 边缘 fail（如 ts_dist=2.1s vs tolerance=2.0s），整 case 被错杀。
+
+[app/eval_harness.py:evaluate_case](app/eval_harness.py#L107) 的解法：当 `judge.correct=True` 时，**citation / agent / retrieval** 三个 gate 全部 soft-waive，并在 JSON 里留下 `*_soft_waived: True` 字段供 forensic：
+
+```python
+# 简化伪代码
+if judge_pass:
+    answer["citation_soft_waived"] = not answer["citation_correct"]
+    answer["passed"] = hallucination_free and uncertainty_ok
+    agent["soft_waived"] = (agent["passed"] is False)
+    retrieval["soft_waived"] = (retrieval["passed"] is False)
+
+retrieval_ok = retrieval["passed"] is not False or retrieval["soft_waived"]
+agent_ok = agent["passed"] is not False or agent["soft_waived"]
+passed = retrieval_ok and answer["passed"] and agent_ok
+```
+
+效果：当前 NExT-GQA 20-case run 的 `pass_rate == judge_correct_rate == 0.70`，三个 strict gate 在严格统计里仍可读（`agent_loop_pass_rate=0.65, retrieval_pass_rate=0.75`），但不会拖累 outcome 分。
+
+---
+
+### 5. Prediction Cache + Prompt-Aware Fingerprint
+
+跑 harness 时直接调本地 agent 是 token-密集型操作。[app/eval_fingerprint.py](app/eval_fingerprint.py) 把 cache key 设计成：
+
+```python
+key = sha1(QA_SYSTEM_PROMPT ‖ _orchestrator_prompt(has_video=True) ‖
+           _orchestrator_prompt(has_video=False) ‖ AGENT_CODE_VERSION)[:12]
+```
+
+含义：
+
+- **改 prompt**：fingerprint 自动变，受影响的缓存条目失效，未变的继续命中。
+- **改 agent 运行时行为**（dedup 逻辑、salvage 逻辑等不动 prompt 的改动）：手动 bump `AGENT_CODE_VERSION`（当前 `v5`），全量重跑。
+- **改打分逻辑**（如 Phase B 的 soft citation gate）：完全不动 prediction，只在已有缓存上重算指标，秒级出报告。
+
+`data/eval/prediction_cache.jsonl` 是 append-only JSONL（类似 [app/eval_harness.py](app/eval_harness.py) 的 JudgeCache 模式）。
+
+---
+
+### 6. 多 Provider VLM + Run-Level Footprint
+
+#### 6.1 两种 wire format 自动切换
+
+[app/vqa.py](app/vqa.py) 封装：
+
+- `responses`：火山方舟 Doubao `POST /responses`，input 是 `[{role, content:[{type:input_image|input_text}]}]`
+- `chat_completions`：OpenAI-compatible（ModelScope / 小米 MiMo / Volcengine /...），messages 是 `[{role, content:[{type:image_url|text}]}]`
+
+切换只动 `.env`，业务零改动。
+
+#### 6.2 每次 run 留可对比指纹
+
+`scripts/eval_harness.py` 在每次 run 时往输出 JSON 写 `run_meta` 块，并 append 一行到 `data/eval/runs_index.csv`：
+
+```
+timestamp,vlm_model,orch_model,fingerprint,version,n,seed,pass_rate,
+answer_pass_rate,judge_correct_rate,recall_mean,ts_dist_mean,output_path
+```
+
+VLM swap 体验：换 provider → 跑一次 → `column -t -s, data/eval/runs_index.csv` 直接对比。本 README 顶部的成绩表就是这个 CSV 导出的。
+
+---
+
+### 7. Grounding + Negative-Answer Protocol
+
+回答里写 `[FRAME:t=29.7]` 这类 marker，前端把 marker 替换成内联缩略图。`verify_grounding` 工具做四件事：
+
+1. marker 是否落在已检索帧附近（容忍 tolerance）。
+2. visual claim 是否带 citation（如"红衣男子在跑步"但没引用任何帧）。
+3. 否定回答（"没有/不存在/未看到/没看到"）是否先调用过 `negative_check` profile 检索。
+4. 否定回答是否把作用域限定在"已检查证据/当前关键帧"而非全视频（防止过度泛化否定）。
+
+效果：模型倾向回答"在已检查的关键帧中没有看到 X"而不是直接"视频中没有 X"。
+
+---
+
+### 8. 双层记忆系统
+
+| 层 | 后端 | 作用域 | 内容 |
+| --- | --- | --- | --- |
+| LangGraph Checkpointer | `data/graph_checkpoints.sqlite3` | thread_id（一个对话 = 一个视频） | 完整 `GraphState`，支持断线重连/历史回看 |
+| LangMem | `data/langmem_store.sqlite3` | user_id | 用户偏好、跨 session 的语义事实 |
+
+[app/graph.py:_make_memory_write_node](app/graph.py#L377) 在每轮回答后，把最近 12 条可见消息送给 LangMem manager 抽取并 upsert。orchestrator 通过 `search_user_memories` 工具主动检索。两层互不串扰——视频内的临时实体不会污染跨 session 的 user memory。
+
+---
+
+### 9. 控制组：无检索基线
+
+[scripts/eval_no_retrieval.py](scripts/eval_no_retrieval.py) 提供一个"均匀抽 N 帧 + 一次 VLM 调用"的 control group，输出 prediction JSONL 可直接喂回 `eval_harness.py --predictions`：
+
+```bash
+# 1. 跑控制组生成预测
+python scripts/eval_no_retrieval.py \
+    --cases tests/fixtures/eval_cases_nextgqa.jsonl \
+    --output data/eval/preds_no_retrieval_$(date +%Y%m%d_%H%M).jsonl \
+    --num-frames 6 --sample 20 --sample-seed 0
+
+# 2. 用同一 harness 评分
+python scripts/eval_harness.py \
+    --cases tests/fixtures/eval_cases_nextgqa.jsonl \
+    --predictions data/eval/preds_no_retrieval_*.jsonl \
+    --output data/eval/runs/nextgqa_$(date +%Y%m%d_%H%M)_no_retrieval.json \
+    --judge
+```
+
+意义：成绩表第 6 行表明在当前 20-case 样本上，**两阶段检索把召回从 0.675 抬到 0.800**（+18%），但 pass_rate 都是 0.70——VLM 视觉识别已经成了瓶颈。下一步收益不在 retrieval，在 [paper_reference_plan.md](paper_references/paper_reference_plan.md) 里的 multi-segment Observer 工具。
+
+---
+
+## 完整请求流程（提问到回答）
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant UI as Browser
+    participant API as FastAPI
+    participant G as LangGraph
+    participant O as Orchestrator LLM
+    participant T as Tools
+    participant R as two_stage_retrieve
+    participant V as VLM API
+    participant LM as LangMem
+
+    UI->>API: GET /api/chat_stream?session=X&q=...
+    API->>G: ainvoke(state with video_id, user_id, q)
+    G->>O: SystemPrompt + history
+    O-->>G: tool_calls=[retrieve_video_evidence(...)]
+    G->>T: ToolNode dispatch
+    T->>R: two_stage_retrieve(video_id, q)
+    R-->>T: frames, timestamps, scene_hits
+    T-->>G: ToolMessage + state update
+    G->>O: append ToolMessage
+    O-->>G: tool_calls=[assess_evidence_sufficiency(...)]
+    G->>T: dispatch
+    T-->>G: {sufficient: false, recommended_next_action: "expand_temporal_evidence"}
+    O-->>G: tool_calls=[expand_temporal_evidence(...)]
+    G->>T: dispatch
+    T->>R: dense frame window
+    R-->>T: more frames
+    T-->>G: state update
+    O-->>G: tool_calls=[answer_with_evidence(...)]
+    G->>T: dispatch
+    T->>V: POST chat/completions (images + question)
+    V-->>T: draft answer + [FRAME:t=...]
+    T-->>G: ToolMessage(draft)
+    O-->>G: tool_calls=[verify_grounding(draft)]
+    G->>T: dispatch
+    T-->>G: {grounded: true}
+    O-->>G: AIMessage(content=draft, tool_calls=[])
+    G->>LM: write_memories(visible messages)
+    G-->>API: stream tokens
+    API-->>UI: SSE chunks
+```
+
+虚线护栏（dedup / verify-stall / salvage / cap）随时可能介入并提前 emit 最终回答。
+
+---
 
 ## 快速开始
 
-建议使用 conda 环境：
+### 环境
 
 ```bash
-conda create -n mbe-phase2 python=3.10 -y
-conda activate mbe-phase2
-```
+conda create -n mr-big-eye python=3.10 -y
+conda activate mr-big-eye
 
-配置国内 PyPI 源：
-
-```bash
+# 可选：国内 PyPI 源
 pip config set global.index-url https://mirrors.ustc.edu.cn/pypi/simple
-pip config set global.trusted-host mirrors.ustc.edu.cn
-```
 
-先安装 SGLang。这个顺序很重要：`sglang[all]==0.5.12` 会带入它验证过的 `torch/openai/transformers` 组合，后续 App 依赖按约束安装，避免 pip 重新替换 PyTorch。
-
-```bash
-pip install 'sglang[all]==0.5.12' \
-  -i https://mirrors.aliyun.com/pypi/simple/ \
-  --trusted-host mirrors.aliyun.com \
-  --timeout 300 \
-  --retries 10
-```
-
-再安装 App、LangGraph 和 LangMem 依赖：
-
-```bash
 pip install -r requirements.txt
 ```
 
-也可以用 `requirements-sglang.txt` 安装同一个 SGLang 钉版本；关键是它必须先于 `requirements.txt` 安装。
-
-复制配置：
+### 配置
 
 ```bash
 cp .env.example .env
+# 填 VLM_API_KEY / ORCHESTRATOR_API_KEY，详见 .env.example
 ```
 
-本地 16GB laptop 推荐把 `.env` 调整为：
+ModelScope（推荐，国内免代理）+ Volcengine 组合：
 
 ```env
-LOAD_MODELS_ON_STARTUP=false
-UNLOAD_MODELS_AFTER_USE=true
-MODELS_DEVICE=cpu
-SIGLIP2_DTYPE=float16
-SGLANG_DISABLE_CUDA_GRAPH=true
-SGLANG_ATTENTION_BACKEND=triton
-SGLANG_DISABLE_OVERLAP_SCHEDULE=true
+# VLM
+VLM_API_PROVIDER=modelscope
+VLM_API_FORMAT=chat_completions
+VLM_API_BASE_URL=https://api-inference.modelscope.cn/v1
+VLM_API_KEY=<MODELSCOPE_KEY>
+VLM_MODEL_NAME=Qwen/Qwen3-VL-30B-A3B-Instruct
+
+# Orchestrator
+ORCHESTRATOR_API_BASE_URL=https://ark.cn-beijing.volces.com/api/v3/
+ORCHESTRATOR_API_KEY=<ARK_KEY>
+ORCHESTRATOR_MODEL_NAME=doubao-seed-2-0-pro-260215
 ```
 
-下载模型：
+火山方舟单独跑 VLM：
+
+```env
+VLM_API_FORMAT=responses
+VLM_API_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+VLM_API_KEY=<ARK_KEY>
+VLM_MODEL_NAME=doubao-seed-2-0-pro-260215
+```
+
+### 下载本地检索模型
 
 ```bash
-python scripts/download_models.py
+python scripts/download_models.py     # BGE-M3 + SigLIP2，从 ModelScope CDN
 ```
 
-安装 WSL + SGLang 所需 CUDA 辅助包：
+### 启动
 
 ```bash
-conda install -y --override-channels \
-  -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge \
-  numactl cuda-nvcc libcurand-dev
+bash scripts/launch_app.sh            # http://localhost:8000
+# 关停
+lsof -ti :8000 | xargs -r kill
 ```
 
-启动 SGLang：
-
-```bash
-bash scripts/launch_sglang.sh
-```
-
-另开一个终端启动 App：
-
-```bash
-conda activate mbe-phase2
-bash scripts/launch_app.sh
-```
-
-浏览器打开：
-
-```text
-http://localhost:8000
-```
-
-## Smoke Test
-
-仓库中包含一个生成的短视频：
-
-```text
-tests/fixtures/short_clip.mp4
-```
-
-启动 SGLang 和 App 后运行：
+### Smoke Test
 
 ```bash
 python scripts/smoke_test.py \
@@ -329,96 +446,167 @@ python scripts/smoke_test.py \
   --question "What object moves across the video?"
 ```
 
-预期输出包含：
+---
 
-```text
-status=done
-frames=12
+## API
+
+| Endpoint | 作用 |
+| --- | --- |
+| `GET /` | 浏览器 UI |
+| `POST /upload` | 上传视频 → 返回 `video_id` 与 SSE 预处理流 URL |
+| `GET /status/{video_id}` | 查询预处理状态 |
+| `GET /api/preprocess_stream/{video_id}` | SSE：预处理阶段进度 |
+| `POST /chat` | 匿名直答（direct retrieval + VQA，不走 agent） |
+| `GET /api/chat_stream` | 登录会话 SSE：走完整 LangGraph agent loop |
+| `POST /api/login` | 本地 name-tag 登录 |
+| `GET/POST/PATCH /api/sessions[/...]` | 会话 CRUD + 历史消息 |
+| `GET /api/videos` | 用户已分析的视频列表 |
+
+---
+
+## 评测管线
+
+### 数据集准备（NExT-GQA only；LongVideoBench 已 descope）
+
+```bash
+# 1. 拉数据 + 采样到 20 题
+python scripts/eval_prepare_datasets.py --datasets nextgqa --sample 20
+
+# 2. 转 EvalCase JSONL
+python scripts/eval_convert_nextgqa.py \
+  --raw data/eval/_raw/nextgqa \
+  --output tests/fixtures/eval_cases_nextgqa.jsonl
+
+# 3. 拉视频 + 走完整 preprocess 写缓存
+python scripts/eval_ingest_videos.py \
+  --cases tests/fixtures/eval_cases_nextgqa.jsonl
 ```
 
-## 配置说明
+### 跑评测
 
-关键环境变量：
+```bash
+# 直接调本地 agent（默认）
+python scripts/eval_harness.py \
+  --cases tests/fixtures/eval_cases_nextgqa.jsonl \
+  --sample 20 --sample-seed 0 --judge \
+  --prediction-cache data/eval/prediction_cache.jsonl \
+  --output data/eval/runs/nextgqa_$(date +%Y%m%d_%H%M).json
 
-| 变量 | 作用 | 本地建议 | 服务器建议 |
-| --- | --- | --- | --- |
-| `VLM_MODEL_NAME` | Qwen3-VL 模型名 | `Qwen/Qwen3-VL-2B-Instruct` | `Qwen/Qwen3-VL-8B-Instruct` |
-| `VLM_MODEL_LOCAL_DIR` | 本地 VLM 路径 | `./models/Qwen3-VL-2B-Instruct` | `./models/Qwen3-VL-8B-Instruct` |
-| `MODELS_DEVICE` | bge-m3 / SigLIP2 设备 | `cpu` | `cuda:0` |
-| `LOAD_MODELS_ON_STARTUP` | App 启动时加载检索模型 | `false` | `true` |
-| `UNLOAD_MODELS_AFTER_USE` | 用完释放检索模型 | `true` | `false` |
-| `SIGLIP2_DTYPE` | SigLIP2 dtype | `float16` | `auto` |
-| `DENSE_FPS` | 稠密抽帧帧率 | `1.0` | `1.0` 或更高 |
-| `TOP_K_FRAMES` | 问答关键帧数 | `12` | `12` |
-| `VQA_MAX_FRAMES` | 实际送入 Qwen3-VL 的证据帧上限 | `6` | `12` |
-| `VQA_MAX_IMAGE_SIDE` | VQA 输入图片最长边 | `448` | `768` |
-| `VQA_IMAGE_QUALITY` | VQA 输入 JPEG 质量 | `75` | `85` |
-| `DATABASE_PATH` | SQLite 业务库路径 | 空，默认 `DATA_DIR/mr_big_eye.sqlite3` | 独立高速盘路径 |
-| `GRAPH_CHECKPOINT_PATH` | LangGraph checkpoint 库路径 | 空，默认 `DATA_DIR/graph_checkpoints.sqlite3` | 独立高速盘路径 |
-| `LANGMEM_STORE_PATH` | LangMem SQLite store 路径 | 空，默认 `DATA_DIR/langmem_store.sqlite3` | 独立高速盘路径 |
-| `LANGMEM_ENDPOINT` | LangMem 抽取模型 endpoint | 空，默认复用 `SGLANG_ENDPOINT/v1` | 可指向单独的小模型服务 |
-| `LANGMEM_MODEL_NAME` | LangMem 抽取模型名 | 空，默认复用 `SGLANG_SERVED_MODEL_NAME` | 可用独立文本模型 |
-| `PROGRESS_LANG` | 预处理 SSE 文案语言 | `zh` | `zh` 或 `en` |
-| `APP_CUDA_VISIBLE_DEVICES` | App/检索进程可见 GPU | 空或 `0` | `0` |
-| `SGLANG_CUDA_VISIBLE_DEVICES` | SGLang 进程可见 GPU | 空 | `1` 或 `1,2` |
-| `SGLANG_TP_SIZE` | SGLang tensor parallel size | `1` | 按可见 GPU 数设置 |
+# 用离线 prediction JSONL（控制组 / 其他系统对比）
+python scripts/eval_harness.py \
+  --cases tests/fixtures/eval_cases_nextgqa.jsonl \
+  --predictions some_predictions.jsonl \
+  --output data/eval/runs/<name>.json --judge
+```
 
-服务器迁移时建议从 `.env.server.example` 开始，而不是复用本地 `.env`。
+### Judge
 
-四卡 RTX 3080 20GB 服务器的推荐起点：
+`.env` 里 `JUDGE_API_KEY` 留空时，harness 会要求显式 `--no-judge` 或回退到 `VLM_API_*`（带"自评 bias" 警告）。建议生产路径填一个独立 judge：
 
 ```env
-APP_CUDA_VISIBLE_DEVICES=0
-MODELS_DEVICE=cuda:0
-SGLANG_CUDA_VISIBLE_DEVICES=1
-SGLANG_TP_SIZE=1
-VLM_MODEL_NAME=Qwen/Qwen3-VL-8B-Instruct
-VQA_MAX_FRAMES=12
-VQA_MAX_IMAGE_SIDE=768
+JUDGE_API_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+JUDGE_API_KEY=<ARK_KEY>
+JUDGE_MODEL_NAME=doubao-seed-2-0-pro-260215
 ```
 
-如果要让 SGLang 横跨两张卡，可改为：
+Judge 结果写入 `data/eval/judge_cache.jsonl`（key=case_id+judge_model+prompt_hash），改打分逻辑时无需重跑 VLM。
 
-```env
-SGLANG_CUDA_VISIBLE_DEVICES=1,2
-SGLANG_TP_SIZE=2
-```
+### 解读 run 报告
+
+每次 `eval_harness.py` 输出：
+
+- `data/eval/runs/<name>.json`：`run_meta` + `summary` + per-case `results`。
+- `data/eval/runs/<name>.md`：人类可读 markdown 报告。
+- `data/eval/runs_index.csv`：追加一行用于跨 run 对比。
+
+---
+
+## 配置
+
+| 变量 | 作用 | 默认/示例 |
+| --- | --- | --- |
+| `VLM_API_FORMAT` | `responses` / `chat_completions` | `chat_completions` |
+| `VLM_API_BASE_URL` | VLM 端点 | `https://api-inference.modelscope.cn/v1` |
+| `VLM_API_KEY` | VLM Bearer | 空 |
+| `VLM_MODEL_NAME` | caption + 多帧 QA 模型 | `Qwen/Qwen3-VL-30B-A3B-Instruct` |
+| `VLM_API_TIMEOUT` | VLM HTTP 超时 | `120` |
+| `ORCHESTRATOR_API_BASE_URL` | tool-call orchestrator 端点；空则复用 VLM | 空 |
+| `ORCHESTRATOR_API_KEY` | orchestrator key | 空 |
+| `ORCHESTRATOR_MODEL_NAME` | orchestrator 模型 | 空 |
+| `ORCHESTRATOR_TEMPERATURE` | 默认 `0.2` |
+| `ORCHESTRATOR_MAX_TOOL_CALLS` | 单轮工具上限 | `8` |
+| `ORCHESTRATOR_STREAMING` | 某些 proxy 不支持工具流式，默认关 | `false` |
+| `JUDGE_*` | LLM judge 独立端点，空则回退 VLM | 空 |
+| `LANGMEM_*` | LangMem 抽取端点，空则回退 VLM | 空 |
+| `LANGMEM_QUERY_LIMIT` | 单次 user memory 检索条数 | `6` |
+| `TOP_N_SCENES` / `TOP_K_FRAMES` | 检索默认 | `5` / `12` |
+| `PLANNER_MAX_TOP_N_SCENES` / `PLANNER_MAX_TOP_K_FRAMES` | planner 上限 | `12` / `36` |
+| `VQA_MAX_FRAMES` | 实际送 VLM 的证据帧上限 | 本地 `6`，服务器 `12` |
+| `VQA_MAX_IMAGE_SIDE` / `VQA_IMAGE_QUALITY` | 输入图片预处理 | `448` / `75` |
+| `DENSE_FPS` | 稠密抽帧帧率 | `1.0` |
+| `SCENE_DETECT_THRESHOLD` | PySceneDetect | `27.0` |
+| `MAX_VIDEO_DURATION_SEC` | 最大视频时长 | `600` |
+| `MODELS_DEVICE` | 本地 BGE/SigLIP 设备 | `cpu` / `cuda:0` |
+| `LOAD_MODELS_ON_STARTUP` | 启动时加载本地编码器 | 本地 `false`，服务器 `true` |
+| `DATA_DIR` | 运行数据目录 | `./data` |
+
+服务器迁移见 `.env.server.example`。
+
+---
 
 ## 目录结构
 
 ```text
 .
 ├── app/
-│   ├── main.py          # FastAPI 路由与后台任务
-│   ├── config.py        # Pydantic Settings
-│   ├── vqa.py           # SGLang / Qwen3-VL client
-│   ├── models.py        # bge-m3 / SigLIP2 wrappers
-│   ├── preprocess.py    # 视频预处理与索引构建
-│   ├── retrieval.py     # 两阶段检索
-│   ├── graph.py         # LangGraph 会话状态机
-│   ├── memory.py        # LangMem manager + LangGraph SQLite store
-│   ├── db.py            # SQLite users/sessions/videos
-│   ├── progress.py      # SSE progress pub/sub
-│   ├── usernames.py     # Witch/Queen 风格用户名池
-│   ├── cache.py         # 文件缓存与状态
-│   ├── schemas.py       # API schema
-│   └── static/          # 浏览器 UI
+│   ├── main.py             # FastAPI 路由 + SSE + 后台预处理
+│   ├── config.py           # Pydantic Settings
+│   ├── vqa.py              # VLM API client（responses + chat_completions）
+│   ├── models.py           # BGE-M3 / SigLIP2 wrappers + lazy load/release
+│   ├── preprocess.py       # 视频预处理 + 索引构建 + set_video_status
+│   ├── retrieval.py        # 两阶段检索 + 配额混合
+│   ├── graph.py            # LangGraph orchestrator + 4 道护栏
+│   ├── tools.py            # 9 工具实现 + planner 解析
+│   ├── memory.py           # LangMem manager / store
+│   ├── eval_harness.py     # 评测指标 + Soft-Waive + 缓存
+│   ├── eval_fingerprint.py # AGENT_CODE_VERSION + prompt fingerprint
+│   ├── eval_datasets.py    # 数据集元信息
+│   ├── cache.py            # 文件缓存 + .done 状态
+│   ├── db.py               # SQLite users/sessions/videos
+│   ├── progress.py         # SSE pub/sub
+│   ├── schemas.py / usernames.py
+│   └── static/             # 浏览器 UI
 ├── scripts/
-│   ├── download_models.py
-│   ├── launch_sglang.sh
 │   ├── launch_app.sh
-│   └── smoke_test.py
+│   ├── download_models.py
+│   ├── smoke_test.py
+│   ├── eval_harness.py
+│   ├── eval_no_retrieval.py        # 控制组：均匀采 N 帧 + VLM
+│   ├── eval_convert_nextgqa.py     # NExT-GQA → EvalCase JSONL
+│   ├── eval_convert_longvideobench.py  # （legacy，LVB 已 descope）
+│   ├── eval_prepare_datasets.py    # 拉数据集 + 采样
+│   └── eval_ingest_videos.py       # 跑 preprocess + 绑定 video_id
 ├── tests/
-│   ├── test_cache.py
-│   ├── test_db.py
-│   ├── test_memory.py
+│   ├── fixtures/
+│   │   ├── short_clip.mp4
+│   │   ├── eval_cases.jsonl
+│   │   ├── eval_cases_nextgqa.jsonl
+│   │   ├── eval_cases_nextgqa_smoke.jsonl
+│   │   ├── eval_predictions.jsonl
+│   │   └── datasets/
+│   ├── test_eval_harness.py
+│   ├── test_eval_converters.py
+│   ├── test_graph_orchestrator.py
+│   ├── test_main_stream_contract.py
+│   ├── test_tools_planner.py
 │   ├── test_retrieval.py
-│   ├── test_usernames.py
-│   └── fixtures/short_clip.mp4
-├── .env.example
-├── .env.server.example
-├── requirements.txt
-└── requirements-sglang.txt
+│   ├── test_vqa.py
+│   ├── test_cache.py / test_db.py / test_memory.py / test_usernames.py
+├── paper_references/
+│   ├── LensWalk.pdf                # 下一阶段灵感来源
+│   └── paper_reference_plan.md     # LensWalk-inspired 改造计划（5 个 phase）
+├── .env.example / .env.server.example
+└── requirements.txt
 ```
 
 运行时目录：
@@ -426,91 +614,64 @@ SGLANG_TP_SIZE=2
 ```text
 data/
 ├── uploads/
-├── mr_big_eye.sqlite3
-├── graph_checkpoints.sqlite3
-├── langmem_store.sqlite3
-└── cache/{video_id}/
-    ├── meta.json
-    ├── frames_scene/
-    ├── frames_dense/
-    ├── captions.jsonl
-    ├── caption_index/
-    └── frame_index/
+├── mr_big_eye.sqlite3                  # users/sessions/videos
+├── graph_checkpoints.sqlite3           # LangGraph thread 状态
+├── langmem_store.sqlite3               # LangMem user memory
+├── cache/<video_id>/                   # 见 1.3
+└── eval/
+    ├── _raw/                           # 原始数据集
+    ├── datasets/                       # 处理后样本
+    ├── prediction_cache.jsonl          # case_id + fingerprint → prediction
+    ├── judge_cache.jsonl               # case_id + judge_model → judge 结果
+    ├── runs/<dataset>_<ts>_<tag>.json  # 每次 run 报告
+    ├── runs/<dataset>_<ts>_<tag>.md
+    └── runs_index.csv                  # 跨 run 对比
 ```
 
-`data/` 和 `models/` 默认不提交到 Git。
+`data/` 与 `models/` 默认不入 Git。
 
-## 验证结果
+---
 
-当前已完成的验证：
+## 测试
 
 ```bash
 python -m pytest -q
 ```
 
-结果：
+当前覆盖：缓存 / DB / 用户名 / VQA payload / 两阶段检索契约 / LangGraph orchestrator 4 道护栏 / 工具 planner profile 映射 / evidence sufficiency / grounding report / Soft-Waive 评分 / 数据集 converter / prediction cache / `main.py` SSE stream contract。
 
-```text
-10 passed, 1 skipped
-```
-
-当前 `trustcall` 会在测试中输出一个 LangGraph deprecation warning，来自第三方包内部导入，不影响运行。
-
-SGLang OpenAI-compatible API 已验证：
-
-```text
-GET  /v1/models
-POST /v1/chat/completions
-```
-
-轻量 HTTP smoke 已验证：
-
-```text
-GET  /
-POST /api/login
-POST /api/sessions
-GET  /api/sessions
-GET  /api/sessions/{id}/messages
-GET  /api/preprocess_stream/{video_id}
-```
-
-完整视频链路仍需要先启动 SGLang：
-
-```text
-upload -> preprocess -> retrieve -> answer -> keyframes
-```
+---
 
 ## 已知限制
 
-Phase 2 已经补齐会话、SSE 和内联帧，但仍保留一些刻意简化：
-
 - 用户身份是本地 name-tag，不是认证系统。
-- 预处理仍使用 FastAPI 后台任务，不是生产级任务队列。
-- 当前在 Python 3.10 下对 LangMem 做了 `typing.NotRequired` 兼容补丁；升级到 Python 3.11+ 后可以移除这层兼容。
-- `pip check` 可能报告 `decord 0.6.0 is not supported on this platform`，但当前环境中 `import decord` 和 `VideoReader` 已验证可用。
-- 本地 laptop 模式下检索模型按需加载，速度不代表服务器表现。
-- Demo GIF 仍待录制。
+- 预处理走 FastAPI 后台任务，不是生产级队列。
+- 远程 VLM 延迟 / 并发 / 费用取决于 provider。
+- `POST /chat` 匿名路径仍是 direct retrieval + VQA；只有登录 SSE 走完整 agent。
+- Grounding 是规则型 + LLM judge 混合；细粒度语义对齐还可继续加强。
+- caption_index / frame_index 没有版本号，升级 BGE / SigLIP 模型需手动清缓存。
 
 ## 后续方向
 
-可继续扩展的方向：
+- **LensWalk-inspired agent 升级**（详见 [paper_references/paper_reference_plan.md](paper_references/paper_reference_plan.md)）：
+  - `stitched_verify` 工具：跨多窗口对比，对应 temporal_order / comparison
+  - `segment_focus` 工具：单窗口 1fps 密采，对应 visual_detail
+  - VQA prompt LensWalk-style 严格 scope 约束（防 Evidence Dilution）
+  - Orchestrator THINK→PLAN→OBSERVE 显式声明
+  - Subject Registry：单视频跨 turn 实体追踪（GraphState 字段，per thread_id 持久化，**不**进 LangMem）
+- 索引产物加版本号，模型升级自动失效缓存。
+- 引入 Redis / Celery 等任务队列替代后台任务。
+- 时间轴 UI：点击关键帧跳转视频时间点。
 
-- 引入 Redis / Celery / Dramatiq 等任务队列替代当前后台任务。
-- 加入片段级时间轴 UI，点击关键帧跳转到视频时间点。
-- 在服务器上压测 Qwen3-VL-8B-Instruct，并让 bge-m3 / SigLIP2 常驻 GPU。
-- 对 caption index 和 frame index 增加版本号，支持模型升级后的缓存失效。
+---
 
-## Project Highlights
+## Highlights (English TL;DR)
 
-- Two-stage retrieval with bge-m3 caption filtering and SigLIP2 visual reranking reduces long-video QA to a small set of high-value frames.
-- LangGraph + LangMem powers per-user persistent sessions and long-term memory with human-readable user IDs.
-- SSE streams preprocessing progress and token-by-token answers for lower perceived latency.
-- FastAPI + SGLang + Chroma + SigLIP2 + bge-m3, with config boundaries ready for a 4x RTX 3080 20GB server.
-
-## Demo
-
-待补充：
-
-```text
-docs/demo.gif
-```
+- Long-video QA via PySceneDetect + BGE-M3 caption retrieval + SigLIP2 frame reranking with **quota-blended fallback** against BGE routing failures.
+- Remote VLM API only (Doubao Responses / OpenAI-compat Chat); zero local VLM serving stack.
+- LangGraph agent loop with 9 tools, 4 production-grade guards (tool-call dedup, verify-grounding stall short-circuit, empty-content salvage, tool-call cap).
+- **Soft-Waive scoring**: when LLM judge accepts, citation/agent/retrieval gates soft-waive but keep strict signal in JSON for forensics.
+- **Prompt-aware prediction cache**: SHA1(prompts ‖ AGENT_CODE_VERSION) auto-invalidates affected entries on prompt edits.
+- **Run-level footprint**: per-run `run_meta` + append-only `runs_index.csv` for reproducible VLM/orchestrator comparison.
+- Two-layer memory: LangGraph SQLite checkpointer for thread state + LangMem SQLite store for cross-session user memory.
+- Reproducible quality harness over NExT-GQA with a no-retrieval control-group baseline.

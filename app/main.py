@@ -13,7 +13,7 @@ import aiofiles
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 from PIL import Image
 
 from app import db
@@ -23,9 +23,10 @@ from app.graph import (
     build_checkpointer,
     build_graph,
     messages_from_snapshot,
+    _should_use_video,
     video_id_from_snapshot,
 )
-from app.memory import build_memory_manager, build_memory_store, memory_context, write_memories
+from app.memory import build_memory_manager, build_memory_store
 from app.models import load_all_models
 from app.progress import make_progress_callback, publish_progress, sse, stage_label, subscribe_progress
 from app.schemas import (
@@ -45,7 +46,7 @@ from app.schemas import (
     VideoSummary,
 )
 from app.usernames import pick_username
-from app.vqa import answer_question, stream_answer_question, stream_text
+from app.vqa import answer_question
 
 logging.basicConfig(
     level=getattr(logging, settings.log_level.upper(), logging.INFO),
@@ -272,6 +273,12 @@ async def api_update_session(
                 "video_id": updates.get("video_id", values.get("video_id")),
                 "retrieved_frames": values.get("retrieved_frames", []),
                 "retrieved_scene_hits": values.get("retrieved_scene_hits", []),
+                "retrieval_plan": values.get("retrieval_plan", {}),
+                "timeline": values.get("timeline", []),
+                "hypotheses": values.get("hypotheses", []),
+                "evidence_sufficiency": values.get("evidence_sufficiency", {}),
+                "draft_answer": values.get("draft_answer", ""),
+                "grounding_report": values.get("grounding_report", {}),
             },
             as_node="memory_write_node",
         )
@@ -318,49 +325,96 @@ async def chat_stream(
             session = db.get_session(sid)
             active_video_id = video_id or (session or {}).get("video_id")
             if active_video_id:
+                if _should_use_video(question):
+                    status = get_video_status(active_video_id)
+                    if status != "done":
+                        raise HTTPException(status_code=409, detail=f"Video is not ready: {status}")
                 db.update_session(sid, video_id=active_video_id)
             if not (session or {}).get("title"):
                 db.update_session(sid, title=_make_title(question))
 
-            retrieval_result = await _retrieve_result_for_stream(active_video_id, question)
-            frames = _frame_payloads(retrieval_result) if retrieval_result else []
-            scene_hits = retrieval_result.scene_hits if retrieval_result else []
             yield sse(
                 "frames",
                 {
                     "session_id": sid,
                     "created_session": created_session,
-                    "frames": frames,
-                    "scene_hits": scene_hits,
+                    "frames": [],
+                    "scene_hits": [],
                 },
             )
 
             answer = ""
-            if retrieval_result is not None:
-                history = await _checkpoint_history_for_vqa(sid)
-                async for token in stream_answer_question(
-                    question,
-                    retrieval_result.frames,
-                    retrieval_result.timestamps,
-                    history,
-                ):
-                    answer += token
-                    yield sse("token", {"text": token})
-            else:
-                messages = await _messages_for_direct_stream(sid, user_id, question)
-                async for token in stream_text(messages):
-                    answer += token
-                    yield sse("token", {"text": token})
+            pending_orchestrator_tokens: list[str] = []
+            tool_phase_completed = False
+            final_state: dict[str, Any] | None = None
+            async for event in app.state.graph.astream_events(
+                {
+                    "messages": [HumanMessage(content=question)],
+                    "video_id": active_video_id,
+                    "user_id": user_id,
+                    "retrieved_frames": [],
+                    "retrieved_scene_hits": [],
+                    "retrieval_plan": {},
+                    "timeline": [],
+                    "hypotheses": [],
+                    "evidence_sufficiency": {},
+                    "draft_answer": "",
+                    "grounding_report": {},
+                },
+                config=_graph_config(sid),
+                version="v2",
+            ):
+                event_name = event.get("event")
+                name = event.get("name")
+                data = event.get("data") or {}
+                if event_name == "on_chain_stream" and name == "LangGraph":
+                    chunk = data.get("chunk") or {}
+                    tool_update = chunk.get("tool_node")
+                    if tool_update:
+                        tool_phase_completed = True
+                        pending_orchestrator_tokens = []
+                        frames = tool_update.get("retrieved_frames", [])
+                        scene_hits = tool_update.get("retrieved_scene_hits", [])
+                        if frames or scene_hits:
+                            yield sse(
+                                "frames",
+                                {
+                                    "session_id": sid,
+                                    "created_session": created_session,
+                                    "frames": frames,
+                                    "scene_hits": scene_hits,
+                                },
+                            )
+                elif event_name == "on_chat_model_stream" and name == "ChatOpenAI":
+                    metadata = event.get("metadata") or {}
+                    if metadata.get("langgraph_node") != "orchestrator":
+                        continue
+                    chunk = data.get("chunk")
+                    text = _message_content_text(getattr(chunk, "content", ""))
+                    if text:
+                        if tool_phase_completed:
+                            answer += text
+                            yield sse("token", {"text": text})
+                        else:
+                            pending_orchestrator_tokens.append(text)
+                elif event_name == "on_chain_end" and name == "orchestrator":
+                    if tool_phase_completed or not pending_orchestrator_tokens:
+                        continue
+                    output = data.get("output") or {}
+                    node_messages = output.get("messages", [])
+                    last_message = node_messages[-1] if node_messages else None
+                    if not getattr(last_message, "tool_calls", None):
+                        for token in pending_orchestrator_tokens:
+                            answer += token
+                            yield sse("token", {"text": token})
+                    pending_orchestrator_tokens = []
+                elif event_name == "on_chain_end" and name == "LangGraph":
+                    final_state = data.get("output") or {}
 
-            await _append_checkpoint_turn(
-                sid,
-                user_id,
-                active_video_id,
-                question,
-                answer,
-                frames,
-                scene_hits,
-            )
+            if not answer and final_state:
+                answer = _last_assistant_message(final_state.get("messages", []))
+                if answer:
+                    yield sse("token", {"text": answer})
             if answer:
                 db.update_session(sid)
             yield sse("done", {"session_id": sid})
@@ -393,6 +447,22 @@ def _image_to_b64(image: Image.Image) -> str:
     return base64.b64encode(buffer.getvalue()).decode("ascii")
 
 
+def _message_content_text(content: Any) -> str:
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        chunks: list[str] = []
+        for item in content:
+            if isinstance(item, str):
+                chunks.append(item)
+            elif isinstance(item, dict):
+                text = item.get("text")
+                if isinstance(text, str):
+                    chunks.append(text)
+        return "".join(chunks)
+    return ""
+
+
 async def _chat_with_graph(req: ChatRequest) -> ChatResponse:
     user = _require_user(req.user_id or "")
     session_id = req.session_id or db.create_session(
@@ -401,23 +471,31 @@ async def _chat_with_graph(req: ChatRequest) -> ChatResponse:
         _make_title(req.question),
     )
     if req.session_id:
-        _require_session_owner(req.session_id, user["user_id"])
+        session = _require_session_owner(req.session_id, user["user_id"])
     else:
+        session = db.get_session(session_id) or {}
         await _seed_graph_session(session_id, user["user_id"], req.video_id)
 
-    if req.video_id:
-        status = get_video_status(req.video_id)
+    active_video_id = req.video_id or session.get("video_id")
+    if active_video_id:
+        status = get_video_status(active_video_id)
         if status != "done":
             raise HTTPException(status_code=409, detail=f"Video is not ready: {status}")
-        db.update_session(session_id, video_id=req.video_id)
+        db.update_session(session_id, video_id=active_video_id)
 
     state = await app.state.graph.ainvoke(
         {
             "messages": [HumanMessage(content=req.question)],
-            "video_id": req.video_id,
+            "video_id": active_video_id,
             "user_id": user["user_id"],
             "retrieved_frames": [],
             "retrieved_scene_hits": [],
+            "retrieval_plan": {},
+            "timeline": [],
+            "hypotheses": [],
+            "evidence_sufficiency": {},
+            "draft_answer": "",
+            "grounding_report": {},
         },
         config=_graph_config(session_id),
     )
@@ -425,99 +503,10 @@ async def _chat_with_graph(req: ChatRequest) -> ChatResponse:
     db.update_session(session_id)
     return ChatResponse(
         answer=answer,
-        frames=[FramePayload(**frame) for frame in state.get("retrieved_frames", [])],
+        frames=[_frame_response(frame) for frame in state.get("retrieved_frames", [])],
         scene_hits=state.get("retrieved_scene_hits", []),
         session_id=session_id,
     )
-
-
-async def _retrieve_result_for_stream(
-    video_id: str | None,
-    question: str,
-) -> Any | None:
-    if not video_id or not _looks_like_video_question(question):
-        return None
-    status = get_video_status(video_id)
-    if status != "done":
-        raise HTTPException(status_code=409, detail=f"Video is not ready: {status}")
-    from app.retrieval import two_stage_retrieve
-
-    return await asyncio.to_thread(two_stage_retrieve, video_id, question)
-
-
-def _frame_payloads(result: Any) -> list[dict[str, Any]]:
-    return [
-        {"timestamp": timestamp, "image_b64": _image_to_b64(frame)}
-        for frame, timestamp in zip(result.frames, result.timestamps, strict=False)
-    ]
-
-
-async def _messages_for_direct_stream(
-    session_id: str,
-    user_id: str,
-    question: str,
-) -> list[Any]:
-    snapshot = await app.state.graph.aget_state(_graph_config(session_id))
-    values = getattr(snapshot, "values", {}) or {}
-    memory_text = await memory_context(
-        app.state.memory_store,
-        user_id,
-        question,
-        settings.langmem_query_limit,
-    )
-    prompt = (
-        "You are Mr. Big-Eye, a warm and concise video-analysis assistant. "
-        "Answer directly and match the user's language."
-    )
-    if memory_text:
-        prompt += "\n\nRelevant user memories:\n" + memory_text
-    return [{"role": "system", "content": prompt}, *values.get("messages", []), HumanMessage(content=question)]
-
-
-async def _checkpoint_history_for_vqa(session_id: str) -> list[dict[str, str]]:
-    snapshot = await app.state.graph.aget_state(_graph_config(session_id))
-    values = getattr(snapshot, "values", {}) or {}
-    history: list[dict[str, str]] = []
-    for message in values.get("messages", [])[-10:]:
-        if getattr(message, "type", "") == "human":
-            history.append({"role": "user", "content": str(message.content)})
-        elif getattr(message, "type", "") == "ai":
-            history.append({"role": "assistant", "content": str(message.content)})
-    return history
-
-
-async def _append_checkpoint_turn(
-    session_id: str,
-    user_id: str,
-    video_id: str | None,
-    question: str,
-    answer: str,
-    frames: list[dict[str, Any]],
-    scene_hits: list[dict[str, Any]],
-) -> None:
-    await app.state.graph.aupdate_state(
-        _graph_config(session_id),
-        {
-            "messages": [HumanMessage(content=question), AIMessage(content=answer)],
-            "user_id": user_id,
-            "video_id": video_id,
-            "retrieved_frames": frames,
-            "retrieved_scene_hits": scene_hits,
-        },
-        as_node="memory_write_node",
-    )
-    memory_messages: list[Any] = []
-    if video_id:
-        memory_messages.append(
-            AIMessage(
-                content=(
-                    f"This session analyzed video_id={video_id}. "
-                    f"User question: {question}"
-                )
-            )
-        )
-    memory_messages.extend([HumanMessage(content=question), AIMessage(content=answer)])
-    await write_memories(app.state.memory_manager, memory_messages, user_id)
 
 
 async def _seed_graph_session(session_id: str, user_id: str, video_id: str | None) -> None:
@@ -533,6 +522,12 @@ async def _seed_graph_session(session_id: str, user_id: str, video_id: str | Non
             "video_id": video_id,
             "retrieved_frames": [],
             "retrieved_scene_hits": [],
+            "retrieval_plan": {},
+            "timeline": [],
+            "hypotheses": [],
+            "evidence_sufficiency": {},
+            "draft_answer": "",
+            "grounding_report": {},
         },
         as_node="memory_write_node",
     )
@@ -540,6 +535,13 @@ async def _seed_graph_session(session_id: str, user_id: str, video_id: str | Non
 
 def _graph_config(session_id: str) -> dict[str, Any]:
     return {"configurable": {"thread_id": session_id}}
+
+
+def _frame_response(frame: dict[str, Any]) -> FramePayload:
+    return FramePayload(
+        timestamp=float(frame["timestamp"]),
+        image_b64=str(frame["image_b64"]),
+    )
 
 
 def _require_user(user_id: str) -> dict[str, Any]:
@@ -560,7 +562,7 @@ def _require_session_owner(session_id: str, user_id: str) -> dict[str, Any]:
 
 def _last_assistant_message(messages: list[Any]) -> str:
     for message in reversed(messages):
-        if getattr(message, "type", "") == "ai":
+        if getattr(message, "type", "") == "ai" and not getattr(message, "tool_calls", None):
             return str(message.content)
     return ""
 
@@ -574,34 +576,4 @@ def _make_title(question: str) -> str:
 
 
 def _looks_like_video_question(question: str) -> bool:
-    text = question.lower()
-    direct = ("who are you", "你是谁", "hello", "hi", "你好", "嗨")
-    if any(marker in text for marker in direct) and len(text) < 80:
-        return False
-    markers = (
-        "video",
-        "frame",
-        "scene",
-        "watch",
-        "happen",
-        "object",
-        "person",
-        "minute",
-        "second",
-        "timestamp",
-        "what",
-        "where",
-        "when",
-        "describe",
-        "视频",
-        "画面",
-        "镜头",
-        "场景",
-        "发生",
-        "看到",
-        "哪里",
-        "什么时候",
-        "第几",
-        "描述",
-    )
-    return any(marker in text for marker in markers)
+    return _should_use_video(question)

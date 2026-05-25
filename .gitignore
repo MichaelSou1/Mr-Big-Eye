@@ -19,3 +19,9 @@ docs/*.mp4
 
 .DS_Store
 Thumbs.db
+
+# debugging
+debug_input/
+
+# large reference PDFs — keep plan.md, exclude binary papers
+paper_references/*.pdf

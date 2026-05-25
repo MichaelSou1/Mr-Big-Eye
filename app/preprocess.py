@@ -12,7 +12,7 @@ import numpy as np
 from PIL import Image
 from scenedetect import ContentDetector, detect
 
-from app.cache import ensure_cache_dirs, save_meta
+from app.cache import ensure_cache_dirs, save_meta, set_video_status
 from app.config import settings
 from app.models import get_bge, get_siglip, release_bge, release_siglip
 from app.progress import stage_label
@@ -95,6 +95,7 @@ async def preprocess_video(
     )
     meta["dense_frame_count"] = dense_count
     save_meta(video_id, meta)
+    set_video_status(video_id, "done")
     _emit(progress_callback, "done", 1.0)
     return meta
 

@@ -1,0 +1,2 @@
+{"case_id":"short-move","video_id":"test001","question":"What object moves across the video?","gold_timestamps":[1.0],"gold_scenes":[{"start":0.0,"end":2.0}],"required_keywords":["object"],"forbidden_keywords":["cat"],"expected_action":"assess_evidence_sufficiency","needs_expansion":false}
+{"case_id":"short-absence","video_id":"test001","question":"Is there a cat in the video?","gold_timestamps":[0.0,1.0],"required_keywords":["cat"],"forbidden_keywords":["definitely"],"expected_action":"retrieve_video_evidence","requires_uncertainty":true,"needs_expansion":true}

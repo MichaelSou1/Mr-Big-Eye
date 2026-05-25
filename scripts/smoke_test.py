@@ -16,12 +16,36 @@ if str(ROOT_DIR) not in sys.path:
 from app.config import settings
 
 
+def _vlm_api_reachable() -> tuple[bool, str]:
+    """Best-effort health check: send a HEAD/GET to the API base URL.
+
+    We don't have a portable /v1/models endpoint across providers (Doubao
+    Responses API doesn't expose it the same way), so we just confirm the
+    host resolves and accepts a request.
+    """
+    url = settings.vlm_api_base_url.rstrip("/")
+    headers = {}
+    if settings.vlm_api_key:
+        headers["Authorization"] = f"Bearer {settings.vlm_api_key}"
+    try:
+        with httpx.Client(timeout=10) as client:
+            resp = client.get(url, headers=headers)
+        return True, f"HTTP {resp.status_code}"
+    except Exception as exc:
+        return False, str(exc)
+
+
 def main() -> int:
     load_dotenv()
     parser = argparse.ArgumentParser()
     parser.add_argument("--video", default="tests/fixtures/short_clip.mp4")
     parser.add_argument("--question", default="What is happening in the video?")
     parser.add_argument("--timeout", type=int, default=900)
+    parser.add_argument(
+        "--skip-vlm-check",
+        action="store_true",
+        help="Skip the VLM API reachability check.",
+    )
     args = parser.parse_args()
 
     base_url = f"http://127.0.0.1:{settings.app_port}"
@@ -30,14 +54,14 @@ def main() -> int:
         print(f"Missing video fixture: {video_path}", file=sys.stderr)
         return 2
 
-    with httpx.Client(timeout=60) as client:
-        try:
-            sglang = client.get(f"{settings.sglang_endpoint.rstrip('/')}/v1/models")
-            sglang.raise_for_status()
-        except Exception as exc:
-            print(f"SGLang is not reachable: {exc}", file=sys.stderr)
+    if not args.skip_vlm_check:
+        ok, detail = _vlm_api_reachable()
+        if not ok:
+            print(f"VLM API is not reachable at {settings.vlm_api_base_url}: {detail}", file=sys.stderr)
             return 3
+        print(f"vlm_api_base_url={settings.vlm_api_base_url} reachable ({detail})")
 
+    with httpx.Client(timeout=60) as client:
         with video_path.open("rb") as handle:
             upload = client.post(
                 f"{base_url}/upload",

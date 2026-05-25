@@ -1,4 +1,0 @@
-# Optional inference-server dependencies.
-# Install this in the same conda env when you want to launch Qwen3-VL locally.
-# Install before the app dependencies so pip keeps the SGLang-tested torch stack.
-sglang[all]==0.5.12

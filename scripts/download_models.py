@@ -1,5 +1,9 @@
 #!/usr/bin/env python
-"""Download Phase 1 models via ModelScope for faster mainland China access."""
+"""Download local retrieval models (bge-m3 + SigLIP2) via ModelScope.
+
+The VLM (multimodal Q&A model) is no longer downloaded locally; it is now
+served via a remote API (see VLM_API_* settings in .env).
+"""
 
 from __future__ import annotations
 
@@ -42,7 +46,6 @@ def _verify(model_id: str) -> None:
 
 def _targets() -> dict[str, tuple[str, Path, list[str] | None]]:
     return {
-        "vlm": (settings.vlm_model_name, settings.vlm_model_local_dir, None),
         "bge": (
             settings.bge_m3_model,
             settings.bge_m3_local_dir,
@@ -56,9 +59,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--only",
-        choices=("all", "vlm", "bge", "siglip"),
+        choices=("all", "bge", "siglip"),
         default="all",
-        help="Download one model family or all Phase 1 models.",
+        help="Download one retrieval model or all of them.",
     )
     parser.add_argument(
         "--dry-run",

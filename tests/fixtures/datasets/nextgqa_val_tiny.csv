@@ -1,0 +1,4 @@
+video_id,frame_count,width,height,question,answer,qid,type,a0,a1,a2,a3,a4
+4882821564,150,640,360,why does the man pick up the bottle,to drink water,q1,CW,to drink water,to throw it,to wash it,to read the label,to pour it
+5750463032,200,640,360,when does the dog start barking,when the cat enters,q2,TN,immediately,when the cat enters,at the end,never,after the man leaves
+4882821564,150,640,360,how does the child react,he laughs,q3,CH,he laughs,he cries,he runs away,he stays still,he claps

@@ -27,7 +27,20 @@ def _patch_typing_for_langmem() -> None:
 
 _patch_typing_for_langmem()
 
-from langmem import create_memory_store_manager  # noqa: E402
+try:
+    from langmem import create_memory_store_manager  # noqa: E402
+except ModuleNotFoundError:  # pragma: no cover - exercised when optional dep is absent
+    class MemoryStoreManager:
+        def __init__(self, *args: Any, **kwargs: Any):
+            self.args = args
+            self.kwargs = kwargs
+
+        async def ainvoke(self, payload: dict[str, Any], config: dict[str, Any] | None = None):
+            logger.warning("langmem is not installed; skipping memory extraction")
+            return None
+
+    def create_memory_store_manager(*args: Any, **kwargs: Any) -> MemoryStoreManager:
+        return MemoryStoreManager(*args, **kwargs)
 
 
 MEMORY_NAMESPACE_PREFIX = "memories"
@@ -43,13 +56,24 @@ async def build_memory_store() -> AsyncSqliteStore:
 
 
 def build_memory_manager(store: BaseStore):
-    model_name = settings.langmem_model_name or settings.sglang_served_model_name
-    base_url = settings.langmem_endpoint or f"{settings.sglang_endpoint.rstrip('/')}/v1"
+    """Build the LangMem manager.
+
+    LangMem only does text extraction, so it always hits an OpenAI-compatible
+    chat-completions endpoint. By default we reuse the VLM provider (Doubao
+    and MiMo both expose /chat/completions); override LANGMEM_API_* to point at
+    a cheaper text-only model.
+    """
+    model_name = settings.langmem_model_name or settings.vlm_model_name
+    base_url = (
+        settings.langmem_api_base_url
+        or settings.vlm_api_base_url
+    ).rstrip("/")
+    api_key = settings.langmem_api_key or settings.vlm_api_key or "EMPTY"
     model = ChatOpenAI(
         model=model_name,
         base_url=base_url,
-        api_key=settings.langmem_api_key or "EMPTY",
-        timeout=settings.sglang_timeout,
+        api_key=api_key,
+        timeout=settings.vlm_api_timeout,
         temperature=0,
         max_retries=1,
     )

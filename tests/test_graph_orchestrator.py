@@ -1,0 +1,403 @@
+import pytest
+from langchain_core.messages import AIMessage, HumanMessage
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.store.memory import InMemoryStore
+
+from app import graph
+from app import tools
+
+
+class FakeOrchestrator:
+    def bind_tools(self, tools):
+        return self
+
+    async def ainvoke(self, messages):
+        if any(getattr(message, "type", "") == "tool" for message in messages):
+            return AIMessage(content="Final answer with [FRAME:t=1.0]")
+        return AIMessage(
+            content="",
+            tool_calls=[
+                {
+                    "name": "retrieve_video_evidence",
+                    "args": {
+                        "question": "What is happening?",
+                        "question_type": "temporal_order",
+                        "retrieval_profile": "temporal",
+                        "top_n_scenes": 7,
+                        "top_k_frames": 18,
+                        "planner_notes": "Need nearby moments.",
+                    },
+                    "id": "call_vqa",
+                }
+            ],
+        )
+
+
+class FakeMemoryManager:
+    def __init__(self):
+        self.calls = []
+
+    async def ainvoke(self, payload, config=None):
+        self.calls.append((payload, config))
+
+
+@pytest.mark.asyncio
+async def test_graph_orchestrator_tool_loop_updates_frames(monkeypatch):
+    async def fake_answer_question(question, frames, timestamps, history=None):
+        return "The clip shows a test frame. [FRAME:t=1.0]"
+
+    class RetrievalResult:
+        frames = []
+        timestamps = [1.0]
+        scene_hits = [{"start": 0.0, "end": 2.0, "caption": "test scene"}]
+
+    captured_plan = {}
+
+    def fake_retrieve(video_id, question, *, top_n_scenes=None, top_k_frames=None):
+        from PIL import Image
+
+        captured_plan.update(
+            {
+                "video_id": video_id,
+                "question": question,
+                "top_n_scenes": top_n_scenes,
+                "top_k_frames": top_k_frames,
+            }
+        )
+        result = RetrievalResult()
+        result.frames = [Image.new("RGB", (8, 8), "white")]
+        return result
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: FakeOrchestrator())
+    monkeypatch.setattr("app.tools.answer_question", fake_answer_question)
+    monkeypatch.setattr(tools, "_retrieve_video", fake_retrieve)
+
+    manager = FakeMemoryManager()
+    app = graph.build_graph(InMemorySaver(), InMemoryStore(), manager)
+    state = await app.ainvoke(
+        {
+            "messages": [HumanMessage(content="What is happening?")],
+            "video_id": "vid001",
+            "user_id": "user001",
+            "retrieved_frames": [],
+            "retrieved_scene_hits": [],
+            "retrieval_plan": {},
+            "timeline": [],
+            "hypotheses": [],
+            "evidence_sufficiency": {},
+            "draft_answer": "",
+            "grounding_report": {},
+        },
+        config={"configurable": {"thread_id": "thread001"}},
+    )
+
+    assert graph._last_ai_text(state["messages"]) == "Final answer with [FRAME:t=1.0]"
+    assert state["retrieved_frames"][0]["timestamp"] == 1.0
+    assert state["retrieved_scene_hits"][0]["caption"] == "test scene"
+    assert captured_plan == {
+        "video_id": "vid001",
+        "question": "What is happening?",
+        "top_n_scenes": 7,
+        "top_k_frames": 18,
+    }
+    assert manager.calls
+
+
+def test_graph_keeps_compatibility_symbols():
+    assert graph._should_use_video("What happens in this video?")
+    assert not graph._should_use_video("hello")
+    assert callable(graph.tool_node)
+    assert callable(graph._route_after_chat)
+
+
+def test_salvage_draft_answer_prefers_state_draft_when_no_tool_messages():
+    state = {"messages": [], "draft_answer": "  saved draft  "}
+    assert graph._salvage_draft_answer(state) == "saved draft"
+
+
+def test_salvage_draft_answer_uses_tool_message():
+    import json as _json
+    from langchain_core.messages import ToolMessage
+
+    tool_message = ToolMessage(
+        content=_json.dumps({"tool": "answer_with_evidence", "answer": "rescued answer"}),
+        tool_call_id="abc",
+    )
+    state = {"messages": [tool_message], "draft_answer": ""}
+    assert graph._salvage_draft_answer(state) == "rescued answer"
+
+
+def test_salvage_draft_answer_picks_longest_across_history():
+    """Prefer the longest valid answer so a later short/garbled response doesn't win."""
+    import json as _json
+    from langchain_core.messages import ToolMessage
+
+    long_msg = ToolMessage(
+        content=_json.dumps(
+            {"tool": "answer_with_evidence", "answer": "long well-formed analysis with detail"}
+        ),
+        tool_call_id="a",
+    )
+    short_msg = ToolMessage(
+        content=_json.dumps({"tool": "answer_with_evidence", "answer": "**1. brief"}),
+        tool_call_id="b",
+    )
+    state = {
+        "messages": [long_msg, short_msg],
+        "draft_answer": "**1. brief",  # last write overwrote the long one
+    }
+    assert graph._salvage_draft_answer(state) == "long well-formed analysis with detail"
+
+
+def test_salvage_draft_answer_skips_replacement_character():
+    """Answers ending in the Unicode replacement char are VLM-truncated; reject."""
+    import json as _json
+    from langchain_core.messages import ToolMessage
+
+    truncated = ToolMessage(
+        content=_json.dumps({"tool": "answer_with_evidence", "answer": "header\n**1. �"}),
+        tool_call_id="t",
+    )
+    good = ToolMessage(
+        content=_json.dumps({"tool": "answer_with_evidence", "answer": "a clean shorter line"}),
+        tool_call_id="g",
+    )
+    state = {"messages": [truncated, good], "draft_answer": ""}
+    assert graph._salvage_draft_answer(state) == "a clean shorter line"
+
+
+def test_salvage_draft_answer_skips_error_payloads():
+    import json as _json
+    from langchain_core.messages import ToolMessage
+
+    err_msg = ToolMessage(
+        content=_json.dumps(
+            {"tool": "answer_with_evidence", "answer": "stale draft", "error": "empty_vlm_response"}
+        ),
+        tool_call_id="e",
+    )
+    state = {"messages": [err_msg], "draft_answer": ""}
+    assert graph._salvage_draft_answer(state) == ""
+
+
+def test_salvage_draft_answer_returns_empty_when_no_signal():
+    assert graph._salvage_draft_answer({"messages": [], "draft_answer": ""}) == ""
+
+
+def test_orchestrator_prompt_mcq_and_dedup_rules():
+    """Phase C: video-branch prompt must enforce MCQ commit + anti-loop rules."""
+    video_prompt = graph._orchestrator_prompt(has_video=True)
+    no_video_prompt = graph._orchestrator_prompt(has_video=False)
+    assert "MUST commit" in video_prompt
+    assert "Do not call the same tool with the same arguments twice" in video_prompt
+    assert "Do not call the same tool with the same arguments twice" in no_video_prompt
+    # MCQ rule does not apply when there is no video
+    assert "MUST commit" not in no_video_prompt
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_dedups_identical_tool_call(monkeypatch):
+    """Phase D: a fresh tool_call that matches a prior (name, args) signature
+    must NOT re-invoke the live tool — it should be answered from the cached
+    ToolMessage and stripped from the AIMessage."""
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    class RepeatingModel:
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages):
+            return AIMessage(
+                content="",
+                tool_calls=[
+                    {
+                        "name": "retrieve_video_evidence",
+                        "args": {"question": "What is happening?"},
+                        "id": "call_repeat",
+                    }
+                ],
+            )
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: RepeatingModel())
+
+    orchestrator = graph._make_orchestrator()
+    prior_ai = AIMessage(
+        content="",
+        tool_calls=[
+            {
+                "name": "retrieve_video_evidence",
+                "args": {"question": "What is happening?"},
+                "id": "call_prev",
+            }
+        ],
+    )
+    prior_tool = ToolMessage(
+        content='{"tool": "retrieve_video_evidence", "timestamps": [1.0]}',
+        tool_call_id="call_prev",
+    )
+    state = {
+        "messages": [
+            HumanMessage(content="What is happening?"),
+            prior_ai,
+            prior_tool,
+        ],
+        "draft_answer": "",
+        "user_id": "u",
+        "video_id": "v",
+    }
+    result = await orchestrator(state)
+    msgs = result["messages"]
+    # Expect: new AIMessage with surviving tool_calls stripped + synthesized ToolMessage
+    assert len(msgs) == 2
+    assert isinstance(msgs[0], AIMessage)
+    assert not (msgs[0].tool_calls or [])
+    assert isinstance(msgs[1], ToolMessage)
+    assert msgs[1].tool_call_id == "call_repeat"
+    assert "timestamps" in msgs[1].content
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_force_terminates_on_stale_verify_grounding(monkeypatch):
+    """Phase D: when the last two verify_grounding results agree on the same
+    answer, the orchestrator must short-circuit with that answer rather than
+    consult the model again."""
+    import json as _json
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    class NeverCalledModel:
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages):  # pragma: no cover
+            raise AssertionError("orchestrator must short-circuit on stalled verify_grounding")
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: NeverCalledModel())
+
+    orchestrator = graph._make_orchestrator()
+    payload = _json.dumps(
+        {"tool": "answer_with_evidence", "answer": "stable answer [FRAME:t=1.0]"}
+    )
+    verify_payload = _json.dumps(
+        {"tool": "verify_grounding", "answer": "stable answer [FRAME:t=1.0]", "grounded": False}
+    )
+    state = {
+        "messages": [
+            HumanMessage(content="Q?"),
+            AIMessage(content="", tool_calls=[{"name": "answer_with_evidence", "args": {}, "id": "a"}]),
+            ToolMessage(content=payload, tool_call_id="a"),
+            AIMessage(content="", tool_calls=[{"name": "verify_grounding", "args": {}, "id": "v1"}]),
+            ToolMessage(content=verify_payload, tool_call_id="v1"),
+            AIMessage(content="", tool_calls=[{"name": "verify_grounding", "args": {}, "id": "v2"}]),
+            ToolMessage(content=verify_payload, tool_call_id="v2"),
+        ],
+        "draft_answer": "",
+        "user_id": "u",
+        "video_id": "v",
+    }
+    result = await orchestrator(state)
+    assert result["messages"][0].content == "stable answer [FRAME:t=1.0]"
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_cap_signals_unanswered(monkeypatch):
+    """Phase D: when the tool-call cap is hit with no salvageable draft, the
+    state must surface agent_terminated='cap' alongside the fallback string."""
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    class NeverCalledModel:
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages):  # pragma: no cover
+            raise AssertionError("orchestrator must not be invoked past cap")
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: NeverCalledModel())
+    monkeypatch.setattr(graph.settings, "orchestrator_max_tool_calls", 2)
+
+    orchestrator = graph._make_orchestrator()
+    state = {
+        "messages": [
+            HumanMessage(content="Q?"),
+            AIMessage(content="", tool_calls=[{"name": "x", "args": {}, "id": "a"}]),
+            ToolMessage(content="{}", tool_call_id="a"),
+            AIMessage(content="", tool_calls=[{"name": "y", "args": {}, "id": "b"}]),
+            ToolMessage(content="{}", tool_call_id="b"),
+        ],
+        "draft_answer": "",
+        "user_id": "u",
+        "video_id": "v",
+    }
+    result = await orchestrator(state)
+    assert result.get("agent_terminated") == "cap"
+    assert "could not finish" in result["messages"][0].content
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_salvages_when_final_ai_content_is_empty(monkeypatch):
+    """If the model decides to stop (no tool_calls) but emits empty content,
+    fall back to the prior answer_with_evidence draft instead of an empty answer."""
+    import json as _json
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    class EmptyFinishModel:
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages):
+            return AIMessage(content="", tool_calls=[])
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: EmptyFinishModel())
+
+    orchestrator = graph._make_orchestrator()
+    tool_payload = _json.dumps(
+        {"tool": "answer_with_evidence", "answer": "rescued draft [FRAME:t=1.0]"}
+    )
+    state = {
+        "messages": [
+            HumanMessage(content="Q?"),
+            AIMessage(content="", tool_calls=[{"name": "answer_with_evidence", "args": {}, "id": "a"}]),
+            ToolMessage(content=tool_payload, tool_call_id="a"),
+        ],
+        "draft_answer": "",
+        "user_id": "u",
+        "video_id": "v",
+    }
+    result = await orchestrator(state)
+    assert result["messages"][0].content == "rescued draft [FRAME:t=1.0]"
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_fallback_uses_salvaged_draft(monkeypatch):
+    """When the tool-call cap is hit, the orchestrator should emit the prior good draft
+    instead of the generic 'tried several tool calls' message."""
+    import json as _json
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    class NeverCalledModel:
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages):  # pragma: no cover - should not be called
+            raise AssertionError("orchestrator model must not be invoked once cap is hit")
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: NeverCalledModel())
+    monkeypatch.setattr(graph.settings, "orchestrator_max_tool_calls", 2)
+
+    orchestrator = graph._make_orchestrator()
+    tool_payload = _json.dumps(
+        {"tool": "answer_with_evidence", "answer": "good draft [FRAME:t=1.0]"}
+    )
+    state = {
+        "messages": [
+            HumanMessage(content="how is my form?"),
+            AIMessage(content="", tool_calls=[{"name": "x", "args": {}, "id": "a"}]),
+            ToolMessage(content=tool_payload, tool_call_id="a"),
+            AIMessage(content="", tool_calls=[{"name": "y", "args": {}, "id": "b"}]),
+            ToolMessage(content="{}", tool_call_id="b"),
+        ],
+        "draft_answer": "",
+        "user_id": "u",
+        "video_id": "v",
+    }
+    result = await orchestrator(state)
+    assert result["messages"][0].content == "good draft [FRAME:t=1.0]"

@@ -1,25 +1,51 @@
 from __future__ import annotations
 
+import base64
+import io
+import json
 from typing import Annotated, Any, TypedDict
 
 import aiosqlite
-from langchain_core.messages import AIMessage, AnyMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, AnyMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.store.base import BaseStore
 
 from app import memory
 from app.config import settings
-from app.vqa import answer_question, chat_text
+from app.tools import TOOLS
+from app.vqa import answer_question
+
+
+def _last_write(left: Any, right: Any) -> Any:
+    """Reducer for state fields that may receive parallel writes in one step.
+
+    When the orchestrator emits multiple tool_calls in a single round and more
+    than one tool updates the same scalar/dict/list field, LangGraph treats it
+    as a multi-writer conflict unless the field has a reducer. Keep the right
+    (latest) non-None value so the most recent tool wins.
+    """
+    if right is None:
+        return left
+    return right
 
 
 class GraphState(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
     video_id: str | None
     user_id: str
-    retrieved_frames: list[dict[str, Any]]
-    retrieved_scene_hits: list[dict[str, Any]]
+    retrieved_frames: Annotated[list[dict[str, Any]], _last_write]
+    retrieved_scene_hits: Annotated[list[dict[str, Any]], _last_write]
+    retrieval_plan: Annotated[dict[str, Any], _last_write]
+    timeline: Annotated[list[dict[str, Any]], _last_write]
+    hypotheses: Annotated[list[dict[str, Any]], _last_write]
+    evidence_sufficiency: Annotated[dict[str, Any], _last_write]
+    draft_answer: Annotated[str, _last_write]
+    grounding_report: Annotated[dict[str, Any], _last_write]
+    agent_terminated: str | None
 
 
 async def build_checkpointer() -> AsyncSqliteSaver:
@@ -38,49 +64,290 @@ def build_graph(
 ):
     memory_manager = memory_manager or memory.build_memory_manager(store)
     graph = StateGraph(GraphState)
-    graph.add_node("chat_node", _make_chat_node(store))
-    graph.add_node("tool_node", tool_node)
+    graph.add_node("orchestrator", _make_orchestrator())
+    graph.add_node("tool_node", ToolNode(TOOLS, name="tool_node"))
     graph.add_node("memory_write_node", _make_memory_write_node(memory_manager))
-    graph.add_edge(START, "chat_node")
+    graph.add_edge(START, "orchestrator")
     graph.add_conditional_edges(
-        "chat_node",
-        _route_after_chat,
+        "orchestrator",
+        _route_after_orchestrator,
         {"tool_node": "tool_node", "memory_write_node": "memory_write_node"},
     )
-    graph.add_edge("tool_node", "memory_write_node")
+    graph.add_edge("tool_node", "orchestrator")
     graph.add_edge("memory_write_node", END)
     return graph.compile(checkpointer=checkpointer, store=store)
 
 
-def _make_chat_node(store: BaseStore):
-    async def chat_node(state: GraphState) -> dict[str, Any]:
-        question = _last_human_text(state["messages"])
-        if not question:
+def _make_orchestrator():
+    model = _orchestrator_model().bind_tools(TOOLS)
+
+    async def orchestrator(state: GraphState) -> dict[str, Any]:
+        if not _last_human_text(state["messages"]):
             return {"messages": []}
+        if _tool_call_count(state["messages"]) >= settings.orchestrator_max_tool_calls:
+            salvaged = _salvage_draft_answer(state)
+            content = salvaged or (
+                "I tried several tool calls but could not finish cleanly. "
+                "Please rephrase the question or try again."
+            )
+            out: dict[str, Any] = {"messages": [AIMessage(content=content)]}
+            if not salvaged:
+                out["agent_terminated"] = "cap"
+            return out
+        if _verify_grounding_stalled(state["messages"]):
+            draft = _salvage_draft_answer(state)
+            if draft:
+                return {"messages": [AIMessage(content=draft)]}
+        messages = [
+            SystemMessage(content=_orchestrator_prompt(has_video=bool(state.get("video_id")))),
+            *_visible_messages(state["messages"]),
+        ]
+        response = await model.ainvoke(messages)
+        # If the model decides to stop (no tool_calls) but emits empty content,
+        # the final answer would be the empty string. Recover by salvaging the
+        # best prior answer_with_evidence draft.
+        if not (getattr(response, "tool_calls", None) or []):
+            text = str(getattr(response, "content", "") or "").strip()
+            if not text:
+                salvaged = _salvage_draft_answer(state)
+                if salvaged:
+                    return {"messages": [AIMessage(content=salvaged)]}
+                # No draft to salvage (turn-0 empty short-circuit, often seen
+                # with GLM-4.7-flash). Re-invoke once with a coercion message
+                # so the model commits to calling retrieve_video_evidence.
+                coercion = HumanMessage(
+                    content=(
+                        "Your previous response was empty. You MUST use the available "
+                        "tools to answer the user's question. Start by calling "
+                        "retrieve_video_evidence; do not reply with an empty message."
+                    )
+                )
+                response = await model.ainvoke(messages + [coercion])
+                if not (getattr(response, "tool_calls", None) or []):
+                    text2 = str(getattr(response, "content", "") or "").strip()
+                    if not text2:
+                        return {
+                            "messages": [
+                                AIMessage(
+                                    content=(
+                                        "I was unable to produce an answer for this question. "
+                                        "Please rephrase or try again."
+                                    )
+                                )
+                            ],
+                            "agent_terminated": "empty",
+                        }
+        deduped = _dedup_tool_calls(response, state["messages"], state)
+        return {"messages": deduped}
 
-        if state.get("video_id") and _should_use_video(question):
-            return {"messages": []}
-
-        memories = await memory.memory_context(
-            store=store,
-            user_id=state["user_id"],
-            query=question,
-            limit=settings.langmem_query_limit,
-        )
-        prompt = (
-            "You are Mr. Big-Eye, a warm and concise video-analysis assistant. "
-            "Answer directly when the user is greeting you or asking about prior "
-            "context. Match the user's language."
-        )
-        if memories:
-            prompt += "\n\nRelevant user memories:\n" + memories
-        messages = [SystemMessage(content=prompt), *state["messages"]]
-        answer = await chat_text(messages)
-        return {"messages": [AIMessage(content=answer)]}
-
-    return chat_node
+    return orchestrator
 
 
+def _tool_signature(name: str, args: Any) -> str:
+    try:
+        normalized = json.dumps(args or {}, sort_keys=True, ensure_ascii=False)
+    except (TypeError, ValueError):
+        normalized = str(args)
+    return f"{name}::{normalized}"
+
+
+def _prior_tool_results(messages: list[AnyMessage]) -> dict[str, str]:
+    """Map tool signature -> cached ToolMessage content for prior calls."""
+    # Index ToolMessages by their tool_call_id so we can pair them with the
+    # AIMessage tool_call that triggered them.
+    tool_by_id: dict[str, ToolMessage] = {}
+    for message in messages:
+        if isinstance(message, ToolMessage):
+            tc_id = getattr(message, "tool_call_id", None)
+            if tc_id:
+                tool_by_id[str(tc_id)] = message
+    seen: dict[str, str] = {}
+    for message in messages:
+        if not (isinstance(message, AIMessage) or getattr(message, "type", "") == "ai"):
+            continue
+        for call in getattr(message, "tool_calls", []) or []:
+            call_id = call.get("id") if isinstance(call, dict) else getattr(call, "id", None)
+            name = call.get("name") if isinstance(call, dict) else getattr(call, "name", None)
+            args = call.get("args") if isinstance(call, dict) else getattr(call, "args", None)
+            if not (call_id and name):
+                continue
+            matching = tool_by_id.get(str(call_id))
+            if matching is None:
+                continue
+            sig = _tool_signature(str(name), args)
+            seen.setdefault(sig, str(matching.content))
+    return seen
+
+
+def _dedup_tool_calls(
+    response: AIMessage,
+    history: list[AnyMessage],
+    state: GraphState,
+) -> list[AnyMessage]:
+    """Strip duplicate tool_calls from a fresh AI response.
+
+    For each tool_call whose (name, args) signature matches a prior call OR an
+    earlier call within the same response, synthesize a ToolMessage with the
+    cached content and remove the call from the AIMessage.tool_calls list. This
+    short-circuits the LangGraph tool loop without re-issuing the live tool.
+    """
+    tool_calls = list(getattr(response, "tool_calls", []) or [])
+    if not tool_calls:
+        return [response]
+
+    prior_seen = _prior_tool_results(history)
+    surviving: list[Any] = []
+    synthesized: list[ToolMessage] = []
+    intra_seen: dict[str, str] = {}
+
+    for call in tool_calls:
+        if isinstance(call, dict):
+            name = call.get("name")
+            args = call.get("args")
+            call_id = call.get("id")
+        else:
+            name = getattr(call, "name", None)
+            args = getattr(call, "args", None)
+            call_id = getattr(call, "id", None)
+        if not (name and call_id):
+            surviving.append(call)
+            continue
+        sig = _tool_signature(str(name), args)
+        cached_content = prior_seen.get(sig) or intra_seen.get(sig)
+        if cached_content is not None:
+            synthesized.append(
+                ToolMessage(content=cached_content, tool_call_id=str(call_id), name=str(name))
+            )
+        else:
+            surviving.append(call)
+            # If the live tool fires we won't see its result here, but other
+            # calls in this same response cluster can still dedup against it.
+            intra_seen[sig] = ""
+
+    if synthesized and not surviving:
+        # Every call was a duplicate. If we have a draft to emit, terminate the
+        # loop with the draft so we don't hand the synthesized messages back to
+        # a tools_condition that would route to tool_node with no live calls.
+        draft = _salvage_draft_answer(state)
+        if draft:
+            return [AIMessage(content=draft)]
+
+    new_response = AIMessage(
+        content=response.content,
+        tool_calls=surviving,
+        additional_kwargs=getattr(response, "additional_kwargs", {}) or {},
+        response_metadata=getattr(response, "response_metadata", {}) or {},
+    )
+    return [new_response, *synthesized]
+
+
+def _verify_grounding_stalled(messages: list[AnyMessage]) -> bool:
+    """True when the last two verify_grounding ToolMessages report the same answer.
+
+    Used to break out of a verify_grounding ↔ orchestrator ping-pong where the
+    model keeps re-verifying the same draft instead of emitting it.
+    """
+    seen: list[str] = []
+    for message in reversed(messages):
+        if not isinstance(message, ToolMessage):
+            continue
+        try:
+            payload = json.loads(str(message.content))
+        except (TypeError, ValueError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, dict) or payload.get("tool") != "verify_grounding":
+            continue
+        answer = str(payload.get("answer") or "").strip()
+        if not answer:
+            return False
+        seen.append(answer)
+        if len(seen) >= 2:
+            return seen[0] == seen[1]
+    return False
+
+
+def _orchestrator_model() -> ChatOpenAI:
+    base_url = (settings.orchestrator_api_base_url or settings.vlm_api_base_url).rstrip("/")
+    api_key = settings.orchestrator_api_key or settings.vlm_api_key or "EMPTY"
+    model_name = settings.orchestrator_model_name or settings.vlm_model_name
+    timeout = settings.orchestrator_api_timeout or settings.vlm_api_timeout
+    return ChatOpenAI(
+        model=model_name,
+        base_url=base_url,
+        api_key=api_key,
+        timeout=timeout,
+        temperature=settings.orchestrator_temperature,
+        streaming=settings.orchestrator_streaming,
+        max_retries=5,
+    )
+
+
+def _orchestrator_prompt(*, has_video: bool) -> str:
+    video_guidance = (
+        "A video is attached. For any question about visual content, actions, "
+        "objects, timing, quality, form, or what is happening in the clip, call "
+        "the video evidence tools before answering. Do not answer video-content questions "
+        "from memory alone."
+        if has_video
+        else "No video is attached. If the user asks about a video, explain that a ready video is needed."
+    )
+    mcq_rule = (
+        "For multiple-choice questions (the prompt presents options A/B/C/D/E) "
+        "you MUST commit to one of the listed options unless verify_grounding "
+        "explicitly flags a contradiction. Never reply 'insufficient information' "
+        "if you have already retrieved frames within the question's timespan — "
+        "pick the best-supported option and cite frames for it. "
+        if has_video
+        else ""
+    )
+    return (
+        "You are Mr. Big-Eye, a warm and concise video-analysis assistant. "
+        "Match the user's language. Use tools when they help, then write the final answer "
+        "directly for the user. For video questions, act as the query planner first: "
+        "classify the question as overview, event_location, temporal_order, counting, "
+        "comparison, visual_detail, text_ocr, existence, or general; then choose a "
+        "retrieval_profile. Use focused for simple local details, balanced by default, "
+        "broad for summaries, temporal for before/after/order/counting, detail for "
+        "fine visual/OCR questions, and negative_check before saying something is absent. "
+        "Prefer the fine-grained tools over the legacy multimodal_vqa shortcut. Start with "
+        "retrieve_video_evidence, then call assess_evidence_sufficiency before answering. "
+        "If evidence is insufficient, follow the recommended_next_action. For temporal, "
+        "counting, order, or comparison questions, call build_timeline or "
+        "expand_temporal_evidence before answering. When you have competing explanations, "
+        "call retrieve_hypothesis_evidence for the concrete hypothesis you need to test. "
+        "Only set explicit "
+        "top_n_scenes or top_k_frames when the question clearly needs a non-default "
+        "amount of evidence. Call answer_with_evidence to draft the answer, then "
+        "verify_grounding. "
+        "Do not call the same tool with the same arguments twice. If verify_grounding "
+        "returns grounded=true, immediately emit the current draft as your final "
+        "answer text verbatim — do not re-retrieve, re-expand, or call "
+        "answer_with_evidence again. Only iterate when grounded=false and a "
+        "concrete warning tells you what to fix. "
+        "Final answers must preserve valid [FRAME:t=...] markers. "
+        "Every concrete visual claim should have frame evidence. For absence or negative "
+        "answers, use negative_check retrieval and scope the answer to checked evidence "
+        "unless the evidence truly covers the whole video. "
+        f"{mcq_rule}"
+        "Use search_user_memories only when prior user preferences or context would "
+        "materially improve the answer. "
+        f"{video_guidance}"
+    )
+
+
+def _route_after_orchestrator(state: GraphState) -> str:
+    try:
+        return "tool_node" if tools_condition(state) == "tools" else "memory_write_node"
+    except ValueError:
+        return "memory_write_node"
+
+
+# Backward-compatible name for tests / callers that imported the old route helper.
+def _route_after_chat(state: GraphState) -> str:
+    return _route_after_orchestrator(state)
+
+
+# Backward-compatible direct node for tests / callers that imported the old tool node.
 async def tool_node(state: GraphState) -> dict[str, Any]:
     question = _last_human_text(state["messages"])
     video_id = state.get("video_id")
@@ -125,7 +392,7 @@ def _make_memory_write_node(memory_manager: Any):
                 )
             await memory.write_memories(
                 manager=memory_manager,
-                messages=[*context_messages, *state["messages"][-8:]],
+                messages=[*context_messages, *_visible_messages(state["messages"][-12:])],
                 user_id=user_id,
             )
         return {}
@@ -133,52 +400,28 @@ def _make_memory_write_node(memory_manager: Any):
     return memory_write_node
 
 
-def _route_after_chat(state: GraphState) -> str:
-    question = _last_human_text(state["messages"])
-    if state.get("video_id") and question and _should_use_video(question):
-        return "tool_node"
-    return "memory_write_node"
-
-
 def _should_use_video(question: str) -> bool:
-    text = question.lower()
-    direct_chat_markers = (
+    """Return whether an attached video should be consulted for this question."""
+    text = question.strip().lower()
+    if not text:
+        return False
+    greeting_markers = (
         "who are you",
+        "what can you do",
         "你是谁",
+        "你是什么",
+        "你能做什么",
         "hello",
-        "hi",
+        "hi there",
+        "hi!",
+        "hey",
         "你好",
         "嗨",
+        "在吗",
     )
-    if any(marker in text for marker in direct_chat_markers) and len(text) < 80:
+    if any(marker in text for marker in greeting_markers) and len(text) < 40:
         return False
-    video_markers = (
-        "video",
-        "frame",
-        "scene",
-        "watch",
-        "happen",
-        "object",
-        "person",
-        "minute",
-        "second",
-        "timestamp",
-        "what",
-        "where",
-        "when",
-        "describe",
-        "视频",
-        "画面",
-        "镜头",
-        "场景",
-        "发生",
-        "看到",
-        "哪里",
-        "什么时候",
-        "第几",
-        "描述",
-    )
-    return any(marker in text for marker in video_markers)
+    return True
 
 
 def _last_human_text(messages: list[AnyMessage]) -> str:
@@ -191,7 +434,11 @@ def _last_human_text(messages: list[AnyMessage]) -> str:
 def _last_ai_text(messages: list[AnyMessage]) -> str:
     for message in reversed(messages):
         if isinstance(message, AIMessage) or getattr(message, "type", "") == "ai":
-            return str(message.content)
+            if getattr(message, "tool_calls", None):
+                continue
+            content = str(message.content)
+            if content:
+                return content
     return ""
 
 
@@ -201,7 +448,11 @@ def _history_for_vqa(messages: list[AnyMessage]) -> list[dict[str, str]]:
         if isinstance(message, HumanMessage) or getattr(message, "type", "") == "human":
             history.append({"role": "user", "content": str(message.content)})
         elif isinstance(message, AIMessage) or getattr(message, "type", "") == "ai":
-            history.append({"role": "assistant", "content": str(message.content)})
+            if getattr(message, "tool_calls", None):
+                continue
+            content = str(message.content)
+            if content:
+                history.append({"role": "assistant", "content": content})
     return history
 
 
@@ -212,7 +463,11 @@ def messages_from_snapshot(snapshot: Any) -> list[dict[str, str]]:
         if isinstance(message, HumanMessage) or getattr(message, "type", "") == "human":
             output.append({"role": "user", "content": str(message.content)})
         elif isinstance(message, AIMessage) or getattr(message, "type", "") == "ai":
-            output.append({"role": "assistant", "content": str(message.content)})
+            if getattr(message, "tool_calls", None):
+                continue
+            content = str(message.content)
+            if content:
+                output.append({"role": "assistant", "content": content})
     return output
 
 
@@ -222,10 +477,67 @@ def video_id_from_snapshot(snapshot: Any) -> str | None:
     return str(value) if value else None
 
 
-def _image_to_b64(image) -> str:
-    import base64
-    import io
+def _visible_messages(messages: list[AnyMessage]) -> list[AnyMessage]:
+    last_human_index = -1
+    for index, message in enumerate(messages):
+        if isinstance(message, HumanMessage) or getattr(message, "type", "") == "human":
+            last_human_index = index
 
+    visible: list[AnyMessage] = []
+    for index, message in enumerate(messages):
+        msg_type = getattr(message, "type", "")
+        if index < last_human_index:
+            if msg_type == "human":
+                visible.append(message)
+            elif msg_type == "ai" and str(message.content):
+                visible.append(message)
+            continue
+        if msg_type in {"human", "ai", "tool"}:
+            visible.append(message)
+    return visible
+
+
+def _salvage_draft_answer(state: GraphState) -> str:
+    """Recover the best available draft when the orchestrator hits the tool-call cap.
+
+    Picks the longest non-truncated answer_with_evidence output. Falls back to the
+    state's draft_answer only if no tool messages are present (e.g. legacy paths).
+    """
+    best = ""
+    for message in state.get("messages", []):
+        if not isinstance(message, ToolMessage):
+            continue
+        try:
+            payload = json.loads(str(message.content))
+        except (TypeError, ValueError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, dict) or payload.get("tool") != "answer_with_evidence":
+            continue
+        if payload.get("error"):
+            continue
+        answer = str(payload.get("answer") or "").strip()
+        if answer.endswith("�") or "�" in answer[-4:]:
+            continue
+        if len(answer) > len(best):
+            best = answer
+    if best:
+        return best
+    return str(state.get("draft_answer") or "").strip()
+
+
+def _tool_call_count(messages: list[AnyMessage]) -> int:
+    last_human_index = -1
+    for index, message in enumerate(messages):
+        if isinstance(message, HumanMessage) or getattr(message, "type", "") == "human":
+            last_human_index = index
+    total = 0
+    for message in messages[last_human_index + 1 :]:
+        if isinstance(message, AIMessage) or getattr(message, "type", "") == "ai":
+            total += len(getattr(message, "tool_calls", []) or [])
+    return total
+
+
+def _image_to_b64(image: Any) -> str:
     buffer = io.BytesIO()
     image.convert("RGB").save(buffer, format="JPEG", quality=80, optimize=True)
     return base64.b64encode(buffer.getvalue()).decode("ascii")

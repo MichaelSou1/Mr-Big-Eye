@@ -1,0 +1,29 @@
+[
+  {
+    "id": "lvb-short-1",
+    "question": "What does the person wear?",
+    "candidates": ["a red hat", "a blue shirt", "no clothing visible", "a green scarf"],
+    "correct_choice": 1,
+    "video_path": "videos/short_1.mp4",
+    "duration": 45.0,
+    "starting_timestamp_for_subtitles": 0.0
+  },
+  {
+    "id": "lvb-med-1",
+    "question": "How many times does the singer change outfits?",
+    "candidates": ["once", "twice", "three times", "not at all"],
+    "correct_choice": 2,
+    "video_path": "videos/med_1.mp4",
+    "duration": 180.0,
+    "starting_timestamp_for_subtitles": 0.0
+  },
+  {
+    "id": "lvb-long-1",
+    "question": "Which speaker presents the topic of climate policy?",
+    "candidates": ["the host", "the panelist on the left", "the panelist on the right", "the moderator"],
+    "correct_choice": 2,
+    "video_path": "videos/long_1.mp4",
+    "duration": 1800.0,
+    "starting_timestamp_for_subtitles": 0.0
+  }
+]

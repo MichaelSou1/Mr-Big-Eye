@@ -49,9 +49,16 @@ def two_stage_retrieve(
 
 
 def _query_caption_index(cache_dir: Path, question: str, top_n: int) -> list[dict[str, Any]]:
-    collection = chromadb.PersistentClient(path=str(cache_dir / "caption_index")).get_collection(
-        "captions"
-    )
+    try:
+        collection = chromadb.PersistentClient(path=str(cache_dir / "caption_index")).get_collection(
+            "captions"
+        )
+    except chromadb.errors.NotFoundError:
+        # Video was marked .done but caption index never built (typically a video
+        # whose preprocess crashed mid-way before chromadb persistence and was
+        # later flagged done manually). Treat as "no scene hits found" so the
+        # orchestrator can fall back to dense frame retrieval instead of crashing.
+        return []
     try:
         query_embedding = get_bge().encode_text([question])[0].tolist()
     finally:
@@ -80,11 +87,18 @@ def _query_frame_index(
     time_ranges: list[tuple[float, float]],
     top_k: int,
 ) -> list[dict[str, Any]]:
-    collection = chromadb.PersistentClient(path=str(cache_dir / "frame_index")).get_collection(
-        "frames"
-    )
+    try:
+        collection = chromadb.PersistentClient(path=str(cache_dir / "frame_index")).get_collection(
+            "frames"
+        )
+    except chromadb.errors.NotFoundError:
+        return []
     query_embedding = get_siglip().encode_text([question])[0].tolist()
-    hits = _query_frames(collection, query_embedding, top_k, _build_where(time_ranges))
+    # Always blend a slice of un-gated global SigLIP top-K so a wrong BGE
+    # caption→scene routing can be recovered. Quota stays under top_k so total
+    # frame count (and VLM token cost) is unchanged.
+    scene_quota = _scene_quota(top_k, time_ranges)
+    hits = _query_frames(collection, query_embedding, scene_quota, _build_where(time_ranges))
     if len(hits) < top_k:
         fallback = _query_frames(collection, query_embedding, top_k * 3, None)
         existing = {float(item["timestamp"]) for item in hits}
@@ -130,6 +144,18 @@ def _query_frames(
         item["score"] = 1.0 - float(distance)
         hits.append(item)
     return hits
+
+
+def _scene_quota(top_k: int, time_ranges: list[tuple[float, float]]) -> int:
+    """How many of the top_k frames should come from scene-gated search.
+
+    When no scene ranges were found, use the full quota for un-gated retrieval.
+    Otherwise reserve ~1/3 of the budget for un-gated frames so a wrong scene
+    routing can be recovered by the global SigLIP top-K.
+    """
+    if not time_ranges:
+        return top_k
+    return max(1, (top_k * 2) // 3)
 
 
 def _build_where(time_ranges: list[tuple[float, float]]) -> dict[str, Any] | None:
