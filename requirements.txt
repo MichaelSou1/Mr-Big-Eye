@@ -20,6 +20,10 @@ imageio-ffmpeg>=0.4.9
 funasr>=1.3.0
 soundfile>=0.12.1
 
+# OCR (slide / whiteboard text via RapidOCR — PP-OCRv4 weights on onnxruntime,
+# avoids PaddlePaddle SIGILL on WSL2 + 13th-gen Intel without AVX-512)
+rapidocr_onnxruntime>=1.4.4
+
 # Retrieval encoders (local)
 torch>=2.1.0
 transformers>=4.40.0

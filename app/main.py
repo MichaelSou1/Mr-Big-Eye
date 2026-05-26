@@ -10,7 +10,7 @@ from typing import Any
 from uuid import uuid4
 
 import aiofiles
-from fastapi import FastAPI, File, HTTPException, Query, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from langchain_core.messages import HumanMessage
@@ -86,6 +86,7 @@ async def index() -> FileResponse:
 @app.post("/upload", response_model=UploadResponse)
 async def upload_video(
     file: UploadFile = File(...),
+    hotwords: str | None = Form(default=None),
     user_id: str | None = Query(default=None),
 ) -> UploadResponse:
     suffix = Path(file.filename or "upload.mp4").suffix or ".mp4"
@@ -114,9 +115,9 @@ async def upload_video(
         else:
             temp_path.rename(video_path)
 
-        from app.preprocess import _probe
+        from app.preprocess import probe_video_lenient
 
-        meta = await asyncio.to_thread(_probe, video_path)
+        meta = await asyncio.to_thread(probe_video_lenient, video_path)
         if float(meta["duration"]) > settings.max_video_duration_sec:
             if video_path.exists():
                 video_path.unlink()
@@ -150,7 +151,7 @@ async def upload_video(
 
         set_video_status(video_id, "running")
         publish_progress(video_id, "probe", stage_label("probe"), 0.01)
-        asyncio.create_task(_run_preprocess(video_id, video_path))
+        asyncio.create_task(_run_preprocess(video_id, video_path, _parse_hotwords(hotwords)))
         return UploadResponse(
             video_id=video_id,
             status="running",
@@ -274,6 +275,8 @@ async def api_update_session(
                 "video_id": updates.get("video_id", values.get("video_id")),
                 "retrieved_frames": values.get("retrieved_frames", []),
                 "retrieved_scene_hits": values.get("retrieved_scene_hits", []),
+                "retrieved_transcripts": values.get("retrieved_transcripts", []),
+                "retrieved_slides": values.get("retrieved_slides", []),
                 "retrieval_plan": values.get("retrieval_plan", {}),
                 "timeline": values.get("timeline", []),
                 "hypotheses": values.get("hypotheses", []),
@@ -367,6 +370,8 @@ async def chat_stream(
                     "user_id": user_id,
                     "retrieved_frames": [],
                     "retrieved_scene_hits": [],
+                    "retrieved_transcripts": [],
+                    "retrieved_slides": [],
                     "retrieval_plan": {},
                     "timeline": [],
                     "hypotheses": [],
@@ -391,12 +396,16 @@ async def chat_stream(
                         updates = tool_update if isinstance(tool_update, list) else [tool_update]
                         frames: list[Any] = []
                         scene_hits: list[Any] = []
+                        transcripts: list[Any] = []
+                        slides: list[Any] = []
                         for upd in updates:
                             if not isinstance(upd, dict):
                                 continue
                             frames.extend(upd.get("retrieved_frames", []) or [])
                             scene_hits.extend(upd.get("retrieved_scene_hits", []) or [])
-                        if frames or scene_hits:
+                            transcripts.extend(upd.get("retrieved_transcripts", []) or [])
+                            slides.extend(upd.get("retrieved_slides", []) or [])
+                        if frames or scene_hits or transcripts or slides:
                             yield sse(
                                 "frames",
                                 {
@@ -404,6 +413,8 @@ async def chat_stream(
                                     "created_session": created_session,
                                     "frames": frames,
                                     "scene_hits": scene_hits,
+                                    "transcripts": transcripts,
+                                    "slides": slides,
                                 },
                             )
                 elif event_name == "on_chat_model_stream" and name == "ChatOpenAI":
@@ -446,13 +457,13 @@ async def chat_stream(
     return StreamingResponse(_events(), media_type="text/event-stream")
 
 
-async def _run_preprocess(video_id: str, video_path: Path) -> None:
+async def _run_preprocess(video_id: str, video_path: Path, hotwords: list[str] | None = None) -> None:
     try:
         from app.preprocess import preprocess_video
 
         progress_callback = make_progress_callback(video_id)
         await asyncio.to_thread(
-            lambda: asyncio.run(preprocess_video(video_id, video_path, progress_callback))
+            lambda: asyncio.run(preprocess_video(video_id, video_path, progress_callback, hotwords))
         )
         set_video_status(video_id, "done")
         publish_progress(video_id, "done", stage_label("done"), 1.0)
@@ -521,6 +532,8 @@ async def _chat_with_graph(req: ChatRequest) -> ChatResponse:
             "user_id": user["user_id"],
             "retrieved_frames": [],
             "retrieved_scene_hits": [],
+            "retrieved_transcripts": [],
+            "retrieved_slides": [],
             "retrieval_plan": {},
             "timeline": [],
             "hypotheses": [],
@@ -553,6 +566,8 @@ async def _seed_graph_session(session_id: str, user_id: str, video_id: str | Non
             "video_id": video_id,
             "retrieved_frames": [],
             "retrieved_scene_hits": [],
+            "retrieved_transcripts": [],
+            "retrieved_slides": [],
             "retrieval_plan": {},
             "timeline": [],
             "hypotheses": [],
@@ -569,11 +584,46 @@ def _graph_config(session_id: str) -> dict[str, Any]:
     return {"configurable": {"thread_id": session_id}}
 
 
+@app.get("/api/videos/{video_id}/transcripts")
+async def api_video_transcripts(video_id: str) -> dict[str, Any]:
+    from app.text_assets import load_transcripts
+
+    return {"video_id": video_id, "segments": load_transcripts(video_id)}
+
+
+@app.get("/api/videos/{video_id}/slides")
+async def api_video_slides(video_id: str) -> dict[str, Any]:
+    from app.text_assets import load_slides
+
+    return {"video_id": video_id, "slides": load_slides(video_id)}
+
+
+@app.get("/api/videos/{video_id}/subtitles.vtt")
+async def api_video_subtitles(video_id: str) -> FileResponse:
+    from app.text_assets import vtt_path
+
+    path = vtt_path(video_id)
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Subtitles not found")
+    return FileResponse(path, media_type="text/vtt", filename=f"{video_id}.vtt")
+
+
 def _frame_response(frame: dict[str, Any]) -> FramePayload:
     return FramePayload(
         timestamp=float(frame["timestamp"]),
         image_b64=str(frame["image_b64"]),
     )
+
+
+def _parse_hotwords(value: str | None) -> list[str] | None:
+    if not value:
+        return None
+    items = []
+    for line in value.replace(",", "\n").splitlines():
+        item = line.strip()
+        if item:
+            items.append(item)
+    return items or None
 
 
 def _require_user(user_id: str) -> dict[str, Any]:

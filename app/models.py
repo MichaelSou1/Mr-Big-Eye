@@ -190,6 +190,11 @@ def get_siglip() -> Siglip2Wrapper:
     return _siglip
 
 
+def get_text_embed() -> BgeM3Wrapper:
+    """Transcript/slide dense search reuses the bge-m3 singleton."""
+    return get_bge()
+
+
 def release_bge() -> None:
     """Drop the bge-m3 singleton for low-memory local runs."""
     global _bge
@@ -202,6 +207,11 @@ def release_siglip() -> None:
     global _siglip
     _siglip = None
     _cleanup_memory()
+
+
+def release_text_embed() -> None:
+    """Text embedding shares the bge-m3 singleton; defer to release_bge."""
+    release_bge()
 
 
 def _cleanup_memory() -> None:

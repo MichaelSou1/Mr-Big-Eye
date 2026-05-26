@@ -19,6 +19,7 @@ from pydantic import BeforeValidator, Field
 from app import memory
 from app.cache import load_meta, video_cache_dir
 from app.config import settings
+from app.text_assets import nearby_text, search_keyword, search_text
 from app.vqa import (
     ANSWER_WITH_EVIDENCE_PROMPT,
     SEGMENT_FOCUS_PROMPT,
@@ -114,6 +115,8 @@ VISUAL_CLAIM_MARKERS = (
     "镜头",
 )
 FRAME_MARKER_RE = re.compile(r"\[FRAME:t=([0-9]+(?:\.[0-9]+)?)\]")
+TRANSCRIPT_MARKER_RE = re.compile(r"\[TRANSCRIPT:t=([0-9]+(?:\.[0-9]+)?)-([0-9]+(?:\.[0-9]+)?)\]")
+SLIDE_MARKER_RE = re.compile(r"\[SLIDE:t=([0-9]+(?:\.[0-9]+)?)\]")
 DENSE_FRAME_RE = re.compile(r"^t([0-9]+(?:\.[0-9]+)?)\.jpg$")
 SUBJECT_REGISTRY_MAX = 15
 SEGMENT_FOCUS_MAX_FRAMES = 12
@@ -369,6 +372,113 @@ async def retrieve_video_evidence(
             "retrieved_frames": frames,
             "retrieved_scene_hits": scene_hits,
             "retrieval_plan": _plan_payload(plan),
+        },
+    )
+
+
+@tool
+async def retrieve_transcript_evidence(
+    query: Annotated[str, Field(description="The speech/transcript search query.")],
+    state: Annotated[dict[str, Any], InjectedState],
+    tool_call_id: Annotated[str, InjectedToolCallId],
+    top_k: Annotated[int, Field(description="Number of transcript chunks to return.")] = 5,
+) -> Command:
+    """Retrieve speech transcript evidence for audio-heavy or joint questions."""
+    video_id = state.get("video_id")
+    if not video_id:
+        return _command(tool_call_id, {"error": "No video is attached to this session."})
+    hits = [hit.as_dict() for hit in search_text(str(video_id), query, kind="transcript", top_k=top_k)]
+    evidence = _merge_text_evidence(state.get("retrieved_transcripts", []), hits)
+    payload = {
+        "tool": "retrieve_transcript_evidence",
+        "evidence": hits,
+        "next": "answer_with_evidence",
+    }
+    return _command(tool_call_id, payload, update={"retrieved_transcripts": evidence})
+
+
+@tool
+async def search_transcript_keyword(
+    keyword: Annotated[str, Field(description="Exact keyword or term to find in the transcript.")],
+    state: Annotated[dict[str, Any], InjectedState],
+    tool_call_id: Annotated[str, InjectedToolCallId],
+    top_k: Annotated[int, Field(description="Maximum keyword hits to return.")] = 10,
+) -> Command:
+    """Find exact transcript keyword mentions such as REINFORCE or A2C."""
+    video_id = state.get("video_id")
+    if not video_id:
+        return _command(tool_call_id, {"error": "No video is attached to this session."})
+    hits = [hit.as_dict() for hit in search_keyword(str(video_id), keyword, kind="transcript", top_k=top_k)]
+    evidence = _merge_text_evidence(state.get("retrieved_transcripts", []), hits)
+    payload = {
+        "tool": "search_transcript_keyword",
+        "evidence": hits,
+        "next": "align_audiovisual_evidence" if hits else "retrieve_transcript_evidence",
+    }
+    return _command(tool_call_id, payload, update={"retrieved_transcripts": evidence})
+
+
+@tool
+async def retrieve_slide_evidence(
+    query: Annotated[str, Field(description="The slide/PPT/OCR search query.")],
+    state: Annotated[dict[str, Any], InjectedState],
+    tool_call_id: Annotated[str, InjectedToolCallId],
+    top_k: Annotated[int, Field(description="Number of slide OCR chunks to return.")] = 5,
+) -> Command:
+    """Retrieve OCR text from slides/whiteboard frames."""
+    video_id = state.get("video_id")
+    if not video_id:
+        return _command(tool_call_id, {"error": "No video is attached to this session."})
+    hits = [hit.as_dict() for hit in search_text(str(video_id), query, kind="slide", top_k=top_k)]
+    evidence = _merge_text_evidence(state.get("retrieved_slides", []), hits)
+    payload = {
+        "tool": "retrieve_slide_evidence",
+        "evidence": hits,
+        "next": "answer_with_evidence",
+    }
+    return _command(tool_call_id, payload, update={"retrieved_slides": evidence})
+
+
+@tool
+async def align_audiovisual_evidence(
+    timestamp: Annotated[float, Field(description="Center timestamp in seconds.")],
+    state: Annotated[dict[str, Any], InjectedState],
+    tool_call_id: Annotated[str, InjectedToolCallId],
+    window_sec: Annotated[float, Field(description="Seconds before and after timestamp.")] = 8.0,
+    max_frames: Annotated[int, Field(description="Maximum nearby frames to add.")] = 12,
+) -> Command:
+    """Return frames plus transcript/slide evidence from the same time window."""
+    video_id = state.get("video_id")
+    if not video_id:
+        return _command(tool_call_id, {"error": "No video is attached to this session."})
+    frames_added = _load_dense_payloads(
+        str(video_id),
+        [float(timestamp)],
+        window_sec=window_sec,
+        max_frames=max_frames,
+        source="audiovisual_align",
+    )
+    frames = _merge_frame_payloads(state.get("retrieved_frames", []), frames_added)
+    transcripts = [hit.as_dict() for hit in nearby_text(str(video_id), timestamp, window_sec=window_sec, kind="transcript")]
+    slides = [hit.as_dict() for hit in nearby_text(str(video_id), timestamp, window_sec=window_sec, kind="slide")]
+    transcript_evidence = _merge_text_evidence(state.get("retrieved_transcripts", []), transcripts)
+    slide_evidence = _merge_text_evidence(state.get("retrieved_slides", []), slides)
+    payload = {
+        "tool": "align_audiovisual_evidence",
+        "timestamp": float(timestamp),
+        "window_sec": float(window_sec),
+        "frames": _public_frame_refs(frames_added),
+        "transcripts": transcripts,
+        "slides": slides,
+        "next": "answer_with_evidence",
+    }
+    return _command(
+        tool_call_id,
+        payload,
+        update={
+            "retrieved_frames": frames,
+            "retrieved_transcripts": transcript_evidence,
+            "retrieved_slides": slide_evidence,
         },
     )
 
@@ -737,11 +847,12 @@ async def answer_with_evidence(
 ) -> Command:
     """Answer using the current evidence set only."""
     frames, timestamps = _state_frames_as_images(state)
-    if not frames:
+    text_evidence = _state_text_evidence(state)
+    if not frames and not text_evidence:
         payload = {
             "tool": "answer_with_evidence",
-            "answer": "I need retrieved video frames before I can answer that.",
-            "error": "no_evidence_frames",
+            "answer": "I need retrieved video, transcript, or slide evidence before I can answer that.",
+            "error": "no_evidence",
         }
         return _command(tool_call_id, payload, update={"draft_answer": payload["answer"]})
 
@@ -755,6 +866,7 @@ async def answer_with_evidence(
         history,
         system_prompt=ANSWER_WITH_EVIDENCE_PROMPT,
         subject_registry=registry,
+        text_evidence=text_evidence,
     )
     clean_answer, deltas = parse_subject_deltas(answer)
     cleaned = (clean_answer or "").strip()
@@ -907,6 +1019,10 @@ async def search_user_memories(
 
 TOOLS = [
     retrieve_video_evidence,
+    retrieve_transcript_evidence,
+    search_transcript_keyword,
+    retrieve_slide_evidence,
+    align_audiovisual_evidence,
     build_timeline,
     retrieve_hypothesis_evidence,
     segment_focus,
@@ -1068,6 +1184,45 @@ def _merge_scene_hits(
             continue
         by_key.setdefault(key, dict(item))
     return sorted(by_key.values(), key=lambda item: float(item.get("start", 0.0)))
+
+
+def _merge_text_evidence(
+    existing: list[dict[str, Any]],
+    new: list[dict[str, Any]],
+    *,
+    limit: int = 20,
+) -> list[dict[str, Any]]:
+    by_key: dict[tuple[str, float, float, str], dict[str, Any]] = {}
+    for item in [*(existing or []), *(new or [])]:
+        try:
+            kind = str(item.get("kind") or "")
+            t_start = round(float(item.get("t_start", 0.0)), 2)
+            t_end = round(float(item.get("t_end", t_start)), 2)
+            text = str(item.get("text") or "").strip()
+        except (TypeError, ValueError):
+            continue
+        if not kind or not text:
+            continue
+        key = (kind, t_start, t_end, text[:80])
+        current = by_key.get(key)
+        if current is None or float(item.get("score", 0.0) or 0.0) > float(current.get("score", 0.0) or 0.0):
+            by_key[key] = {**item, "t_start": t_start, "t_end": t_end}
+    merged = sorted(
+        by_key.values(),
+        key=lambda item: (
+            str(item.get("kind") or ""),
+            float(item.get("t_start", 0.0)),
+            float(item.get("t_end", 0.0)),
+        ),
+    )
+    return merged[:limit]
+
+
+def _state_text_evidence(state: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        *_merge_text_evidence([], state.get("retrieved_transcripts", []) or []),
+        *_merge_text_evidence([], state.get("retrieved_slides", []) or []),
+    ]
 
 
 def _public_frame_refs(frames: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -1283,6 +1438,7 @@ def _sufficiency_report(
 ) -> dict[str, Any]:
     frames = state.get("retrieved_frames", [])
     scenes = state.get("retrieved_scene_hits", [])
+    text_count = len(state.get("retrieved_transcripts", []) or []) + len(state.get("retrieved_slides", []) or [])
     frame_count = len(frames)
     scene_count = len(scenes)
     timestamps = sorted(float(item["timestamp"]) for item in frames if "timestamp" in item)
@@ -1292,11 +1448,11 @@ def _sufficiency_report(
     missing: list[str] = []
     action = "answer_with_evidence"
 
-    if frame_count == 0:
-        missing.append("No visual frames have been retrieved.")
+    if frame_count == 0 and text_count == 0:
+        missing.append("No visual, transcript, or slide evidence has been retrieved.")
         action = "retrieve_video_evidence"
-    if scene_count == 0:
-        missing.append("No caption-level scene evidence has been retrieved.")
+    if scene_count == 0 and text_count == 0:
+        missing.append("No caption-level scene or text evidence has been retrieved.")
         action = "retrieve_video_evidence"
     if question_type in TEMPORAL_QUESTION_TYPES:
         if frame_count < min(8, settings.planner_max_top_k_frames):
@@ -1329,6 +1485,7 @@ def _sufficiency_report(
         "retrieval_profile": retrieval_profile,
         "frame_count": frame_count,
         "scene_count": scene_count,
+        "text_evidence_count": text_count,
         "time_span_sec": round(span, 2),
         "missing_evidence": missing,
         "recommended_next_action": action,
@@ -1388,8 +1545,9 @@ def _question_with_answer_protocol(
 ) -> str:
     sufficiency = state.get("evidence_sufficiency", {}) or {}
     grounding = (
-        "Answer using only the provided frames. Tie every concrete visual claim "
-        "to evidence with [FRAME:t=...] markers using the exact shown timestamps. "
+        "Answer using only the provided frames, transcript chunks, and slide/OCR chunks. "
+        "Tie every concrete visual claim to [FRAME:t=...] or [SLIDE:t=...] markers, "
+        "and every speech/transcript claim to [TRANSCRIPT:t=...] markers using exact shown timestamps. "
         "If the evidence is insufficient, say what cannot be determined."
     )
     negative = (
@@ -1419,11 +1577,26 @@ def _grounding_report(
         for marker in markers
         if not _has_nearby_timestamp(marker, timestamps)
     ]
+    transcript_markers = [
+        (float(match.group(1)), float(match.group(2)))
+        for match in TRANSCRIPT_MARKER_RE.finditer(answer or "")
+    ]
+    slide_markers = [float(match.group(1)) for match in SLIDE_MARKER_RE.finditer(answer or "")]
+    invalid_transcript_markers = [
+        marker
+        for marker in transcript_markers
+        if not _has_nearby_text_interval(marker, state.get("retrieved_transcripts", []) or [])
+    ]
+    invalid_slide_markers = [
+        marker
+        for marker in slide_markers
+        if not _has_nearby_text_timestamp(marker, state.get("retrieved_slides", []) or [])
+    ]
     visual_claims = _visual_claim_lines(answer or "")
     uncited_claims = [
         claim
         for claim in visual_claims
-        if not _line_has_nearby_marker(answer or "", claim)
+        if not _line_has_visual_marker(answer or "", claim)
     ]
     negative = _looks_like_negative_answer(answer or "")
     plan = state.get("retrieval_plan", {}) or {}
@@ -1432,20 +1605,28 @@ def _grounding_report(
     recommended = "revise_answer_with_citations"
     if invalid_markers:
         warnings.append("Some [FRAME:t=...] markers do not match retrieved evidence.")
+    if invalid_transcript_markers:
+        warnings.append("Some [TRANSCRIPT:t=...] markers do not match retrieved transcript evidence.")
+    if invalid_slide_markers:
+        warnings.append("Some [SLIDE:t=...] markers do not match retrieved slide evidence.")
     if uncited_claims:
-        warnings.append("Some visual claim lines are not tied to frame markers.")
+        warnings.append("Some visual claim lines are not tied to frame or slide markers.")
     if negative and profile != "negative_check":
         warnings.append("Negative/absence answer was produced without negative_check retrieval.")
         recommended = "retrieve_video_evidence"
     if negative and not _has_negative_scope(answer or ""):
         warnings.append("Negative answer should scope itself to checked evidence.")
-    if not markers and visual_claims:
+    if not (markers or slide_markers) and visual_claims:
         warnings.append("Visual answer has no frame citations.")
     grounded = not warnings
     return {
         "grounded": grounded,
         "valid_markers": len(markers) - len(invalid_markers),
         "invalid_markers": invalid_markers,
+        "valid_transcript_markers": len(transcript_markers) - len(invalid_transcript_markers),
+        "invalid_transcript_markers": invalid_transcript_markers,
+        "valid_slide_markers": len(slide_markers) - len(invalid_slide_markers),
+        "invalid_slide_markers": invalid_slide_markers,
         "uncited_claims": uncited_claims[:5],
         "warnings": warnings,
         "recommended_next_action": "final_answer" if grounded else recommended,
@@ -1454,6 +1635,33 @@ def _grounding_report(
 
 def _has_nearby_timestamp(marker: float, timestamps: list[float]) -> bool:
     return any(abs(marker - timestamp) <= 0.65 for timestamp in timestamps)
+
+
+def _has_nearby_text_interval(marker: tuple[float, float], evidence: list[dict[str, Any]]) -> bool:
+    start, end = marker
+    if end < start:
+        start, end = end, start
+    for item in evidence:
+        try:
+            t_start = float(item.get("t_start", 0.0))
+            t_end = float(item.get("t_end", t_start))
+        except (TypeError, ValueError):
+            continue
+        if abs(t_start - start) <= 0.75 and abs(t_end - end) <= 0.75:
+            return True
+    return False
+
+
+def _has_nearby_text_timestamp(marker: float, evidence: list[dict[str, Any]]) -> bool:
+    for item in evidence:
+        try:
+            t_start = float(item.get("t_start", 0.0))
+            t_end = float(item.get("t_end", t_start))
+        except (TypeError, ValueError):
+            continue
+        if t_start - 0.75 <= marker <= t_end + 0.75:
+            return True
+    return False
 
 
 def _visual_claim_lines(answer: str) -> list[str]:
@@ -1468,15 +1676,15 @@ def _visual_claim_lines(answer: str) -> list[str]:
     return lines
 
 
-def _line_has_nearby_marker(answer: str, claim: str) -> bool:
+def _line_has_visual_marker(answer: str, claim: str) -> bool:
     lines = [line.strip() for line in answer.splitlines() if line.strip()]
     for index, line in enumerate(lines):
         if claim not in line:
             continue
         neighborhood = "\n".join(lines[max(0, index - 1) : index + 2])
-        if FRAME_MARKER_RE.search(neighborhood):
+        if FRAME_MARKER_RE.search(neighborhood) or SLIDE_MARKER_RE.search(neighborhood):
             return True
-    return bool(FRAME_MARKER_RE.search(claim))
+    return bool(FRAME_MARKER_RE.search(claim) or SLIDE_MARKER_RE.search(claim))
 
 
 def _looks_like_negative_answer(answer: str) -> bool:

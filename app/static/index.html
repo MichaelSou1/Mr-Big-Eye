@@ -37,6 +37,12 @@
             <input id="video-file" type="file" accept="video/*" />
             <button id="upload-button" type="button">Upload</button>
           </div>
+          <textarea
+            id="hotwords-input"
+            rows="2"
+            placeholder="Hotwords for ASR, one term per line"
+          ></textarea>
+          <video id="video-preview" controls playsinline></video>
           <progress id="upload-progress" value="0" max="100"></progress>
           <div id="upload-status" class="status-line"></div>
         </section>
@@ -54,6 +60,9 @@
           </form>
         </section>
       </section>
+      <aside class="evidence-panel">
+        <div id="transcript-timeline" class="transcript-timeline"></div>
+      </aside>
     </main>
 
     <script src="/static/app.js"></script>

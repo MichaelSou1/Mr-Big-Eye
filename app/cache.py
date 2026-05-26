@@ -25,7 +25,15 @@ def video_cache_dir(video_id: str) -> Path:
 def ensure_cache_dirs(video_id: str) -> Path:
     """Create root cache dir and all Phase 1 artifact subdirs."""
     root = video_cache_dir(video_id)
-    for child in ("frames_scene", "frames_dense", "caption_index", "frame_index"):
+    for child in (
+        "frames_scene",
+        "frames_dense",
+        "caption_index",
+        "frame_index",
+        "transcript_index",
+        "slide_index",
+        "frames_slides",
+    ):
         (root / child).mkdir(parents=True, exist_ok=True)
     return root
 

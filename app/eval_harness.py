@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import argparse
+import asyncio
 import hashlib
 import json
 import logging
 import re
+import sys
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -15,6 +18,10 @@ logger = logging.getLogger(__name__)
 
 
 FRAME_MARKER_RE = re.compile(r"\[FRAME:t=([0-9]+(?:\.[0-9]+)?)\]")
+TRANSCRIPT_MARKER_RE = re.compile(
+    r"\[TRANSCRIPT:t=([0-9]+(?:\.[0-9]+)?)-([0-9]+(?:\.[0-9]+)?)\]"
+)
+SLIDE_MARKER_RE = re.compile(r"\[SLIDE:t=([0-9]+(?:\.[0-9]+)?)\]")
 UNCERTAINTY_MARKERS = (
     "not enough",
     "insufficient",
@@ -48,6 +55,11 @@ class EvalCase:
     expected_action: str | None = None
     requires_uncertainty: bool = False
     needs_expansion: bool = False
+    modality_tag: str = ""
+    question_type: str = ""
+    expected_keywords: list[str] = field(default_factory=list)
+    expected_citation_min: int | None = None
+    expected_citation_kinds: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -55,6 +67,8 @@ class EvalPrediction:
     case_id: str
     retrieved_timestamps: list[float] = field(default_factory=list)
     scene_hits: list[dict[str, float]] = field(default_factory=list)
+    retrieved_transcripts: list[dict[str, Any]] = field(default_factory=list)
+    retrieved_slides: list[dict[str, Any]] = field(default_factory=list)
     answer: str = ""
     agent_actions: list[str] = field(default_factory=list)
     evidence_sufficiency: dict[str, Any] = field(default_factory=dict)
@@ -70,8 +84,17 @@ def load_predictions(path: str | Path) -> dict[str, EvalPrediction]:
 
 
 def parse_case(item: dict[str, Any]) -> EvalCase:
+    case_id = item.get("case_id") or item.get("question_id")
+    if not case_id:
+        raise KeyError("case_id")
+    expected_citation_kinds = _parse_citation_kinds(item.get("expected_citation_kinds", []))
+    expected_citation_min = item.get("expected_citation_min")
+    if expected_citation_min is None and expected_citation_kinds:
+        expected_citation_min = 1
+    expected_keywords = [str(value) for value in item.get("expected_keywords", [])]
+    required_keywords = [str(value) for value in item.get("required_keywords", [])]
     return EvalCase(
-        case_id=str(item["case_id"]),
+        case_id=str(case_id),
         video_id=str(item.get("video_id") or ""),
         question=str(item["question"]),
         gold_timestamps=[float(value) for value in item.get("gold_timestamps", [])],
@@ -80,11 +103,18 @@ def parse_case(item: dict[str, Any]) -> EvalCase:
             for scene in item.get("gold_scenes", [])
         ],
         reference_answer=str(item.get("reference_answer") or ""),
-        required_keywords=[str(value) for value in item.get("required_keywords", [])],
+        required_keywords=required_keywords or expected_keywords,
         forbidden_keywords=[str(value) for value in item.get("forbidden_keywords", [])],
         expected_action=item.get("expected_action"),
         requires_uncertainty=bool(item.get("requires_uncertainty", False)),
         needs_expansion=bool(item.get("needs_expansion", False)),
+        modality_tag=str(item.get("modality_tag") or "").strip().lower(),
+        question_type=str(item.get("question_type") or "").strip().lower(),
+        expected_keywords=expected_keywords,
+        expected_citation_min=(
+            int(expected_citation_min) if expected_citation_min is not None else None
+        ),
+        expected_citation_kinds=expected_citation_kinds,
     )
 
 
@@ -96,6 +126,14 @@ def parse_prediction(item: dict[str, Any]) -> EvalPrediction:
             {"start": float(scene["start"]), "end": float(scene["end"])}
             for scene in item.get("scene_hits", [])
             if "start" in scene and "end" in scene
+        ],
+        retrieved_transcripts=[
+            dict(value) for value in item.get("retrieved_transcripts", [])
+            if isinstance(value, dict)
+        ],
+        retrieved_slides=[
+            dict(value) for value in item.get("retrieved_slides", [])
+            if isinstance(value, dict)
         ],
         answer=str(item.get("answer") or ""),
         agent_actions=[str(value) for value in item.get("agent_actions", [])],
@@ -121,15 +159,27 @@ def evaluate_case(
         tolerance_sec=tolerance_sec,
         recall_k=recall_k,
     )
-    answer = evaluate_answer(
-        answer=prediction.answer,
-        retrieved_timestamps=prediction.retrieved_timestamps,
-        required_keywords=case.required_keywords,
-        forbidden_keywords=case.forbidden_keywords,
-        requires_uncertainty=case.requires_uncertainty,
-    )
-    answer["citation_soft_waived"] = False
-    if judge is not None:
+    audiovisual_case = _is_audiovisual_case(case)
+    if audiovisual_case:
+        answer = evaluate_audiovisual_answer(
+            answer=prediction.answer,
+            expected_keywords=case.expected_keywords or case.required_keywords,
+            forbidden_keywords=case.forbidden_keywords,
+            expected_citation_min=case.expected_citation_min,
+            expected_citation_kinds=case.expected_citation_kinds,
+            requires_uncertainty=case.requires_uncertainty,
+        )
+        answer["citation_soft_waived"] = False
+    else:
+        answer = evaluate_answer(
+            answer=prediction.answer,
+            retrieved_timestamps=prediction.retrieved_timestamps,
+            required_keywords=case.required_keywords,
+            forbidden_keywords=case.forbidden_keywords,
+            requires_uncertainty=case.requires_uncertainty,
+        )
+        answer["citation_soft_waived"] = False
+    if judge is not None and not audiovisual_case:
         judge_result = evaluate_answer_llm(case, prediction, judge=judge, cache=judge_cache)
         answer["llm_judge"] = judge_result
         # Soft gate: when judge accepts, drop the keyword AND the citation
@@ -269,6 +319,72 @@ def evaluate_answer(
     }
 
 
+def evaluate_audiovisual_answer(
+    *,
+    answer: str,
+    expected_keywords: list[str],
+    forbidden_keywords: list[str],
+    expected_citation_min: int | None,
+    expected_citation_kinds: list[str],
+    requires_uncertainty: bool = False,
+) -> dict[str, Any]:
+    """Deterministic Phase-E answer score for audiovisual cases.
+
+    The rubric is intentionally simple and reproducible: all expected keywords
+    must appear, forbidden terms must not appear, and the answer must include
+    enough citation markers of the expected modalities.
+    """
+    text = answer.lower()
+    keyword_hits = {
+        keyword: keyword.lower() in text
+        for keyword in expected_keywords
+    }
+    forbidden_hits = [
+        keyword for keyword in forbidden_keywords if keyword.lower() in text
+    ]
+    citations = extract_evidence_markers(answer)
+    expected_kinds = _parse_citation_kinds(expected_citation_kinds)
+    citation_min = max(0, int(expected_citation_min or 0))
+    citation_counts = {
+        "frame": 0,
+        "transcript": 0,
+        "slide": 0,
+    }
+    for citation in citations:
+        kind = str(citation.get("kind") or "")
+        if kind in citation_counts:
+            citation_counts[kind] += 1
+    citation_kind_coverage = {
+        kind: citation_counts.get(kind, 0) > 0
+        for kind in expected_kinds
+    }
+    citation_count_ok = sum(citation_counts.values()) >= citation_min
+    citation_kinds_ok = all(citation_kind_coverage.values())
+    uncertainty_ok = True
+    if requires_uncertainty:
+        uncertainty_ok = any(marker in text for marker in UNCERTAINTY_MARKERS)
+    answered = bool(answer.strip()) and all(keyword_hits.values())
+    hallucination_free = not forbidden_hits
+    citation_correct = citation_count_ok and citation_kinds_ok
+    passed = answered and hallucination_free and citation_correct and uncertainty_ok
+    return {
+        "passed": passed,
+        "answered": answered,
+        "hallucination_free": hallucination_free,
+        "citation_correct": citation_correct,
+        "uncertainty_ok": uncertainty_ok,
+        "expected_keyword_hits": keyword_hits,
+        "required_keyword_hits": keyword_hits,
+        "forbidden_keyword_hits": forbidden_hits,
+        "citation_markers": citations,
+        "citation_counts": citation_counts,
+        "expected_citation_min": citation_min,
+        "expected_citation_kinds": expected_kinds,
+        "citation_count_ok": citation_count_ok,
+        "citation_kind_coverage": citation_kind_coverage,
+    }
+
+
 def evaluate_agent_loop(
     *,
     agent_actions: list[str],
@@ -358,6 +474,47 @@ def extract_frame_markers(answer: str) -> list[float]:
     return [float(match.group(1)) for match in FRAME_MARKER_RE.finditer(answer)]
 
 
+def extract_evidence_markers(answer: str) -> list[dict[str, Any]]:
+    markers: list[tuple[int, dict[str, Any]]] = []
+    for match in FRAME_MARKER_RE.finditer(answer or ""):
+        timestamp = float(match.group(1))
+        markers.append((
+            match.start(),
+            {
+                "kind": "frame",
+                "t_start": timestamp,
+                "t_end": timestamp,
+                "raw": match.group(0),
+            },
+        ))
+    for match in TRANSCRIPT_MARKER_RE.finditer(answer or ""):
+        start = float(match.group(1))
+        end = float(match.group(2))
+        if end < start:
+            start, end = end, start
+        markers.append((
+            match.start(),
+            {
+                "kind": "transcript",
+                "t_start": start,
+                "t_end": end,
+                "raw": match.group(0),
+            },
+        ))
+    for match in SLIDE_MARKER_RE.finditer(answer or ""):
+        timestamp = float(match.group(1))
+        markers.append((
+            match.start(),
+            {
+                "kind": "slide",
+                "t_start": timestamp,
+                "t_end": timestamp,
+                "raw": match.group(0),
+            },
+        ))
+    return [payload for _, payload in sorted(markers, key=lambda item: item[0])]
+
+
 def write_json(path: str | Path, payload: dict[str, Any]) -> None:
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -385,6 +542,42 @@ def _nearest_distance(target: float, timestamps: Iterable[float]) -> float | Non
 
 def _marker_distance(target: float, timestamps: Iterable[float]) -> float | None:
     return _nearest_distance(target, timestamps)
+
+
+def _is_audiovisual_case(case: EvalCase) -> bool:
+    return bool(
+        case.modality_tag
+        or case.expected_keywords
+        or case.expected_citation_kinds
+        or case.expected_citation_min is not None
+    )
+
+
+def _parse_citation_kinds(values: Any) -> list[str]:
+    aliases = {
+        "frame": "frame",
+        "frames": "frame",
+        "visual": "frame",
+        "transcript": "transcript",
+        "transcripts": "transcript",
+        "audio": "transcript",
+        "speech": "transcript",
+        "slide": "slide",
+        "slides": "slide",
+        "ppt": "slide",
+        "ocr": "slide",
+    }
+    if isinstance(values, str):
+        raw_values = [part.strip() for part in values.split(",")]
+    else:
+        raw_values = list(values or [])
+    kinds: list[str] = []
+    for value in raw_values:
+        key = str(value).strip().lower()
+        kind = aliases.get(key)
+        if kind and kind not in kinds:
+            kinds.append(kind)
+    return kinds
 
 
 def _scene_hit_accuracy(
@@ -654,6 +847,8 @@ class PredictionCache:
             "case_id": prediction.case_id,
             "retrieved_timestamps": list(prediction.retrieved_timestamps),
             "scene_hits": [dict(scene) for scene in prediction.scene_hits],
+            "retrieved_transcripts": [dict(item) for item in prediction.retrieved_transcripts],
+            "retrieved_slides": [dict(item) for item in prediction.retrieved_slides],
             "answer": prediction.answer,
             "agent_actions": list(prediction.agent_actions),
             "evidence_sufficiency": dict(prediction.evidence_sufficiency),
@@ -669,6 +864,14 @@ class PredictionCache:
                 {"start": float(s["start"]), "end": float(s["end"])}
                 for s in data.get("scene_hits", [])
                 if "start" in s and "end" in s
+            ],
+            retrieved_transcripts=[
+                dict(item) for item in data.get("retrieved_transcripts", [])
+                if isinstance(item, dict)
+            ],
+            retrieved_slides=[
+                dict(item) for item in data.get("retrieved_slides", [])
+                if isinstance(item, dict)
             ],
             answer=str(data.get("answer") or ""),
             agent_actions=[str(v) for v in data.get("agent_actions", [])],
@@ -812,7 +1015,7 @@ def _failures_markdown_table(failures: list[dict[str, Any]]) -> str:
         sections = []
         for name in ("retrieval", "answer", "agent_loop"):
             block = item.get(name) or {}
-            if not block.get("passed"):
+            if block.get("passed") is False:
                 sections.append(name)
         question = (item.get("question") or "").replace("|", "\\|").replace("\n", " ")
         if len(question) > 120:
@@ -829,3 +1032,286 @@ def _fmt(value: Any) -> str:
     if isinstance(value, float):
         return f"{value:.3f}"
     return str(value)
+
+
+# ---------------------------------------------------------------------------
+# Module CLI: python -m app.eval_harness --dataset audiovisual --n 20
+# ---------------------------------------------------------------------------
+
+
+def main(argv: list[str] | None = None) -> int:
+    return asyncio.run(_main_async(argv))
+
+
+async def _main_async(argv: list[str] | None = None) -> int:
+    try:
+        from dotenv import load_dotenv
+
+        load_dotenv()
+    except ImportError:
+        pass
+
+    parser = argparse.ArgumentParser(description="Run deterministic audiovisual QA evals.")
+    parser.add_argument(
+        "--dataset",
+        choices=["audiovisual"],
+        help="Named eval dataset. Currently supports the Phase-E audiovisual schema.",
+    )
+    parser.add_argument("--cases", help="JSONL cases. Overrides the dataset default path.")
+    parser.add_argument(
+        "--predictions",
+        help="Optional JSONL predictions. If omitted, run the local graph against ingested videos.",
+    )
+    parser.add_argument("--n", type=int, default=20, help="Number of cases to run from the top of the file.")
+    parser.add_argument("--output", default="data/eval/audiovisual_report.json")
+    parser.add_argument("--markdown", default=None, help="Markdown report path; defaults to <output>.md")
+    parser.add_argument("--tolerance-sec", type=float, default=2.0)
+    parser.add_argument("--recall-k", type=int, default=None)
+    parser.add_argument(
+        "--fail-under",
+        type=float,
+        default=0.0,
+        help="Exit non-zero if overall pass_rate is below this threshold.",
+    )
+    parser.add_argument(
+        "--prediction-cache",
+        default="data/eval/audiovisual_prediction_cache.jsonl",
+        help="JSONL cache for local graph predictions; pass empty string to disable.",
+    )
+    parser.add_argument(
+        "--per-case-delay-sec",
+        type=float,
+        default=0.0,
+        help="Sleep this many seconds between local graph cases.",
+    )
+    parser.add_argument(
+        "--group-by-prefix",
+        dest="group_by_prefix",
+        action="store_true",
+        default=True,
+    )
+    parser.add_argument(
+        "--no-group-by-prefix",
+        dest="group_by_prefix",
+        action="store_false",
+    )
+    args = parser.parse_args(argv)
+
+    if not args.dataset and not args.cases:
+        parser.error("provide --dataset audiovisual or --cases")
+
+    cases_path = Path(args.cases) if args.cases else _default_dataset_cases_path(args.dataset)
+    cases = load_cases(cases_path)
+    if args.n is not None and args.n > 0:
+        cases = cases[: args.n]
+
+    if args.predictions:
+        predictions = load_predictions(args.predictions)
+    else:
+        prediction_cache = PredictionCache(args.prediction_cache) if args.prediction_cache else None
+        predictions = await _run_local_predictions(
+            cases,
+            prediction_cache=prediction_cache,
+            per_case_delay_sec=args.per_case_delay_sec,
+        )
+
+    results: list[dict[str, Any]] = []
+    missing: list[str] = []
+    for case in cases:
+        prediction = predictions.get(case.case_id)
+        if prediction is None:
+            missing.append(case.case_id)
+            continue
+        results.append(
+            evaluate_case(
+                case,
+                prediction,
+                tolerance_sec=args.tolerance_sec,
+                recall_k=args.recall_k,
+                judge=None,
+            )
+        )
+
+    group_by = group_by_case_prefix if args.group_by_prefix else None
+    summary = summarize_results(results, group_by=group_by)
+    report = {
+        "run_meta": _cli_run_meta(args, cases_path, cases, results),
+        "summary": summary,
+        "missing_predictions": missing,
+        "results": results,
+    }
+    write_json(args.output, report)
+    markdown_path = args.markdown or str(Path(args.output).with_suffix(".md"))
+    write_markdown_report(report, markdown_path)
+
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    print(f"wrote {args.output}")
+    print(f"wrote {markdown_path}")
+    if missing:
+        print(f"missing predictions: {', '.join(missing)}", file=sys.stderr)
+        return 2
+    return 1 if summary["pass_rate"] < args.fail_under else 0
+
+
+def _default_dataset_cases_path(dataset: str | None) -> Path:
+    if dataset != "audiovisual":
+        raise ValueError(f"Unsupported dataset: {dataset!r}")
+    candidates = [
+        Path("eval/audiovisual/questions.jsonl"),
+        Path("tests/fixtures/eval_cases_audiovisual_seed.jsonl"),
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    return candidates[0]
+
+
+async def _run_local_predictions(
+    cases: list[EvalCase],
+    *,
+    prediction_cache: PredictionCache | None,
+    per_case_delay_sec: float,
+) -> dict[str, EvalPrediction]:
+    from langchain_core.messages import HumanMessage
+    from langgraph.checkpoint.memory import InMemorySaver
+    from langgraph.store.memory import InMemoryStore
+
+    from app.cache import get_video_status
+    from app.config import settings
+    from app.eval_fingerprint import AGENT_CODE_VERSION, prompt_fingerprint
+    from app.graph import build_graph
+
+    app_graph = build_graph(InMemorySaver(), InMemoryStore(), memory_manager=_NoopMemoryManager())
+    fingerprint = prompt_fingerprint() if prediction_cache is not None else ""
+    orch_name = (settings.orchestrator_model_name or settings.vlm_model_name or "")
+    vlm_name = (settings.vlm_model_name or "")
+    model_name = f"{orch_name}|vlm={vlm_name}"
+    predictions: dict[str, EvalPrediction] = {}
+
+    for case in cases:
+        if not case.video_id or get_video_status(case.video_id) != "done":
+            raise RuntimeError(
+                f"Video cache is not ready for {case.video_id or '(empty video_id)'}. "
+                "Preprocess it first or pass --predictions."
+            )
+        cache_key: str | None = None
+        if prediction_cache is not None:
+            cache_key = PredictionCache.make_key(
+                case_id=case.case_id,
+                model=model_name,
+                prompt_fingerprint=fingerprint,
+                video_id=case.video_id,
+                agent_code_version=AGENT_CODE_VERSION,
+            )
+            cached = prediction_cache.get(cache_key)
+            if cached is not None:
+                print(f"[cache] hit case={case.case_id}", flush=True)
+                predictions[case.case_id] = PredictionCache.prediction_from_dict(case.case_id, cached)
+                continue
+            print(f"[cache] miss case={case.case_id}", flush=True)
+
+        state = await app_graph.ainvoke(
+            {
+                "messages": [HumanMessage(content=case.question)],
+                "video_id": case.video_id,
+                "user_id": "eval",
+                "retrieved_frames": [],
+                "retrieved_scene_hits": [],
+                "retrieved_transcripts": [],
+                "retrieved_slides": [],
+                "retrieval_plan": {},
+                "timeline": [],
+                "hypotheses": [],
+                "evidence_sufficiency": {},
+                "draft_answer": "",
+                "grounding_report": {},
+            },
+            config={"configurable": {"thread_id": f"eval-{case.case_id}"}},
+        )
+        evidence_sufficiency = dict(state.get("evidence_sufficiency", {}) or {})
+        agent_terminated = state.get("agent_terminated")
+        if agent_terminated:
+            evidence_sufficiency["agent_terminated"] = agent_terminated
+        prediction = EvalPrediction(
+            case_id=case.case_id,
+            retrieved_timestamps=[
+                float(item["timestamp"])
+                for item in state.get("retrieved_frames", [])
+                if "timestamp" in item
+            ],
+            scene_hits=state.get("retrieved_scene_hits", []),
+            retrieved_transcripts=[
+                dict(item) for item in state.get("retrieved_transcripts", [])
+                if isinstance(item, dict)
+            ],
+            retrieved_slides=[
+                dict(item) for item in state.get("retrieved_slides", [])
+                if isinstance(item, dict)
+            ],
+            answer=_last_assistant_message(state.get("messages", [])),
+            agent_actions=_agent_actions(state.get("messages", [])),
+            evidence_sufficiency=evidence_sufficiency,
+            grounding_report=state.get("grounding_report", {}),
+        )
+        predictions[case.case_id] = prediction
+        if prediction_cache is not None and cache_key is not None:
+            prediction_cache.put(cache_key, PredictionCache.prediction_to_dict(prediction))
+        if per_case_delay_sec > 0:
+            await asyncio.sleep(per_case_delay_sec)
+    return predictions
+
+
+def _last_assistant_message(messages: list[Any]) -> str:
+    for message in reversed(messages):
+        if getattr(message, "type", "") == "ai" and not getattr(message, "tool_calls", None):
+            return str(message.content)
+    return ""
+
+
+def _agent_actions(messages: list[Any]) -> list[str]:
+    actions = []
+    for message in messages:
+        if getattr(message, "type", "") != "tool":
+            continue
+        try:
+            payload = json.loads(str(message.content))
+        except json.JSONDecodeError:
+            continue
+        tool_name = payload.get("tool")
+        if tool_name:
+            actions.append(str(tool_name))
+    return actions
+
+
+class _NoopMemoryManager:
+    async def ainvoke(self, payload: Any, config: Any = None) -> None:
+        return None
+
+
+def _cli_run_meta(
+    args: argparse.Namespace,
+    cases_path: Path,
+    cases: list[EvalCase],
+    results: list[dict[str, Any]],
+) -> dict[str, Any]:
+    from app.config import settings
+    from app.eval_fingerprint import AGENT_CODE_VERSION, prompt_fingerprint
+
+    return {
+        "dataset": args.dataset or "custom",
+        "dataset_path": str(cases_path),
+        "n": args.n,
+        "n_cases_total": len(cases),
+        "n_cases_predicted": len(results),
+        "vlm_model_name": settings.vlm_model_name,
+        "orchestrator_model_name": settings.orchestrator_model_name or settings.vlm_model_name,
+        "prompt_fingerprint": prompt_fingerprint(),
+        "agent_code_version": AGENT_CODE_VERSION,
+        "tolerance_sec": args.tolerance_sec,
+        "recall_k": args.recall_k,
+        "judge_enabled": False,
+    }
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

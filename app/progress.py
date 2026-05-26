@@ -11,8 +11,11 @@ from app.config import settings
 
 STAGE_LABELS = {
     "probe": ["正在打开视频卷轴", "Unrolling the video..."],
+    "remux": ["正在修复视频封装", "Repairing video container..."],
     "scenes": ["数一数有多少个场景", "Counting scenes..."],
     "captions": ["瞪大眼睛仔细看每个镜头", "Studying each scene..."],
+    "asr": ["正在听老师讲了什么", "Listening to the audio..."],
+    "slides": ["正在整理 PPT 和板书", "Reading slides and whiteboard..."],
     "indexing": ["把看到的写进小本本", "Taking notes..."],
     "embed": ["给每一帧拍个写真", "Photographing every frame..."],
     "done": ["视频索引完成", "Video index is ready."],

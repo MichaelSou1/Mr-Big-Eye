@@ -250,6 +250,8 @@ async def _run_predictions(
                 "user_id": "eval",
                 "retrieved_frames": [],
                 "retrieved_scene_hits": [],
+                "retrieved_transcripts": [],
+                "retrieved_slides": [],
                 "retrieval_plan": {},
                 "timeline": [],
                 "hypotheses": [],
@@ -271,6 +273,14 @@ async def _run_predictions(
                 if "timestamp" in item
             ],
             scene_hits=state.get("retrieved_scene_hits", []),
+            retrieved_transcripts=[
+                dict(item) for item in state.get("retrieved_transcripts", [])
+                if isinstance(item, dict)
+            ],
+            retrieved_slides=[
+                dict(item) for item in state.get("retrieved_slides", [])
+                if isinstance(item, dict)
+            ],
             answer=_last_assistant_message(state.get("messages", [])),
             agent_actions=_agent_actions(state.get("messages", [])),
             evidence_sufficiency=evidence_sufficiency,

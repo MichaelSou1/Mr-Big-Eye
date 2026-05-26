@@ -27,7 +27,8 @@ body {
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
 }
 
@@ -49,7 +50,7 @@ button:disabled {
 .app-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-columns: 300px minmax(0, 1fr) 320px;
 }
 
 .sidebar {
@@ -181,7 +182,8 @@ h1 {
 }
 
 input[type="file"],
-.composer input {
+.composer input,
+#hotwords-input {
   width: 100%;
   min-height: 40px;
   border: 1px solid var(--line);
@@ -189,6 +191,26 @@ input[type="file"],
   background: white;
   color: var(--ink);
   padding: 8px 10px;
+}
+
+#hotwords-input {
+  display: block;
+  min-height: 58px;
+  margin-top: 10px;
+  resize: vertical;
+}
+
+#video-preview {
+  display: none;
+  width: 100%;
+  max-height: 260px;
+  margin-top: 12px;
+  border-radius: 6px;
+  background: #111;
+}
+
+#video-preview.active {
+  display: block;
 }
 
 progress {
@@ -380,6 +402,70 @@ progress {
   margin-top: 4px;
 }
 
+.inline-citation {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin: 2px 3px;
+  padding: 2px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  color: var(--accent);
+  font-size: 12px;
+  vertical-align: baseline;
+}
+
+.inline-citation.transcript {
+  color: #6a4b00;
+}
+
+.inline-citation.slide {
+  color: #5a4bb3;
+}
+
+.evidence-panel {
+  min-height: 100vh;
+  border-left: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.74);
+  padding: 16px;
+  overflow: hidden;
+}
+
+.transcript-timeline {
+  height: calc(100vh - 32px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.transcript-item {
+  width: 100%;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  color: var(--ink);
+  padding: 8px;
+  text-align: left;
+}
+
+.transcript-item:hover {
+  border-color: #bdd9d3;
+  background: var(--accent-weak);
+}
+
+.transcript-time {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .composer {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -397,6 +483,16 @@ progress {
     min-height: auto;
     border-right: 0;
     border-bottom: 1px solid var(--line);
+  }
+
+  .evidence-panel {
+    min-height: auto;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .transcript-timeline {
+    height: 220px;
   }
 
   .session-list {

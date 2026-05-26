@@ -1,4 +1,7 @@
 from pathlib import Path
+import json
+import subprocess
+import sys
 
 from app.eval_harness import (
     EvalCase,
@@ -8,8 +11,10 @@ from app.eval_harness import (
     _parse_judge_json,
     evaluate_agent_loop,
     evaluate_answer,
+    evaluate_audiovisual_answer,
     evaluate_case,
     evaluate_retrieval,
+    extract_evidence_markers,
     group_by_case_prefix,
     load_cases,
     load_predictions,
@@ -45,6 +50,83 @@ def test_answer_harness_flags_hallucination_and_bad_citation():
     assert not result["passed"]
     assert not result["hallucination_free"]
     assert not result["citation_correct"]
+
+
+def test_audiovisual_answer_scores_keywords_and_citation_kinds():
+    result = evaluate_audiovisual_answer(
+        answer=(
+            "The lecturer compares REINFORCE and A2C. "
+            "[TRANSCRIPT:t=10.0-14.0] The slide shows TD target. [SLIDE:t=72.0]"
+        ),
+        expected_keywords=["REINFORCE", "A2C", "TD target"],
+        forbidden_keywords=["DQN"],
+        expected_citation_min=2,
+        expected_citation_kinds=["transcript", "slide"],
+    )
+
+    assert result["passed"]
+    assert result["citation_counts"] == {"frame": 0, "transcript": 1, "slide": 1}
+    assert result["citation_kind_coverage"] == {"transcript": True, "slide": True}
+
+
+def test_audiovisual_case_uses_question_id_schema_and_skips_llm_judge():
+    case = EvalCase(
+        case_id="av-1",
+        video_id="v",
+        question="Which methods are compared?",
+        modality_tag="audio",
+        expected_keywords=["REINFORCE", "A2C"],
+        expected_citation_min=1,
+        expected_citation_kinds=["transcript"],
+    )
+    prediction = EvalPrediction(
+        case_id="av-1",
+        answer="It compares REINFORCE and A2C. [TRANSCRIPT:t=10.0-14.0]",
+    )
+
+    class ExplodingJudge:
+        model = "unused"
+
+        def grade(self, *, question, reference, answer):  # pragma: no cover - must not run
+            raise AssertionError("audiovisual deterministic eval must not call the judge")
+
+    result = evaluate_case(case, prediction, judge=ExplodingJudge())
+    assert result["passed"]
+    assert "llm_judge" not in result["answer"]
+
+
+def test_parse_audiovisual_jsonl_schema(tmp_path):
+    path = tmp_path / "cases.jsonl"
+    path.write_text(
+        json.dumps(
+            {
+                "question_id": "av-schema-1",
+                "video_id": "vid",
+                "question": "What is on the slide?",
+                "modality_tag": "joint",
+                "question_type": "open",
+                "expected_keywords": ["A2C"],
+                "expected_citation_min": 2,
+                "expected_citation_kinds": ["transcript", "slide"],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    case = load_cases(path)[0]
+    assert case.case_id == "av-schema-1"
+    assert case.required_keywords == ["A2C"]
+    assert case.expected_keywords == ["A2C"]
+    assert case.expected_citation_kinds == ["transcript", "slide"]
+
+
+def test_extract_evidence_markers_preserves_order():
+    markers = extract_evidence_markers(
+        "see [SLIDE:t=20.0] then [TRANSCRIPT:t=10.0-12.0] and [FRAME:t=11.0]"
+    )
+
+    assert [marker["kind"] for marker in markers] == ["slide", "transcript", "frame"]
 
 
 def test_agent_loop_harness_checks_recommended_action():
@@ -277,6 +359,8 @@ def test_prediction_cache_round_trip(tmp_path):
         case_id="c-1",
         retrieved_timestamps=[1.0, 2.5],
         scene_hits=[{"start": 0.0, "end": 3.0}],
+        retrieved_transcripts=[{"t_start": 1.0, "t_end": 2.0, "text": "hello"}],
+        retrieved_slides=[{"t_start": 2.0, "t_end": 2.0, "text": "slide"}],
         answer="hello [FRAME:t=1.0]",
         agent_actions=["retrieve_video_evidence"],
         evidence_sufficiency={"sufficient": True},
@@ -290,6 +374,8 @@ def test_prediction_cache_round_trip(tmp_path):
     restored = PredictionCache.prediction_from_dict("c-1", cached)
     assert restored.retrieved_timestamps == [1.0, 2.5]
     assert restored.scene_hits == [{"start": 0.0, "end": 3.0}]
+    assert restored.retrieved_transcripts == [{"t_start": 1.0, "t_end": 2.0, "text": "hello"}]
+    assert restored.retrieved_slides == [{"t_start": 2.0, "t_end": 2.0, "text": "slide"}]
     assert restored.answer == "hello [FRAME:t=1.0]"
     assert restored.agent_actions == ["retrieve_video_evidence"]
     assert restored.evidence_sufficiency == {"sufficient": True}
@@ -364,3 +450,62 @@ def test_write_markdown_report_contains_global_and_groups(tmp_path):
     assert "longvideobench" in text
     assert "nextgqa" in text
     assert "Worst" in text  # failure section header
+
+
+def test_eval_harness_module_cli_audiovisual_predictions_smoke(tmp_path):
+    cases = tmp_path / "cases.jsonl"
+    predictions = tmp_path / "predictions.jsonl"
+    output = tmp_path / "report.json"
+    cases.write_text(
+        json.dumps(
+            {
+                "question_id": "av-cli-1",
+                "video_id": "vid",
+                "question": "Which algorithms are compared?",
+                "modality_tag": "audio",
+                "question_type": "open",
+                "expected_keywords": ["REINFORCE", "A2C"],
+                "expected_citation_min": 1,
+                "expected_citation_kinds": ["transcript"],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    predictions.write_text(
+        json.dumps(
+            {
+                "case_id": "av-cli-1",
+                "answer": "The lecture compares REINFORCE and A2C. [TRANSCRIPT:t=10.0-12.0]",
+                "agent_actions": ["retrieve_transcript_evidence", "answer_with_evidence"],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "app.eval_harness",
+            "--dataset",
+            "audiovisual",
+            "--cases",
+            str(cases),
+            "--predictions",
+            str(predictions),
+            "--output",
+            str(output),
+            "--n",
+            "20",
+        ],
+        cwd=Path(__file__).resolve().parents[1],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    report = json.loads(output.read_text(encoding="utf-8"))
+    assert report["summary"]["passed"] == 1

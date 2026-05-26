@@ -68,12 +68,15 @@ QA_SYSTEM_PROMPT = (
     "═══ End MCQ HARD RULE ═══\n"
     "\n"
     "For non-MCQ (open-ended) questions: answer strictly from the provided "
-    "frames; do not speculate about content outside the frames or between them; "
+    "frames and any provided transcript/slide evidence; do not speculate about "
+    "content outside the supplied evidence; "
     "if evidence is truly insufficient, say \"证据不足\" plainly — but again, "
     "this exception does NOT apply to MCQs.\n"
     "Every concrete visual claim must carry a [FRAME:t=X.X] citation; 2-4 "
     "markers per answer is typical.\n"
-    "The renderer will replace valid [FRAME:t=...] markers with thumbnails."
+    "Use [TRANSCRIPT:t=A.B-C.D] for speech evidence and [SLIDE:t=X.X] for "
+    "OCR/PPT evidence when those evidence blocks are provided.\n"
+    "The renderer will replace valid citation markers with inline evidence."
 )
 
 SUBJECT_DELTA_PROTOCOL = (
@@ -293,6 +296,7 @@ def _build_qa_payload(
     stream: bool = False,
     system_prompt: str | None = None,
     subject_registry: list[dict[str, Any]] | None = None,
+    text_evidence: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     evidence_frames, evidence_timestamps = _select_evidence_frames(
         frames,
@@ -304,12 +308,18 @@ def _build_qa_payload(
     prompt = system_prompt or QA_SYSTEM_PROMPT
     rendered_question = _question_with_subject_registry(question, subject_registry or [])
 
-    user_content: list[dict[str, Any]] = [
-        _text_part(
-            f"Question: {rendered_question}\n"
-            "Relevant sampled frames follow. Each image is preceded by its timestamp."
+    evidence_text = _render_text_evidence(text_evidence or [])
+    prompt_text = (
+        f"Question: {rendered_question}\n"
+        "Relevant sampled frames follow. Each image is preceded by its timestamp."
+    )
+    if evidence_text:
+        prompt_text += (
+            "\n\nAdditional transcript/slide evidence follows. Cite it with the exact "
+            "[TRANSCRIPT:t=...] or [SLIDE:t=...] marker shown when using it.\n"
+            f"{evidence_text}"
         )
-    ]
+    user_content: list[dict[str, Any]] = [_text_part(prompt_text)]
     for frame, timestamp in zip(evidence_frames, evidence_timestamps, strict=False):
         user_content.append(_text_part(f"[t={timestamp:.1f}s]"))
         user_content.append(
@@ -368,6 +378,17 @@ def _question_with_subject_registry(
             f"- {sid} ({label}, 首次见于 {first_seen}, 最近 {last_seen}): {attributes}"
         )
     return "\n".join([*lines, "", "【用户问题】", question])
+
+
+def _render_text_evidence(items: list[dict[str, Any]]) -> str:
+    lines: list[str] = []
+    for item in items[:12]:
+        marker = str(item.get("marker") or "").strip()
+        text = str(item.get("text") or "").strip()
+        if not marker or not text:
+            continue
+        lines.append(f"{marker} {text}")
+    return "\n".join(lines)
 
 
 def _format_registry_time(value: Any) -> str:
@@ -567,6 +588,7 @@ async def answer_question(
     *,
     system_prompt: str | None = None,
     subject_registry: list[dict[str, Any]] | None = None,
+    text_evidence: list[dict[str, Any]] | None = None,
 ) -> str:
     """Answer a question using sampled keyframes sorted by timestamp."""
     frame_limit = settings.vqa_max_frames if settings.vqa_max_frames > 0 else len(frames)
@@ -585,6 +607,7 @@ async def answer_question(
                 stream=False,
                 system_prompt=system_prompt,
                 subject_registry=subject_registry,
+                text_evidence=text_evidence,
             )
             data = await _post_json(payload)
             text = _extract_text(data)
@@ -624,6 +647,7 @@ async def stream_answer_question(
     *,
     system_prompt: str | None = None,
     subject_registry: list[dict[str, Any]] | None = None,
+    text_evidence: list[dict[str, Any]] | None = None,
 ) -> AsyncIterator[str]:
     """Yield VQA answer tokens using sampled keyframes."""
     payload = _build_qa_payload(
@@ -637,6 +661,7 @@ async def stream_answer_question(
         stream=True,
         system_prompt=system_prompt,
         subject_registry=subject_registry,
+        text_evidence=text_evidence,
     )
     async for delta in _stream_sse(payload):
         yield delta

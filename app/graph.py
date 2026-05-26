@@ -39,6 +39,8 @@ class GraphState(TypedDict):
     user_id: str
     retrieved_frames: Annotated[list[dict[str, Any]], _last_write]
     retrieved_scene_hits: Annotated[list[dict[str, Any]], _last_write]
+    retrieved_transcripts: Annotated[list[dict[str, Any]], _last_write]
+    retrieved_slides: Annotated[list[dict[str, Any]], _last_write]
     retrieval_plan: Annotated[dict[str, Any], _last_write]
     timeline: Annotated[list[dict[str, Any]], _last_write]
     hypotheses: Annotated[list[dict[str, Any]], _last_write]
@@ -291,10 +293,13 @@ def _orchestrator_model() -> ChatOpenAI:
 
 def _orchestrator_prompt(*, has_video: bool) -> str:
     video_guidance = (
-        "A video is attached. For any question about visual content, actions, "
-        "objects, timing, quality, form, or what is happening in the clip, call "
-        "the video evidence tools before answering. Do not answer video-content questions "
-        "from memory alone."
+        "A video is attached. Treat questions as video-grounded by default. "
+        "For any question about visual content, speech, lecture concepts, actions, "
+        "objects, timing, quality, form, slides, OCR, or what is happening in the clip, "
+        "call evidence tools before answering. Do not answer video-content questions "
+        "from memory alone. If the question names a term likely from the video "
+        "(for example REINFORCE, A2C, baseline, TD target), call transcript search "
+        "at least once even if the user did not say 'according to the video'."
         if has_video
         else "No video is attached. If the user asks about a video, explain that a ready video is needed."
     )
@@ -335,7 +340,8 @@ def _orchestrator_prompt(*, has_video: bool) -> str:
     final_answer_protocol = (
         " 【FINAL ANSWER PROTOCOL — 不可省略】"
         "无论你之前调用了 segment_focus / stitched_verify / build_timeline / "
-        "retrieve_video_evidence / retrieve_hypothesis_evidence / expand_temporal_evidence "
+        "retrieve_video_evidence / retrieve_transcript_evidence / search_transcript_keyword / "
+        "retrieve_slide_evidence / align_audiovisual_evidence / retrieve_hypothesis_evidence / expand_temporal_evidence "
         "中的哪些工具，**最终面向用户的答案必须由 `answer_with_evidence` 工具产生**，"
         "再由 `verify_grounding` 校验通过后才能 emit。"
         "禁止：把任何 sub-tool 返回的 `observation` 字段（segment_focus / stitched_verify "
@@ -361,7 +367,11 @@ def _orchestrator_prompt(*, has_video: bool) -> str:
         "retrieval_profile. Use focused for simple local details, balanced by default, "
         "broad for summaries, temporal for before/after/order/counting, detail for "
         "fine visual/OCR questions, and negative_check before saying something is absent. "
-        "Prefer the fine-grained tools over the legacy multimodal_vqa shortcut. Start with "
+        "Prefer the fine-grained tools over the legacy multimodal_vqa shortcut. "
+        "For audio-heavy lecture questions, start with retrieve_transcript_evidence; "
+        "for exact terms, use search_transcript_keyword; for PPT/board/OCR questions, "
+        "use retrieve_slide_evidence; for questions that connect what was said to what was "
+        "shown at the same moment, use align_audiovisual_evidence. Otherwise start with "
         "retrieve_video_evidence, then call assess_evidence_sufficiency before answering. "
         "If evidence is insufficient, follow the recommended_next_action. For temporal, "
         "counting, order, or comparison questions, call build_timeline or "
@@ -377,8 +387,10 @@ def _orchestrator_prompt(*, has_video: bool) -> str:
         "answer text verbatim — do not re-retrieve, re-expand, or call "
         "answer_with_evidence again. Only iterate when grounded=false and a "
         "concrete warning tells you what to fix. "
-        "Final answers must preserve valid [FRAME:t=...] markers. "
-        "Every concrete visual claim should have frame evidence. For absence or negative "
+        "Final answers must preserve valid [FRAME:t=...], [TRANSCRIPT:t=A.B-C.D], "
+        "and [SLIDE:t=...] markers. Every concrete visual claim should have frame or "
+        "slide evidence; every concrete speech/lecture claim should have transcript evidence. "
+        "For absence or negative "
         "answers, use negative_check retrieval and scope the answer to checked evidence "
         "unless the evidence truly covers the whole video. "
         f"{final_answer_protocol}"

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -53,6 +54,24 @@ _ensure_ffmpeg_on_path()
 
 _VAD: Any = None
 _ASR: Any = None
+ASR_MODEL_NAME = "iic/SenseVoiceSmall"
+
+_EMOJI_RE = re.compile(
+    "["
+    "\U0001F1E6-\U0001F1FF"
+    "\U0001F300-\U0001FAFF"
+    "\U00002700-\U000027BF"
+    "\U00002600-\U000026FF"
+    "]+"
+)
+
+_TERM_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"\ba\s*(?:二|2|two)\s*c\b", re.IGNORECASE), "A2C"),
+    (re.compile(r"\bA\s*(?:二|2|two)\s*C\b", re.IGNORECASE), "A2C"),
+    (re.compile(r"\brl\b", re.IGNORECASE), "RL"),
+    (re.compile(r"\breinforce\b", re.IGNORECASE), "REINFORCE"),
+    (re.compile(r"\btd\b", re.IGNORECASE), "TD"),
+)
 
 
 def _load_models() -> tuple[Any, Any]:
@@ -74,7 +93,7 @@ def _load_models() -> tuple[Any, Any]:
     )
     logger.info("Loading SenseVoice-Small on %s ...", device)
     _ASR = AutoModel(
-        model="iic/SenseVoiceSmall",
+        model=ASR_MODEL_NAME,
         device=device,
         disable_update=True,
         log_level="ERROR",
@@ -100,12 +119,14 @@ def transcribe(
     video_path: str | os.PathLike[str],
     *,
     language: str = "auto",
+    hotwords: list[str] | None = None,
 ) -> list[dict[str, Any]]:
     """Transcribe a video file to sentence-level segments.
 
     Args:
         video_path: path to video file (any container ffmpeg can read).
         language: 'auto' | 'zh' | 'en' | 'yue' | 'ja' | 'ko'.
+        hotwords: Optional course/domain terms forwarded to SenseVoice.
 
     Returns:
         List of segments [{"text": str, "t_start": float, "t_end": float}, ...]
@@ -120,6 +141,7 @@ def transcribe(
         raise FileNotFoundError(video_path)
 
     vad, asr = _load_models()
+    hotword_text = " ".join(str(item).strip() for item in (hotwords or []) if str(item).strip())
 
     with tempfile.TemporaryDirectory() as tmp:
         wav_path = Path(tmp) / "audio.wav"
@@ -144,25 +166,38 @@ def transcribe(
         if chunk.size == 0:
             continue
 
-        asr_res = asr.generate(
-            input=chunk,
-            fs=sr,
-            cache={},
-            language=language,
-            use_itn=True,
-        )
+        kwargs: dict[str, Any] = {
+            "input": chunk,
+            "fs": sr,
+            "cache": {},
+            "language": language,
+            "use_itn": True,
+        }
+        if hotword_text:
+            kwargs["hotword"] = hotword_text
+        asr_res = asr.generate(**kwargs)
         raw_text = (asr_res[0].get("text", "") or "") if asr_res else ""
-        text = rich_transcription_postprocess(raw_text).strip()
+        text = postprocess_text(rich_transcription_postprocess(raw_text))
         if not text:
             continue
         segments.append({
             "text": text,
             "t_start": round(t_start_ms / 1000.0, 3),
             "t_end": round(t_end_ms / 1000.0, 3),
+            "source": "asr",
         })
 
     segments.sort(key=lambda seg: seg["t_start"])
     return segments
+
+
+def postprocess_text(text: str) -> str:
+    """Normalize SenseVoice text for downstream retrieval."""
+    cleaned = _EMOJI_RE.sub("", text or "")
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    for pattern, replacement in _TERM_PATTERNS:
+        cleaned = pattern.sub(replacement, cleaned)
+    return cleaned.strip()
 
 
 def _cli() -> None:

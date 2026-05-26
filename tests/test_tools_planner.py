@@ -100,6 +100,73 @@ def test_grounding_report_accepts_scoped_negative_with_citation():
     assert report["invalid_markers"] == []
 
 
+def test_grounding_report_accepts_transcript_only_evidence():
+    report = tools._grounding_report(
+        "The lecturer compares REINFORCE and A2C. [TRANSCRIPT:t=10.0-14.0]",
+        [],
+        {
+            "retrieved_transcripts": [
+                {"t_start": 10.0, "t_end": 14.0, "text": "REINFORCE and A2C"}
+            ],
+            "retrieval_plan": {},
+        },
+    )
+
+    assert report["grounded"]
+    assert report["valid_transcript_markers"] == 1
+
+
+def test_grounding_report_accepts_slide_citation_for_visual_claim():
+    report = tools._grounding_report(
+        "The slide shows TD target versus return. [SLIDE:t=72.0]",
+        [],
+        {
+            "retrieved_slides": [
+                {"t_start": 72.0, "t_end": 72.0, "text": "TD target versus return"}
+            ],
+            "retrieval_plan": {},
+        },
+    )
+
+    assert report["grounded"]
+    assert report["valid_slide_markers"] == 1
+
+
+@pytest.mark.asyncio
+async def test_retrieve_transcript_evidence_updates_state(monkeypatch):
+    class FakeHit:
+        def as_dict(self):
+            return {
+                "kind": "transcript",
+                "text": "REINFORCE and A2C",
+                "t_start": 10.0,
+                "t_end": 14.0,
+                "score": 1.0,
+                "source": "test",
+                "marker": "[TRANSCRIPT:t=10.0-14.0]",
+            }
+
+    monkeypatch.setattr(tools, "search_text", lambda *args, **kwargs: [FakeHit()])
+    command = await tools.retrieve_transcript_evidence.ainvoke(
+        {
+            "name": "retrieve_transcript_evidence",
+            "id": "rt",
+            "type": "tool_call",
+            "args": {
+                "query": "REINFORCE",
+                "top_k": 1,
+                "state": {"video_id": "vid", "retrieved_transcripts": []},
+                "tool_call_id": "rt",
+            },
+        }
+    )
+    update = command.update if hasattr(command, "update") else command["update"]
+    payload = json.loads(update["messages"][0].content)
+
+    assert payload["tool"] == "retrieve_transcript_evidence"
+    assert update["retrieved_transcripts"][0]["marker"] == "[TRANSCRIPT:t=10.0-14.0]"
+
+
 def test_coerce_float_list_accepts_native_list():
     assert tools._coerce_float_list([1.0, 2.5]) == [1.0, 2.5]
 

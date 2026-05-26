@@ -60,6 +60,12 @@ class Settings(BaseSettings):
     vqa_max_output_tokens: int = 1024
     scene_detect_threshold: float = 27.0
     dense_fps: float = 1.0
+    enable_asr: bool = True
+    asr_language: str = "auto"
+    enable_slide_ocr: bool = True
+    slide_sample_fps: float = 0.25
+    slide_change_hash_threshold: int = 8
+    slide_change_frame_threshold: float = 7.5
 
     data_dir: Path = Path("./data")
     database_path: Path | None = None

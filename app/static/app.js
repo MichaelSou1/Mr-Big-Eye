@@ -4,8 +4,11 @@ const newSessionButton = document.getElementById('new-session-button');
 const sessionList = document.getElementById('session-list');
 const uploadButton = document.getElementById('upload-button');
 const videoFile = document.getElementById('video-file');
+const hotwordsInput = document.getElementById('hotwords-input');
+const videoPreview = document.getElementById('video-preview');
 const uploadProgress = document.getElementById('upload-progress');
 const uploadStatus = document.getElementById('upload-status');
+const transcriptTimeline = document.getElementById('transcript-timeline');
 const messages = document.getElementById('messages');
 const chatForm = document.getElementById('chat-form');
 const questionInput = document.getElementById('question-input');
@@ -18,6 +21,8 @@ let currentUser = null;
 let currentSessionId = localStorage.getItem(SESSION_KEY);
 let currentVideoId = null;
 let currentFrames = [];
+let currentTranscripts = [];
+let currentSlides = [];
 let chatSource = null;
 let progressSource = null;
 
@@ -43,6 +48,13 @@ newSessionButton.addEventListener('click', async () => {
   await createSession(null, true);
 });
 
+videoFile.addEventListener('change', () => {
+  const file = videoFile.files[0];
+  if (!file) return;
+  videoPreview.src = URL.createObjectURL(file);
+  videoPreview.classList.add('active');
+});
+
 uploadButton.addEventListener('click', () => {
   const file = videoFile.files[0];
   if (!file) {
@@ -56,6 +68,9 @@ uploadButton.addEventListener('click', () => {
 
   const form = new FormData();
   form.append('file', file);
+  if (hotwordsInput.value.trim()) {
+    form.append('hotwords', hotwordsInput.value.trim());
+  }
 
   const xhr = new XMLHttpRequest();
   const userParam = currentUser ? `?user_id=${encodeURIComponent(currentUser.user_id)}` : '';
@@ -118,7 +133,10 @@ chatForm.addEventListener('submit', (event) => {
       localStorage.setItem(SESSION_KEY, currentSessionId);
     }
     currentFrames = payload.frames || [];
+    currentTranscripts = payload.transcripts || currentTranscripts;
+    currentSlides = payload.slides || currentSlides;
     renderGallery(assistant.article, currentFrames);
+    renderTranscriptTimeline(currentTranscripts);
     refreshSessions();
   });
 
@@ -187,8 +205,11 @@ async function createSession(videoId = null, clear = true) {
   currentSessionId = payload.session_id;
   currentVideoId = videoId;
   currentFrames = [];
+  currentTranscripts = [];
+  currentSlides = [];
   localStorage.setItem(SESSION_KEY, currentSessionId);
   if (clear) messages.textContent = '';
+  renderTranscriptTimeline([]);
   await refreshSessions();
 }
 
@@ -253,11 +274,14 @@ async function restoreSession(sessionId) {
   currentSessionId = sessionId;
   currentVideoId = payload.video_id || null;
   currentFrames = [];
+  currentTranscripts = [];
+  currentSlides = [];
   localStorage.setItem(SESSION_KEY, sessionId);
   messages.textContent = '';
   for (const message of payload.messages || []) {
     appendMessage(message.role === 'assistant' ? 'assistant' : 'user', message.content);
   }
+  await loadTranscriptTimeline();
   await refreshSessions();
 }
 
@@ -288,6 +312,7 @@ function subscribePreprocess(url) {
 function onVideoReady() {
   uploadProgress.value = 100;
   setUploadStatus('Video ready.');
+  loadTranscriptTimeline();
   questionInput.focus();
 }
 
@@ -312,17 +337,23 @@ function appendMessage(role, text, frames = []) {
   return { article, bubble, text };
 }
 
-const FRAME_PLACEHOLDER_PREFIX = '@@MBE_FRAME_';
-const FRAME_PLACEHOLDER_SUFFIX = '@@';
+const CITATION_PLACEHOLDER_PREFIX = '@@MBE_CITE_';
+const CITATION_PLACEHOLDER_SUFFIX = '@@';
 
 function renderAnswer(container, text, frames) {
   container.textContent = '';
-  const marker = /\[FRAME:t=([0-9]+(?:\.[0-9]+)?)\]/g;
-  const seenFrames = [];
-  const masked = text.replace(marker, (_m, ts) => {
-    const idx = seenFrames.length;
-    seenFrames.push(closestFrame(Number(ts), frames));
-    return `${FRAME_PLACEHOLDER_PREFIX}${idx}${FRAME_PLACEHOLDER_SUFFIX}`;
+  const marker = /\[(FRAME|TRANSCRIPT|SLIDE):t=([0-9]+(?:\.[0-9]+)?)(?:-([0-9]+(?:\.[0-9]+)?))?\]/g;
+  const citations = [];
+  const masked = text.replace(marker, (raw, kind, start, end) => {
+    const idx = citations.length;
+    citations.push({
+      raw,
+      kind,
+      start: Number(start),
+      end: end == null ? null : Number(end),
+      frame: kind === 'FRAME' ? closestFrame(Number(start), frames) : null,
+    });
+    return `${CITATION_PLACEHOLDER_PREFIX}${idx}${CITATION_PLACEHOLDER_SUFFIX}`;
   });
 
   if (typeof window.marked === 'undefined' || typeof window.DOMPurify === 'undefined') {
@@ -333,7 +364,7 @@ function renderAnswer(container, text, frames) {
       window.__mbeMarkdownWarned = true;
       console.warn('[mbe] marked/DOMPurify not loaded — markdown rendering disabled');
     }
-    appendMaskedTextFallback(container, masked, seenFrames);
+    appendMaskedTextFallback(container, masked, citations);
     return;
   }
   container.classList.remove('plain-text-fallback');
@@ -358,24 +389,23 @@ function renderAnswer(container, text, frames) {
     }
   }
 
-  swapFramePlaceholders(container, seenFrames);
+  swapCitationPlaceholders(container, citations);
 }
 
-function appendMaskedTextFallback(container, masked, frames) {
-  const re = new RegExp(`${FRAME_PLACEHOLDER_PREFIX}(\\d+)${FRAME_PLACEHOLDER_SUFFIX}`, 'g');
+function appendMaskedTextFallback(container, masked, citations) {
+  const re = new RegExp(`${CITATION_PLACEHOLDER_PREFIX}(\\d+)${CITATION_PLACEHOLDER_SUFFIX}`, 'g');
   let lastIndex = 0;
   let match;
   while ((match = re.exec(masked)) !== null) {
     appendText(container, masked.slice(lastIndex, match.index));
-    const frame = frames[Number(match[1])];
-    if (frame) container.appendChild(inlineFrame(frame));
+    container.appendChild(inlineCitation(citations[Number(match[1])]));
     lastIndex = re.lastIndex;
   }
   appendText(container, masked.slice(lastIndex));
 }
 
-function swapFramePlaceholders(container, frames) {
-  const re = new RegExp(`${FRAME_PLACEHOLDER_PREFIX}(\\d+)${FRAME_PLACEHOLDER_SUFFIX}`);
+function swapCitationPlaceholders(container, citations) {
+  const re = new RegExp(`${CITATION_PLACEHOLDER_PREFIX}(\\d+)${CITATION_PLACEHOLDER_SUFFIX}`);
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
   const targets = [];
   let node;
@@ -385,7 +415,7 @@ function swapFramePlaceholders(container, frames) {
   for (const textNode of targets) {
     const parent = textNode.parentNode;
     if (!parent) continue;
-    const reGlobal = new RegExp(`${FRAME_PLACEHOLDER_PREFIX}(\\d+)${FRAME_PLACEHOLDER_SUFFIX}`, 'g');
+    const reGlobal = new RegExp(`${CITATION_PLACEHOLDER_PREFIX}(\\d+)${CITATION_PLACEHOLDER_SUFFIX}`, 'g');
     const value = textNode.nodeValue;
     let cursor = 0;
     let m;
@@ -394,12 +424,7 @@ function swapFramePlaceholders(container, frames) {
       if (m.index > cursor) {
         fragment.appendChild(document.createTextNode(value.slice(cursor, m.index)));
       }
-      const frame = frames[Number(m[1])];
-      if (frame) {
-        fragment.appendChild(inlineFrame(frame));
-      } else {
-        fragment.appendChild(document.createTextNode(m[0]));
-      }
+      fragment.appendChild(inlineCitation(citations[Number(m[1])]));
       cursor = reGlobal.lastIndex;
     }
     if (cursor < value.length) {
@@ -425,6 +450,24 @@ function inlineFrame(frame) {
   wrapper.appendChild(img);
   wrapper.appendChild(label);
   return wrapper;
+}
+
+function inlineCitation(citation) {
+  if (!citation) return document.createTextNode('');
+  if (citation.kind === 'FRAME' && citation.frame) {
+    return inlineFrame(citation.frame);
+  }
+  const node = document.createElement('button');
+  node.type = 'button';
+  node.className = `inline-citation ${citation.kind.toLowerCase()}`;
+  if (citation.kind === 'TRANSCRIPT') {
+    const end = citation.end == null ? citation.start : citation.end;
+    node.textContent = `${citation.start.toFixed(1)}-${end.toFixed(1)}s`;
+  } else {
+    node.textContent = `${citation.kind.toLowerCase()} ${citation.start.toFixed(1)}s`;
+  }
+  node.addEventListener('click', () => seekVideo(citation.start));
+  return node;
 }
 
 function renderGallery(article, frames) {
@@ -457,6 +500,57 @@ function closestFrame(timestamp, frames) {
       ? frame
       : best;
   }, null);
+}
+
+async function loadTranscriptTimeline() {
+  if (!currentVideoId || !transcriptTimeline) {
+    renderTranscriptTimeline([]);
+    return;
+  }
+  try {
+    const response = await fetch(`/api/videos/${currentVideoId}/transcripts`);
+    if (!response.ok) {
+      renderTranscriptTimeline([]);
+      return;
+    }
+    const payload = await response.json();
+    currentTranscripts = payload.segments || [];
+    renderTranscriptTimeline(currentTranscripts);
+  } catch {
+    renderTranscriptTimeline([]);
+  }
+}
+
+function renderTranscriptTimeline(segments) {
+  if (!transcriptTimeline) return;
+  transcriptTimeline.textContent = '';
+  if (!segments || !segments.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = 'Transcript will appear after ASR.';
+    transcriptTimeline.appendChild(empty);
+    return;
+  }
+  for (const segment of segments) {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'transcript-item';
+    const time = document.createElement('span');
+    time.className = 'transcript-time';
+    time.textContent = `${Number(segment.t_start || 0).toFixed(1)}s`;
+    const text = document.createElement('span');
+    text.textContent = segment.text || '';
+    item.appendChild(time);
+    item.appendChild(text);
+    item.addEventListener('click', () => seekVideo(Number(segment.t_start || 0)));
+    transcriptTimeline.appendChild(item);
+  }
+}
+
+function seekVideo(timestamp) {
+  if (!videoPreview || Number.isNaN(timestamp)) return;
+  videoPreview.currentTime = Math.max(0, timestamp);
+  videoPreview.focus();
 }
 
 function setUploadStatus(text) {
