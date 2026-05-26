@@ -312,22 +312,101 @@ function appendMessage(role, text, frames = []) {
   return { article, bubble, text };
 }
 
+const FRAME_PLACEHOLDER_PREFIX = '@@MBE_FRAME_';
+const FRAME_PLACEHOLDER_SUFFIX = '@@';
+
 function renderAnswer(container, text, frames) {
   container.textContent = '';
   const marker = /\[FRAME:t=([0-9]+(?:\.[0-9]+)?)\]/g;
+  const seenFrames = [];
+  const masked = text.replace(marker, (_m, ts) => {
+    const idx = seenFrames.length;
+    seenFrames.push(closestFrame(Number(ts), frames));
+    return `${FRAME_PLACEHOLDER_PREFIX}${idx}${FRAME_PLACEHOLDER_SUFFIX}`;
+  });
+
+  if (typeof window.marked === 'undefined' || typeof window.DOMPurify === 'undefined') {
+    // CDN libs not loaded (network blocked / slow). Fall back to plain text but
+    // keep newlines visible so the answer is still readable.
+    container.classList.add('plain-text-fallback');
+    if (!window.__mbeMarkdownWarned) {
+      window.__mbeMarkdownWarned = true;
+      console.warn('[mbe] marked/DOMPurify not loaded — markdown rendering disabled');
+    }
+    appendMaskedTextFallback(container, masked, seenFrames);
+    return;
+  }
+  container.classList.remove('plain-text-fallback');
+
+  const rawHtml = window.marked.parse(masked, { breaks: true, gfm: true });
+  container.innerHTML = window.DOMPurify.sanitize(rawHtml);
+
+  if (typeof window.renderMathInElement === 'function') {
+    try {
+      window.renderMathInElement(container, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false },
+          { left: '\\[', right: '\\]', display: true },
+        ],
+        throwOnError: false,
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+      });
+    } catch (_) {
+      // never let a bad LaTeX expression kill the whole render
+    }
+  }
+
+  swapFramePlaceholders(container, seenFrames);
+}
+
+function appendMaskedTextFallback(container, masked, frames) {
+  const re = new RegExp(`${FRAME_PLACEHOLDER_PREFIX}(\\d+)${FRAME_PLACEHOLDER_SUFFIX}`, 'g');
   let lastIndex = 0;
   let match;
-  while ((match = marker.exec(text)) !== null) {
-    appendText(container, text.slice(lastIndex, match.index));
-    const frame = closestFrame(Number(match[1]), frames);
-    if (frame) {
-      container.appendChild(inlineFrame(frame));
-    } else {
-      appendText(container, match[0]);
-    }
-    lastIndex = marker.lastIndex;
+  while ((match = re.exec(masked)) !== null) {
+    appendText(container, masked.slice(lastIndex, match.index));
+    const frame = frames[Number(match[1])];
+    if (frame) container.appendChild(inlineFrame(frame));
+    lastIndex = re.lastIndex;
   }
-  appendText(container, text.slice(lastIndex));
+  appendText(container, masked.slice(lastIndex));
+}
+
+function swapFramePlaceholders(container, frames) {
+  const re = new RegExp(`${FRAME_PLACEHOLDER_PREFIX}(\\d+)${FRAME_PLACEHOLDER_SUFFIX}`);
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
+  const targets = [];
+  let node;
+  while ((node = walker.nextNode())) {
+    if (re.test(node.nodeValue)) targets.push(node);
+  }
+  for (const textNode of targets) {
+    const parent = textNode.parentNode;
+    if (!parent) continue;
+    const reGlobal = new RegExp(`${FRAME_PLACEHOLDER_PREFIX}(\\d+)${FRAME_PLACEHOLDER_SUFFIX}`, 'g');
+    const value = textNode.nodeValue;
+    let cursor = 0;
+    let m;
+    const fragment = document.createDocumentFragment();
+    while ((m = reGlobal.exec(value)) !== null) {
+      if (m.index > cursor) {
+        fragment.appendChild(document.createTextNode(value.slice(cursor, m.index)));
+      }
+      const frame = frames[Number(m[1])];
+      if (frame) {
+        fragment.appendChild(inlineFrame(frame));
+      } else {
+        fragment.appendChild(document.createTextNode(m[0]));
+      }
+      cursor = reGlobal.lastIndex;
+    }
+    if (cursor < value.length) {
+      fragment.appendChild(document.createTextNode(value.slice(cursor)));
+    }
+    parent.replaceChild(fragment, textNode);
+  }
 }
 
 function appendText(container, text) {

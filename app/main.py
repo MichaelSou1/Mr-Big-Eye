@@ -373,8 +373,16 @@ async def chat_stream(
                     if tool_update:
                         tool_phase_completed = True
                         pending_orchestrator_tokens = []
-                        frames = tool_update.get("retrieved_frames", [])
-                        scene_hits = tool_update.get("retrieved_scene_hits", [])
+                        # LangGraph 1.x emits a list of Command updates when ToolNode
+                        # runs several tool calls in parallel; a single call is still a dict.
+                        updates = tool_update if isinstance(tool_update, list) else [tool_update]
+                        frames: list[Any] = []
+                        scene_hits: list[Any] = []
+                        for upd in updates:
+                            if not isinstance(upd, dict):
+                                continue
+                            frames.extend(upd.get("retrieved_frames", []) or [])
+                            scene_hits.extend(upd.get("retrieved_scene_hits", []) or [])
                         if frames or scene_hits:
                             yield sse(
                                 "frames",

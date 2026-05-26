@@ -17,6 +17,50 @@
 
 ---
 
+## 视觉-only 基线（Phase A 启动前测得，2026-05-26）
+
+测试视频：`data/uploads/reinforce_vs_A2C_remux.mp4`（王树森 RL 讲座 *REINFORCE vs A2C*，7'43"，1280x720）。
+VLM：qwen3.6-plus（百炼），Orchestrator：deepseek-v4-flash，AGENT_CODE_VERSION=v14。
+
+| Q | 问题 | 答案要点 | Citation | 评价 |
+| --- | --- | --- | --- | --- |
+| Q1 (Easy / OCR) | 视频里的 PPT 上写了哪些公式或数学符号？ | 正确识别 transition tuple $(s_t,a_t,r_t,s_{t+1})$、单步 TD target $y_t=r_t+\gamma v(s_{t+1};w)$、多步 TD target $y_t=\sum_{l=0}^{m-1}\gamma^l r_{t+l}+\gamma^m v(s_{t+m};w)$ | 73/78/83/320s 全部精准指 PPT 帧 | ✅ 视觉强项，公式 LaTeX 正确无幻觉 |
+| Q2 (Medium / multi-frame) | 视频中提到了哪几种强化学习算法或方法？ | 识别出 A2C、A2C with Multi-Step TD Target、One-step TD target；**漏掉 REINFORCE** | 71/76/80/62/67/150s 都是 A2C 类 PPT | ⚠️ PPT 主要展示 A2C，REINFORCE 几乎只在口述中出现 → 纯视觉天花板暴露 |
+| Q3 (Hard / audio-dep) | 请详细对比 REINFORCE 和 A2C 这两个算法的区别。 | Orchestrator 判定"纯知识性问题，不调视频"，完全 bypass video，用 LLM 通用知识答题 | **零引用** | ❌ 音画联合刚需的反面教材——视觉不足以回答时不是降级，而是直接放弃视频，回答与视频本身脱钩 |
+
+### 关键启示（直接影响 Phase A–C 设计）
+
+1. **Q2 现象 → Phase A/B 必须把 ASR 接进检索栈**。视频里 REINFORCE 的关键内容（公式、与 A2C 的对比逻辑）只在讲师口述中，PPT 完全无痕。这正是 transcript 检索的核心价值证明，不再是"锦上添花"。
+2. **Q3 现象 → Phase C router 不能简单做"视觉够不够"判断**。当前 orchestrator 在视觉证据不足时直接走"通用问答"路径，把视频丢了。Phase C 的 Question Router 必须包含一条规则：**只要问题里出现视频中的实体名/术语**（REINFORCE、A2C），就强制至少一次 transcript 检索，不允许 bypass。
+   - **追加观察**：Q3 改成"**根据视频**，请详细对比……"后 orchestrator 就会调视频工具，答案落到 PPT *TD Target versus Return* 一张幻灯片（t=430s）上，只能给出"A2C 含 bootstrapping、REINFORCE 不含"这一句话级别的对比。说明 router 决策门槛是**问题里是否显式提到视频**，而非问题本身的语义；同时也再次印证 PPT 上能拿到的内容远比音频里讲到的少。Phase C router 应在分类阶段就默认 `video-grounded`，把"非视频问题"作为需要明确证据才能切走的少数情况。
+3. **Q1 现象 → Phase D OCR 优先级可降**。qwen3.6-plus 在 PPT 公式上的 OCR + LaTeX 还原能力已经很强，纯 PPT 课堂场景下，PaddleOCR/pix2tex 的边际收益可能没原计划那么高。Phase D 之前先用真实评测（Phase E）量化一下 VLM OCR 召回率，再决定要不要做。
+4. **前端缺 markdown 渲染**：答案里大量 `$...$` LaTeX、`### 标题`、`| 表格 |` 都是原文显示，体感差。Phase F 不能放到最后——至少 markdown + KaTeX 在 Phase A 完成前就该补上，否则后续测试都很痛苦。
+
+### 已发现并修复的工程问题
+
+- **decord EOF**：B 站 XCoder 重封装的 mp4 会让 decord 在 `_probe()` 抛 EOF。解决方案是 ffmpeg lossless remux（见下方 Phase A.0）。
+- **main.py:376 `'list' object has no attribute 'get'`**：LangGraph 1.2 在 ToolNode 并发执行多个 tool 时，把 Command updates 以 list 形式 stream；老代码当 dict 处理就崩。已修。
+- **Checkpoint 污染**：tool_node 异常中断时 AIMessage(tool_calls) 已落 checkpoint 但 ToolMessage 没跟上，下次 replay DeepSeek 直接 400。临时解法是手工新建 session；后面 Phase A 之后应加 guard——在 orchestrator 抛错时把当前 turn 的 messages 整体回滚。
+
+---
+
+## Phase A.0 · Ingest 兜底：ffmpeg remux preflight（半天，先做）
+
+在做 Phase A 任何 ASR 集成前，先把 ingest 的「读不了视频」边缘修掉。
+
+| 任务 | 做法 |
+| --- | --- |
+| 触发点 | [app/preprocess.py](app/preprocess.py) `_probe()` 用 decord 打开视频。增加 `try/except DECORDError`，捕获 EOF 类错误 |
+| 兜底操作 | 用 imageio-ffmpeg 自带的 ffmpeg 跑 `-c copy -movflags +faststart` 重封装到 `data/cache/{video_id}/remuxed.mp4`，无损、~1s 完成（7 分钟视频 ≈ 0.5s） |
+| 回灌 | 重封装后用新文件替换 `video_path` 重试 probe；成功就继续 ingest，失败再抛 |
+| 元数据 | `meta.json` 加 `remuxed: true / source_remux_reason: "decord_eof"`，方便日后排查 |
+| 触发场景 | B 站 XCoder、抖音、剪映等导出的 mp4 都可能 trip decord。已在 `reinforce vs A2C.mp4` 上验证有效 |
+| 版本 bump | 不算 prediction-affecting，**不 bump** AGENT_CODE_VERSION |
+
+**为什么放在 Phase A 之前**：ASR 也依赖 ffmpeg 抽 wav，但 ASR 的 ffmpeg 调用走 shell `subprocess.run`，对 B 站 mp4 是 OK 的（ffmpeg 本身能读，只是 decord 不行）。所以 ASR 不会因为这条坑被卡住，但 ingest 的 dense_frame_index / scene_caption 会。先把 decord 这条路打通，Phase A 才能安心并行接 ASR。
+
+---
+
 ## Phase A · ASR 后处理与持久化（1–2 天）
 
 把 `transcribe()` 的原始输出变成系统可用的资产。
