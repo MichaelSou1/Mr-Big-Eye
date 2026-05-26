@@ -211,7 +211,9 @@ async def test_stitched_verify_truncates_dedupes_and_caps_frames(monkeypatch):
     assert payload["tool"] == "stitched_verify"
     assert payload["warning"] == "truncated to 4 windows"
     assert len(payload["windows"]) == 4
-    assert payload["answer"] == "The earlier and later windows show a change. [FRAME:t=0.0]"
+    assert payload["observation"] == "The earlier and later windows show a change. [FRAME:t=0.0]"
+    assert payload["required_next_action"] == "answer_with_evidence"
+    assert "Observer sub-call" in payload["note_for_orchestrator"]
     assert payload["subject_deltas"][0]["id"] == "person_A"
     assert len(timestamps) <= 24
     assert timestamps == sorted(set(timestamps))
@@ -284,6 +286,9 @@ async def test_segment_focus_clamps_window_and_caps_frames(monkeypatch):
     assert len(captured["timestamps"]) == 12
     assert len(update["retrieved_frames"]) == 12
     assert update["draft_answer"] == "The window shows detail. [FRAME:t=0.0]"
+    assert payload["observation"] == "The window shows detail. [FRAME:t=0.0]"
+    assert payload["required_next_action"] == "answer_with_evidence"
+    assert "Observer sub-call" in payload["note_for_orchestrator"]
     assert "同一片段内按时间顺序" in captured["system_prompt"]
 
 

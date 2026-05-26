@@ -102,10 +102,22 @@ def test_parse_subject_deltas_accepts_multiline_json_block():
     assert deltas == [{"op": "update", "id": "person_A"}]
 
 
-def test_parse_subject_deltas_keeps_answer_on_garbage_line():
+def test_parse_subject_deltas_strips_garbage_line():
     raw = "A person runs.\nSUBJECT_DELTAS: not-json"
 
     answer, deltas = parse_subject_deltas(raw)
 
-    assert answer == raw
+    assert answer == "A person runs."
+    assert deltas == []
+
+
+def test_parse_subject_deltas_strips_leading_truncated_block():
+    # VLM occasionally emits a leading SUBJECT_DELTAS line whose JSON is truncated
+    # mid-stream. The leftover JSON fragment must never leak into the user-facing
+    # answer, even though deltas can't be parsed.
+    raw = 'SUBJECT_DELTAS: {"deltas": [   {"op": "update", "id": "girl",'
+
+    answer, deltas = parse_subject_deltas(raw)
+
+    assert answer == ""
     assert deltas == []

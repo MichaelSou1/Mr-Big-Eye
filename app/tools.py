@@ -120,6 +120,13 @@ SEGMENT_FOCUS_MAX_FRAMES = 12
 STITCHED_VERIFY_MAX_WINDOWS = 4
 STITCHED_VERIFY_MAX_FRAMES = 24
 
+OBSERVER_NOTE_FOR_ORCHESTRATOR = (
+    "This is an Observer sub-call's intermediate observation, NOT the final user answer. "
+    "Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` "
+    "(then `verify_grounding`) before producing the final answer. For MCQ questions, "
+    "the final answer MUST be in the form 'The correct answer is X) <option>'."
+)
+
 
 def _coerce_float_list(value: Any) -> list[float] | None:
     """Accept list[float], JSON-encoded list, or comma-separated string from tool callers."""
@@ -236,10 +243,12 @@ def parse_subject_deltas(answer_text: str) -> tuple[str, list[dict[str, Any]]]:
         except (TypeError, ValueError, json.JSONDecodeError):
             continue
     if parsed is None:
-        return (answer_text or "").strip(), []
+        # Malformed/truncated JSON: still strip from the SUBJECT_DELTAS line forward
+        # so the leftover JSON fragment never leaks into the user-facing answer.
+        return "\n".join(lines[:delta_index]).strip(), []
     deltas = parsed.get("deltas") if isinstance(parsed, dict) else None
     if not isinstance(deltas, list):
-        return (answer_text or "").strip(), []
+        return "\n".join(lines[:delta_index]).strip(), []
 
     if remove_from_index:
         clean_lines = lines[:delta_index]
@@ -511,9 +520,10 @@ async def segment_focus(
             {
                 "tool": "segment_focus",
                 "window": {**window, "frame_count": 0},
-                "answer": "I could not load dense frames for the requested window.",
+                "observation": "I could not load dense frames for the requested window.",
                 "subject_deltas": [],
-                "next": "retrieve_video_evidence",
+                "required_next_action": "retrieve_video_evidence",
+                "note_for_orchestrator": OBSERVER_NOTE_FOR_ORCHESTRATOR,
             },
         )
 
@@ -533,9 +543,10 @@ async def segment_focus(
     payload = {
         "tool": "segment_focus",
         "window": {**window, "frame_count": len(added)},
-        "answer": clean_answer,
+        "observation": clean_answer,
         "subject_deltas": deltas,
-        "next": "verify_grounding",
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": OBSERVER_NOTE_FOR_ORCHESTRATOR,
     }
     return _command(
         tool_call_id,
@@ -619,9 +630,10 @@ async def stitched_verify(
             {
                 "tool": "stitched_verify",
                 "windows": [],
-                "answer": "No valid time windows were provided.",
+                "observation": "No valid time windows were provided.",
                 "subject_deltas": [],
-                "next": "retrieve_video_evidence",
+                "required_next_action": "retrieve_video_evidence",
+                "note_for_orchestrator": OBSERVER_NOTE_FOR_ORCHESTRATOR,
             },
         )
 
@@ -635,9 +647,10 @@ async def stitched_verify(
         payload = {
             "tool": "stitched_verify",
             "windows": window_summaries,
-            "answer": "I could not load dense frames for the requested windows.",
+            "observation": "I could not load dense frames for the requested windows.",
             "subject_deltas": [],
-            "next": "retrieve_video_evidence",
+            "required_next_action": "retrieve_video_evidence",
+            "note_for_orchestrator": OBSERVER_NOTE_FOR_ORCHESTRATOR,
         }
         if warning:
             payload["warning"] = warning
@@ -659,9 +672,10 @@ async def stitched_verify(
     payload = {
         "tool": "stitched_verify",
         "windows": window_summaries,
-        "answer": clean_answer,
+        "observation": clean_answer,
         "subject_deltas": deltas,
-        "next": "verify_grounding",
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": OBSERVER_NOTE_FOR_ORCHESTRATOR,
     }
     if warning:
         payload["warning"] = warning
