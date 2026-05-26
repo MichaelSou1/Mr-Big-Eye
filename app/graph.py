@@ -608,7 +608,11 @@ def _visible_messages(messages: list[AnyMessage]) -> list[AnyMessage]:
             if msg_type == "human":
                 visible.append(message)
             elif msg_type == "ai" and str(message.content):
-                visible.append(message)
+                # Strip tool_calls from prior-turn assistant messages — the paired
+                # ToolMessages get dropped above, so leaving tool_calls intact
+                # makes the provider 400 with "insufficient tool messages
+                # following tool_calls message" on the next turn.
+                visible.append(AIMessage(content=message.content))
             continue
         if msg_type in {"human", "ai", "tool"}:
             visible.append(message)
