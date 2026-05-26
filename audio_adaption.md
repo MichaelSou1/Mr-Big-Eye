@@ -17,6 +17,111 @@
 
 ---
 
+## Handoff context for Codex (Phase 0)
+
+Codex 拿不到此前 session 里建立的隐性 context；下面是实施每个 Phase 前必须知道的项目约束、关键文件、和决策门槛。**先读完这一节再动 Phase A**。
+
+### 1. 环境
+
+- Python 解释器固定走 `mbe-phase2` conda env：`/home/user/miniconda3/envs/mbe-phase2/bin/python`。**不要**用系统 python / base env。
+- 任何新依赖：先 `pip install` 进 `mbe-phase2`，再同步写进 `requirements.txt`（版本 floor `>=x.y.z` 风格，与现有条目一致）。
+- HF 模型下载走 `HF_ENDPOINT=https://hf-mirror.com`（已在 `.env`），ModelScope 镜像优先。
+
+### 2. 三条标准命令
+
+```bash
+# 起服务（前端 + API + ingest worker 一体）
+/home/user/miniconda3/envs/mbe-phase2/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+# 跑测试
+/home/user/miniconda3/envs/mbe-phase2/bin/python -m pytest tests/ -x
+
+# 跑评测（Phase E 上线后）
+/home/user/miniconda3/envs/mbe-phase2/bin/python -m app.eval_harness --dataset audiovisual --n 20
+```
+
+### 3. 项目约束（不可越线）
+
+- **NExT-GQA 已废弃**，所有评测路径指向自建音画 QA 数据集（Phase E）。不要再往 NExT-GQA 加代码。
+- Eval 默认 `n=20`，不是 100（学生 token 预算）。
+- **不引入 LLM-as-judge**。Phase E 评分 = 关键词命中 + citation 覆盖率，确定性的规则评分。
+- 对话语言中文、代码 / 标识符 / 提交信息英文（提交信息允许中英混合，看现有 commit 风格）。
+- 用户的 `.env` 真实 API key 不允许进 git；任何新 key 用占位符写到示例并 `.gitignore`。
+
+### 4. 关键文件 map（Phase A–D 主要会动这些）
+
+| 文件 | 角色 | 关键约定 |
+| --- | --- | --- |
+| [app/tools.py](app/tools.py) | LangGraph tool 集合 | `@tool` + `Annotated[..., InjectedState]` + 返回 `Command(update=..., goto=...)`；新工具需注册到模块底部 `TOOLS = [...]` |
+| [app/cache.py](app/cache.py) | 一视频一目录约定 | `video_cache_dir(video_id)`、`load_meta/save_meta`；所有视频相关 artifact 都进 `data/cache/{video_id}/` |
+| [app/preprocess.py](app/preprocess.py) | ingest pipeline | `preprocess_video()` 是入口；新阶段挂在这里，必要时与现有 stage 并行 |
+| [app/progress.py](app/progress.py) | 进度推送 | `publish_progress(video_id, stage, label, ratio, error?)` + `stage_label` 字典；新阶段必须先在 `stage_label` 加 key |
+| [app/graph.py](app/graph.py) | LangGraph 编译 + State | `GraphState` 用 `add_messages` reducer for messages、`_last_write` for 其余字段；新 state 字段必须配 reducer；`sanitize_dangling_tool_calls` 入口在 `chat_stream` 已挂 |
+| [app/vqa.py](app/vqa.py) | VLM 客户端 + system prompt | `QA_SYSTEM_PROMPT` 决定 citation 协议、`answer_question` 是 VQA 唯一入口；改 prompt 必须 bump `AGENT_CODE_VERSION` |
+| [app/eval_fingerprint.py](app/eval_fingerprint.py) | prediction-cache 版本 | `AGENT_CODE_VERSION` 凡是 prompt / 工具集 / 决策行为改了都要 bump；切 VLM/Orchestrator 模型也必须 bump |
+| [app/main.py](app/main.py) | FastAPI 入口 | `/api/chat_stream` 是 SSE 流；新 event type 同步改 `app/static/app.js` |
+| [app/models.py](app/models.py) | 模型加载 / 卸载 | `get_xxx / release_xxx` 模式做 VRAM 轮换；新模型必须按这个模式加，不要全局常驻 |
+| [app/static/app.js](app/static/app.js) | 前端渲染 | `renderAnswer()` 已处理 markdown + KaTeX + `[FRAME:t=X]` 占位回填；新 citation kind 在这里扩展 |
+
+### 5. Citation 协议（Phase B/C/D 反复改）
+
+任何新增 citation kind 都要**同步改三处**，少一处都会出 bug：
+
+1. `app/vqa.py` `QA_SYSTEM_PROMPT` — 告诉 VLM 怎么生成
+2. `app/tools.py` `_grounding_report()`（约 L80）— 服务端校验
+3. `app/static/app.js` `renderAnswer()` 里的 `marker` 正则 — 前端识别 + 占位回填
+
+### 6. Phase 完成定义 (DoD)
+
+每个 Phase 收尾前必须满足：
+
+- [ ] 有 `tests/` 覆盖（单测优先；E2E 测试用 `data/uploads/reinforce_vs_A2C_remux.mp4` 作 fixture）
+- [ ] `requirements.txt` 同步新依赖
+- [ ] 如有 prompt / 工具集 / 决策行为变化 → bump `AGENT_CODE_VERSION`
+- [ ] 新增 ingest 阶段在 `stage_label` + 进度条占合理比例
+- [ ] 改了 tools 必须同步 grounding 校验
+- [ ] commit message 中英文都行，要说明「为什么改」不是「改了什么」
+
+### 7. 必须先问用户的事（不要擅自做）
+
+- 切 LLM / VLM provider（当前 VLM=Bailian qwen3.6-plus，Orchestrator=DeepSeek deepseek-v4-flash）
+- 改 checkpointer / DB schema（`data/graph_checkpoints.sqlite3` 已有 production 数据）
+- `git push` 远端
+- destructive git（`reset --hard`、`branch -D`、`push --force`）
+- 改 `.env` 真实 key（仅可写占位符到 example）
+- 跳过 `AGENT_CODE_VERSION` bump（prediction_cache 污染过一次了，痛过）
+
+### 8. 当前 baseline（实施任何 Phase 前的起点）
+
+- git HEAD = `03b6e6b`（"Heal dangling tool_calls in checkpoint before each turn"）
+- `AGENT_CODE_VERSION = "v14"`
+- VLM: Bailian qwen3.6-plus（DashScope chat_completions），native multimodal Early Fusion，1M context，reasoning model
+- Orchestrator: DeepSeek `deepseek-v4-flash`（官方 API，已充值）
+- LangMem: Doubao mini（火山引擎）
+- Judge: Doubao lite（Phase E 不再用，留 backup）
+- 本地 ASR (SenseVoice-Small + FSMN-VAD) 已 import-ready，未集成 ingest
+- 前端 markdown + KaTeX 已上
+- checkpoint guard 已上（`sanitize_dangling_tool_calls`）
+
+### 9. 端到端冒烟视频
+
+`data/uploads/reinforce_vs_A2C_remux.mp4`（王树森 RL 讲座，7'43"）+ Q1/Q2/Q3 三档（见下「视觉-only 基线」节）是固定回归用例。每个 Phase 完成后跑一遍：
+
+- Phase A 完成：transcripts.jsonl 写出，肉眼检查 REINFORCE / A2C / baseline 等术语转写正确
+- Phase B 完成：Q2 应命中 REINFORCE（被 transcript 召回）
+- Phase C 完成：Q3 不加 "根据视频" 前缀也能调视频；答案有 `[TRANSCRIPT:t=...]` 引用，超过 PPT 一句话级别的对比
+- Phase D 完成：能回答「第 N 张 PPT 写了什么」
+
+### 10. 通用 hygiene
+
+- 新 SQLite 库写到 `data/`，独立于 `mr_big_eye.sqlite3`（用户/会话域）和 `graph_checkpoints.sqlite3`（LangGraph 域）
+- 新模型走 `app/models.py` 的 `get_*/release_*` 轮换模式；8GB VRAM 预算紧，常驻只允许 ASR + (CLIP or bge-m3)
+- 新 user-facing 文案中文；日志 / 错误消息英文
+- 任何 `print` 改 `logger.info/warning/error`，不要污染 stdout（uvicorn 共用）
+- 时间戳全部秒为单位 float，不要 ms 和 s 混用
+
+---
+
 ## 视觉-only 基线（Phase A 启动前测得，2026-05-26）
 
 测试视频：`data/uploads/reinforce_vs_A2C_remux.mp4`（王树森 RL 讲座 *REINFORCE vs A2C*，7'43"，1280x720）。
