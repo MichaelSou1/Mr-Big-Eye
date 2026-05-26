@@ -23,6 +23,7 @@ from app.graph import (
     build_checkpointer,
     build_graph,
     messages_from_snapshot,
+    sanitize_dangling_tool_calls,
     _should_use_video,
     video_id_from_snapshot,
 )
@@ -343,6 +344,18 @@ async def chat_stream(
                 },
             )
 
+            # Heal any dangling AIMessage(tool_calls) left by a previous crashed
+            # turn before the new question hits the LLM provider.
+            removed = await sanitize_dangling_tool_calls(
+                app.state.graph, _graph_config(sid)
+            )
+            if removed:
+                logger.warning(
+                    "Pruned %d dangling tool-call message(s) from session %s",
+                    removed,
+                    sid,
+                )
+
             answer = ""
             pending_orchestrator_tokens: list[str] = []
             tool_phase_completed = False
@@ -490,6 +503,16 @@ async def _chat_with_graph(req: ChatRequest) -> ChatResponse:
         if status != "done":
             raise HTTPException(status_code=409, detail=f"Video is not ready: {status}")
         db.update_session(session_id, video_id=active_video_id)
+
+    removed = await sanitize_dangling_tool_calls(
+        app.state.graph, _graph_config(session_id)
+    )
+    if removed:
+        logger.warning(
+            "Pruned %d dangling tool-call message(s) from session %s",
+            removed,
+            session_id,
+        )
 
     state = await app.state.graph.ainvoke(
         {

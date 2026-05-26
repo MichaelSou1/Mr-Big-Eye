@@ -533,6 +533,56 @@ def video_id_from_snapshot(snapshot: Any) -> str | None:
     return str(value) if value else None
 
 
+async def sanitize_dangling_tool_calls(graph: Any, config: dict[str, Any]) -> int:
+    """Strip a trailing AIMessage(tool_calls) whose tool calls are not fully
+    answered by ToolMessages — and any orphan ToolMessages after it.
+
+    Triggered when a previous turn crashed inside tool_node (e.g. provider 5xx,
+    pipeline bug). The checkpoint then holds an AIMessage(tool_calls=[...]) with
+    missing fulfillments; on next replay DeepSeek/OpenAI rejects the request with
+    400 "tool_calls must be followed by tool messages". Returns the number of
+    messages removed (0 if state was already clean).
+    """
+    from langchain_core.messages import RemoveMessage
+
+    snapshot = await graph.aget_state(config)
+    values = getattr(snapshot, "values", {}) or {}
+    messages: list[Any] = values.get("messages", []) or []
+    if not messages:
+        return 0
+
+    last_ai_idx = -1
+    last_tool_call_ids: set[str] = set()
+    for idx, msg in enumerate(messages):
+        if getattr(msg, "type", "") == "ai":
+            tool_calls = getattr(msg, "tool_calls", None) or []
+            if tool_calls:
+                last_ai_idx = idx
+                last_tool_call_ids = {tc.get("id") for tc in tool_calls if tc.get("id")}
+    if last_ai_idx < 0:
+        return 0
+
+    fulfilled: set[str] = set()
+    for msg in messages[last_ai_idx + 1 :]:
+        if getattr(msg, "type", "") == "tool":
+            tcid = getattr(msg, "tool_call_id", None)
+            if tcid:
+                fulfilled.add(tcid)
+
+    if last_tool_call_ids.issubset(fulfilled):
+        return 0
+
+    to_remove = []
+    for msg in messages[last_ai_idx:]:
+        mid = getattr(msg, "id", None)
+        if mid:
+            to_remove.append(RemoveMessage(id=mid))
+    if not to_remove:
+        return 0
+    await graph.aupdate_state(config, {"messages": to_remove})
+    return len(to_remove)
+
+
 def _visible_messages(messages: list[AnyMessage]) -> list[AnyMessage]:
     last_human_index = -1
     for index, message in enumerate(messages):
