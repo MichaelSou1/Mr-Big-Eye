@@ -40,20 +40,40 @@ TASK_TYPE_TO_MODALITY = {
     "Information Synopsis": "overview",
 }
 
-# Default citation kinds per modality
-MODALITY_TO_CITATION_KINDS = {
-    "visual": ["slide"],   # OCR / object → likely on-screen text or frames
-    "joint": ["transcript", "slide"],
-    "overview": ["transcript"],
-    "audio": ["transcript"],
-}
-
 STOPWORDS = {
     "the","a","an","of","in","on","at","to","for","with","is","are","was","were","be",
     "and","or","that","this","these","those","it","its","by","as","from","into","than",
     "all","any","both","each","every","most","some","no","not","one","two","three",
     "kinds","kind","same","number","largest","smallest","more","less","several",
 }
+
+
+def format_candidates(options: list[str]) -> str:
+    lines = ["Candidates:"]
+    for index, option in enumerate(options):
+        letter = chr(ord("A") + index)
+        text = re.sub(r"^[A-E][\.\)]\s*", "", str(option)).strip()
+        lines.append(f"{letter}) {text}")
+    return "\n".join(lines)
+
+
+def question_with_candidates(question: str, options: list[str]) -> str:
+    text = str(question).strip()
+    if "Candidates:" in text:
+        return text
+    return f"{text}\n\n{format_candidates(options)}"
+
+
+def expected_citation_kinds(task_type: str, modality: str) -> list[str]:
+    if modality == "audio":
+        return ["transcript"]
+    if modality == "overview":
+        return ["transcript"]
+    if task_type == "OCR Problems":
+        return ["slide"]
+    if modality == "joint":
+        return ["transcript", "frame_or_slide"]
+    return ["frame_or_slide"]
 
 
 def extract_keywords(option_text: str, max_n: int = 3) -> list[str]:
@@ -153,12 +173,12 @@ def main() -> int:
         case = {
             "question_id": f"vme-{r['question_id']}",
             "video_id": manifest[yt_id]["video_id"],
-            "question": r["question"],
+            "question": question_with_candidates(r["question"], opts),
             "modality_tag": modality,
             "question_type": task_type.lower(),
             "expected_keywords": keywords,
             "expected_citation_min": 1,
-            "expected_citation_kinds": MODALITY_TO_CITATION_KINDS[modality],
+            "expected_citation_kinds": expected_citation_kinds(task_type, modality),
             "reference_answer": re.sub(r"^[A-D][\.\)]\s*", "", correct_opt).strip(),
             "source": "Video-MME",
             "source_meta": {

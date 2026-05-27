@@ -257,6 +257,7 @@ async def _run_predictions(
                 "hypotheses": [],
                 "evidence_sufficiency": {},
                 "draft_answer": "",
+                "observer_notes": [],
                 "grounding_report": {},
             },
             config={"configurable": {"thread_id": f"eval-{case.case_id}-{uuid4().hex}"}},

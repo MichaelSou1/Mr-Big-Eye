@@ -1,0 +1,40 @@
+# Build-time excludes. Keep image small + builds reproducible.
+# Note: build context is the repo root (docker build -f docker/Dockerfile .).
+
+# Large data — bind-mounted at runtime
+data/
+models/
+.cache/
+
+# Local secrets — bind-mounted at runtime
+.env
+.env.*
+
+# VCS
+.git/
+.gitignore
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Big references / docs
+paper_references/*.pdf
+docs/*.gif
+docs/*.mp4
+
+# Debug fixtures
+debug_input/
+todos/

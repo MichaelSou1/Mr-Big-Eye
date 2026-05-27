@@ -179,7 +179,7 @@ def evaluate_case(
             requires_uncertainty=case.requires_uncertainty,
         )
         answer["citation_soft_waived"] = False
-    if judge is not None and not audiovisual_case:
+    if judge is not None:
         judge_result = evaluate_answer_llm(case, prediction, judge=judge, cache=judge_cache)
         answer["llm_judge"] = judge_result
         # Soft gate: when judge accepts, drop the keyword AND the citation
@@ -355,7 +355,11 @@ def evaluate_audiovisual_answer(
         if kind in citation_counts:
             citation_counts[kind] += 1
     citation_kind_coverage = {
-        kind: citation_counts.get(kind, 0) > 0
+        kind: (
+            (citation_counts["frame"] + citation_counts["slide"] > 0)
+            if kind == "frame_or_slide"
+            else citation_counts.get(kind, 0) > 0
+        )
         for kind in expected_kinds
     }
     citation_count_ok = sum(citation_counts.values()) >= citation_min
@@ -558,6 +562,8 @@ def _parse_citation_kinds(values: Any) -> list[str]:
         "frame": "frame",
         "frames": "frame",
         "visual": "frame",
+        "frame_or_slide": "frame_or_slide",
+        "visual_evidence": "frame_or_slide",
         "transcript": "transcript",
         "transcripts": "transcript",
         "audio": "transcript",
@@ -1115,6 +1121,15 @@ async def _main_async(argv: list[str] | None = None) -> int:
             per_case_delay_sec=args.per_case_delay_sec,
         )
 
+    from app.config import settings as _settings
+    judge = JudgeClient.from_settings(_settings)
+    judge_cache = JudgeCache("data/eval/judge_cache.jsonl") if judge is not None else None
+    if judge is not None:
+        logger.info(
+            "LLM judge enabled: model=%s source=%s base=%s",
+            judge.model, judge.source, judge.base_url,
+        )
+
     results: list[dict[str, Any]] = []
     missing: list[str] = []
     for case in cases:
@@ -1128,7 +1143,8 @@ async def _main_async(argv: list[str] | None = None) -> int:
                 prediction,
                 tolerance_sec=args.tolerance_sec,
                 recall_k=args.recall_k,
-                judge=None,
+                judge=judge,
+                judge_cache=judge_cache,
             )
         )
 
@@ -1224,6 +1240,7 @@ async def _run_local_predictions(
                 "hypotheses": [],
                 "evidence_sufficiency": {},
                 "draft_answer": "",
+                "observer_notes": [],
                 "grounding_report": {},
             },
             config={"configurable": {"thread_id": f"eval-{case.case_id}"}},

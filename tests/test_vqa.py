@@ -11,6 +11,8 @@ from app.vqa import QA_SYSTEM_PROMPT, _build_qa_payload, _select_evidence_frames
 def test_qa_system_prompt_demands_frame_markers():
     """Phase C: prompt must push the VLM to cite frames, not 'use sparingly'."""
     assert "[frame:t=" in QA_SYSTEM_PROMPT.lower()
+    assert "Never use bare `[t=Xs]`" in QA_SYSTEM_PROMPT
+    assert "exact [TRANSCRIPT:t=A.B-C.D]" in QA_SYSTEM_PROMPT
     assert "证据不足" in QA_SYSTEM_PROMPT
     assert "sparingly" not in QA_SYSTEM_PROMPT.lower()
 

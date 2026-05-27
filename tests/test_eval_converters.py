@@ -44,6 +44,16 @@ def nextgqa_module():
     )
 
 
+@pytest.fixture(scope="module")
+def videomme_module():
+    if str(ROOT_DIR) not in sys.path:
+        sys.path.insert(0, str(ROOT_DIR))
+    return _load_module(
+        "build_videomme_eval",
+        ROOT_DIR / "scripts" / "build_videomme_eval.py",
+    )
+
+
 def _read_jsonl(path: Path) -> list[dict]:
     items = []
     with path.open("r", encoding="utf-8") as handle:
@@ -87,6 +97,26 @@ def test_lvb_converter_keeps_all_three_buckets_and_correct_answer(lvb_module, tm
     manifest = json.loads(manifest_out.read_text())
     buckets = {entry["duration_bucket"] for entry in manifest}
     assert buckets == {"short", "medium", "long"}
+
+
+def test_videomme_converter_helpers_inject_candidates_and_expected_citations(videomme_module):
+    question = videomme_module.question_with_candidates(
+        "Which of the following statements is true?",
+        [
+            "A. First option.",
+            "B. Second option.",
+        ],
+    )
+
+    assert "Candidates:" in question
+    assert "A) First option." in question
+    assert "B) Second option." in question
+    assert videomme_module.expected_citation_kinds("OCR Problems", "visual") == ["slide"]
+    assert videomme_module.expected_citation_kinds("Attribute Perception", "visual") == ["frame_or_slide"]
+    assert videomme_module.expected_citation_kinds("Temporal Reasoning", "joint") == [
+        "transcript",
+        "frame_or_slide",
+    ]
 
 
 def test_nextgqa_converter_extracts_gold_scenes_and_temporal_action(nextgqa_module, tmp_path, monkeypatch):

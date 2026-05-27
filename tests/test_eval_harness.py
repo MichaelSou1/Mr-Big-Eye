@@ -69,11 +69,33 @@ def test_audiovisual_answer_scores_keywords_and_citation_kinds():
     assert result["citation_kind_coverage"] == {"transcript": True, "slide": True}
 
 
-def test_audiovisual_case_uses_question_id_schema_and_skips_llm_judge():
+def test_audiovisual_answer_accepts_frame_or_slide_citation_kind():
+    frame_result = evaluate_audiovisual_answer(
+        answer="The speaker wears a green plaid shirt. [FRAME:t=19.0]",
+        expected_keywords=["green", "plaid", "shirt"],
+        forbidden_keywords=[],
+        expected_citation_min=1,
+        expected_citation_kinds=["frame_or_slide"],
+    )
+    slide_result = evaluate_audiovisual_answer(
+        answer="The answer is American Express. [SLIDE:t=20.0]",
+        expected_keywords=["American", "Express"],
+        forbidden_keywords=[],
+        expected_citation_min=1,
+        expected_citation_kinds=["frame_or_slide"],
+    )
+
+    assert frame_result["passed"]
+    assert slide_result["passed"]
+    assert frame_result["citation_kind_coverage"] == {"frame_or_slide": True}
+
+
+def test_audiovisual_case_uses_question_id_schema_and_llm_judge():
     case = EvalCase(
         case_id="av-1",
         video_id="v",
         question="Which methods are compared?",
+        reference_answer="It compares REINFORCE and A2C.",
         modality_tag="audio",
         expected_keywords=["REINFORCE", "A2C"],
         expected_citation_min=1,
@@ -87,12 +109,12 @@ def test_audiovisual_case_uses_question_id_schema_and_skips_llm_judge():
     class ExplodingJudge:
         model = "unused"
 
-        def grade(self, *, question, reference, answer):  # pragma: no cover - must not run
-            raise AssertionError("audiovisual deterministic eval must not call the judge")
+        def grade(self, *, question, reference, answer):
+            return {"correct": True, "score": 5, "justification": "ok"}
 
     result = evaluate_case(case, prediction, judge=ExplodingJudge())
     assert result["passed"]
-    assert "llm_judge" not in result["answer"]
+    assert result["answer"]["llm_judge"]["correct"] is True
 
 
 def test_parse_audiovisual_jsonl_schema(tmp_path):

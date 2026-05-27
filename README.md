@@ -1,522 +1,594 @@
 # Mr. Big-Eye
 
-> 面向长视频理解的浏览器端问答系统：离线把视频压成可检索索引，在线由 LangGraph
-> agent 规划多步检索 / Observer 子模块探查 / 跨段对比 / 假设排除 / grounding 校验，
-> 最终生成带 `[FRAME:t=...]` 引用、严守 MCQ 强制选项规则的回答。业务侧零 VLM
-> 权重，VLM 推理全部走云端 OpenAI-Compatible API；本地常驻只有 BGE-M3（文本→
-> 场景召回）与 SigLIP2（文本→关键帧精排）两个轻量编码器。
+面向长视频理解的浏览器端音画问答系统。
 
-## 核心定位
+一句话说：**先离线把视频拆成可检索的证据库，再在线让一个 LangGraph agent 按需查证、观察、对齐、回答，并把答案绑定到具体帧、字幕或 PPT/OCR 引用上。**
 
-把"看长视频→回答任意问题"拆成 **预处理 / 检索 / 推理 / 评测** 四条独立可演进的流水线，并且每条流水线都有可量化的指标和可替换的 provider。结果：
+这个项目不是“把整段视频直接塞给一个大模型”。长视频太长、太贵，也容易丢细节。Mr. Big-Eye 的做法更像一个小型取证系统：
 
-| 维度 | 实现 |
+1. 上传视频后，先把视频压缩成多种索引：场景 caption、稠密关键帧、语音转写、PPT/OCR 文本。
+2. 用户提问时，agent 先判断问题需要哪种证据：画面、语音、PPT、还是音画联合。
+3. agent 调工具检索证据，必要时让 Observer 子模块盯住某个短窗口或多个时刻做细看。 
+4. 最终只允许 `answer_with_evidence` 生成面向用户的回答，再由 `verify_grounding` 校验引用。
+5. 前端把 `[FRAME:t=...]`、`[TRANSCRIPT:t=...]`、`[SLIDE:t=...]` 渲染成可查看的证据。
+
+如果你已经熟悉 VLM / Agent 的基本概念，但不熟 LangGraph、Chroma、BGE、SigLIP、ASR/OCR 这些具体技术栈，可以把这份 README 当成项目导览和术语翻译表。
+
+---
+
+## 当前实现状态
+
+当前代码库已经从早期“纯视觉 VQA”升级成了 **视觉 + 语音 + PPT/OCR** 的音画 QA 系统。
+
+| 维度 | 当前实现 |
 | --- | --- |
-| 视频压缩 | PySceneDetect 切场景 + decord 稠密抽帧 → 双索引（Caption + Frame） |
-| 检索 | BGE-M3 caption→scene 召回 + SigLIP2 frame 精排，**配额混合**抗 BGE 路由失败 |
-| 推理 | LangGraph **10 工具** agent loop：query planner → retrieve → assess → Observer 子模块（`segment_focus` / `stitched_verify` / `expand_temporal_evidence` / `build_timeline`）→ `answer_with_evidence` → `verify_grounding` |
-| LensWalk-inspired | Observer 子模块严格"非最终回答者"角色 + `subject_registry` 跨 turn 实体追踪 + 嵌入式 `SUBJECT_DELTAS` 协议（单次 VLM 调用拿状态更新，零额外推理开销） |
-| 鲁棒性 | 6 道护栏：FINAL ANSWER PROTOCOL（强制走 `answer_with_evidence`）/ MCQ HARD RULE + banned-phrase / 工具调用去重 / verify-stall 短路 / 空回复 salvage / tool-call 上限兜底 |
-| 评测 | 规则指标 + LLM judge + **Soft-Waive**（结果对即过，路径对错只留 forensic 字段）；prompt + orchestrator + VLM + code 四维度 fingerprint 自动失效预测缓存 |
-| 可重复 | 每次 run 写 `run_meta` 块 + 追加 `runs_index.csv`，VLM/orchestrator 互换可量化对比 |
-| 记忆 | LangGraph SQLite checkpointer（thread 级会话状态，含 `subject_registry`） + LangMem SQLite store（user 级长期记忆） |
+| Web 应用 | FastAPI + 原生浏览器 UI，支持上传、预处理进度、会话列表、SSE 流式回答 |
+| 视频预处理 | decord probe + ffmpeg remux 兜底、PySceneDetect 切场景、稠密抽帧 |
+| 视觉索引 | VLM 生成场景 caption，BGE-M3 建 caption 向量索引；SigLIP2 建关键帧图文向量索引 |
+| 语音索引 | FunASR：FSMN-VAD 切语音段，SenseVoice-Small 转写，写 `transcripts.jsonl` + VTT 字幕 |
+| PPT/OCR 索引 | 从稠密帧检测 slide/whiteboard 候选，RapidOCR 识别，写 `slides.jsonl` |
+| 文本检索 | SQLite FTS5 稀疏检索 + BGE-M3 dense 检索 + RRF 融合 |
+| 在线 agent | LangGraph 状态机：orchestrator LLM 决策，ToolNode 执行 14 个注册工具 |
+| VLM 推理 | 业务侧不部署本地 VLM；caption、局部观察、最终回答都走远程 OpenAI-compatible / Doubao API |
+| 本地模型 | BGE-M3、SigLIP2、SenseVoice-Small、FSMN-VAD、RapidOCR；它们负责索引和检索，不负责最终大模型回答 |
+| 引用协议 | `[FRAME:t=12.3]`、`[TRANSCRIPT:t=10.0-14.0]`、`[SLIDE:t=72.0]` |
+| 记忆 | LangGraph SQLite checkpointer 保存单会话状态；LangMem SQLite store 保存跨会话用户记忆 |
+| 评测 | `app.eval_harness` 支持 `audiovisual` 数据集；保留 legacy NExT-GQA / LongVideoBench 转换脚本 |
+| Agent 版本 | `AGENT_CODE_VERSION = "v18"`，见 `app/eval_fingerprint.py` |
 
-## NExT-GQA 当前成绩
-
-NExT-GQA 20-case 固定抽样（`--sample 20 --sample-seed 0`，除标注外），按 LensWalk-inspired 改造阶段排序，全部来自 `data/eval/runs_index.csv` 与 `data/eval/runs/*.json`：
-
-| # | 阶段 | VLM | Orchestrator | Code | Sample | Pass | Judge | 备注 |
-|:-:|:----|:----|:-------------|:----:|:----:|:----:|:----:|:-----|
-| 1 | baseline | Qwen3-VL-30B-A3B | Doubao-Pro | v5 | seed=0 | 14/20 (70%) | 3.45 | LensWalk 改造前 |
-| 1' | no-retrieval 控制组 | Qwen3-VL-30B-A3B | *(均匀抽 6 帧 + 单次 VLM)* | v5 | seed=0 | 14/20 (70%) | — | 检索召回 +18% 但 pass 持平 → VLM 视觉识别成瓶颈 |
-| 2 | LensWalk v1 | Qwen3-VL-30B-A3B | Doubao-Pro | v7 | seed=0 | **12/20 (60%)** | — | 加 `segment_focus` + `stitched_verify` + Subject Registry；但 LensWalk "证据不足"指令引入 3 个 MCQ 拒答 regression |
-| 3 | MCQ commit 修复 | Qwen3-VL-30B-A3B | Doubao-Pro | v8 | seed=1 | 15/19 (~79%)* | — | 加 MCQ 强制选项规则；3 个 regression 全部救回。*1 case quota 卡掉，pro-rated ~15.8/20 |
-| 4 | VLM 升级 | Qwen3.5-122B-A10B | Doubao-Pro | v9 | seed=0 | 14/20 (70%) | 3.50 | 平 baseline 但内部 5 救 / 3 跌 churn；新 VLM 拒答倾向更强 |
-| 5 | MCQ hardening | Qwen3.5-122B-A10B | Doubao-Pro | v10 | seed=0 | 14/20 (70%) | 3.50 | 加 banned-phrase 列表 + 决策模板；拒答 2 → 1，救回 1 跌回 1 |
-| 6 | DeepSeek orchestrator | Qwen3.5-122B-A10B | DeepSeek-v4-flash | v11 | seed=0 | 6/12 (50%)* | 2.58 | *只完成 12/20（quota）。发现 ds-v4-flash **跳过 `answer_with_evidence` 直接 emit segment_focus 输出**：`segment_focus` 调用从 1 → 37，MCQ 规则失效 |
-| 7 | Observer 角色防御 | Qwen3.5-122B-A10B | DeepSeek-v4-flash | **v12** | — | **TBD** | — | 加 FINAL ANSWER PROTOCOL + sub-tool prompt 自己拒答 MCQ；等 quota 重置后跑 |
-
-**可读出的核心经验**：
-
-- **Orchestrator 与 VLM 不可独立优化**：v11 → v12 教训证明，**换 orchestrator 时必须重新审视 sub-tool prompt 的角色边界**——doubao 习惯调 `segment_focus` 探查后再 `answer_with_evidence` 出答案，但 DeepSeek-v4-flash 倾向把 sub-tool 输出当最终答案 emit，导致全部 MCQ 规则失效。
-- **n=20 噪声很大**：同套 agent (v7) 在 seed=0/seed=1 之间能跑出 60% vs 79%。**单 seed 数字不可靠，需要 multi-seed 聚合**（详见后续方向）。
-- **VLM 视觉识别仍是上限**：v9 升级到 Qwen3.5-122B（4× 激活参数）后总分平 baseline，5 个救回 + 3 个跌回，证明大模型解锁了某些 case 同时也带来新的失败模式（更保守 / 倾向拒答）。
-- **Soft-Waive 让 judge 主导分数**：`pass_rate ≈ judge_correct_rate`，规则 gate 只在 judge 明显错杀时降权。
+> 注意：旧 README 里提到的“10 工具”“NExT-GQA only”“v12”等信息已经过时。当前 `TOOLS` 注册表有 14 个工具，音频和 PPT/OCR 已经进入主路径。
 
 ---
 
-## 架构总览
+## 给第一次读代码的人：先建立心智模型
+
+### 这不是一个单模型应用
+
+项目里有几类“模型”，职责不同：
+
+| 名称 | 类型 | 跑在哪里 | 用来做什么 |
+| --- | --- | --- | --- |
+| Orchestrator LLM | 文本模型，支持 tool call | 远程 API | 决定下一步调用哪个工具，相当于 agent 的调度脑 |
+| VLM | 视觉语言模型 | 远程 API | 看图片帧、生成 caption、做局部观察、写最终答案 |
+| BGE-M3 | 文本向量模型 | 本地 | 把问题、caption、字幕、PPT 文本转成向量，用于语义检索 |
+| SigLIP2 | 图文向量模型 | 本地 | 把图片帧和文本问题转成同一空间的向量，用于找关键帧 |
+| FSMN-VAD | 语音活动检测 | 本地 | 找出音频里哪些时间段有人说话 |
+| SenseVoice-Small | ASR | 本地 | 把语音段转成文字和时间戳 |
+| RapidOCR | OCR | 本地 | 识别 PPT、白板、屏幕文字 |
+
+所以，“本地不部署 VLM”不等于“本地没有模型”。本地模型负责把长视频变成可检索证据，远程 VLM 负责真正的多模态理解和生成。
+
+### Agent 不等于 VLM
+
+在这个项目里：
+
+- **VLM**：被动接收若干帧和文本证据，然后产出 caption、观察或答案。
+- **Agent**：主动决定“先查什么、证据够不够、要不要扩窗、最后怎么校验”。
+
+Agent 的控制逻辑在 `app/graph.py` 和 `app/tools.py`，VLM API 封装在 `app/vqa.py`。
+
+### RAG 在这里是什么意思
+
+RAG 通常是“检索增强生成”。这里的“检索”不是只搜文本，而是搜四类证据：
+
+1. 场景 caption：适合先粗定位视频大段落。
+2. 稠密关键帧：适合找画面细节、动作、物体。
+3. 语音转写：适合课堂、访谈、解说、对白。
+4. PPT/OCR 文本：适合公式、标题、图表标签、屏幕文字。
+
+最终答案必须从这些证据里来，不能直接用模型常识乱答视频内容。
+
+---
+
+## 总体架构
 
 ```mermaid
 flowchart TB
-    UI["Browser UI (app/static)"] --> API["FastAPI (app/main.py)"]
-    API --> UPLOAD["POST /upload + SSE /api/preprocess_stream"]
-    API --> CHAT_STREAM["GET /api/chat_stream (登录会话, SSE)"]
-    API --> CHAT_DIRECT["POST /chat (匿名直答)"]
-    API --> SESSION["sessions / videos / login API"]
-    API --> DB[("SQLite: users / sessions / videos")]
+    UI["Browser UI<br/>app/static"] --> API["FastAPI<br/>app/main.py"]
 
-    UPLOAD --> PRE["preprocess_video (app/preprocess.py)"]
-    PRE --> PROBE["decord probe + PySceneDetect"]
-    PROBE --> SCENE_FRAMES["frames_scene/ (场景中间帧)"]
-    PROBE --> DENSE_FRAMES["frames_dense/ (DENSE_FPS 抽帧)"]
-    SCENE_FRAMES --> CAPTION["VLM API: scene caption"]
-    CAPTION --> BGE_BUILD["BGE-M3 caption embeddings"]
-    DENSE_FRAMES --> SIG_BUILD["SigLIP2 image embeddings"]
-    BGE_BUILD --> CIDX[("Chroma: caption_index")]
-    SIG_BUILD --> FIDX[("Chroma: frame_index")]
-    PRE --> CACHE[("data/cache/<video_id>/")]
+    API --> Upload["POST /upload"]
+    API --> PreSSE["GET /api/preprocess_stream/{video_id}"]
+    API --> ChatSSE["GET /api/chat_stream"]
+    API --> DirectChat["POST /chat<br/>legacy direct path"]
+    API --> SessionAPI["login / sessions / videos API"]
+    API --> DB[("SQLite<br/>users / sessions / videos")]
 
-    CHAT_STREAM --> GRAPH["LangGraph orchestrator (app/graph.py)"]
-    GRAPH --> ORCH_LLM["Orchestrator LLM (OpenAI-compatible chat)"]
-    GRAPH --> TOOLS["10 evidence tools (app/tools.py)"]
-    TOOLS --> RET["two_stage_retrieve (app/retrieval.py)"]
-    RET --> CIDX
-    RET --> FIDX
-    TOOLS --> VQA["VLM client (app/vqa.py)"]
-    VQA --> REMOTE["Doubao Responses / OpenAI-compat Chat"]
-    GRAPH --> CKPT[("SQLite: graph_checkpoints")]
-    GRAPH --> MEM["LangMem manager (app/memory.py)"]
-    MEM --> LM[("SQLite: langmem_store")]
-    CHAT_DIRECT --> RET
-    CHAT_DIRECT --> VQA
+    Upload --> Pre["preprocess_video<br/>app/preprocess.py"]
+    Pre --> Probe["decord probe<br/>ffmpeg remux fallback"]
+    Probe --> Scene["PySceneDetect scenes"]
+    Scene --> SceneFrames["frames_scene/"]
+    Scene --> DenseFrames["frames_dense/"]
+    SceneFrames --> CaptionVLM["remote VLM<br/>scene captions"]
+    CaptionVLM --> CaptionIndex[("Chroma caption_index<br/>BGE-M3 vectors")]
+    DenseFrames --> FrameIndex[("Chroma frame_index<br/>SigLIP2 vectors")]
+    Probe --> ASR["FSMN-VAD + SenseVoice<br/>transcripts.jsonl / subtitles.vtt"]
+    ASR --> TextIndex1[("FTS5 + Chroma<br/>transcript_index")]
+    DenseFrames --> OCR["RapidOCR<br/>slides.jsonl"]
+    OCR --> TextIndex2[("FTS5 + Chroma<br/>slide_index")]
+    Pre --> Cache[("data/cache/{video_id}/")]
+
+    ChatSSE --> Graph["LangGraph agent<br/>app/graph.py"]
+    Graph --> Orch["Orchestrator LLM<br/>ChatOpenAI.bind_tools"]
+    Graph --> Tools["14 tools<br/>app/tools.py"]
+    Tools --> Retrieval["visual / transcript / slide retrieval"]
+    Retrieval --> CaptionIndex
+    Retrieval --> FrameIndex
+    Retrieval --> TextIndex1
+    Retrieval --> TextIndex2
+    Tools --> VQA["remote VLM client<br/>app/vqa.py"]
+    Graph --> CKPT[("SQLite graph_checkpoints")]
+    Graph --> MEM["LangMem manager"]
+    MEM --> MEMDB[("SQLite langmem_store")]
 ```
 
 ---
 
-## 技术深度与亮点
+## 请求链路：从上传到回答
 
-### 1. 两阶段检索 + 配额混合（抗 BGE 路由失败）
+### 1. 上传视频
 
-#### 1.1 离线索引构建
+前端选择视频后，请求 `POST /upload`。后端逻辑在 `app/main.py`：
 
-```mermaid
-flowchart LR
-    V[上传 MP4] --> HASH[SHA256 → video_id]
-    HASH --> PROBE[decord probe]
-    PROBE --> SCENE[PySceneDetect<br/>threshold=27.0]
-    SCENE --> MID[场景中间帧<br/>frames_scene/]
-    MID --> CAP[VLM API<br/>scene caption]
-    CAP --> BGEIDX[BGE-M3<br/>caption_index]
-    PROBE --> DENSE[按 DENSE_FPS<br/>稠密抽帧]
-    DENSE --> SIGIDX[SigLIP2<br/>frame_index]
-    BGEIDX --> DONE[set_video_status=done]
-    SIGIDX --> DONE
+1. 按块读取上传文件，计算 SHA256。
+2. 取 digest 前 16 位作为 `video_id`。
+3. 存到 `data/uploads/{video_id}.mp4`。
+4. 用 `probe_video_lenient()` 快速检查时长。
+5. 如果缓存已经完成，直接返回 `cached=true`。
+6. 如果没缓存，标记状态为 `running`，后台启动 `_run_preprocess()`。
+
+这意味着同一个视频重复上传会复用缓存，不会重新做索引。
+
+### 2. 预处理视频
+
+主入口是 `app/preprocess.py:preprocess_video()`。它把一段视频变成一组离线资产：
+
+```text
+data/cache/{video_id}/
+├── meta.json
+├── .done
+├── remuxed.mp4                 # 只有原视频封装异常时才有
+├── frames_scene/               # 每个场景的中间帧
+├── frames_dense/               # 按 DENSE_FPS 抽出的稠密帧，t0000.0.jpg 这种命名
+├── frames_slides/              # 被判定为 PPT/白板候选的帧
+├── captions.jsonl              # 每个场景的 VLM caption
+├── transcripts.jsonl           # ASR 字幕段
+├── subtitles.vtt               # 浏览器字幕文件
+├── slides.jsonl                # OCR 结果
+├── caption_index/              # Chroma，BGE-M3 caption 向量
+├── frame_index/                # Chroma，SigLIP2 图像向量
+├── transcript_index/           # Chroma，BGE-M3 字幕块向量
+└── slide_index/                # Chroma，BGE-M3 PPT/OCR 块向量
 ```
 
-#### 1.2 在线检索（配额混合是关键）
+预处理阶段包括：
 
-```mermaid
-flowchart LR
-    Q[用户问题] --> BGEQ[BGE-M3 文本向量]
-    BGEQ --> CIDX[(Caption Index)]
-    CIDX --> SCENES[Top-N 场景<br/>+ 时间区间]
-    Q --> SIGQ[SigLIP2 文本向量]
-    SIGQ --> SCENED[Scene-Gated 检索<br/>quota = 2/3 · K]
-    SIGQ --> GLOBAL[全局 Un-Gated 检索<br/>quota = 1/3 · K]
-    SCENES --> SCENED
-    SCENED --> MERGE{合并去重}
-    GLOBAL --> MERGE
-    MERGE --> TOPK[Top-K 关键帧<br/>送给 Agent]
-```
+| 阶段 | 做什么 | 主要文件 |
+| --- | --- | --- |
+| probe | 用 decord 打开视频，读 fps、时长、尺寸；失败时 ffmpeg 无损 remux 后重试 | `app/preprocess.py` |
+| scenes | PySceneDetect 按画面变化切场景；场景太少时 fallback 到均匀 10 秒块 | `app/preprocess.py` |
+| captions | 每个场景取中间帧，远程 VLM 生成一句 caption | `app/vqa.py` |
+| asr | 提取音频，VAD 切段，SenseVoice 转写 | `app/asr.py` |
+| caption index | BGE-M3 编码 captions，写 Chroma | `app/preprocess.py` |
+| dense frames | 按 `DENSE_FPS` 抽帧，SigLIP2 编码图像，写 Chroma | `app/preprocess.py` |
+| slides | 从稠密帧中检测变化明显的候选页，RapidOCR 识别文字 | `app/preprocess.py` |
+| text indexes | 字幕和 slide 文本分块，写 FTS5 + BGE dense index | `app/text_assets.py` |
 
-**配额混合的动机**：BGE caption→scene 是有失败率的（场景文字描述 ≠ 用户语义问题）。如果 frame 检索完全被 BGE 选中的场景时间窗 gate 住，BGE 一旦路由错，整轮就死。代码在 [app/retrieval.py:84-111](app/retrieval.py#L84-L111)：默认把 2/3 配额留给 scene-gated SigLIP（精度），剩下 1/3 留给全局 un-gated SigLIP（召回兜底）。总帧数和 VLM token 成本不变。
+### 3. 用户提问
 
-#### 1.3 缓存目录契约
+浏览器端提交问题后走 `GET /api/chat_stream`，它是 SSE 流。后端会：
 
-```
-data/cache/<video_id>/
-├── meta.json              # duration / fps / scene 列表
-├── frames_scene/          # 场景中间帧
-├── frames_dense/          # tNNNN.N.jpg，按 DENSE_FPS
-├── captions.jsonl         # 每场景 caption + meta
-├── caption_index/         # Chroma persistent
-├── frame_index/           # Chroma persistent
-└── .done                  # set_video_status 写入
-```
+1. 找到或创建 session。
+2. 确认视频预处理状态是 `done`。
+3. 修复上次异常中断可能留下的 dangling tool calls。
+4. 调用 LangGraph 的 `astream_events()`。
+5. 一边接收工具执行结果，一边把证据帧、字幕、答案 token 推给前端。
 
-`POST /upload` 用 SHA256 算 `video_id`，相同视频复传秒级命中缓存。
+有一个老接口 `POST /chat`：如果不传 `user_id`，它只做 `two_stage_retrieve + answer_question`，不走完整 agent。真正的主路径是登录会话里的 `/api/chat_stream`。
 
 ---
 
-### 2. LangGraph Agent Loop with 10-Tool Toolbox
+## 离线索引详解
 
-#### 2.1 控制流
+### 视觉索引：先找场景，再找帧
+
+长视频里直接搜每一帧成本高，也容易被局部噪声干扰。项目采用两阶段视觉检索：
 
 ```mermaid
-flowchart TB
-    START([START]) --> ORCH[orchestrator<br/>LLM with bind_tools]
-    ORCH -->|tools_condition=tools| TOOL[tool_node<br/>ToolNode TOOLS]
-    ORCH -->|no tool_calls| MEM[memory_write_node]
-    TOOL --> ORCH
-    MEM --> END([END])
+flowchart LR
+    Q["用户问题"] --> BGEQ["BGE-M3 文本向量"]
+    BGEQ --> CIDX[("caption_index")]
+    CIDX --> Scenes["Top-N 场景<br/>每个有 start/end/caption"]
 
-    ORCH -.->|tool-call cap hit| SALVAGE[_salvage_draft_answer]
-    SALVAGE -.-> ORCH
-    ORCH -.->|verify_grounding 两次同答| STALL_BREAK[_verify_grounding_stalled<br/>→ emit draft]
-    STALL_BREAK -.-> ORCH
+    Q --> SIGQ["SigLIP2 文本向量"]
+    Scenes --> Gated["scene-gated frame search<br/>约 2/3 配额"]
+    SIGQ --> Gated
+    SIGQ --> Global["global frame search<br/>约 1/3 兜底"]
+    Gated --> Merge["合并去重"]
+    Global --> Merge
+    Merge --> Frames["Top-K keyframes"]
 ```
 
-#### 2.2 工具清单（[app/tools.py](app/tools.py)）
+关键点是 **配额混合**。如果完全相信 caption 检索出来的场景，那么 BGE-M3 一旦把问题路由到错误场景，后面 SigLIP2 只能在错误时间窗里找帧，整轮就死了。
 
-工具按"agent 典型调用顺序"列出，注册在 `TOOLS` 列表（[app/tools.py:894](app/tools.py#L894)）的有 10 个；`multimodal_vqa` 已 deprecated，不在注册列表里。
+所以 `app/retrieval.py` 会：
 
-| # | 工具 | 角色 | 作用 | 状态写入 |
-| :-: | --- | --- | --- | --- |
-| 1 | `retrieve_video_evidence` | **检索** | 按 question_type + retrieval_profile 调用 [two_stage_retrieve](app/retrieval.py)（BGE caption → SigLIP frame，配额混合），返回 top-K 关键帧 base64 | `retrieved_frames`, `retrieved_scene_hits`, `retrieval_plan` |
-| 2 | `assess_evidence_sufficiency` | **元判断** | 用规则启发式判 sufficient/insufficient 并给 `recommended_next_action`（"call segment_focus"/"call retrieve_hypothesis_evidence"/...） | `evidence_sufficiency` |
-| 3 | `build_timeline` | **时序综合** | 把已检索帧按时间排序生成简版 timeline（含 caption），供 temporal_order / counting / comparison 类问题参考 | `timeline` |
-| 4 | `segment_focus` ⭐ | **Observer 子模块** | 在指定中心时刻 `center_t` 周围密采 ≤12 帧（默认 1 fps），调 VLM 用 `SEGMENT_FOCUS_PROMPT`（**显式声明"非最终回答者"**）描述窗口内视觉细节；同时通过 `SUBJECT_DELTAS` 协议回传实体增量 | `retrieved_frames` 合并新帧、`subject_registry`、`draft_answer`（中间观察，会被后续 `answer_with_evidence` 覆盖） |
-| 5 | `expand_temporal_evidence` | **legacy 扩窗** | 围绕给定时间戳列表扩前后窗口；prompt 明确标 "(legacy; prefer segment_focus)"，仅 fallback 用 | `retrieved_frames` 合并新帧 |
-| 6 | `stitched_verify` ⭐ | **Observer 子模块（多窗口）** | 接受 2-4 个不连续时间窗（含 LensWalk-style 触发器：题面有 before/after/in between/比较词时优先），从每段密采，总帧数 cap 24；调 VLM 用 `STITCHED_VERIFY_PROMPT` 综合对比；同样通过 `SUBJECT_DELTAS` 回传增量 | `retrieved_frames` 合并新帧、`subject_registry`、`draft_answer`（中间观察） |
-| 7 | `retrieve_hypothesis_evidence` | **假设排除** | 针对一个具体视觉 hypothesis（如 "is the man wearing a hat"）做二次定向检索；MCQ 题型在 candidates 互排时常用 | `hypotheses`, `retrieved_frames` 合并 |
-| 8 | `answer_with_evidence` | **最终回答** | 用全部已积累的 frames + `subject_registry` + 用户原问题，调 VLM 用 `ANSWER_WITH_EVIDENCE_PROMPT`（= `QA_SYSTEM_PROMPT` + `SUBJECT_DELTA_PROTOCOL`，**应用 MCQ HARD RULE**）产出 draft 答案；带 `[FRAME:t=...]` 引用 | `draft_answer`, `grounding_report`, `subject_registry` |
-| 9 | `verify_grounding` | **校验** | 检查 `[FRAME:t=...]` 是否匹配已检索帧、每条视觉论断是否带 citation、否定回答是否走过 `negative_check` profile 且作用域限定在已检查证据 | `grounding_report` |
-| 10 | `search_user_memories` | **跨 session 记忆** | 读取 LangMem store 中该 `user_id` 下的偏好/历史 fact，按 query 相似度返 top-K | （无 GraphState 写入，只产生 ToolMessage 文本） |
-| — | `multimodal_vqa` | *(legacy)* | 一次性"frames + question → answer" 快捷调用，prompt 明确告诫不优先用 | 不在 `TOOLS`，仅保留 import |
+- 先拿 caption index 找 `top_n_scenes`。
+- 再在这些场景的时间范围内找约 2/3 的关键帧。
+- 如果还没满 `top_k_frames`，再做全局 SigLIP2 检索补足。
 
-#### 2.3 LensWalk-inspired 改造的核心：Observer 子模块 + Subject Registry
+这样总帧数不变，VLM token 成本不变，但召回更稳。
 
-`segment_focus` 和 `stitched_verify` 是从 LensWalk 论文（[paper_references/LensWalk.pdf](paper_references/LensWalk.pdf)）迁移的"密采单段" / "跨段对比"两种 Observer 模式。我们的实现做了 3 个本地化改动：
+### 文本索引：FTS5 + dense + RRF
 
-- **Token 预算适配**：LensWalk 用 GPT-4 级 token 预算，我们桥到 1/3——`segment_focus` cap 12 帧，`stitched_verify` cap 24 帧 + 最多 4 段窗口。
-- **Observer 角色硬约束**（[app/vqa.py:70-92](app/vqa.py#L70-L92)）：每个 sub-tool prompt 开头第一段就声明"**你是 Observer 子模块，不是最终回答者**"，明令禁止写 "The correct answer is X)" 这种最终答案格式。这一条配合 [app/graph.py](app/graph.py) 里的 FINAL ANSWER PROTOCOL（见 §3）是双保险。
-- **Subject Registry inline 协议**：避免独立的 memory-update LLM 调用（LensWalk 原方案），我们让 Observer prompt 在答案末尾追加一行 `SUBJECT_DELTAS: {"deltas":[...]}` JSON；[app/tools.py:parse_subject_deltas](app/tools.py) 解析并通过 [app/tools.py:merge_subject_deltas](app/tools.py) merge 进 `subject_registry`，pruned 到 15 个最近实体。下一轮 `answer_with_evidence` 调用时，`subject_registry` 会渲染成"【已知主体登记表】..."注入 VLM user message 头部，模型可以用 `person_A` 这类 id 跨 turn 消歧。
+字幕和 PPT/OCR 不是只用向量搜，也不是只用关键词搜。`app/text_assets.py` 同时建两类索引：
 
-为什么 Subject Registry **不** 存进 LangMem：实体是 intra-video 的，跨 session 复用会污染（同 user 看不同视频，"person_A" 概念完全不同）。Subject Registry 只走 LangGraph SQLite checkpointer，scope 是 `thread_id`（= 一个视频对话）。
+- SQLite FTS5：适合精确词，例如 `REINFORCE`、`A2C`、年份、公式符号。
+- BGE-M3 dense index：适合语义问题，例如“老师说 baseline 有什么作用”。
 
-#### 2.4 7 种 question_type × 6 种 retrieval_profile
+查询时两路各取更多候选，然后用 RRF 合并。RRF 可以理解为“两个排行榜都觉得不错的内容更靠前，但某一路特别强也能保留”。
 
-Query planner 在 prompt 里强制 orchestrator 先分类、再选 profile。每个 profile 影响 `top_n_scenes` / `top_k_frames` 默认值：
+### Slide/OCR 检测
 
-- `focused`：单点细节（top_n=3, top_k=8）
-- `balanced`：默认
-- `broad`：综述/摘要（top_n=10, top_k=20）
-- `temporal`：时序/计数/比较（top_n=8, top_k=18）
-- `detail`：高分辨率视觉/OCR（top_k=18）
-- `negative_check`：否定回答前的兜底扫荡（top_n=12, top_k=24）
+PPT/OCR 阶段不是对每一帧都 OCR。它先从 `frames_dense/` 中采样，用简单的图像 hash 和灰度差异检测“页面变化明显”的候选帧，再把这些候选复制到 `frames_slides/` 并交给 RapidOCR。
 
-详见 [app/tools.py](app/tools.py) `_profile_defaults` 与 `_resolve_retrieval_plan`。
+这是一种工程折中：课堂视频里 PPT 通常停留一段时间，没必要每秒 OCR 一次。
 
-#### 2.5 GraphState（持久化在 SQLite checkpointer）
+---
+
+## LangGraph Agent 架构
+
+### GraphState：agent 的工作台
+
+`GraphState` 是 LangGraph 每轮循环携带的状态，大致长这样：
 
 ```python
 class GraphState(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
+    messages: list[AnyMessage]
     video_id: str | None
     user_id: str
-    retrieved_frames: Annotated[list[dict], _last_write]
-    retrieved_scene_hits: Annotated[list[dict], _last_write]
-    retrieval_plan: Annotated[dict, _last_write]
-    timeline: Annotated[list[dict], _last_write]
-    hypotheses: Annotated[list[dict], _last_write]
-    evidence_sufficiency: Annotated[dict, _last_write]
-    draft_answer: Annotated[str, _last_write]
-    grounding_report: Annotated[dict, _last_write]
-    subject_registry: Annotated[list[dict], _last_write]  # ⭐ Subject Registry
+    retrieved_frames: list[dict]
+    retrieved_scene_hits: list[dict]
+    retrieved_transcripts: list[dict]
+    retrieved_slides: list[dict]
+    retrieval_plan: dict
+    timeline: list[dict]
+    hypotheses: list[dict]
+    evidence_sufficiency: dict
+    draft_answer: str
+    grounding_report: dict
+    subject_registry: list[dict]
     agent_terminated: str | None
 ```
 
-`_last_write` 是自定义 reducer——一轮中如果 orchestrator 并发触发多个改同一字段的工具（LangGraph 多写冲突），保留最新非 None 的值，避免节点报错。
+这里有两个容易混的点：
 
-`subject_registry` 每项形如：
+1. `messages` 是对话和工具消息历史，用 LangGraph 的 `add_messages` reducer 累加。
+2. 其他字段用 `_last_write` reducer，避免一个 orchestrator 同时发多个 tool call 时发生多写冲突。
 
-```python
+`retrieved_frames` 里存的是给前端和 VLM 用的 base64 JPEG payload；`retrieved_transcripts` 和 `retrieved_slides` 存的是带时间戳和 marker 的文本证据。
+
+### Graph 节点
+
+`app/graph.py` 编译出的图只有三个主要节点：
+
+```mermaid
+flowchart LR
+    START --> O["orchestrator"]
+    O -->|"有 tool_calls"| T["tool_node"]
+    T --> O
+    O -->|"无 tool_calls"| M["memory_write_node"]
+    M --> END
+```
+
+- `orchestrator`：调用 `ChatOpenAI(...).bind_tools(TOOLS)`，让模型可以返回 tool calls。
+- `tool_node`：LangGraph 的 `ToolNode`，真正执行 `app/tools.py` 里的工具。
+- `memory_write_node`：每轮回答结束后，把最近对话交给 LangMem 做长期记忆抽取。
+
+### Orchestrator prompt 的职责
+
+Orchestrator 不是最终回答模型，它的首要职责是规划：
+
+- 先判断问题类型：overview、temporal_order、counting、comparison、visual_detail、text_ocr、existence 等。
+- 再选择 retrieval profile：focused、balanced、broad、temporal、detail、negative_check。
+- 根据问题决定先调视觉工具、字幕工具、PPT 工具，还是音画对齐工具。
+- 如果证据不足，按 `assess_evidence_sufficiency` 的建议继续查。
+- 最终必须调用 `answer_with_evidence`，然后调用 `verify_grounding`。
+
+对课堂、讲座、纪录片类视频，prompt 里有一条 **AUDIOVISUAL DUAL-PATH RULE**：通常至少查一次 transcript 和 slide，避免只看 PPT 漏掉口述内容，或者只看字幕漏掉屏幕上的公式/图表。
+
+---
+
+## 14 个注册工具
+
+当前 `TOOLS` 注册表在 `app/tools.py` 底部，共 14 个工具。`multimodal_vqa` 仍作为 legacy 函数保留，但不在 `TOOLS` 里，不是主路径。
+
+| # | 工具 | 类型 | 作用 | 主要写入状态 |
+| :-: | --- | --- | --- | --- |
+| 1 | `retrieve_video_evidence` | 视觉检索 | BGE caption 找场景，SigLIP2 找关键帧 | `retrieved_frames`, `retrieved_scene_hits`, `retrieval_plan` |
+| 2 | `retrieve_transcript_evidence` | 字幕检索 | 搜 ASR transcript chunks | `retrieved_transcripts` |
+| 3 | `search_transcript_keyword` | 精确字幕搜索 | 找精确术语，例如 REINFORCE / A2C | `retrieved_transcripts` |
+| 4 | `retrieve_slide_evidence` | PPT/OCR 检索 | 搜 OCR 到的 slide/whiteboard 文本 | `retrieved_slides` |
+| 5 | `align_audiovisual_evidence` | 音画对齐 | 给定时间点，取附近帧 + 字幕 + slide | `retrieved_frames`, `retrieved_transcripts`, `retrieved_slides` |
+| 6 | `build_timeline` | 时序整理 | 把已有 scene/frame 证据按时间排序，必要时扩附近帧 | `timeline`, `retrieved_frames` |
+| 7 | `retrieve_hypothesis_evidence` | 假设排除 | 针对一个具体假设二次检索，例如“是否戴帽子” | `hypotheses`, `retrieved_frames`, `retrieved_scene_hits` |
+| 8 | `segment_focus` | Observer | 围绕一个中心时刻密采短窗口，观察细节 | `retrieved_frames`, `draft_answer`, `subject_registry` |
+| 9 | `expand_temporal_evidence` | legacy 扩窗 | 围绕已有时间戳补附近帧；现在更推荐 `segment_focus` | `retrieved_frames` |
+| 10 | `stitched_verify` | Observer | 对 2-4 个不连续时间窗做对比观察 | `retrieved_frames`, `draft_answer`, `subject_registry` |
+| 11 | `assess_evidence_sufficiency` | 元判断 | 用规则判断证据是否足够，推荐下一步 | `evidence_sufficiency` |
+| 12 | `answer_with_evidence` | 最终草稿 | 用当前所有视觉/字幕/PPT 证据调用 VLM 写答案 | `draft_answer`, `grounding_report`, `subject_registry` |
+| 13 | `verify_grounding` | 校验 | 检查引用 marker、视觉 claim、否定回答范围 | `grounding_report` |
+| 14 | `search_user_memories` | 长期记忆 | 从 LangMem store 搜用户历史偏好/上下文 | 不改 GraphState，只返回 ToolMessage |
+
+工具的返回值都是 LangGraph `Command(update=...)`，所以工具不仅会返回一条 ToolMessage 给 orchestrator，还能直接更新 GraphState。
+
+---
+
+## Retrieval Plan：问题类型和检索 profile
+
+Orchestrator 调 `retrieve_video_evidence` 时可以带两个规划字段：
+
+### question_type
+
+| 类型 | 典型问题 |
+| --- | --- |
+| `overview` | “总结一下这个视频” |
+| `event_location` | “某件事发生在哪里” |
+| `temporal_order` | “先发生什么，后发生什么” |
+| `counting` | “出现了几次 / 有几个人” |
+| `comparison` | “前后有什么变化 / A 和 B 有什么区别” |
+| `visual_detail` | “衣服颜色 / 手里拿什么 / 动作细节” |
+| `text_ocr` | “屏幕上写了什么 / PPT 公式是什么” |
+| `existence` | “有没有某物 / 是否出现过” |
+| `general` | 默认兜底 |
+
+### retrieval_profile
+
+| Profile | 默认行为 |
+| --- | --- |
+| `focused` | 少量场景和帧，适合局部简单细节 |
+| `balanced` | 默认 |
+| `broad` | 更多场景和帧，适合总结 |
+| `temporal` | 更多场景 + 更多帧，适合顺序/计数/比较 |
+| `detail` | 帧数翻倍，适合 OCR 或细粒度视觉 |
+| `negative_check` | 更大范围扫描；在回答“不存在/没看到”之前使用 |
+
+`_resolve_retrieval_plan()` 会把 planner 给的参数归一化并 clamp 到配置上限，避免模型一口气要求太多证据。
+
+---
+
+## Observer 子模块：为什么需要 segment_focus / stitched_verify
+
+普通检索只会给出若干关键帧。对一些问题，这不够：
+
+- 动作细节需要看一个短窗口里的连续变化。
+- “前后变化”需要把两个或多个不连续时刻放在一起对比。
+- MCQ 题有时需要排除几个候选，单帧很容易误判。
+
+所以项目加了两个 Observer 工具：
+
+### segment_focus
+
+围绕 `center_t` 取一个短窗口，例如 `[center_t - 4s, center_t + 4s]`。工具层最多加载 12 帧，合并进全局证据池。实际单次 VLM 调用还会受 `VQA_MAX_FRAMES` 限制，默认会均匀抽样最多 6 帧；如果服务端配置把 `VQA_MAX_FRAMES` 调高，就能给 VLM 看更多。
+
+它的 prompt 明确要求：
+
+- 你是 Observer，不是最终回答者。
+- 不要选 MCQ 选项。
+- 不要写 `The correct answer is X)`。
+- 只描述这个窗口里看到的视觉事实。
+
+### stitched_verify
+
+接受 2-4 个时间窗，例如：
+
+```json
+[
+  {"start": 15.0, "end": 19.0},
+  {"start": 22.0, "end": 26.0}
+]
+```
+
+它把多个窗口的帧拼起来，交给 VLM 做跨时刻观察。工具层最多加载 24 帧，同样受最终 VLM evidence frame 配置影响。
+
+这两个工具的输出都只是 `observation`。它们会在返回 JSON 里写：
+
+```json
 {
-    "id": "person_A",
-    "label": "红衣男子",
-    "first_seen_t": 12.3,
-    "last_seen_t": 45.6,
-    "attributes": ["持有背包", "在跑步"],
-    "evidence_frames": [12.3, 30.1, 45.6],
+  "required_next_action": "answer_with_evidence",
+  "note_for_orchestrator": "This is an Observer sub-call's intermediate observation..."
 }
 ```
 
-整个列表通过 LangGraph checkpointer 持久化在 `data/graph_checkpoints.sqlite3`，scope 是 `thread_id`（= 单个视频对话）。跨对话/跨视频不复用，跨 turn 复用。
+这是为了防止 orchestrator 把中间观察直接当最终答案。
 
 ---
 
-### 3. Orchestrator 鲁棒性护栏（6 道）
+## Subject Registry：视频内主体追踪
 
-实际 production 调用中，LLM 会产生各种"语法上合法但语义死循环 / 跳步 / 拒答"的输出。护栏分两类：**prompt-level**（在 prompt 里写硬规则）和 **runtime-level**（python 代码强制干预）。
+长视频里经常会问“刚才那个红衣服的人后来做了什么”。如果每轮都只看当前检索帧，模型容易忘记“那个”是谁。
 
-| # | 护栏 | 类型 | 触发条件 | 行为 |
-| :-: | --- | --- | --- | --- |
-| 1 | **FINAL ANSWER PROTOCOL** ⭐ | prompt | orchestrator 想直接 emit `segment_focus` / `stitched_verify` 等 sub-tool 的输出当最终答案 | [_orchestrator_prompt](app/graph.py#L292) 顶部硬规则：最终答案必须由 `answer_with_evidence` 产生 + `verify_grounding` 校验；sub-tool 输出仅作为中间观察。双保险：[SEGMENT_FOCUS_PROMPT](app/vqa.py#L70) / [STITCHED_VERIFY_PROMPT](app/vqa.py#L84) 自己也声明"Observer 子模块，**不是最终回答者**"，明令禁止写 `The correct answer is X)` |
-| 2 | **MCQ HARD RULE + banned-phrase** ⭐ | prompt | VLM 在 MCQ 题面前想用 "证据不足/cannot determine/do not show" 等措辞拒答 | [QA_SYSTEM_PROMPT](app/vqa.py#L42) 把 MCQ 规则放在最前面 `═══ MCQ HARD RULE ═══` 区块；列出 12 条 banned phrase（"I cannot determine"/"insufficient evidence"/"证据不足" 等）+ 4 步决策模板（列候选→排除→提交→按 'The correct answer is X) ...' 格式输出）。明确"30%-confident guess > refusing to commit" |
-| 3 | **工具调用去重** | runtime | 同一 `(name, args)` 签名在历史里出现过（[_dedup_tool_calls](app/graph.py#L183)） | 合成 `ToolMessage`（用上次缓存内容），不再 fire 真实工具；若全是 dup 且有 draft，直接 emit draft 终止 |
-| 4 | **verify_grounding 停滞** | runtime | 倒数两次 `verify_grounding` 返回相同 answer（[_verify_grounding_stalled](app/graph.py#L245)） | 短路出 draft，不再调模型 |
-| 5 | **空回复 salvage** | runtime | 模型返回 `tool_calls=[]` 且 `content=""`（[_make_orchestrator](app/graph.py#L82)） | 从历史里捞最长 non-truncated `answer_with_evidence` payload；若仍无，注入 coercion HumanMessage 重试一次 |
-| 6 | **Tool-call 上限** | runtime | 一轮工具调用数 ≥ `orchestrator_max_tool_calls`（默认 8） | salvage draft；无 draft 则置 `agent_terminated="cap"` |
+项目用 `subject_registry` 做单视频内实体登记：
 
-每个 runtime 护栏（#3-#6）对应 [tests/test_graph_orchestrator.py](tests/test_graph_orchestrator.py) 里的一个回归测试。prompt 护栏（#1-#2）的核心 invariants 在 [tests/test_vqa.py](tests/test_vqa.py)（`证据不足` 关键词存在）和 [tests/test_graph_orchestrator.py](tests/test_graph_orchestrator.py)（`stitched_verify`/`segment_focus`/`PLAN`/`OBSERVE` 关键词存在）里被守护。
-
-**护栏 #1 的来源**：v11 在 DeepSeek-v4-flash orchestrator 上跑 eval 时发现的真实 failure mode——doubao 习惯调 `segment_focus` 探查后再 `answer_with_evidence`，DeepSeek-v4-flash 倾向把 `segment_focus` 的描述输出当最终答案 emit，导致 `segment_focus` 调用从 ~1 次/case 飙到 37 次，且 MCQ 规则完全失效。v12 加这条护栏修复。
-
----
-
-### 4. Soft-Waive 评测哲学：结果对就过，路径对错留 forensic
-
-传统 harness：retrieval / answer / agent_loop 三段都 strict gate，AND。问题：LLM judge 已经判答案正确，但 retrieval 召回因 tolerance 边缘 fail（如 ts_dist=2.1s vs tolerance=2.0s），整 case 被错杀。
-
-[app/eval_harness.py:evaluate_case](app/eval_harness.py#L107) 的解法：当 `judge.correct=True` 时，**citation / agent / retrieval** 三个 gate 全部 soft-waive，并在 JSON 里留下 `*_soft_waived: True` 字段供 forensic：
-
-```python
-# 简化伪代码
-if judge_pass:
-    answer["citation_soft_waived"] = not answer["citation_correct"]
-    answer["passed"] = hallucination_free and uncertainty_ok
-    agent["soft_waived"] = (agent["passed"] is False)
-    retrieval["soft_waived"] = (retrieval["passed"] is False)
-
-retrieval_ok = retrieval["passed"] is not False or retrieval["soft_waived"]
-agent_ok = agent["passed"] is not False or agent["soft_waived"]
-passed = retrieval_ok and answer["passed"] and agent_ok
+```json
+{
+  "id": "person_A",
+  "label": "红衣男子",
+  "first_seen_t": 12.3,
+  "last_seen_t": 45.6,
+  "attributes": ["持有背包", "在跑步"],
+  "evidence_frames": [12.3, 30.1, 45.6]
+}
 ```
 
-效果：当前 NExT-GQA 20-case run 的 `pass_rate == judge_correct_rate == 0.70`，三个 strict gate 在严格统计里仍可读（`agent_loop_pass_rate=0.65, retrieval_pass_rate=0.75`），但不会拖累 outcome 分。
+实现方式比较巧：VLM prompt 要求在答案末尾追加一行：
 
----
-
-### 5. Prediction Cache + 四维度 Fingerprint
-
-跑 harness 时直接调本地 agent 是 token-密集型操作。Cache key 由两层组成：
-
-```python
-# Layer 1: prompt fingerprint (app/eval_fingerprint.py)
-prompt_fp = sha1(QA_SYSTEM_PROMPT ‖ _orchestrator_prompt(has_video=True) ‖
-                 _orchestrator_prompt(has_video=False) ‖ AGENT_CODE_VERSION)[:12]
-
-# Layer 2: full cache key (app/eval_harness.py:PredictionCache.make_key)
-key = sha1(case_id ‖ f"{orchestrator}|vlm={vlm}" ‖ prompt_fp ‖
-           video_id ‖ AGENT_CODE_VERSION)
+```text
+SUBJECT_DELTAS: {"deltas": [...]}
 ```
 
-四维度自动失效规则：
+然后 `parse_subject_deltas()` 把这行 JSON 拿出来，`merge_subject_deltas()` 合并进 registry。这样不需要额外调用一个“记忆更新模型”，成本更低。
 
-- **改 prompt**：fingerprint 自动变，受影响的缓存条目失效，未变的继续命中。
-- **改 orchestrator 模型**（doubao → ds-v4-flash）：`f"{orchestrator}|..."` 段变，key 变，cache miss → 重跑。
-- **改 VLM 模型**（Qwen3-VL-30B → Qwen3.5-122B）：`vlm={vlm}` 段变，key 变，cache miss → 重跑。
-- **改 agent 运行时行为**（dedup 逻辑、新加护栏、改 `extra_body` 等不动 prompt 文本的改动）：必须**手动** bump `AGENT_CODE_VERSION`（当前 **`v12`**），否则历史 cache 仍命中导致结果污染。
-- **改打分逻辑**（如 Phase B 的 soft citation gate）：完全不动 prediction，只在已有缓存上重算指标，秒级出报告。
-
-> **⚠️ 历史坑**：早期 fingerprint **只**含 prompts + version，不含 model name。改 VLM 而不 bump version 会沉默命中旧模型 prediction。已修：`make_key` 在 [app/eval_harness.py:222-226](app/eval_harness.py#L222-L226) 把 orchestrator + VLM model name 都打进 key 第二段（"compose both orchestrator and VLM into the cache key so swapping either one invalidates affected entries"）。但**改 model 时仍建议 bump version 双保险**，因为 `extra_body` 等其他 model-specific 参数不在 key 里。
-
-`data/eval/prediction_cache.jsonl` 是 append-only JSONL（同 `JudgeCache` 模式）。
+注意：`subject_registry` 只属于当前视频对话，存在 LangGraph checkpointer 里，不写入 LangMem。原因很简单：不同视频里的 `person_A` 完全不是同一个人，跨视频复用会污染。
 
 ---
 
-### 6. 多 Provider VLM + Run-Level Footprint
+## Grounding：引用和校验协议
 
-#### 6.1 两种 wire format 自动切换
+最终答案里可以出现三类引用：
 
-[app/vqa.py](app/vqa.py) 封装：
+| Marker | 代表什么 | 例子 |
+| --- | --- | --- |
+| `[FRAME:t=X.X]` | 某个已检索视频帧 | `[FRAME:t=12.0]` |
+| `[TRANSCRIPT:t=A.B-C.D]` | 某段字幕/语音转写 | `[TRANSCRIPT:t=10.0-14.0]` |
+| `[SLIDE:t=X.X]` | 某张 PPT/OCR 帧 | `[SLIDE:t=72.0]` |
 
-- `responses`：火山方舟 Doubao `POST /responses`，input 是 `[{role, content:[{type:input_image|input_text}]}]`
-- `chat_completions`：OpenAI-compatible（ModelScope / 小米 MiMo / Volcengine /...），messages 是 `[{role, content:[{type:image_url|text}]}]`
+`verify_grounding` 会检查：
 
-切换只动 `.env`，业务零改动。
+1. `[FRAME:t=...]` 是否靠近已检索帧时间戳。
+2. `[TRANSCRIPT:t=...]` 是否匹配已检索字幕证据。
+3. `[SLIDE:t=...]` 是否落在已检索 slide/OCR 证据范围内。
+4. 视觉 claim 是否带 frame 或 slide 引用。
+5. 否定回答是否先走过 `negative_check`。
+6. 否定回答是否限定在“已检查证据中”，而不是武断说“整个视频都没有”。
 
-#### 6.2 每次 run 留可对比指纹
-
-`scripts/eval_harness.py` 在每次 run 时往输出 JSON 写 `run_meta` 块，并 append 一行到 `data/eval/runs_index.csv`：
-
-```
-timestamp,vlm_model,orch_model,fingerprint,version,n,seed,pass_rate,
-answer_pass_rate,judge_correct_rate,recall_mean,ts_dist_mean,output_path
-```
-
-VLM swap 体验：换 provider → 跑一次 → `column -t -s, data/eval/runs_index.csv` 直接对比。本 README 顶部的成绩表就是这个 CSV 导出的。
-
----
-
-### 7. Grounding + Negative-Answer Protocol
-
-回答里写 `[FRAME:t=29.7]` 这类 marker，前端把 marker 替换成内联缩略图。`verify_grounding` 工具做四件事：
-
-1. marker 是否落在已检索帧附近（容忍 tolerance）。
-2. visual claim 是否带 citation（如"红衣男子在跑步"但没引用任何帧）。
-3. 否定回答（"没有/不存在/未看到/没看到"）是否先调用过 `negative_check` profile 检索。
-4. 否定回答是否把作用域限定在"已检查证据/当前关键帧"而非全视频（防止过度泛化否定）。
-
-效果：模型倾向回答"在已检查的关键帧中没有看到 X"而不是直接"视频中没有 X"。
+这套规则不是完美语义验证，但它能拦住很多工程上常见的幻觉：乱编时间戳、说画面事实但不给引用、没做全局扫描就回答“不存在”。
 
 ---
 
-### 8. 双层记忆系统
+## 生产护栏
 
-| 层 | 后端 | 作用域 | 内容 |
-| --- | --- | --- | --- |
-| LangGraph Checkpointer | `data/graph_checkpoints.sqlite3` | thread_id（一个对话 = 一个视频） | 完整 `GraphState`，支持断线重连/历史回看 |
-| LangMem | `data/langmem_store.sqlite3` | user_id | 用户偏好、跨 session 的语义事实 |
+真实 LLM 很容易出现“语法正确但流程错误”的行为。项目里有 prompt-level 和 runtime-level 两类护栏。
 
-[app/graph.py:_make_memory_write_node](app/graph.py#L377) 在每轮回答后，把最近 12 条可见消息送给 LangMem manager 抽取并 upsert。orchestrator 通过 `search_user_memories` 工具主动检索。两层互不串扰——视频内的临时实体不会污染跨 session 的 user memory。
+| 护栏 | 类型 | 解决什么问题 |
+| --- | --- | --- |
+| FINAL ANSWER PROTOCOL | prompt | 禁止把 `segment_focus` / `stitched_verify` 的 observation 直接当最终答案 |
+| MCQ HARD RULE | prompt | 多选题必须提交一个选项，不许用“证据不足/无法确定”拒答 |
+| AUDIOVISUAL DUAL-PATH RULE | prompt | 讲座/纪录片类问题要兼顾 transcript 和 slide，避免单模态漏证据 |
+| 工具调用去重 | runtime | 同一 `(tool, args)` 已经调过就复用结果，避免死循环 |
+| tool-call 上限 | runtime | 默认最多 8 次工具调用，到上限就 salvage 或终止 |
+| verify_grounding 停滞检测 | runtime | 连续两次校验同一个答案就短路，避免 verify 循环 |
+| 空回复 salvage | runtime | 模型空答时，从历史 `answer_with_evidence` 里抢救草稿 |
+| dangling tool-call 清理 | runtime | 上一轮异常中断后，清掉 checkpoint 里未配对的 tool_call，避免下轮 API 400 |
 
----
-
-### 9. 控制组：无检索基线
-
-[scripts/eval_no_retrieval.py](scripts/eval_no_retrieval.py) 提供一个"均匀抽 N 帧 + 一次 VLM 调用"的 control group，输出 prediction JSONL 可直接喂回 `eval_harness.py --predictions`：
-
-```bash
-# 1. 跑控制组生成预测
-python scripts/eval_no_retrieval.py \
-    --cases tests/fixtures/eval_cases_nextgqa.jsonl \
-    --output data/eval/preds_no_retrieval_$(date +%Y%m%d_%H%M).jsonl \
-    --num-frames 6 --sample 20 --sample-seed 0
-
-# 2. 用同一 harness 评分
-python scripts/eval_harness.py \
-    --cases tests/fixtures/eval_cases_nextgqa.jsonl \
-    --predictions data/eval/preds_no_retrieval_*.jsonl \
-    --output data/eval/runs/nextgqa_$(date +%Y%m%d_%H%M)_no_retrieval.json \
-    --judge
-```
-
-意义：成绩表第 6 行表明在当前 20-case 样本上，**两阶段检索把召回从 0.675 抬到 0.800**（+18%），但 pass_rate 都是 0.70——VLM 视觉识别已经成了瓶颈。下一步收益不在 retrieval，在 [paper_reference_plan.md](paper_references/paper_reference_plan.md) 里的 multi-segment Observer 工具。
+这些护栏对应的回归测试主要在 `tests/test_graph_orchestrator.py`、`tests/test_tools_planner.py`、`tests/test_vqa.py` 和 `tests/test_main_stream_contract.py`。
 
 ---
 
-## 完整请求流程（提问到回答）
+## VLM 客户端和 Provider 切换
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant UI as Browser
-    participant API as FastAPI
-    participant G as LangGraph
-    participant O as Orchestrator LLM
-    participant T as Tools
-    participant R as two_stage_retrieve
-    participant V as VLM API
-    participant SR as subject_registry<br/>(GraphState)
-    participant LM as LangMem
+`app/vqa.py` 封装了两种 wire format：
 
-    UI->>API: GET /api/chat_stream?session=X&q=...
-    API->>G: ainvoke(state with video_id, user_id, q,<br/>prior subject_registry)
-    G->>O: SystemPrompt(含 FINAL ANSWER PROTOCOL +<br/>MCQ HARD RULE) + history
-    note over O: PLAN: 先 retrieve 拿粗候选
+| `VLM_API_FORMAT` | 适用接口 | 请求路径 |
+| --- | --- | --- |
+| `responses` | Volcano Ark / Doubao Responses API | `{base_url}/responses` |
+| `chat_completions` | 大多数 OpenAI-compatible 多模态接口 | `{base_url}/chat/completions` |
 
-    O-->>G: tool_calls=[retrieve_video_evidence(...)]
-    G->>T: ToolNode dispatch
-    T->>R: two_stage_retrieve(video_id, q)<br/>(BGE caption + SigLIP frame，配额混合)
-    R-->>T: frames, timestamps, scene_hits
-    T-->>G: ToolMessage + state.retrieved_frames
+业务代码只调用：
 
-    O-->>G: tool_calls=[assess_evidence_sufficiency(...)]
-    G->>T: dispatch
-    T-->>G: {sufficient: false,<br/>recommended_next_action: "segment_focus"}
-    note over O: OBSERVE: 中段视觉细节不清<br/>PLAN: segment_focus 在 t≈12s 密采
+- `generate_caption(image)`
+- `answer_question(question, frames, timestamps, ...)`
+- `stream_answer_question(...)`
 
-    O-->>G: tool_calls=[segment_focus(center_t=12, half=4)]
-    G->>T: dispatch
-    T->>R: 拉 frames_dense/ 窗口内 ≤12 帧
-    R-->>T: dense frames
-    T->>V: POST chat/completions<br/>(SEGMENT_FOCUS_PROMPT + frames + subject_registry header)
-    V-->>T: 中间观察 + [FRAME:t=...] + SUBJECT_DELTAS JSON
-    T->>SR: merge_subject_deltas → registry 更新
-    T-->>G: ToolMessage（中间观察，不是最终答案）
-    note over O: OBSERVE: 拿到 person_A=红衣男子<br/>PLAN: 调 answer_with_evidence 出最终答
+至于底层是 Doubao、ModelScope、DashScope、MiMo，主要通过 `.env` 切换。
 
-    O-->>G: tool_calls=[answer_with_evidence(...)]
-    G->>T: dispatch
-    T->>V: POST chat/completions<br/>(ANSWER_WITH_EVIDENCE_PROMPT + MCQ HARD RULE +<br/>所有 frames + subject_registry 头部)
-    V-->>T: "The correct answer is C) ... [FRAME:t=12.0]"
-    T->>SR: 再次 merge subject_deltas
-    T-->>G: ToolMessage(draft) + state.draft_answer
+图片在发送前会：
 
-    O-->>G: tool_calls=[verify_grounding(draft)]
-    G->>T: dispatch
-    T-->>G: {grounded: true}
-    O-->>G: AIMessage(content=draft, tool_calls=[])
-    G->>LM: write_memories(visible messages)
-    note over SR: subject_registry 通过<br/>SQLite checkpointer 持久化<br/>下一 turn 仍可见
-    G-->>API: stream tokens
-    API-->>UI: SSE chunks
-```
+1. 转 RGB。
+2. 按 `VQA_MAX_IMAGE_SIDE` 缩放。
+3. 按 `VQA_IMAGE_QUALITY` 编码 JPEG。
+4. 变成 base64 data URL。
+5. 帧前插入 `[t=X.Xs]` 时间标签。
 
-**6 道护栏随时可能介入提前 emit**：FINAL ANSWER PROTOCOL（禁止把 sub-tool 输出当最终答案）、MCQ HARD RULE（禁止对 MCQ 拒答）、dedup（同 args 工具调用）、verify-stall（两次同答短路）、salvage（空回复捞 draft）、cap（≥8 工具调用强制收尾）。
+如果多模态 prompt 超预算，`answer_question()` 会自动降低帧数和图像尺寸重试，最多几轮。
+
+---
+
+## API
+
+| Endpoint | 作用 |
+| --- | --- |
+| `GET /` | 浏览器 UI |
+| `POST /upload` | 上传视频，返回 `video_id` 和预处理 SSE URL |
+| `GET /status/{video_id}` | 查询视频预处理状态 |
+| `GET /api/preprocess_stream/{video_id}` | SSE 推送预处理阶段进度 |
+| `POST /chat` | 兼容/匿名直答；无 `user_id` 时不走完整 agent |
+| `GET /api/chat_stream` | 主聊天接口；登录会话 + SSE + 完整 LangGraph agent |
+| `POST /api/login` | 本地 name-tag 登录，没有真正认证 |
+| `GET /api/sessions` | 当前用户会话列表 |
+| `POST /api/sessions` | 创建会话 |
+| `PATCH /api/sessions/{session_id}` | 更新会话视频或标题 |
+| `GET /api/sessions/{session_id}/messages` | 读取会话历史 |
+| `GET /api/videos` | 当前用户已上传/分析的视频 |
+| `GET /api/videos/{video_id}/transcripts` | 读取 ASR 字幕段 |
+| `GET /api/videos/{video_id}/slides` | 读取 PPT/OCR 结果 |
+| `GET /api/videos/{video_id}/subtitles.vtt` | WebVTT 字幕文件 |
 
 ---
 
 ## 快速开始
 
-### 环境
+### 1. 创建环境
 
 ```bash
 conda create -n mr-big-eye python=3.10 -y
 conda activate mr-big-eye
-
-# 可选：国内 PyPI 源
-pip config set global.index-url https://mirrors.ustc.edu.cn/pypi/simple
-
 pip install -r requirements.txt
 ```
 
-### 配置
+如果使用已有项目环境，请确保 `torch`、`decord`、`chromadb`、`funasr`、`rapidocr_onnxruntime`、`langgraph` 等依赖都装在同一个 Python 环境里。
+
+### 2. 配置 `.env`
 
 ```bash
 cp .env.example .env
-# 填 VLM_API_KEY / ORCHESTRATOR_API_KEY，详见 .env.example
 ```
 
-**当前推荐配置**（ModelScope VLM + DeepSeek 官方 API orchestrator）：
-
-```env
-# VLM (Qwen3.5-122B-A10B，多模态早融合)
-VLM_API_PROVIDER=modelscope
-VLM_API_FORMAT=chat_completions
-VLM_API_BASE_URL=https://api-inference.modelscope.cn/v1
-VLM_API_KEY=<MODELSCOPE_KEY>
-VLM_MODEL_NAME=Qwen/Qwen3.5-122B-A10B
-
-# Orchestrator (DeepSeek-v4-flash，1元/M 输入，cache hit 0.02元/M)
-ORCHESTRATOR_API_BASE_URL=https://api.deepseek.com
-ORCHESTRATOR_API_KEY=<DEEPSEEK_KEY>
-ORCHESTRATOR_MODEL_NAME=deepseek-v4-flash
-ORCHESTRATOR_TEMPERATURE=0.2
-ORCHESTRATOR_MAX_TOOL_CALLS=8
-```
-
-> **⚠️ DeepSeek 必备**：[app/graph.py:_orchestrator_model](app/graph.py#L270) 在检测到 `api.deepseek.com` 时自动注入 `extra_body={"thinking": {"type": "disabled"}}`。不关 thinking 模式的话，multi-turn tool call 会触发 HTTP 400 (`reasoning_content must be passed back`)。
-
-**备选 1**：ModelScope VLM + Volcengine ARK orchestrator（doubao）：
-
-```env
-VLM_API_PROVIDER=modelscope
-VLM_API_BASE_URL=https://api-inference.modelscope.cn/v1
-VLM_API_KEY=<MODELSCOPE_KEY>
-VLM_MODEL_NAME=Qwen/Qwen3.5-122B-A10B
-
-ORCHESTRATOR_API_BASE_URL=https://ark.cn-beijing.volces.com/api/v3/
-ORCHESTRATOR_API_KEY=<ARK_KEY>
-ORCHESTRATOR_MODEL_NAME=doubao-seed-2-0-pro-260215
-```
-
-**备选 2**：火山方舟单独跑 VLM（无独立 orchestrator，VLM 自己当 orchestrator，不推荐）：
+至少需要填：
 
 ```env
 VLM_API_FORMAT=responses
 VLM_API_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
-VLM_API_KEY=<ARK_KEY>
+VLM_API_KEY=<YOUR_KEY>
 VLM_MODEL_NAME=doubao-seed-2-0-pro-260215
 ```
 
-### 下载本地检索模型
+如果希望 orchestrator 使用另一个更便宜或更擅长 tool call 的文本模型，填：
 
-```bash
-python scripts/download_models.py     # BGE-M3 + SigLIP2，从 ModelScope CDN
+```env
+ORCHESTRATOR_API_BASE_URL=<OPENAI_COMPATIBLE_BASE_URL>
+ORCHESTRATOR_API_KEY=<YOUR_KEY>
+ORCHESTRATOR_MODEL_NAME=<TOOL_CALL_MODEL>
 ```
 
-### 启动
+如果这些 `ORCHESTRATOR_*` 留空，orchestrator 会复用 `VLM_API_*`。
+
+### 3. 下载本地检索模型
 
 ```bash
-bash scripts/launch_app.sh            # http://localhost:8000
-# 关停
+python scripts/download_models.py
+```
+
+这个脚本下载 BGE-M3 和 SigLIP2。远程 VLM 不会下载到本地。
+
+### 4. 启动应用
+
+```bash
+bash scripts/launch_app.sh
+```
+
+默认访问：
+
+```text
+http://localhost:8000
+```
+
+关闭：
+
+```bash
 lsof -ti :8000 | xargs -r kill
 ```
 
-### Smoke Test
+### 5. Smoke test
 
 ```bash
 python scripts/smoke_test.py \
@@ -526,109 +598,119 @@ python scripts/smoke_test.py \
 
 ---
 
-## API
+## 配置说明
 
-| Endpoint | 作用 |
+配置由 `app/config.py` 的 Pydantic Settings 读取，默认加载 `.env`。
+
+| 变量 | 作用 |
 | --- | --- |
-| `GET /` | 浏览器 UI |
-| `POST /upload` | 上传视频 → 返回 `video_id` 与 SSE 预处理流 URL |
-| `GET /status/{video_id}` | 查询预处理状态 |
-| `GET /api/preprocess_stream/{video_id}` | SSE：预处理阶段进度 |
-| `POST /chat` | 匿名直答（direct retrieval + VQA，不走 agent） |
-| `GET /api/chat_stream` | 登录会话 SSE：走完整 LangGraph agent loop |
-| `POST /api/login` | 本地 name-tag 登录 |
-| `GET/POST/PATCH /api/sessions[/...]` | 会话 CRUD + 历史消息 |
-| `GET /api/videos` | 用户已分析的视频列表 |
+| `VLM_API_PROVIDER` | provider 标签，仅用于记录和分支判断 |
+| `VLM_API_FORMAT` | `responses` 或 `chat_completions` |
+| `VLM_API_BASE_URL` | VLM API base URL |
+| `VLM_API_KEY` | VLM API key |
+| `VLM_MODEL_NAME` | caption 和多帧 QA 使用的 VLM |
+| `VLM_API_TIMEOUT` | VLM HTTP 超时 |
+| `ORCHESTRATOR_API_BASE_URL` | tool-call orchestrator base URL，空则复用 VLM |
+| `ORCHESTRATOR_API_KEY` | orchestrator key |
+| `ORCHESTRATOR_MODEL_NAME` | orchestrator 模型名 |
+| `ORCHESTRATOR_TEMPERATURE` | orchestrator 温度，默认 0.2 |
+| `ORCHESTRATOR_MAX_TOOL_CALLS` | 单轮最大工具调用次数，默认 8 |
+| `ORCHESTRATOR_STREAMING` | orchestrator 是否流式；默认 false，兼容更多 proxy |
+| `MAX_VIDEO_DURATION_SEC` | 上传视频最长时长，默认 600 秒 |
+| `MAX_UPLOAD_SIZE_MB` | 上传大小上限 |
+| `LOAD_MODELS_ON_STARTUP` | 启动时是否加载本地 BGE/SigLIP |
+| `UNLOAD_MODELS_AFTER_USE` | 每次检索后是否释放本地模型，适合低显存机器 |
+| `BGE_M3_*` | BGE-M3 模型名和本地目录 |
+| `SIGLIP2_*` | SigLIP2 模型名、本地目录、dtype |
+| `MODELS_DEVICE` | 本地检索模型设备，例如 `cpu`、`cuda:0`、`auto` |
+| `TOP_N_SCENES` | 默认召回多少场景 |
+| `TOP_K_FRAMES` | 默认召回多少关键帧 |
+| `PLANNER_MAX_TOP_N_SCENES` | planner 可要求的场景上限 |
+| `PLANNER_MAX_TOP_K_FRAMES` | planner 可要求的帧上限 |
+| `VQA_MAX_FRAMES` | 单次 VLM 调用最多送多少证据帧 |
+| `VQA_MAX_IMAGE_SIDE` | VLM 输入图像最长边 |
+| `VQA_IMAGE_QUALITY` | VLM 输入 JPEG 质量 |
+| `VQA_MAX_OUTPUT_TOKENS` | VLM 答案 token 上限 |
+| `SCENE_DETECT_THRESHOLD` | PySceneDetect 内容变化阈值 |
+| `DENSE_FPS` | 稠密抽帧帧率 |
+| `ENABLE_ASR` | 是否启用 ASR |
+| `ASR_LANGUAGE` | ASR 语言，默认 `auto` |
+| `ENABLE_SLIDE_OCR` | 是否启用 PPT/OCR |
+| `SLIDE_SAMPLE_FPS` | slide 候选采样频率 |
+| `SLIDE_CHANGE_HASH_THRESHOLD` | slide 变化检测 hash 阈值 |
+| `SLIDE_CHANGE_FRAME_THRESHOLD` | slide 变化检测灰度差阈值 |
+| `DATA_DIR` | 运行数据目录 |
+| `DATABASE_PATH` | 用户/会话 SQLite 路径，空则用 `data/mr_big_eye.sqlite3` |
+| `GRAPH_CHECKPOINT_PATH` | LangGraph checkpoint SQLite 路径 |
+| `LANGMEM_STORE_PATH` | LangMem store SQLite 路径 |
+| `LANGMEM_*` | LangMem 抽取模型配置，空则复用 VLM |
+| `JUDGE_*` | 评测 LLM judge 配置；空时可能 fallback 到 VLM |
+| `PROGRESS_LANG` | 预处理进度文案语言，`zh` 或 `en` |
+| `LOG_LEVEL` | 日志级别 |
 
 ---
 
-## 评测管线
+## 评测
 
-### 数据集准备（NExT-GQA only；LongVideoBench 已 descope）
+### 当前推荐：Audiovisual Eval
 
-```bash
-# 1. 拉数据 + 采样到 20 题
-python scripts/eval_prepare_datasets.py --datasets nextgqa --sample 20
+当前主评测集在 `eval/audiovisual/`，见 `eval/audiovisual/README.md`。它混合了 Video-MME、Perception Test、CinePile、AVQA 等来源，目标是覆盖 visual、audio、joint、overview 几类问题。
 
-# 2. 转 EvalCase JSONL
-python scripts/eval_convert_nextgqa.py \
-  --raw data/eval/_raw/nextgqa \
-  --output tests/fixtures/eval_cases_nextgqa.jsonl
-
-# 3. 拉视频 + 走完整 preprocess 写缓存
-python scripts/eval_ingest_videos.py \
-  --cases tests/fixtures/eval_cases_nextgqa.jsonl
-```
-
-### 跑评测
+运行：
 
 ```bash
-# 直接调本地 agent（默认）
-python scripts/eval_harness.py \
-  --cases tests/fixtures/eval_cases_nextgqa.jsonl \
-  --sample 20 --sample-seed 0 --judge \
-  --prediction-cache data/eval/prediction_cache.jsonl \
-  --output data/eval/runs/nextgqa_$(date +%Y%m%d_%H%M).json
-
-# 用离线 prediction JSONL（控制组 / 其他系统对比）
-python scripts/eval_harness.py \
-  --cases tests/fixtures/eval_cases_nextgqa.jsonl \
-  --predictions some_predictions.jsonl \
-  --output data/eval/runs/<name>.json --judge
+python -m app.eval_harness \
+  --dataset audiovisual \
+  --n 20 \
+  --output data/eval/latest_report.json
 ```
 
-### Judge
+如果不传 `--n`，会跑默认数据集文件中的全部 case。前提是对应视频已经上传/ingest，并且 `get_video_status(video_id) == "done"`。
 
-`.env` 里 `JUDGE_API_KEY` 留空时，harness 会要求显式 `--no-judge` 或回退到 `VLM_API_*`（带"自评 bias" 警告）。建议生产路径填一个独立 judge：
+### 预测缓存
 
-```env
-JUDGE_API_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
-JUDGE_API_KEY=<ARK_KEY>
-JUDGE_MODEL_NAME=doubao-seed-2-0-pro-260215
+评测直接跑 agent 会花费较多 VLM token。`PredictionCache` 用如下信息组成 key：
+
+- case id
+- orchestrator model
+- VLM model
+- prompt fingerprint
+- video id
+- `AGENT_CODE_VERSION`
+
+所以：
+
+- 改 prompt 会自动换 fingerprint。
+- 换 orchestrator 或 VLM 会换 key。
+- 改工具集、runtime 行为、状态机逻辑时，需要手动 bump `AGENT_CODE_VERSION`。
+
+当前版本在 `app/eval_fingerprint.py`：
+
+```python
+AGENT_CODE_VERSION = "v18"
 ```
 
-Judge 结果写入 `data/eval/judge_cache.jsonl`（key=case_id+judge_model+prompt_hash），改打分逻辑时无需重跑 VLM。
+### LLM judge 与 Soft-Waive
 
-### 解读 run 报告
+`app.eval_harness` 保留了可选 LLM judge：
 
-每次 `eval_harness.py` 输出：
+- 如果配置了 `JUDGE_API_KEY`，用独立 judge。
+- 如果没配但有 `VLM_API_KEY`，会 fallback 到 VLM，并打印自评 bias warning。
+- 如果都没有，就只走规则指标。
 
-- `data/eval/runs/<name>.json`：`run_meta` + `summary` + per-case `results`。
-- `data/eval/runs/<name>.md`：人类可读 markdown 报告。
-- `data/eval/runs_index.csv`：追加一行用于跨 run 对比。
+当 judge 判语义正确时，harness 会 soft-waive retrieval / citation / agent-loop 的严格 gate，但会把 `*_soft_waived` 字段留在 JSON 里方便 forensic 分析。换句话说：**结果对就先算过，过程问题保留证据，不让边缘 timestamp tolerance 错杀正确答案。**
 
----
+### Legacy 评测脚本
 
-## 配置
+仓库仍保留 NExT-GQA、LongVideoBench 等转换和脚本：
 
-| 变量 | 作用 | 默认/示例 |
-| --- | --- | --- |
-| `VLM_API_FORMAT` | `responses` / `chat_completions` | `chat_completions` |
-| `VLM_API_BASE_URL` | VLM 端点 | `https://api-inference.modelscope.cn/v1` |
-| `VLM_API_KEY` | VLM Bearer | 空 |
-| `VLM_MODEL_NAME` | caption + 多帧 QA 模型 | `Qwen/Qwen3-VL-30B-A3B-Instruct` |
-| `VLM_API_TIMEOUT` | VLM HTTP 超时 | `120` |
-| `ORCHESTRATOR_API_BASE_URL` | tool-call orchestrator 端点；空则复用 VLM | 空 |
-| `ORCHESTRATOR_API_KEY` | orchestrator key | 空 |
-| `ORCHESTRATOR_MODEL_NAME` | orchestrator 模型 | 空 |
-| `ORCHESTRATOR_TEMPERATURE` | 默认 `0.2` |
-| `ORCHESTRATOR_MAX_TOOL_CALLS` | 单轮工具上限 | `8` |
-| `ORCHESTRATOR_STREAMING` | 某些 proxy 不支持工具流式，默认关 | `false` |
-| `JUDGE_*` | LLM judge 独立端点，空则回退 VLM | 空 |
-| `LANGMEM_*` | LangMem 抽取端点，空则回退 VLM | 空 |
-| `LANGMEM_QUERY_LIMIT` | 单次 user memory 检索条数 | `6` |
-| `TOP_N_SCENES` / `TOP_K_FRAMES` | 检索默认 | `5` / `12` |
-| `PLANNER_MAX_TOP_N_SCENES` / `PLANNER_MAX_TOP_K_FRAMES` | planner 上限 | `12` / `36` |
-| `VQA_MAX_FRAMES` | 实际送 VLM 的证据帧上限 | 本地 `6`，服务器 `12` |
-| `VQA_MAX_IMAGE_SIDE` / `VQA_IMAGE_QUALITY` | 输入图片预处理 | `448` / `75` |
-| `DENSE_FPS` | 稠密抽帧帧率 | `1.0` |
-| `SCENE_DETECT_THRESHOLD` | PySceneDetect | `27.0` |
-| `MAX_VIDEO_DURATION_SEC` | 最大视频时长 | `600` |
-| `MODELS_DEVICE` | 本地 BGE/SigLIP 设备 | `cpu` / `cuda:0` |
-| `LOAD_MODELS_ON_STARTUP` | 启动时加载本地编码器 | 本地 `false`，服务器 `true` |
-| `DATA_DIR` | 运行数据目录 | `./data` |
+- `scripts/eval_prepare_datasets.py`
+- `scripts/eval_convert_nextgqa.py`
+- `scripts/eval_convert_longvideobench.py`
+- `scripts/eval_harness.py`
+- `scripts/eval_no_retrieval.py`
 
-服务器迁移见 `.env.server.example`。
+这些对回归和历史对照仍有价值，但当前 README 的主叙事以音画 QA 为准。
 
 ---
 
@@ -637,76 +719,80 @@ Judge 结果写入 `data/eval/judge_cache.jsonl`（key=case_id+judge_model+promp
 ```text
 .
 ├── app/
-│   ├── main.py             # FastAPI 路由 + SSE + 后台预处理
-│   ├── config.py           # Pydantic Settings
-│   ├── vqa.py              # VLM API client（responses + chat_completions）
-│   ├── models.py           # BGE-M3 / SigLIP2 wrappers + lazy load/release
-│   ├── preprocess.py       # 视频预处理 + 索引构建 + set_video_status
-│   ├── retrieval.py        # 两阶段检索 + 配额混合
-│   ├── graph.py            # LangGraph orchestrator + 4 道护栏
-│   ├── tools.py            # 9 工具实现 + planner 解析
-│   ├── memory.py           # LangMem manager / store
-│   ├── eval_harness.py     # 评测指标 + Soft-Waive + 缓存
-│   ├── eval_fingerprint.py # AGENT_CODE_VERSION + prompt fingerprint
-│   ├── eval_datasets.py    # 数据集元信息
-│   ├── cache.py            # 文件缓存 + .done 状态
-│   ├── db.py               # SQLite users/sessions/videos
-│   ├── progress.py         # SSE pub/sub
-│   ├── schemas.py / usernames.py
-│   └── static/             # 浏览器 UI
+│   ├── main.py                 # FastAPI 入口、上传、聊天 SSE、session API
+│   ├── config.py               # Pydantic Settings，读取 .env
+│   ├── graph.py                # LangGraph agent 状态机、orchestrator prompt、护栏
+│   ├── tools.py                # 14 个注册工具和 grounding / planner 逻辑
+│   ├── vqa.py                  # 远程 VLM API client、prompt、图片 payload 构造
+│   ├── models.py               # BGE-M3 / SigLIP2 本地模型 wrapper
+│   ├── preprocess.py           # 视频预处理、抽帧、caption、ASR、OCR、索引构建
+│   ├── retrieval.py            # 视觉两阶段检索：caption -> frame
+│   ├── text_assets.py          # transcript / slide 持久化、FTS5、dense index、RRF
+│   ├── asr.py                  # FSMN-VAD + SenseVoice-Small
+│   ├── cache.py                # video_id、cache_dir、status、meta、video profile
+│   ├── db.py                   # users / sessions / videos SQLite
+│   ├── memory.py               # LangMem store / manager / search / write
+│   ├── progress.py             # 预处理 SSE pub/sub
+│   ├── eval_harness.py         # 评测指标、judge、prediction cache
+│   ├── eval_fingerprint.py     # AGENT_CODE_VERSION + prompt hash
+│   ├── schemas.py              # FastAPI/Pydantic schema
+│   ├── usernames.py            # 本地随机用户名
+│   └── static/
+│       ├── index.html
+│       ├── style.css
+│       └── app.js              # 上传、聊天、citation 渲染
 ├── scripts/
 │   ├── launch_app.sh
 │   ├── download_models.py
 │   ├── smoke_test.py
+│   ├── ingest_videomme.py
 │   ├── eval_harness.py
-│   ├── eval_no_retrieval.py        # 控制组：均匀采 N 帧 + VLM
-│   ├── eval_convert_nextgqa.py     # NExT-GQA → EvalCase JSONL
-│   ├── eval_convert_longvideobench.py  # （legacy，LVB 已 descope）
-│   ├── eval_prepare_datasets.py    # 拉数据集 + 采样
-│   └── eval_ingest_videos.py       # 跑 preprocess + 绑定 video_id
+│   ├── eval_no_retrieval.py
+│   ├── eval_prepare_datasets.py
+│   ├── eval_convert_nextgqa.py
+│   ├── eval_convert_longvideobench.py
+│   └── build_*_eval.py
+├── eval/
+│   └── audiovisual/
+│       ├── README.md
+│       ├── questions.jsonl
+│       ├── questions.ready.jsonl
+│       └── video_manifest.json
 ├── tests/
-│   ├── fixtures/
-│   │   ├── short_clip.mp4
-│   │   ├── eval_cases.jsonl
-│   │   ├── eval_cases_nextgqa.jsonl
-│   │   ├── eval_cases_nextgqa_smoke.jsonl
-│   │   ├── eval_predictions.jsonl
-│   │   └── datasets/
-│   ├── test_eval_harness.py
-│   ├── test_eval_converters.py
 │   ├── test_graph_orchestrator.py
-│   ├── test_main_stream_contract.py
 │   ├── test_tools_planner.py
-│   ├── test_retrieval.py
+│   ├── test_text_assets.py
+│   ├── test_asr.py
 │   ├── test_vqa.py
-│   ├── test_cache.py / test_db.py / test_memory.py / test_usernames.py
+│   ├── test_retrieval.py
+│   ├── test_eval_harness.py
+│   └── fixtures/
+├── docker/
 ├── paper_references/
-│   ├── LensWalk.pdf                # 下一阶段灵感来源
-│   └── paper_reference_plan.md     # LensWalk-inspired 改造计划（5 个 phase）
-├── .env.example / .env.server.example
-└── requirements.txt
+├── audio_adaption.md           # 音画升级路线和历史 handoff
+├── requirements.txt
+├── .env.example
+└── .env.server.example
 ```
 
 运行时目录：
 
 ```text
 data/
-├── uploads/
-├── mr_big_eye.sqlite3                  # users/sessions/videos
-├── graph_checkpoints.sqlite3           # LangGraph thread 状态
-├── langmem_store.sqlite3               # LangMem user memory
-├── cache/<video_id>/                   # 见 1.3
+├── uploads/                         # 上传视频，按 content hash 命名
+├── cache/{video_id}/                # 每个视频的所有预处理资产和索引
+├── mr_big_eye.sqlite3               # users / sessions / videos
+├── graph_checkpoints.sqlite3        # LangGraph thread 状态
+├── langmem_store.sqlite3            # LangMem user memory
+├── transcripts.sqlite3              # FTS5 transcript / slide chunks
 └── eval/
-    ├── _raw/                           # 原始数据集
-    ├── datasets/                       # 处理后样本
-    ├── prediction_cache.jsonl          # case_id + fingerprint → prediction
-    ├── judge_cache.jsonl               # case_id + judge_model → judge 结果
-    ├── runs/<dataset>_<ts>_<tag>.json  # 每次 run 报告
-    ├── runs/<dataset>_<ts>_<tag>.md
-    └── runs_index.csv                  # 跨 run 对比
+    ├── prediction_cache.jsonl
+    ├── judge_cache.jsonl
+    ├── latest_report.json
+    └── runs/
 ```
 
-`data/` 与 `models/` 默认不入 Git。
+`data/`、`models/` 默认不进 Git。
 
 ---
 
@@ -716,49 +802,100 @@ data/
 python -m pytest -q
 ```
 
-当前覆盖：缓存 / DB / 用户名 / VQA payload / 两阶段检索契约 / LangGraph orchestrator 4 道护栏 / 工具 planner profile 映射 / evidence sufficiency / grounding report / Soft-Waive 评分 / 数据集 converter / prediction cache / `main.py` SSE stream contract。
+当前测试覆盖的重点：
+
+- DB / cache / username 基础行为
+- BGE/SigLIP 检索契约
+- VQA payload、prompt 关键规则
+- ASR 后处理
+- transcript / slide text assets
+- LangGraph orchestrator loop 和护栏
+- tool planner profile、evidence sufficiency、grounding report
+- main SSE stream contract
+- eval converter、eval harness、prediction cache
+
+---
+
+## 常见坑
+
+### 1. decord 打不开视频
+
+某些 B 站、剪映、抖音导出 MP4 会让 decord probe 报 EOF 或 moov 相关错误。项目会自动尝试：
+
+```bash
+ffmpeg -c copy -movflags +faststart
+```
+
+重封装到 `data/cache/{video_id}/remuxed.mp4`，不重新编码，通常很快。
+
+### 2. DeepSeek tool call 400
+
+`app/graph.py` 检测到 `api.deepseek.com` 时会自动加：
+
+```python
+extra_body={"thinking": {"type": "disabled"}}
+```
+
+否则某些 DeepSeek thinking 模式会要求把 `reasoning_content` 继续传回去，多轮 tool call 容易 HTTP 400。
+
+### 3. 回答里没有视频引用
+
+优先确认你走的是 `/api/chat_stream`，而不是匿名 `POST /chat` legacy 路径。再检查：
+
+- 视频状态是否 `done`。
+- 问题是否被 `_should_use_video()` 判成闲聊。
+- Orchestrator 是否已经触发 `answer_with_evidence` 和 `verify_grounding`。
+
+### 4. 模型换了但评测缓存没失效
+
+换 VLM / orchestrator 理论上会进入 prediction cache key。但如果你改的是工具 runtime 行为、prompt 外的代码、VQA 参数、provider-specific `extra_body`，请手动 bump `AGENT_CODE_VERSION`。
+
+### 5. 低显存机器
+
+可以在 `.env` 里设置：
+
+```env
+LOAD_MODELS_ON_STARTUP=false
+UNLOAD_MODELS_AFTER_USE=true
+MODELS_DEVICE=cpu
+```
+
+代价是检索会慢，尤其是 SigLIP2 图像编码和 BGE dense search。
 
 ---
 
 ## 已知限制
 
-- 用户身份是本地 name-tag，不是认证系统。
-- 预处理走 FastAPI 后台任务，不是生产级队列。
-- 远程 VLM 延迟 / 并发 / 费用取决于 provider。
-- `POST /chat` 匿名路径仍是 direct retrieval + VQA；只有登录 SSE 走完整 agent。
-- Grounding 是规则型 + LLM judge 混合；细粒度语义对齐还可继续加强。
-- caption_index / frame_index 没有版本号，升级 BGE / SigLIP 模型需手动清缓存。
-
-## 已完成的里程碑
-
-- **LensWalk-inspired agent 升级 (v6-v12)**（计划见 [paper_references/paper_reference_plan.md](paper_references/paper_reference_plan.md)）：
-  - ✅ `stitched_verify` 工具：跨多窗口对比，对应 temporal_order / comparison
-  - ✅ `segment_focus` 工具：单窗口 1fps 密采，对应 visual_detail
-  - ✅ VQA prompt LensWalk-style 严格 scope 约束（防 Evidence Dilution）
-  - ✅ Orchestrator THINK→PLAN→OBSERVE 显式声明
-  - ✅ Subject Registry：单视频跨 turn 实体追踪（GraphState 字段，per thread_id 持久化，**不**进 LangMem）
-  - ✅ MCQ HARD RULE + banned-phrase 列表（v8/v10 两次硬化）
-  - ✅ FINAL ANSWER PROTOCOL + Observer 角色防御（v12，修 DeepSeek-v4-flash 跳过 `answer_with_evidence` 问题）
-
-## 后续方向
-
-- **`/eval-multiseed` skill（最高 ROI）**：当前 n=20 的方差天花板太高（同套代码不同 seed 能跑出 60%/79%），prompt hill-climbing 在追噪声。需要 multi-seed 聚合脚本，输出 mean ± stdev + 标注 seed 间 flip 的不稳定 case。
-- **Orchestrator-VLM 协调审计**：v11→v12 教训显示换 orchestrator 时 sub-tool prompt 的角色边界必须重审。考虑写一个 `/orchestrator-behavior-check` smoke test：用 ds-v4-flash / doubao / Qwen3 三套 orchestrator 各跑 3-case，统计每个 tool 的调用比例，自动 flag 异常分布。
-- **`segment_focus` 采用率监控**：v12 之后期望 `segment_focus` 调用回归 ~1 次/case；若仍频繁，说明 orchestrator prompt 对 sub-tool vs 最终答案的边界仍不够清晰。
-- 索引产物加版本号，模型升级自动失效缓存。
-- 引入 Redis / Celery 等任务队列替代后台任务。
-- 时间轴 UI：点击关键帧跳转视频时间点。
+- 本地用户系统只是 name-tag，不是认证系统。
+- 预处理是 FastAPI 后台任务，不是生产级任务队列。
+- 多模态 VLM 的速度、稳定性、费用完全取决于远程 provider。
+- `POST /chat` 匿名路径不是完整 agent，只适合兼容和简单 smoke。
+- Grounding 校验是规则型，能抓很多工程错误，但不是完美语义证明。
+- caption_index、frame_index、transcript_index、slide_index 没有内建 schema/version 文件；升级索引模型后建议清理对应视频缓存重建。
+- `subject_registry` 是启发式 JSON 协议，依赖 VLM 按格式输出，代码会尽量 strip 坏 JSON，但不能保证所有 provider 都稳定。
+- `VQA_MAX_FRAMES` 默认较小，细粒度动作问题可能需要调高，同时注意 VLM token/图片预算。
 
 ---
 
-## Highlights (English TL;DR)
+## 读代码建议
 
-- Long-video QA via PySceneDetect + BGE-M3 caption retrieval + SigLIP2 frame reranking with **quota-blended fallback** against BGE routing failures.
-- Remote VLM API only (Doubao Responses / OpenAI-compat Chat / ModelScope / DeepSeek); zero local VLM serving stack.
-- LangGraph agent loop with **10 tools** including LensWalk-inspired Observer sub-modules (`segment_focus` for dense single-window sampling, `stitched_verify` for cross-window comparison) and a `subject_registry` for intra-video entity tracking via embedded `SUBJECT_DELTAS` protocol (no extra LLM call).
-- **6 production-grade guards**: FINAL ANSWER PROTOCOL (forces `answer_with_evidence` as the only path to final answer), MCQ HARD RULE + banned-phrase list (forbids "cannot determine"/"insufficient" on multiple-choice questions), tool-call dedup, verify-grounding stall short-circuit, empty-content salvage, tool-call cap.
-- **Soft-Waive scoring**: when LLM judge accepts, citation/agent/retrieval gates soft-waive but keep strict signal in JSON for forensics.
-- **Four-dimension prediction cache**: SHA1(case_id ‖ orchestrator|vlm ‖ prompts ‖ AGENT_CODE_VERSION); changing orchestrator or VLM auto-invalidates affected entries.
-- **Run-level footprint**: per-run `run_meta` + append-only `runs_index.csv` for reproducible VLM/orchestrator comparison.
-- Two-layer memory: LangGraph SQLite checkpointer for thread state (incl. `subject_registry`) + LangMem SQLite store for cross-session user memory.
-- Reproducible quality harness over NExT-GQA with a no-retrieval control-group baseline.
+如果你想快速理解项目，不建议从 README 的旧评测表开始。建议按这个顺序读：
+
+1. `app/main.py`：应用入口，理解上传、session、SSE。
+2. `app/preprocess.py`：理解视频如何变成缓存和索引。
+3. `app/retrieval.py`：理解视觉两阶段检索。
+4. `app/text_assets.py`：理解字幕/PPT 的文本检索。
+5. `app/tools.py`：理解 agent 能做什么。
+6. `app/graph.py`：理解 agent loop、prompt 和护栏。
+7. `app/vqa.py`：理解 VLM prompt、图片 payload、citation 协议。
+8. `app/static/app.js`：理解前端如何消费 SSE 和渲染引用。
+9. `tests/test_graph_orchestrator.py`、`tests/test_tools_planner.py`：看设计意图的最好补充。
+
+---
+
+## English TL;DR
+
+Mr. Big-Eye is a browser-based long-video audiovisual QA system. It preprocesses each uploaded video into searchable visual, transcript, and slide/OCR assets, then uses a LangGraph tool-calling agent to retrieve evidence, inspect short temporal windows, align audio and visuals, draft an evidence-grounded answer, and verify citations before responding.
+
+The local stack runs retrieval/ingest models only: BGE-M3 for text embeddings, SigLIP2 for image-text frame retrieval, SenseVoice/FSMN-VAD for ASR, and RapidOCR for slides. Multimodal reasoning is delegated to a remote VLM API. The online agent currently exposes 14 registered tools and persists per-session state through a LangGraph SQLite checkpointer plus cross-session user memory through LangMem.
+

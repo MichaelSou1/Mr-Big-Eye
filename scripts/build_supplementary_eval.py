@@ -59,6 +59,21 @@ def extract_keywords(text: str, max_n: int = 3) -> list[str]:
     return kept or [text]
 
 
+def format_candidates(options: list[str]) -> str:
+    lines = ["Candidates:"]
+    for index, option in enumerate(options):
+        letter = chr(ord("A") + index)
+        lines.append(f"{letter}) {str(option).strip()}")
+    return "\n".join(lines)
+
+
+def question_with_candidates(question: str, options: list[str]) -> str:
+    text = str(question).strip()
+    if "Candidates:" in text:
+        return text
+    return f"{text}\n\n{format_candidates(options)}"
+
+
 def hash_file(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -178,7 +193,7 @@ def process_perception_test(manifest: dict, existing_ids: set[str]) -> list[dict
             cases.append({
                 "question_id": qid,
                 "video_id": vid,
-                "question": q["question"],
+                "question": question_with_candidates(q["question"], q["options"]),
                 "modality_tag": modality,
                 "question_type": f"pt-{area}-{reasoning}".strip("-"),
                 "expected_keywords": extract_keywords(correct),
@@ -249,7 +264,7 @@ def process_cinepile(manifest: dict, existing_ids: set[str]) -> list[dict]:
             cases.append({
                 "question_id": qid,
                 "video_id": vid,
-                "question": r["question"],
+                "question": question_with_candidates(r["question"], choices),
                 "modality_tag": modality,
                 "question_type": cat,
                 "expected_keywords": extract_keywords(correct),
@@ -325,7 +340,7 @@ def process_avqa(manifest: dict, existing_ids: set[str]) -> list[dict]:
             cases.append({
                 "question_id": qid,
                 "video_id": vid,
-                "question": r["question_text"],
+                "question": question_with_candidates(r["question_text"], r["multi_choice"]),
                 "modality_tag": modality,
                 "question_type": f"avqa-{r.get('question_type','')}",
                 "expected_keywords": extract_keywords(correct),

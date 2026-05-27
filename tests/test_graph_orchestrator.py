@@ -293,6 +293,17 @@ def test_salvage_draft_answer_returns_empty_when_no_signal():
     assert graph._salvage_draft_answer({"messages": [], "draft_answer": ""}) == ""
 
 
+def test_salvage_draft_answer_ignores_observer_notes():
+    state = {
+        "messages": [],
+        "draft_answer": "",
+        "observer_notes": [
+            {"tool": "segment_focus", "observation": "observer detail [FRAME:t=1.0]"}
+        ],
+    }
+    assert graph._salvage_draft_answer(state) == ""
+
+
 def test_orchestrator_prompt_mcq_and_dedup_rules():
     """Phase C: video-branch prompt must enforce MCQ commit + anti-loop rules."""
     video_prompt = graph._orchestrator_prompt(has_video=True)
@@ -304,6 +315,8 @@ def test_orchestrator_prompt_mcq_and_dedup_rules():
     assert "OBSERVE" in video_prompt
     assert "Do not call the same tool with the same arguments twice" in video_prompt
     assert "Do not call the same tool with the same arguments twice" in no_video_prompt
+    assert "answer_with_evidence, then verify_grounding" in video_prompt
+    assert "observer notes only" in video_prompt
     # MCQ rule does not apply when there is no video
     assert "MUST commit" not in no_video_prompt
 

@@ -119,6 +119,7 @@ TRANSCRIPT_MARKER_RE = re.compile(r"\[TRANSCRIPT:t=([0-9]+(?:\.[0-9]+)?)-([0-9]+
 SLIDE_MARKER_RE = re.compile(r"\[SLIDE:t=([0-9]+(?:\.[0-9]+)?)\]")
 DENSE_FRAME_RE = re.compile(r"^t([0-9]+(?:\.[0-9]+)?)\.jpg$")
 SUBJECT_REGISTRY_MAX = 15
+OBSERVER_NOTES_MAX = 12
 SEGMENT_FOCUS_MAX_FRAMES = 12
 STITCHED_VERIFY_MAX_WINDOWS = 4
 STITCHED_VERIFY_MAX_FRAMES = 24
@@ -663,7 +664,13 @@ async def segment_focus(
         payload,
         update={
             "retrieved_frames": all_frames,
-            "draft_answer": clean_answer,
+            "observer_notes": _append_observer_note(
+                state.get("observer_notes", []),
+                tool_name="segment_focus",
+                observation=clean_answer,
+                timestamps=timestamps,
+                window=window,
+            ),
             "subject_registry": merged_registry,
         },
     )
@@ -794,7 +801,13 @@ async def stitched_verify(
         payload,
         update={
             "retrieved_frames": all_frames,
-            "draft_answer": clean_answer,
+            "observer_notes": _append_observer_note(
+                state.get("observer_notes", []),
+                tool_name="stitched_verify",
+                observation=clean_answer,
+                timestamps=timestamps,
+                windows=window_summaries,
+            ),
             "subject_registry": merged_registry,
         },
     )
@@ -892,7 +905,7 @@ async def answer_with_evidence(
             ),
         }
         return _command(tool_call_id, payload)
-    report = _grounding_report(cleaned, timestamps, state)
+    report = _grounding_report(cleaned, timestamps, {**state, "question": question})
     payload = {
         "tool": "answer_with_evidence",
         "answer": cleaned,
@@ -927,7 +940,7 @@ async def verify_grounding(
         for item in state.get("retrieved_frames", [])
         if "timestamp" in item
     ]
-    report = _grounding_report(draft, timestamps, state)
+    report = _grounding_report(draft, timestamps, {**state, "question": _last_question(state)})
     payload = {
         "tool": "verify_grounding",
         "answer": draft,
@@ -1218,6 +1231,32 @@ def _merge_text_evidence(
     return merged[:limit]
 
 
+def _append_observer_note(
+    existing: list[dict[str, Any]],
+    *,
+    tool_name: str,
+    observation: str,
+    timestamps: list[float],
+    window: dict[str, Any] | None = None,
+    windows: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    note: dict[str, Any] = {
+        "tool": tool_name,
+        "observation": observation,
+        "timestamps": [round(float(item), 1) for item in timestamps],
+    }
+    if window is not None:
+        note["window"] = dict(window)
+    if windows is not None:
+        note["windows"] = [dict(item) for item in windows]
+    notes = [
+        item for item in (existing or [])
+        if isinstance(item, dict) and str(item.get("observation") or "").strip()
+    ]
+    notes.append(note)
+    return notes[-OBSERVER_NOTES_MAX:]
+
+
 def _state_text_evidence(state: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         *_merge_text_evidence([], state.get("retrieved_transcripts", []) or []),
@@ -1505,6 +1544,8 @@ def _is_negative_question(question: str, question_type: str) -> bool:
     text = question.strip().lower()
     if question_type == "existence":
         return True
+    if text.startswith(("is there ", "are there ", "was there ", "were there ")):
+        return True
     return any(marker in text for marker in ("any", "no ", "without", "有没有", "是否有", "没有", "不存在"))
 
 
@@ -1546,8 +1587,11 @@ def _question_with_answer_protocol(
     sufficiency = state.get("evidence_sufficiency", {}) or {}
     grounding = (
         "Answer using only the provided frames, transcript chunks, and slide/OCR chunks. "
+        "Image timestamps are shown as [t=X.Xs] before each image, but final answers "
+        "must convert them to [FRAME:t=X.X]; never use bare [t=Xs] as a citation. "
         "Tie every concrete visual claim to [FRAME:t=...] or [SLIDE:t=...] markers, "
-        "and every speech/transcript claim to [TRANSCRIPT:t=...] markers using exact shown timestamps. "
+        "and every speech/transcript claim to exact [TRANSCRIPT:t=...] markers copied "
+        "from the evidence block. "
         "If the evidence is insufficient, say what cannot be determined."
     )
     negative = (
@@ -1598,9 +1642,15 @@ def _grounding_report(
         for claim in visual_claims
         if not _line_has_visual_marker(answer or "", claim)
     ]
-    negative = _looks_like_negative_answer(answer or "")
     plan = state.get("retrieval_plan", {}) or {}
     profile = str(plan.get("retrieval_profile") or "")
+    question = str(state.get("question") or state.get("current_question") or "")
+    question_type = str(plan.get("question_type") or state.get("question_type") or "")
+    negative_policy_active = (
+        profile == "negative_check"
+        or _is_negative_question(question, question_type)
+    )
+    negative = negative_policy_active and _looks_like_negative_answer(answer or "")
     warnings: list[str] = []
     recommended = "revise_answer_with_citations"
     if invalid_markers:
@@ -1708,6 +1758,14 @@ def _history_for_vqa(messages: list[Any]) -> list[dict[str, str]]:
             if content:
                 history.append({"role": "assistant", "content": content})
     return history
+
+
+def _last_question(state: dict[str, Any]) -> str:
+    messages = state.get("messages", []) or []
+    for message in reversed(messages):
+        if getattr(message, "type", "") == "human":
+            return str(getattr(message, "content", "") or "")
+    return ""
 
 
 def _image_to_b64(image: Any) -> str:

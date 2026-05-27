@@ -93,11 +93,36 @@ def test_grounding_report_accepts_scoped_negative_with_citation():
     report = tools._grounding_report(
         "In the checked frames, I do not see a cat.\n[FRAME:t=1.0]",
         [1.0, 2.0],
-        {"retrieval_plan": {"retrieval_profile": "negative_check"}},
+        {
+            "question": "Is there a cat in the video?",
+            "retrieval_plan": {"retrieval_profile": "negative_check"},
+        },
     )
 
     assert report["grounded"]
     assert report["invalid_markers"] == []
+
+
+def test_grounding_report_does_not_treat_local_visual_negation_as_absence_claim():
+    report = tools._grounding_report(
+        "The speaker wears a green plaid shirt. No tie or jacket is visible. [FRAME:t=1.0]",
+        [1.0, 2.0],
+        {"question": "What is the speaker wearing?", "retrieval_plan": {"retrieval_profile": "balanced"}},
+    )
+
+    assert report["grounded"]
+    assert "Negative/absence answer was produced without negative_check retrieval." not in report["warnings"]
+
+
+def test_grounding_report_flags_negative_answer_for_absence_question():
+    report = tools._grounding_report(
+        "I do not see a cat. [FRAME:t=1.0]",
+        [1.0, 2.0],
+        {"question": "Is there a cat in the video?", "retrieval_plan": {"retrieval_profile": "balanced"}},
+    )
+
+    assert not report["grounded"]
+    assert "Negative/absence answer was produced without negative_check retrieval." in report["warnings"]
 
 
 def test_grounding_report_accepts_transcript_only_evidence():
@@ -285,6 +310,9 @@ async def test_stitched_verify_truncates_dedupes_and_caps_frames(monkeypatch):
     assert len(timestamps) <= 24
     assert timestamps == sorted(set(timestamps))
     assert len(update["retrieved_frames"]) <= 24
+    assert "draft_answer" not in update
+    assert update["observer_notes"][0]["tool"] == "stitched_verify"
+    assert update["observer_notes"][0]["observation"] == payload["observation"]
     assert update["subject_registry"][0]["id"] == "person_A"
     assert "Observer 子模块" in captured["system_prompt"]
     assert "不是最终回答者" in captured["system_prompt"]
@@ -352,7 +380,9 @@ async def test_segment_focus_clamps_window_and_caps_frames(monkeypatch):
     assert captured["max_frames"] == 12
     assert len(captured["timestamps"]) == 12
     assert len(update["retrieved_frames"]) == 12
-    assert update["draft_answer"] == "The window shows detail. [FRAME:t=0.0]"
+    assert "draft_answer" not in update
+    assert update["observer_notes"][0]["tool"] == "segment_focus"
+    assert update["observer_notes"][0]["observation"] == "The window shows detail. [FRAME:t=0.0]"
     assert payload["observation"] == "The window shows detail. [FRAME:t=0.0]"
     assert payload["required_next_action"] == "answer_with_evidence"
     assert "Observer sub-call" in payload["note_for_orchestrator"]

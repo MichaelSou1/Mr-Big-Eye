@@ -46,6 +46,7 @@ class GraphState(TypedDict):
     hypotheses: Annotated[list[dict[str, Any]], _last_write]
     evidence_sufficiency: Annotated[dict[str, Any], _last_write]
     draft_answer: Annotated[str, _last_write]
+    observer_notes: Annotated[list[dict[str, Any]], _last_write]
     grounding_report: Annotated[dict[str, Any], _last_write]
     subject_registry: Annotated[list[dict[str, Any]], _last_write]
     agent_terminated: str | None
@@ -101,8 +102,18 @@ def _make_orchestrator():
             draft = _salvage_draft_answer(state)
             if draft:
                 return {"messages": [AIMessage(content=draft)]}
+        video_id = state.get("video_id")
+        profile = None
+        if video_id:
+            try:
+                from app.cache import compute_video_profile
+
+                prof = compute_video_profile(str(video_id))
+                profile = prof.get("profile") if prof else None
+            except Exception:  # noqa: BLE001
+                profile = None
         messages = [
-            SystemMessage(content=_orchestrator_prompt(has_video=bool(state.get("video_id")))),
+            SystemMessage(content=_orchestrator_prompt(has_video=bool(video_id), profile=profile)),
             *_visible_messages(state["messages"]),
         ]
         response = await model.ainvoke(messages)
@@ -291,115 +302,70 @@ def _orchestrator_model() -> ChatOpenAI:
     )
 
 
-def _orchestrator_prompt(*, has_video: bool) -> str:
-    video_guidance = (
-        "A video is attached. Treat questions as video-grounded by default. "
-        "For any question about visual content, speech, lecture concepts, actions, "
-        "objects, timing, quality, form, slides, OCR, or what is happening in the clip, "
-        "call evidence tools before answering. Do not answer video-content questions "
-        "from memory alone. If the question names a term likely from the video "
-        "(for example REINFORCE, A2C, baseline, TD target), call transcript search "
-        "at least once even if the user did not say 'according to the video'."
-        if has_video
-        else "No video is attached. If the user asks about a video, explain that a ready video is needed."
-    )
-    mcq_rule = (
-        "For multiple-choice questions (the prompt presents options A/B/C/D/E) "
-        "you MUST commit to one of the listed options unless verify_grounding "
-        "explicitly flags a contradiction. Never reply 'insufficient information' "
-        "if you have already retrieved frames within the question's timespan — "
-        "pick the best-supported option and cite frames for it. "
-        if has_video
-        else ""
-    )
-    stitched_guidance = (
-        " 当问题聚焦某一短窗口内的细节（动作识别、计数、文字识别），调用 "
-        "`segment_focus` 在该窗口密采 ≤12 帧；优先于 `expand_temporal_evidence`。"
-        " 【stitched_verify 触发器，命中任一就直接调用，不要再多轮 retrieve】"
-        "(1) 题面含'before/after/先/后/then/接着/then again/再次/又/起初/最后'等"
-        "跨时间比较词；(2) 含'why does X ... after Y'、'in between'、'between'、"
-        "'compare/differ/change/区别/变化';(3) why-型问题，已经定位到≥2 个不连续"
-        "候选时刻；(4) order/order_of/sequence/排序问题。\n"
-        "示例：question='why does the boy in white stop rolling and start again "
-        "in between'，已知第一次停在 17s、再次开始在 24s 附近 → 立即调用 "
-        "`stitched_verify(question=..., windows=[{start:15,end:19},{start:22,end:26}], "
-        "fps_per_window=1.0)`，不要再次 retrieve_video_evidence。"
-        " `expand_temporal_evidence` 是 legacy 工具；只有在需要单纯补附近帧且其他"
-        "工具不合适时才使用。 "
-        if has_video
-        else ""
-    )
-    plan_observe_guidance = (
-        " 每次调用工具之前，先用一句中文写出 PLAN：要解决什么子问题（goal）、"
-        "用哪个工具（tool）、看哪段时间（time_range）、抽帧策略（sampling）。"
-        "工具返回后，写一句 OBSERVE：这次拿到了什么、还差什么。不要重复同样参数的"
-        "工具调用。verify_grounding 返回 grounded=true 时立即输出 draft 作为最终回答。 "
-        if has_video
-        else ""
-    )
-    final_answer_protocol = (
-        " 【FINAL ANSWER PROTOCOL — 不可省略】"
-        "无论你之前调用了 segment_focus / stitched_verify / build_timeline / "
-        "retrieve_video_evidence / retrieve_transcript_evidence / search_transcript_keyword / "
-        "retrieve_slide_evidence / align_audiovisual_evidence / retrieve_hypothesis_evidence / expand_temporal_evidence "
-        "中的哪些工具，**最终面向用户的答案必须由 `answer_with_evidence` 工具产生**，"
-        "再由 `verify_grounding` 校验通过后才能 emit。"
-        "禁止：把任何 sub-tool 返回的 `observation` 字段（segment_focus / stitched_verify "
-        "的返回值）当成给用户的最终回复直接 emit —— 它只是 Observer 子模块的中间观察，"
-        "未经过 MCQ 强制选项规则和 grounding 校验，用作最终答案会直接判 0 分。"
-        "硬信号：segment_focus / stitched_verify 的返回 JSON 包含 "
-        "`required_next_action: \"answer_with_evidence\"` 和 `note_for_orchestrator: \"...\"`，"
-        "你必须严格遵守。即使 observation 看起来已经回答了问题，也要再调用 "
-        "answer_with_evidence 让 VLM 在 MCQ 规则下重新表达。"
-        "正确流程：retrieve/segment_focus/stitched_verify 等探查 → "
-        "`answer_with_evidence`（套用 MCQ HARD RULE 输出 'The correct answer is X) ...' 格式）"
-        " → `verify_grounding` → grounded=true 时把 draft_answer 原样 emit。"
-        "唯一例外：纯闲聊或无视频内容问题，可直接回复。 "
-        if has_video
-        else ""
-    )
+def _profile_hint(profile: str | None) -> str:
+    """One-line retrieval bias derived from ingest-time modality signals.
+
+    Only visual_dynamic gets an explicit hint: the existing AUDIOVISUAL DUAL-PATH
+    RULE already handles lecture/slide content, so a slide_heavy or speech_heavy
+    hint adds nothing but prompt weight and was shown to cause tool-budget
+    blowups (see eval v5: -2 pass rate vs baseline). For visual_dynamic clips
+    the DUAL-PATH RULE would mis-fire — skipping transcript/slide retrieval is
+    correct and not covered elsewhere.
+    """
+    if profile == "visual_dynamic":
+        return (
+            "PROFILE HINT (auto-derived from ingest signals): this video is VISUAL-DYNAMIC "
+            "(action / sports / no narration / no slides). Lean on retrieve_video_evidence "
+            "plus segment_focus; skip retrieve_transcript_evidence and retrieve_slide_evidence "
+            "unless the question explicitly asks about spoken words or text on screen. "
+        )
+    return ""
+
+
+def _orchestrator_prompt(*, has_video: bool, profile: str | None = None) -> str:
+    if not has_video:
+        return (
+            "You are Mr. Big-Eye, a warm and concise video-analysis assistant. "
+            "No video is attached. If the user asks about a video, explain that a ready "
+            "video is needed. Do not call the same tool with the same arguments twice."
+        )
+    profile_hint = _profile_hint(profile) if has_video else ""
     return (
+        f"{profile_hint}"
         "You are Mr. Big-Eye, a warm and concise video-analysis assistant. "
-        "Match the user's language. Use tools when they help, then write the final answer "
-        "directly for the user. For video questions, act as the query planner first: "
-        "classify the question as overview, event_location, temporal_order, counting, "
-        "comparison, visual_detail, text_ocr, existence, or general; then choose a "
-        "retrieval_profile. Use focused for simple local details, balanced by default, "
-        "broad for summaries, temporal for before/after/order/counting, detail for "
-        "fine visual/OCR questions, and negative_check before saying something is absent. "
-        "Prefer the fine-grained tools over the legacy multimodal_vqa shortcut. "
-        "For audio-heavy lecture questions, start with retrieve_transcript_evidence; "
-        "for exact terms, use search_transcript_keyword; for PPT/board/OCR questions, "
-        "use retrieve_slide_evidence; for questions that connect what was said to what was "
-        "shown at the same moment, use align_audiovisual_evidence. Otherwise start with "
-        "retrieve_video_evidence, then call assess_evidence_sufficiency before answering. "
-        "If evidence is insufficient, follow the recommended_next_action. For temporal, "
-        "counting, order, or comparison questions, call build_timeline or "
-        "stitched_verify before answering. For short-window detail, action recognition, "
-        "counting, or OCR questions, call segment_focus. When you have competing explanations, "
-        "call retrieve_hypothesis_evidence for the concrete hypothesis you need to test. "
-        "Only set explicit "
-        "top_n_scenes or top_k_frames when the question clearly needs a non-default "
-        "amount of evidence. Call answer_with_evidence to draft the answer, then "
-        "verify_grounding. "
-        "Do not call the same tool with the same arguments twice. If verify_grounding "
-        "returns grounded=true, immediately emit the current draft as your final "
-        "answer text verbatim — do not re-retrieve, re-expand, or call "
-        "answer_with_evidence again. Only iterate when grounded=false and a "
-        "concrete warning tells you what to fix. "
-        "Final answers must preserve valid [FRAME:t=...], [TRANSCRIPT:t=A.B-C.D], "
-        "and [SLIDE:t=...] markers. Every concrete visual claim should have frame or "
-        "slide evidence; every concrete speech/lecture claim should have transcript evidence. "
-        "For absence or negative "
-        "answers, use negative_check retrieval and scope the answer to checked evidence "
-        "unless the evidence truly covers the whole video. "
-        f"{final_answer_protocol}"
-        f"{mcq_rule}"
-        f"{stitched_guidance}"
-        f"{plan_observe_guidance}"
-        "Use search_user_memories only when prior user preferences or context would "
-        "materially improve the answer. "
-        f"{video_guidance}"
+        "Match the user's language. Treat the attached video as the source of truth.\n"
+        "\n"
+        "PLANNING: before each tool call, write one short PLAN sentence in Chinese. "
+        "Classify the task as overview, event_location, temporal_order, counting, "
+        "comparison, visual_detail, text_ocr, existence, or general. Choose focused, "
+        "balanced, broad, temporal, detail, or negative_check. Use retrieve_video_evidence "
+        "for visual content, retrieve_transcript_evidence for speech, search_transcript_keyword "
+        "for exact terms, retrieve_slide_evidence for OCR/PPT, align_audiovisual_evidence "
+        "when speech and visuals must be matched, segment_focus for short-window details, "
+        "stitched_verify/build_timeline for order/comparison, and retrieve_hypothesis_evidence "
+        "for a concrete competing hypothesis.\n"
+        "\n"
+        "BUDGET: Do not call the same tool with the same arguments twice. After each "
+        "tool result, write one short OBSERVE sentence. If a query returns useful evidence, "
+        "do not keep searching the same modality with near-synonyms; either test one concrete "
+        "hypothesis or move to answering. For lecture/talk/educational/documentary videos, "
+        "prefer checking both transcript and slides once because numbers, dates, labels, "
+        "and ordered lists often live on slides.\n"
+        "\n"
+        "STOP DISCIPLINE: final user-facing answers for video questions must come from "
+        "answer_with_evidence, then verify_grounding. If assess_evidence_sufficiency says "
+        "sufficient=true, immediately call answer_with_evidence next. If verify_grounding "
+        "returns grounded=true, emit that draft verbatim as the final answer; do not "
+        "re-retrieve, re-expand, or re-answer. segment_focus and stitched_verify observations "
+        "are observer notes only, never final answers.\n"
+        "\n"
+        "MCQ: if the user question contains Candidates: A/B/C/D/E, you MUST commit to one "
+        "listed option after evidence lookup. Do not ask for missing options once Candidates "
+        "are present.\n"
+        "\n"
+        "CITATIONS: preserve valid [FRAME:t=...], [TRANSCRIPT:t=A.B-C.D], and [SLIDE:t=...] "
+        "markers. Absence/existence claims require negative_check retrieval and scoped wording. "
+        "Use search_user_memories only when prior user preferences or context materially help."
     )
 
 
