@@ -318,3 +318,35 @@ VRAM 预算总览（RTX 4060 8GB）：CLIP (~200MB) + ASR (~1GB) + bge-m3 (~2.3G
 **环境提醒**：所有安装都进 `mbe-phase2` conda env（`/home/user/miniconda3/envs/mbe-phase2/bin/python`），新组件同步更新 `requirements.txt`。
 
 **版本管理通则**：每个 Phase 完成后 bump 一次 `AGENT_CODE_VERSION`（A→v14, B→v15, C→v16, D→v17）。模型/提示词/工具集合任一变化都要 bump，否则 prediction_cache 会污染。
+
+---
+
+## 实施偏离记录
+
+### Phase A — `get_text_embed` 复用 `get_bge`
+
+**spec L197 写错前提**：那里假设 `get_bge` 是 CLIP/BGE-vision wrapper，应该和文本编码分开。实际 `app.embeddings.get_bge()` 就是 `BgeM3Wrapper`，既能编码图像也能编码文本。
+
+**实际做法**：`get_text_embed()` 改成 `get_bge()` 的 alias，省 1.2GB VRAM（避免重复加载 BGE）。
+
+**后果**：spec 字面要求"独立 wrapper"未满足，但实际行为等价且更高效。
+
+### Phase C — Question router 改为 prompt 启发式
+
+**spec L211 要求**：独立 router 节点位于 orchestrator 之前，输出 `audio_heavy / visual_heavy / joint / general` 影响首调用工具优先级。
+
+**实际做法**：orchestrator system prompt 里塞了"默认 video-grounded"启发式，没有独立 router 节点，没有显式 `modality_tag` 字段。
+
+**触发回滚条件**：P0.1 端到端回归 Q3 仍 bypass video 或 Q2 漏 REINFORCE → 退回独立 router 实现，见 todos/0527.md P1.1。
+
+### Phase E — 数据集来源
+
+**spec 要求**：20-30 视频自标 150-200 题。
+
+**实际做法**：直接用 [Video-MME](https://huggingface.co/datasets/lmms-lab/Video-MME) medium split 50 视频 × 3 题 = 150 题，hf-mirror 拉取。
+
+**后果**：modality 配比偏视觉（Video-MME 无纯 audio 任务类型）：
+- 原 spec: audio 30% / visual 20% / joint 35% / overview 15%
+- 实际: audio ~0% / visual ~65% / joint ~25% / overview ~10%
+
+**audio 补救**：后续走代理补 CinePile（对白密集）/ AVQA（环境音），或采用 Video-MME 自带的 subtitle on/off A/B 协议间接测 audio 依赖。详见 [eval/audiovisual/README.md](eval/audiovisual/README.md)。
