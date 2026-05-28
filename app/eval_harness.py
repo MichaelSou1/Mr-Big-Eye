@@ -13,6 +13,8 @@ from pathlib import Path
 from statistics import mean
 from typing import Any, Iterable
 
+from app.mcq import parse_candidates, parse_order_sequence, selected_candidate
+
 
 logger = logging.getLogger(__name__)
 
@@ -222,11 +224,26 @@ def evaluate_case(
     retrieval_ok = retrieval["passed"] is not False or retrieval["soft_waived"]
     agent_ok = agent["passed"] is not False or agent["soft_waived"]
     passed = retrieval_ok and answer["passed"] and agent_ok
+    failure_tags = _failure_tags(
+        case=case,
+        prediction=prediction,
+        retrieval=retrieval,
+        answer=answer,
+        agent=agent,
+        passed=passed,
+    )
+    candidates = parse_candidates(case.question)
+    selected = selected_candidate(prediction.answer, candidates)
+    recommended = _recommended_option_from_reference(case, candidates)
     return {
         "case_id": case.case_id,
         "video_id": case.video_id,
         "question": case.question,
         "passed": passed,
+        "failure_tags": failure_tags,
+        "selected_option": selected,
+        "recommended_option": recommended,
+        "reference_answer": case.reference_answer,
         "retrieval": retrieval,
         "answer": answer,
         "agent_loop": agent,
@@ -418,6 +435,113 @@ def evaluate_agent_loop(
     }
 
 
+def _failure_tags(
+    *,
+    case: EvalCase,
+    prediction: EvalPrediction,
+    retrieval: dict[str, Any],
+    answer: dict[str, Any],
+    agent: dict[str, Any],
+    passed: bool,
+) -> list[str]:
+    if passed:
+        return []
+    tags: list[str] = []
+    if not str(prediction.answer or "").strip():
+        tags.append("no_final_answer")
+    if answer.get("answered") is False:
+        tags.append("missing_expected_keyword")
+    if answer.get("citation_correct") is False:
+        tags.append("missing_citation_kind")
+    coverage = answer.get("citation_kind_coverage") or {}
+    if coverage.get("slide") is False:
+        tags.append("missing_slide")
+    if coverage.get("frame_or_slide") is False:
+        tags.append("missing_frame_or_slide")
+    if _looks_temporal_eval_case(case):
+        tags.append("temporal_order_error")
+    if _looks_audiovisual_comparison_case(case):
+        tags.append("audiovisual_comparison_error")
+    candidates = parse_candidates(case.question)
+    selected = selected_candidate(prediction.answer, candidates)
+    if candidates and (selected is None or _judge_rejected_answer(answer)):
+        if _looks_temporal_eval_case(case):
+            tags.append("wrong_temporal_option")
+        elif _looks_brand_guess_failure(case, prediction):
+            tags.append("unsupported_visual_brand_guess")
+        else:
+            tags.append("wrong_fact_option")
+    actions = list(prediction.agent_actions or [])
+    if _has_post_answer_retrieval(actions):
+        tags.append("post_answer_retrieval")
+    if agent.get("passed") is False and not agent.get("soft_waived"):
+        tags.append("agent_loop_issue")
+    if retrieval.get("passed") is False and not retrieval.get("soft_waived"):
+        tags.append("retrieval_issue")
+    return sorted(set(tags))
+
+
+def _recommended_option_from_reference(
+    case: EvalCase,
+    candidates: list[dict[str, str]],
+) -> dict[str, str] | None:
+    if not candidates or not case.reference_answer:
+        return None
+    reference_order = parse_order_sequence(case.reference_answer)
+    for candidate in candidates:
+        if reference_order and parse_order_sequence(candidate["text"]) == reference_order:
+            return candidate
+        if candidate["text"].strip().lower().rstrip(".") == case.reference_answer.strip().lower().rstrip("."):
+            return candidate
+        if case.reference_answer.strip().lower().rstrip(".") in candidate["text"].strip().lower().rstrip("."):
+            return candidate
+    return None
+
+
+def _looks_brand_guess_failure(case: EvalCase, prediction: EvalPrediction) -> bool:
+    question = case.question.lower()
+    answer = prediction.answer.lower()
+    brand_question = any(marker in question for marker in ("brand", "logo", "shoe cleaner", "recommended", "品牌", "推荐", "标志"))
+    guess_answer = any(marker in answer for marker in ("widely recognized", "typical", "characteristic", "least implausible", "standard product"))
+    return brand_question and guess_answer
+
+
+def _judge_rejected_answer(answer: dict[str, Any]) -> bool:
+    judge = answer.get("llm_judge")
+    return isinstance(judge, dict) and judge.get("correct") is False
+
+
+def _looks_temporal_eval_case(case: EvalCase) -> bool:
+    text = f"{case.question} {case.question_type}".lower()
+    return any(marker in text for marker in ("sequence", "order", "top 2", "rank", "listed", "temporal"))
+
+
+def _looks_audiovisual_comparison_case(case: EvalCase) -> bool:
+    text = case.question.lower()
+    return ("audio" in text or "mentioned" in text) and (
+        "video" in text or "visual" in text or "featured" in text or "shown" in text
+    )
+
+
+def _has_post_answer_retrieval(actions: list[str]) -> bool:
+    if "answer_with_evidence" not in actions:
+        return False
+    index = actions.index("answer_with_evidence")
+    retrieval_actions = {
+        "retrieve_video_evidence",
+        "retrieve_transcript_evidence",
+        "search_transcript_keyword",
+        "retrieve_slide_evidence",
+        "align_audiovisual_evidence",
+        "build_timeline",
+        "retrieve_hypothesis_evidence",
+        "segment_focus",
+        "expand_temporal_evidence",
+        "stitched_verify",
+    }
+    return any(action in retrieval_actions for action in actions[index + 1 :])
+
+
 def summarize_results(
     case_results: list[dict[str, Any]],
     *,
@@ -454,6 +578,11 @@ def _summary_block(case_results: list[dict[str, Any]]) -> dict[str, Any]:
         if isinstance(item["answer"].get("llm_judge"), dict)
         and isinstance(item["answer"]["llm_judge"].get("score"), (int, float))
     ]
+    failure_tag_counts: dict[str, int] = {}
+    for item in case_results:
+        for tag in item.get("failure_tags", []) or []:
+            tag_text = str(tag)
+            failure_tag_counts[tag_text] = failure_tag_counts.get(tag_text, 0) + 1
     return {
         "total": total,
         "passed": passed,
@@ -465,6 +594,7 @@ def _summary_block(case_results: list[dict[str, Any]]) -> dict[str, Any]:
         "retrieval_pass_rate": _section_pass_rate(case_results, "retrieval"),
         "llm_judge_score_mean": mean(judge_scores) if judge_scores else None,
         "llm_judge_count": len(judge_scores),
+        "failure_tag_counts": dict(sorted(failure_tag_counts.items())),
     }
 
 
@@ -942,6 +1072,12 @@ def write_markdown_report(
         lines.append("## Per-group summary")
         lines.append("")
         lines.append(_groups_markdown_table(groups))
+    tag_counts = summary.get("failure_tag_counts") or {}
+    if tag_counts:
+        lines.append("")
+        lines.append("## Failure tags")
+        lines.append("")
+        lines.append(_failure_tags_markdown_table(tag_counts))
     failures = [item for item in results if not item.get("passed")]
     if failures:
         lines.append("")
@@ -1014,8 +1150,8 @@ def _groups_markdown_table(groups: dict[str, dict[str, Any]]) -> str:
 
 def _failures_markdown_table(failures: list[dict[str, Any]]) -> str:
     lines = [
-        "| case_id | failing section(s) | question |",
-        "| --- | --- | --- |",
+        "| case_id | failing section(s) | tags | question |",
+        "| --- | --- | --- | --- |",
     ]
     for item in failures:
         sections = []
@@ -1026,9 +1162,24 @@ def _failures_markdown_table(failures: list[dict[str, Any]]) -> str:
         question = (item.get("question") or "").replace("|", "\\|").replace("\n", " ")
         if len(question) > 120:
             question = question[:117] + "..."
+        tags = ", ".join(item.get("failure_tags", []) or [])
+        selected = item.get("selected_option") or {}
+        recommended = item.get("recommended_option") or {}
+        if selected or recommended:
+            tags = (
+                f"{tags or '-'}; selected={selected.get('label', '-')}; "
+                f"recommended={recommended.get('label', '-')}"
+            )
         lines.append(
-            f"| `{item.get('case_id', '')}` | {', '.join(sections) or '-'} | {question} |"
+            f"| `{item.get('case_id', '')}` | {', '.join(sections) or '-'} | {tags or '-'} | {question} |"
         )
+    return "\n".join(lines)
+
+
+def _failure_tags_markdown_table(tag_counts: dict[str, int]) -> str:
+    lines = ["| tag | count |", "| --- | --- |"]
+    for tag, count in sorted(tag_counts.items(), key=lambda item: (-int(item[1]), item[0])):
+        lines.append(f"| `{tag}` | {count} |")
     return "\n".join(lines)
 
 
@@ -1173,6 +1324,7 @@ def _default_dataset_cases_path(dataset: str | None) -> Path:
     if dataset != "audiovisual":
         raise ValueError(f"Unsupported dataset: {dataset!r}")
     candidates = [
+        Path("eval/audiovisual/questions.ready.jsonl"),
         Path("eval/audiovisual/questions.jsonl"),
         Path("tests/fixtures/eval_cases_audiovisual_seed.jsonl"),
     ]
@@ -1237,6 +1389,8 @@ async def _run_local_predictions(
                 "retrieved_slides": [],
                 "retrieval_plan": {},
                 "timeline": [],
+                "candidate_timeline": [],
+                "audiovisual_candidate_matrix": [],
                 "hypotheses": [],
                 "evidence_sufficiency": {},
                 "draft_answer": "",

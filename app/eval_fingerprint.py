@@ -10,7 +10,7 @@ import hashlib
 # Bump when the orchestrator's *runtime* behavior changes in a way that should
 # invalidate cached predictions even if the prompt strings are unchanged
 # (e.g. Phase D adds tool-call dedup or force-terminate guards).
-AGENT_CODE_VERSION = "v19"
+AGENT_CODE_VERSION = "v22"
 
 
 def prompt_fingerprint() -> str:

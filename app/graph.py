@@ -43,6 +43,8 @@ class GraphState(TypedDict):
     retrieved_slides: Annotated[list[dict[str, Any]], _last_write]
     retrieval_plan: Annotated[dict[str, Any], _last_write]
     timeline: Annotated[list[dict[str, Any]], _last_write]
+    candidate_timeline: Annotated[list[dict[str, Any]], _last_write]
+    audiovisual_candidate_matrix: Annotated[list[dict[str, Any]], _last_write]
     hypotheses: Annotated[list[dict[str, Any]], _last_write]
     evidence_sufficiency: Annotated[dict[str, Any], _last_write]
     draft_answer: Annotated[str, _last_write]
@@ -86,10 +88,13 @@ def _make_orchestrator():
     model = _orchestrator_model().bind_tools(TOOLS)
 
     async def orchestrator(state: GraphState) -> dict[str, Any]:
-        if not _last_human_text(state["messages"]):
+        question = _last_human_text(state["messages"])
+        if not question:
             return {"messages": []}
         if _tool_call_count(state["messages"]) >= settings.orchestrator_max_tool_calls:
             salvaged = _salvage_draft_answer(state)
+            if _can_force_answer_with_evidence(state):
+                return {"messages": [_forced_answer_call(state, question)]}
             content = salvaged or (
                 "I tried several tool calls but could not finish cleanly. "
                 "Please rephrase the question or try again."
@@ -102,6 +107,15 @@ def _make_orchestrator():
             draft = _salvage_draft_answer(state)
             if draft:
                 return {"messages": [AIMessage(content=draft)]}
+        grounded = _grounded_verify_answer(state["messages"])
+        if grounded:
+            return {"messages": [AIMessage(content=grounded)]}
+        if _should_verify_after_answer(state):
+            return {"messages": [_forced_verify_call()]}
+        if _should_reanswer_after_grounding(state):
+            return {"messages": [_forced_answer_call(state, question)]}
+        if _should_answer_after_sufficiency(state):
+            return {"messages": [_forced_answer_call(state, question)]}
         video_id = state.get("video_id")
         profile = None
         if video_id:
@@ -253,6 +267,129 @@ def _dedup_tool_calls(
         response_metadata=getattr(response, "response_metadata", {}) or {},
     )
     return [new_response, *synthesized]
+
+
+def _can_force_answer_with_evidence(state: GraphState) -> bool:
+    return _state_has_evidence(state) and not _has_successful_answer_with_evidence(state["messages"])
+
+
+def _should_answer_after_sufficiency(state: GraphState) -> bool:
+    if not _can_force_answer_with_evidence(state):
+        return False
+    payload = _last_tool_payload(state["messages"])
+    if not payload or payload.get("tool") != "assess_evidence_sufficiency":
+        return False
+    return bool(payload.get("sufficient")) or payload.get("recommended_next_action") == "answer_with_evidence"
+
+
+def _should_verify_after_answer(state: GraphState) -> bool:
+    payload = _last_tool_payload(state["messages"])
+    if not payload or payload.get("tool") != "answer_with_evidence" or payload.get("error"):
+        return False
+    return payload.get("next") == "verify_grounding"
+
+
+def _should_reanswer_after_grounding(state: GraphState) -> bool:
+    payload = _last_tool_payload(state["messages"])
+    if not payload or payload.get("tool") != "verify_grounding":
+        return False
+    report = payload.get("grounding_report") or {}
+    if report.get("grounded") is True:
+        return False
+    return payload.get("next") in {"revise_answer_with_citations", "answer_with_evidence"}
+
+
+def _forced_answer_call(state: GraphState, question: str) -> AIMessage:
+    return AIMessage(
+        content="",
+        tool_calls=[
+            {
+                "name": "answer_with_evidence",
+                "args": {
+                    "question": question,
+                    "answer_mode": _answer_mode_for_state(state),
+                },
+                "id": "force_answer_with_evidence",
+            }
+        ],
+    )
+
+
+def _forced_verify_call() -> AIMessage:
+    return AIMessage(
+        content="",
+        tool_calls=[
+            {
+                "name": "verify_grounding",
+                "args": {},
+                "id": "force_verify_grounding",
+            }
+        ],
+    )
+
+
+def _grounded_verify_answer(messages: list[AnyMessage]) -> str:
+    payload = _last_tool_payload(messages)
+    if not payload or payload.get("tool") != "verify_grounding":
+        return ""
+    report = payload.get("grounding_report") or {}
+    if report.get("grounded") is True:
+        return str(payload.get("answer") or "").strip()
+    return ""
+
+
+def _answer_mode_for_state(state: GraphState) -> str:
+    plan = state.get("retrieval_plan", {}) or {}
+    qtype = str(plan.get("question_type") or "")
+    profile = str(plan.get("retrieval_profile") or "")
+    if profile == "negative_check":
+        return "negative_cautious"
+    if qtype in {"temporal_order", "counting", "comparison"}:
+        return "temporal"
+    return "direct"
+
+
+def _state_has_evidence(state: GraphState) -> bool:
+    return bool(
+        state.get("retrieved_frames")
+        or state.get("retrieved_transcripts")
+        or state.get("retrieved_slides")
+    )
+
+
+def _tool_was_called(messages: list[AnyMessage], tool_name: str) -> bool:
+    for message in messages:
+        if not (isinstance(message, ToolMessage) or getattr(message, "type", "") == "tool"):
+            continue
+        payload = _tool_payload(message)
+        if payload.get("tool") == tool_name:
+            return True
+    return False
+
+
+def _has_successful_answer_with_evidence(messages: list[AnyMessage]) -> bool:
+    for message in messages:
+        if not (isinstance(message, ToolMessage) or getattr(message, "type", "") == "tool"):
+            continue
+        payload = _tool_payload(message)
+        if payload.get("tool") == "answer_with_evidence" and payload.get("answer") and not payload.get("error"):
+            return True
+    return False
+
+
+def _last_tool_payload(messages: list[AnyMessage]) -> dict[str, Any]:
+    for message in reversed(messages):
+        if isinstance(message, ToolMessage) or getattr(message, "type", "") == "tool":
+            return _tool_payload(message)
+    return {}
+
+
+def _tool_payload(message: AnyMessage) -> dict[str, Any]:
+    try:
+        payload = json.loads(str(message.content))
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
 
 
 def _verify_grounding_stalled(messages: list[AnyMessage]) -> bool:

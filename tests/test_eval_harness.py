@@ -253,6 +253,90 @@ def test_evaluate_case_persists_prediction_text_and_actions():
     assert result["agent_actions"] == ["retrieve_video_evidence", "answer_with_evidence"]
 
 
+def test_evaluate_case_adds_failure_tags_for_mcq_and_post_answer_retrieval():
+    case = EvalCase(
+        case_id="av-fail-tags",
+        video_id="v",
+        question=(
+            "What is the correct order?\n(a) Cats.\n(b) Dogs.\n\n"
+            "Candidates:\nA) (a)(b).\nB) (b)(a)."
+        ),
+        reference_answer="(a)(b).",
+        expected_keywords=["(a)(b)"],
+        expected_citation_min=1,
+        expected_citation_kinds=["frame_or_slide"],
+        question_type="temporal reasoning",
+    )
+    prediction = EvalPrediction(
+        case_id="av-fail-tags",
+        answer="Answer: B) (b)(a). [TRANSCRIPT:t=1.0-2.0]",
+        agent_actions=["retrieve_transcript_evidence", "answer_with_evidence", "retrieve_video_evidence"],
+    )
+
+    class FakeJudge:
+        model = "fake"
+
+        def grade(self, *, question, reference, answer):
+            return {"correct": False, "score": 0, "justification": "wrong option"}
+
+    result = evaluate_case(case, prediction, judge=FakeJudge())
+    assert "wrong_temporal_option" in result["failure_tags"]
+    assert "temporal_order_error" in result["failure_tags"]
+    assert "missing_frame_or_slide" in result["failure_tags"]
+    assert "post_answer_retrieval" in result["failure_tags"]
+    assert result["selected_option"]["label"] == "B"
+    assert result["recommended_option"]["label"] == "A"
+
+
+def test_summary_and_markdown_include_failure_tags(tmp_path):
+    results = [
+        {
+            "case_id": "vme-1",
+            "question": "Q",
+            "passed": False,
+            "failure_tags": ["wrong_fact_option", "missing_slide"],
+            "retrieval": {"passed": None, "recall_at_k": None, "timestamp_distance": None},
+            "answer": {"passed": False},
+            "agent_loop": {"passed": True},
+        }
+    ]
+    summary = summarize_results(results)
+    assert summary["failure_tag_counts"] == {"missing_slide": 1, "wrong_fact_option": 1}
+
+    report = {"summary": summary, "missing_predictions": [], "results": results}
+    out = tmp_path / "report.md"
+    write_markdown_report(report, out)
+    text = out.read_text(encoding="utf-8")
+    assert "## Failure tags" in text
+    assert "`wrong_fact_option`" in text
+    assert "missing_slide" in text
+
+
+def test_evaluate_case_tags_brand_guess_separately():
+    case = EvalCase(
+        case_id="brand-1",
+        video_id="v",
+        question="What is the recommended brand?\n\nCandidates:\nA) SNEAKER LAB.\nB) JASON MARKK.",
+        reference_answer="SNEAKER LAB.",
+        expected_keywords=["SNEAKER", "LAB"],
+        expected_citation_kinds=["slide"],
+    )
+    prediction = EvalPrediction(
+        case_id="brand-1",
+        answer="Answer: B) JASON MARKK. This is typical of the standard product. [FRAME:t=1.0]",
+    )
+
+    class FakeJudge:
+        model = "fake"
+
+        def grade(self, *, question, reference, answer):
+            return {"correct": False, "score": 0, "justification": "wrong"}
+
+    result = evaluate_case(case, prediction, judge=FakeJudge())
+    assert "unsupported_visual_brand_guess" in result["failure_tags"]
+    assert result["recommended_option"]["label"] == "A"
+
+
 def test_evaluate_case_soft_waives_citation_when_judge_passes():
     case = EvalCase(
         case_id="soft-1",

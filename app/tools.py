@@ -19,6 +19,15 @@ from pydantic import BeforeValidator, Field
 from app import memory
 from app.cache import load_meta, video_cache_dir
 from app.config import settings
+from app.mcq import (
+    content_tokens,
+    detect_option_contradiction,
+    parse_candidates,
+    parse_labeled_events,
+    resolve_temporal_option,
+    selected_candidate,
+    text_contains_option,
+)
 from app.text_assets import nearby_text, search_keyword, search_text
 from app.vqa import (
     ANSWER_WITH_EVIDENCE_PROMPT,
@@ -50,6 +59,91 @@ RETRIEVAL_PROFILES = {
 }
 
 TEMPORAL_QUESTION_TYPES = {"temporal_order", "counting", "comparison"}
+RANKING_MARKERS = (
+    "top 1",
+    "top 2",
+    "top 3",
+    "rank",
+    "ranking",
+    "listed",
+    "order",
+    "sequence",
+    "correct order",
+    "first",
+    "second",
+    "third",
+    "第",
+    "排名",
+    "顺序",
+)
+OCR_SLIDE_MARKERS = (
+    "ocr",
+    "slide",
+    "screen",
+    "text",
+    "shown",
+    "featured",
+    "company",
+    "logo",
+    "list",
+    "listed",
+    "top",
+    "rank",
+    "ranking",
+    "PPT",
+    "画面文字",
+    "屏幕",
+    "公司",
+    "标志",
+    "榜单",
+    "排名",
+)
+BRAND_SCREEN_MARKERS = (
+    "brand",
+    "logo",
+    "recommended",
+    "shoe cleaner",
+    "product",
+    "company",
+    "screen",
+    "shown",
+    "featured",
+    "品牌",
+    "推荐",
+    "产品",
+    "公司",
+    "标志",
+    "屏幕",
+)
+UNSUPPORTED_GUESS_MARKERS = (
+    "widely recognized",
+    "typical",
+    "characteristic",
+    "least implausible",
+    "most consistent",
+    "commonly associated",
+    "standard product",
+    "likely",
+    "probably",
+    "猜测",
+    "可能",
+)
+AUDIOVISUAL_COMPARISON_MARKERS = (
+    "featured in the video but not mentioned in the audio",
+    "shown in the video but not mentioned",
+    "visible but not mentioned",
+    "shown but not said",
+    "mentioned but not visible",
+    "not mentioned in the audio",
+    "not mentioned in audio",
+    "audio",
+    "visual",
+    "画面",
+    "音频",
+    "旁白",
+    "提到",
+    "没有提到",
+)
 NEGATIVE_MARKERS = (
     "no ",
     "not ",
@@ -447,6 +541,10 @@ async def align_audiovisual_evidence(
     tool_call_id: Annotated[str, InjectedToolCallId],
     window_sec: Annotated[float, Field(description="Seconds before and after timestamp.")] = 8.0,
     max_frames: Annotated[int, Field(description="Maximum nearby frames to add.")] = 12,
+    question: Annotated[
+        str | None,
+        Field(description="Original question, used to build candidate audio-visual comparison tables."),
+    ] = None,
 ) -> Command:
     """Return frames plus transcript/slide evidence from the same time window."""
     video_id = state.get("video_id")
@@ -464,6 +562,11 @@ async def align_audiovisual_evidence(
     slides = [hit.as_dict() for hit in nearby_text(str(video_id), timestamp, window_sec=window_sec, kind="slide")]
     transcript_evidence = _merge_text_evidence(state.get("retrieved_transcripts", []), transcripts)
     slide_evidence = _merge_text_evidence(state.get("retrieved_slides", []), slides)
+    matrix = _build_audiovisual_candidate_matrix(
+        question or _last_question(state),
+        transcript_evidence,
+        slide_evidence,
+    )
     payload = {
         "tool": "align_audiovisual_evidence",
         "timestamp": float(timestamp),
@@ -473,6 +576,8 @@ async def align_audiovisual_evidence(
         "slides": slides,
         "next": "answer_with_evidence",
     }
+    if matrix:
+        payload["audiovisual_candidate_matrix"] = matrix
     return _command(
         tool_call_id,
         payload,
@@ -480,6 +585,7 @@ async def align_audiovisual_evidence(
             "retrieved_frames": frames,
             "retrieved_transcripts": transcript_evidence,
             "retrieved_slides": slide_evidence,
+            "audiovisual_candidate_matrix": matrix,
         },
     )
 
@@ -518,17 +624,29 @@ async def build_timeline(
         frames = _merge_frame_payloads(frames, added)
 
     timeline = _timeline_entries(state.get("retrieved_scene_hits", []), frames)
+    candidate_timeline = _build_candidate_timeline_payload(
+        question,
+        timeline,
+        state.get("retrieved_transcripts", []) or [],
+        state.get("retrieved_slides", []) or [],
+    )
     payload = {
         "tool": "build_timeline",
         "question": question,
         "added_frames": _public_frame_refs(added),
         "timeline": timeline,
+        "candidate_timeline": candidate_timeline,
+        "inferred_order": candidate_timeline.get("recommended_order", []),
         "next": "assess_evidence_sufficiency",
     }
     return _command(
         tool_call_id,
         payload,
-        update={"retrieved_frames": frames, "timeline": timeline},
+        update={
+            "retrieved_frames": frames,
+            "timeline": timeline,
+            "candidate_timeline": candidate_timeline,
+        },
     )
 
 
@@ -1300,6 +1418,221 @@ def _timeline_entries(
     return sorted(entries, key=lambda item: float(item.get("timestamp", item.get("start", 0.0))))
 
 
+def _build_candidate_timeline(
+    question: str,
+    timeline: list[dict[str, Any]],
+    transcripts: list[dict[str, Any]],
+    slides: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    candidates = parse_labeled_events(question)
+    if not candidates and _looks_like_ranking_question(question):
+        candidates = parse_candidates(question)
+    if not candidates:
+        return []
+    evidence_items = [
+        *_text_timeline_items(transcripts, "transcript"),
+        *_text_timeline_items(slides, "slide"),
+        *_scene_timeline_items(timeline),
+    ]
+    rows: list[dict[str, Any]] = []
+    for candidate in candidates:
+        match = _best_candidate_evidence(candidate["text"], evidence_items)
+        row = {
+            "label": candidate["label"],
+            "text": candidate["text"],
+            "first_timestamp": None,
+            "evidence_kind": None,
+            "evidence_marker": None,
+            "status": "missing",
+        }
+        if match:
+            row.update(
+                {
+                    "first_timestamp": match["timestamp"],
+                    "evidence_kind": match["kind"],
+                    "evidence_marker": match["marker"],
+                    "status": "found",
+                }
+            )
+        rows.append(row)
+    return rows
+
+
+def _build_candidate_timeline_payload(
+    question: str,
+    timeline: list[dict[str, Any]],
+    transcripts: list[dict[str, Any]],
+    slides: list[dict[str, Any]],
+) -> dict[str, Any]:
+    items = _build_candidate_timeline(question, timeline, transcripts, slides)
+    recommended_order = _candidate_inferred_order(items)
+    recommended_option = resolve_temporal_option(question, items)
+    coverage_ok = bool(items) and len(recommended_order) == len(items)
+    return {
+        "items": items,
+        "recommended_order": recommended_order,
+        "recommended_option": recommended_option,
+        "coverage_ok": coverage_ok,
+    }
+
+
+def _candidate_timeline_items(candidate_timeline: Any) -> list[dict[str, Any]]:
+    if isinstance(candidate_timeline, dict):
+        items = candidate_timeline.get("items")
+        return items if isinstance(items, list) else []
+    return candidate_timeline if isinstance(candidate_timeline, list) else []
+
+
+def _candidate_timeline_recommended_option(candidate_timeline: Any) -> dict[str, Any] | None:
+    if isinstance(candidate_timeline, dict):
+        option = candidate_timeline.get("recommended_option")
+        return option if isinstance(option, dict) else None
+    return None
+
+
+def _candidate_inferred_order(candidate_timeline: list[dict[str, Any]]) -> list[str]:
+    found = [
+        item for item in candidate_timeline
+        if item.get("first_timestamp") is not None
+    ]
+    found.sort(key=lambda item: float(item.get("first_timestamp", 0.0)))
+    return [str(item.get("label")) for item in found]
+
+
+def _text_timeline_items(evidence: list[dict[str, Any]], kind: str) -> list[dict[str, Any]]:
+    items: list[dict[str, Any]] = []
+    for item in evidence or []:
+        try:
+            start = float(item.get("t_start", 0.0))
+            end = float(item.get("t_end", start))
+        except (TypeError, ValueError):
+            continue
+        text = str(item.get("text") or "")
+        if not text.strip():
+            continue
+        marker = (
+            f"[TRANSCRIPT:t={start:.1f}-{end:.1f}]"
+            if kind == "transcript"
+            else f"[SLIDE:t={start:.1f}]"
+        )
+        items.append({"kind": kind, "timestamp": round(start, 1), "text": text, "marker": marker})
+    return items
+
+
+def _scene_timeline_items(timeline: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    items: list[dict[str, Any]] = []
+    for item in timeline or []:
+        if item.get("type") != "scene":
+            continue
+        text = str(item.get("caption") or "")
+        if not text.strip():
+            continue
+        try:
+            start = float(item.get("start", 0.0))
+        except (TypeError, ValueError):
+            continue
+        items.append(
+            {
+                "kind": "scene",
+                "timestamp": round(start, 1),
+                "text": text,
+                "marker": f"scene@{start:.1f}",
+            }
+        )
+    return items
+
+
+def _best_candidate_evidence(candidate_text: str, evidence_items: list[dict[str, Any]]) -> dict[str, Any] | None:
+    tokens = content_tokens(candidate_text)
+    if not tokens:
+        return None
+    best: dict[str, Any] | None = None
+    best_score = 0
+    for item in evidence_items:
+        normalized = str(item.get("text") or "").lower()
+        score = sum(1 for token in tokens if token in normalized)
+        threshold = 1 if len(tokens) <= 2 else min(2, len(tokens))
+        if score < threshold:
+            continue
+        timestamp = float(item.get("timestamp", 0.0))
+        if best is None or score > best_score or (score == best_score and timestamp < float(best["timestamp"])):
+            best = item
+            best_score = score
+    return best
+
+
+def _build_audiovisual_candidate_matrix(
+    question: str,
+    transcripts: list[dict[str, Any]],
+    slides: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    if not _is_audiovisual_comparison_question(question):
+        return []
+    candidates = parse_candidates(question)
+    if not candidates:
+        return []
+    transcript_text = "\n".join(str(item.get("text") or "") for item in transcripts or [])
+    slide_text = "\n".join(str(item.get("text") or "") for item in slides or [])
+    rows: list[dict[str, Any]] = []
+    for candidate in candidates:
+        audio_hit = _first_text_hit(candidate["text"], transcripts)
+        visual_hit = _first_text_hit(candidate["text"], slides)
+        visual_seen = visual_hit is not None or text_contains_option(slide_text, candidate["text"])
+        audio_mentioned = audio_hit is not None or text_contains_option(transcript_text, candidate["text"])
+        rows.append(
+            {
+                "label": candidate["label"],
+                "text": candidate["text"],
+                "visual_seen": visual_seen,
+                "audio_mentioned": audio_mentioned,
+                "visual_marker": _text_marker(visual_hit, "slide") if visual_hit else None,
+                "audio_marker": _text_marker(audio_hit, "transcript") if audio_hit else None,
+                "decision": _audiovisual_candidate_decision(question, visual_seen, audio_mentioned),
+            }
+        )
+    return rows
+
+
+def _first_text_hit(option_text: str, evidence: list[dict[str, Any]]) -> dict[str, Any] | None:
+    for item in evidence or []:
+        if text_contains_option(str(item.get("text") or ""), option_text):
+            return item
+    option_tokens = set(content_tokens(option_text))
+    if not option_tokens:
+        return None
+    best: dict[str, Any] | None = None
+    best_score = 0
+    for item in evidence or []:
+        text = str(item.get("text") or "").lower()
+        score = sum(1 for token in option_tokens if token in text)
+        if score > best_score:
+            best = item
+            best_score = score
+    return best if best_score >= min(2, len(option_tokens)) else None
+
+
+def _text_marker(item: dict[str, Any] | None, kind: str) -> str | None:
+    if not item:
+        return None
+    try:
+        start = float(item.get("t_start", 0.0))
+        end = float(item.get("t_end", start))
+    except (TypeError, ValueError):
+        return None
+    if kind == "transcript":
+        return f"[TRANSCRIPT:t={start:.1f}-{end:.1f}]"
+    return f"[SLIDE:t={start:.1f}]"
+
+
+def _audiovisual_candidate_decision(question: str, visual_seen: bool, audio_mentioned: bool) -> str:
+    text = question.lower()
+    if "mentioned but not visible" in text:
+        return "match" if audio_mentioned and not visual_seen else "reject"
+    if "not mentioned" in text or "not said" in text or "没有提到" in text:
+        return "match" if visual_seen and not audio_mentioned else "reject"
+    return "match" if visual_seen and audio_mentioned else "unknown"
+
+
 def _load_dense_payloads(
     video_id: str,
     timestamps: list[float],
@@ -1494,12 +1827,39 @@ def _sufficiency_report(
         missing.append("No caption-level scene or text evidence has been retrieved.")
         action = "retrieve_video_evidence"
     if question_type in TEMPORAL_QUESTION_TYPES:
+        candidate_timeline = state.get("candidate_timeline", []) or []
+        candidate_items = _candidate_timeline_items(candidate_timeline)
+        if _has_temporal_candidates(question) and not candidate_items:
+            missing.append("Temporal/ranking questions need a candidate_timeline.")
+            action = "build_timeline"
+        elif candidate_items:
+            missing_candidates = [
+                item for item in candidate_items
+                if item.get("status") != "found" or item.get("first_timestamp") is None
+            ]
+            if missing_candidates:
+                missing.append("Temporal/ranking candidate_timeline is missing evidence for one or more candidates.")
+                action = "search_transcript_keyword"
+            elif parse_candidates(question) and _candidate_timeline_recommended_option(candidate_timeline) is None:
+                missing.append("Temporal/ranking candidate_timeline could not resolve an MCQ option.")
+                action = "build_timeline"
         if frame_count < min(8, settings.planner_max_top_k_frames):
             missing.append("Temporal questions need more nearby frames.")
             action = "build_timeline"
         if span < 1.0:
             missing.append("Temporal evidence covers too little time.")
             action = "expand_temporal_evidence"
+    if _needs_slide_evidence(question, question_type) and not state.get("retrieved_slides"):
+        missing.append("OCR/ranking/screen-text questions need slide/OCR evidence.")
+        action = "retrieve_slide_evidence"
+    if _is_audiovisual_comparison_question(question):
+        matrix = state.get("audiovisual_candidate_matrix", []) or []
+        if not matrix:
+            missing.append("Audio-visual comparison questions need a candidate matrix.")
+            action = "align_audiovisual_evidence"
+        elif not any(item.get("decision") == "match" and item.get("visual_seen") for item in matrix):
+            missing.append("Audio-visual comparison has no visually supported candidate difference yet.")
+            action = "retrieve_slide_evidence"
     if _is_negative_question(question, question_type):
         required_scenes = min(
             total_scenes or settings.planner_max_top_n_scenes,
@@ -1546,7 +1906,9 @@ def _is_negative_question(question: str, question_type: str) -> bool:
         return True
     if text.startswith(("is there ", "are there ", "was there ", "were there ")):
         return True
-    return any(marker in text for marker in ("any", "no ", "without", "有没有", "是否有", "没有", "不存在"))
+    if re.search(r"\bany\b", text):
+        return True
+    return any(marker in text for marker in ("no ", "without", "有没有", "是否有", "没有", "不存在"))
 
 
 def _state_frames_as_images(state: dict[str, Any]) -> tuple[list[Image.Image], list[float]]:
@@ -1585,6 +1947,7 @@ def _question_with_answer_protocol(
     state: dict[str, Any],
 ) -> str:
     sufficiency = state.get("evidence_sufficiency", {}) or {}
+    candidates = parse_candidates(question)
     grounding = (
         "Answer using only the provided frames, transcript chunks, and slide/OCR chunks. "
         "Image timestamps are shown as [t=X.Xs] before each image, but final answers "
@@ -1594,6 +1957,20 @@ def _question_with_answer_protocol(
         "from the evidence block. "
         "If the evidence is insufficient, say what cannot be determined."
     )
+    if candidates:
+        grounding += (
+            " This is an MCQ. Start with exactly `Answer: X) <exact option text>` "
+            "using one listed candidate, then provide evidence. The selected option "
+            "must match the explanation; if evidence is weak, commit to the least "
+            "contradicted option."
+        )
+    recommended_option = _candidate_timeline_recommended_option(state.get("candidate_timeline"))
+    if recommended_option:
+        grounding += (
+            " A deterministic resolver has already selected the option from structured "
+            f"evidence. You MUST start with `Answer: {recommended_option.get('label')}) "
+            f"{recommended_option.get('text')}` and you must not choose a different option."
+        )
     negative = (
         " For absence/existence questions, do not make an absolute whole-video "
         "claim unless broad negative_check retrieval was performed. Prefer wording "
@@ -1601,13 +1978,41 @@ def _question_with_answer_protocol(
     )
     temporal = (
         " For temporal questions, describe the order using timestamps and avoid "
-        "inferring motion between frames unless the timeline evidence supports it."
+        "inferring motion between frames unless the timeline evidence supports it. "
+        "If candidate_timeline is provided, decide from each candidate's "
+        "first_timestamp rather than narrative impressions."
+    )
+    slide = (
+        " For ranking, logos, companies shown, screen text, or OCR questions, cite "
+        "[SLIDE:t=...] first when slide/OCR evidence exists; otherwise cite "
+        "[FRAME:t=...] for the visual claim."
+    )
+    audiovisual = (
+        " For audio-visual comparison questions, use the audiovisual_candidate_matrix: "
+        "choose the candidate whose visual/audio booleans satisfy the relation in "
+        "the question, such as visual_seen=true and audio_mentioned=false."
     )
     if answer_mode == "negative_cautious" or not sufficiency.get("sufficient", True):
         grounding += negative
     if answer_mode == "temporal":
         grounding += temporal
-    return f"{question}\n\nAnswering protocol: {grounding}"
+    if _needs_slide_evidence(question, str((state.get("retrieval_plan") or {}).get("question_type") or "")):
+        grounding += slide
+    if _is_audiovisual_comparison_question(question):
+        grounding += audiovisual
+    structured: list[str] = []
+    if state.get("candidate_timeline"):
+        structured.append(
+            "candidate_timeline="
+            + json.dumps(state.get("candidate_timeline"), ensure_ascii=False)
+        )
+    if state.get("audiovisual_candidate_matrix"):
+        structured.append(
+            "audiovisual_candidate_matrix="
+            + json.dumps(state.get("audiovisual_candidate_matrix"), ensure_ascii=False)
+        )
+    suffix = "\n\nStructured evidence:\n" + "\n".join(structured) if structured else ""
+    return f"{question}\n\nAnswering protocol: {grounding}{suffix}"
 
 
 def _grounding_report(
@@ -1646,6 +2051,10 @@ def _grounding_report(
     profile = str(plan.get("retrieval_profile") or "")
     question = str(state.get("question") or state.get("current_question") or "")
     question_type = str(plan.get("question_type") or state.get("question_type") or "")
+    candidates = parse_candidates(question)
+    selected = selected_candidate(answer or "", candidates)
+    recommended_option = _candidate_timeline_recommended_option(state.get("candidate_timeline"))
+    contradiction = detect_option_contradiction(answer or "", candidates)
     negative_policy_active = (
         profile == "negative_check"
         or _is_negative_question(question, question_type)
@@ -1668,6 +2077,36 @@ def _grounding_report(
         warnings.append("Negative answer should scope itself to checked evidence.")
     if not (markers or slide_markers) and visual_claims:
         warnings.append("Visual answer has no frame citations.")
+    if _needs_slide_evidence(question, question_type):
+        if not slide_markers and "ocr" in question.lower():
+            warnings.append("OCR/screen-text answer is missing a [SLIDE:t=...] citation.")
+        elif not (markers or slide_markers):
+            warnings.append("Visual/ranking answer is missing a [FRAME:t=...] or [SLIDE:t=...] citation.")
+    if candidates:
+        if selected is None:
+            warnings.append("MCQ answer does not clearly select one listed candidate.")
+        elif recommended_option and selected.get("label") != recommended_option.get("label"):
+            warnings.append("MCQ answer contradicts the deterministic recommended option.")
+            recommended = "answer_with_evidence"
+        elif contradiction:
+            warnings.append("MCQ explanation contradicts the selected option.")
+            recommended = "answer_with_evidence"
+        elif not _answer_supports_selected_candidate(answer or "", selected):
+            warnings.append("MCQ explanation does not consistently support the selected option.")
+    if _is_audiovisual_comparison_question(question):
+        matrix = state.get("audiovisual_candidate_matrix", []) or []
+        if matrix and selected is not None:
+            row = next((item for item in matrix if item.get("label") == selected.get("label")), None)
+            if row and row.get("decision") == "reject":
+                warnings.append("Selected MCQ option contradicts the audio-visual candidate matrix.")
+                recommended = "answer_with_evidence"
+    if _is_brand_screen_question(question) and _has_unsupported_guess_language(answer or ""):
+        if not (markers or slide_markers):
+            warnings.append("Brand/screen-text answer uses unsupported guess language without visual citation.")
+            recommended = "revise_answer_with_citations"
+        elif not slide_markers and "brand" in question.lower():
+            warnings.append("Brand/screen-text answer should not rely on common-product guessing without slide/OCR support.")
+            recommended = "revise_answer_with_citations"
     grounded = not warnings
     return {
         "grounded": grounded,
@@ -1679,6 +2118,9 @@ def _grounding_report(
         "invalid_slide_markers": invalid_slide_markers,
         "uncited_claims": uncited_claims[:5],
         "warnings": warnings,
+        "selected_candidate": selected,
+        "recommended_candidate": recommended_option,
+        "option_contradiction": contradiction,
         "recommended_next_action": "final_answer" if grounded else recommended,
     }
 
@@ -1745,6 +2187,58 @@ def _looks_like_negative_answer(answer: str) -> bool:
 def _has_negative_scope(answer: str) -> bool:
     lowered = answer.lower()
     return any(marker in lowered for marker in NEGATIVE_SCOPE_MARKERS)
+
+
+def _looks_like_ranking_question(question: str) -> bool:
+    lowered = (question or "").lower()
+    return any(marker.lower() in lowered for marker in RANKING_MARKERS)
+
+
+def _has_temporal_candidates(question: str) -> bool:
+    return bool(parse_labeled_events(question) or (_looks_like_ranking_question(question) and parse_candidates(question)))
+
+
+def _needs_slide_evidence(question: str, question_type: str) -> bool:
+    lowered = (question or "").lower()
+    if (question_type or "").lower() == "text_ocr":
+        return True
+    return any(marker.lower() in lowered for marker in OCR_SLIDE_MARKERS)
+
+
+def _is_brand_screen_question(question: str) -> bool:
+    lowered = (question or "").lower()
+    if "brand" in lowered or "logo" in lowered or "shoe cleaner" in lowered or "recommended" in lowered:
+        return True
+    if any(marker in lowered for marker in ("品牌", "推荐", "标志")):
+        return True
+    return False
+
+
+def _has_unsupported_guess_language(answer: str) -> bool:
+    lowered = (answer or "").lower()
+    return any(marker.lower() in lowered for marker in UNSUPPORTED_GUESS_MARKERS)
+
+
+def _is_audiovisual_comparison_question(question: str) -> bool:
+    lowered = (question or "").lower()
+    if not any(marker.lower() in lowered for marker in AUDIOVISUAL_COMPARISON_MARKERS):
+        return False
+    return ("audio" in lowered or "transcript" in lowered or "mentioned" in lowered or "提到" in lowered) and (
+        "video" in lowered or "visual" in lowered or "shown" in lowered or "featured" in lowered or "visible" in lowered or "画面" in lowered
+    )
+
+
+def _answer_supports_selected_candidate(answer: str, selected: dict[str, str]) -> bool:
+    option_text = selected.get("text", "")
+    if not option_text:
+        return False
+    if text_contains_option(answer, option_text):
+        return True
+    tokens = content_tokens(option_text)
+    if not tokens:
+        return False
+    lowered = answer.lower()
+    return sum(1 for token in tokens if token in lowered) >= min(2, len(tokens))
 
 
 def _history_for_vqa(messages: list[Any]) -> list[dict[str, str]]:

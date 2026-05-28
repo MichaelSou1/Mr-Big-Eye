@@ -28,15 +28,15 @@
 | 语音索引 | FunASR：FSMN-VAD 切语音段，SenseVoice-Small 转写，写 `transcripts.jsonl` + VTT 字幕 |
 | PPT/OCR 索引 | 从稠密帧检测 slide/whiteboard 候选，RapidOCR 识别，写 `slides.jsonl` |
 | 文本检索 | SQLite FTS5 稀疏检索 + BGE-M3 dense 检索 + RRF 融合 |
-| 在线 agent | LangGraph 状态机：orchestrator LLM 决策，ToolNode 执行 14 个注册工具 |
+| 在线 agent | LangGraph 状态机：orchestrator LLM 决策，ToolNode 执行 14 个注册工具；answer 后有 runtime 收束护栏 |
 | VLM 推理 | 业务侧不部署本地 VLM；caption、局部观察、最终回答都走远程 OpenAI-compatible / Doubao API |
 | 本地模型 | BGE-M3、SigLIP2、SenseVoice-Small、FSMN-VAD、RapidOCR；它们负责索引和检索，不负责最终大模型回答 |
 | 引用协议 | `[FRAME:t=12.3]`、`[TRANSCRIPT:t=10.0-14.0]`、`[SLIDE:t=72.0]` |
 | 记忆 | LangGraph SQLite checkpointer 保存单会话状态；LangMem SQLite store 保存跨会话用户记忆 |
-| 评测 | `app.eval_harness` 支持 `audiovisual` 数据集；保留 legacy NExT-GQA / LongVideoBench 转换脚本 |
-| Agent 版本 | `AGENT_CODE_VERSION = "v18"`，见 `app/eval_fingerprint.py` |
+| 评测 | `app.eval_harness` 支持 `audiovisual` 数据集；v22 n=50 smoke 为 `45/50 = 0.90` |
+| Agent 版本 | `AGENT_CODE_VERSION = "v22"`，见 `app/eval_fingerprint.py` |
 
-> 注意：旧 README 里提到的“10 工具”“NExT-GQA only”“v12”等信息已经过时。当前 `TOOLS` 注册表有 14 个工具，音频和 PPT/OCR 已经进入主路径。
+> 注意：旧资料里提到的早期工具数、早期 eval 主线和旧 Agent 版本信息已经过时。当前 `TOOLS` 注册表有 14 个工具，音频、PPT/OCR、MCQ 候选解析、temporal resolver 和 grounding 校验都已经进入主路径。
 
 ---
 
@@ -252,9 +252,12 @@ class GraphState(TypedDict):
     retrieved_slides: list[dict]
     retrieval_plan: dict
     timeline: list[dict]
+    candidate_timeline: list[dict] | dict
+    audiovisual_candidate_matrix: list[dict]
     hypotheses: list[dict]
     evidence_sufficiency: dict
     draft_answer: str
+    observer_notes: list[dict]
     grounding_report: dict
     subject_registry: list[dict]
     agent_terminated: str | None
@@ -265,7 +268,7 @@ class GraphState(TypedDict):
 1. `messages` 是对话和工具消息历史，用 LangGraph 的 `add_messages` reducer 累加。
 2. 其他字段用 `_last_write` reducer，避免一个 orchestrator 同时发多个 tool call 时发生多写冲突。
 
-`retrieved_frames` 里存的是给前端和 VLM 用的 base64 JPEG payload；`retrieved_transcripts` 和 `retrieved_slides` 存的是带时间戳和 marker 的文本证据。
+`retrieved_frames` 里存的是给前端和 VLM 用的 base64 JPEG payload；`retrieved_transcripts` 和 `retrieved_slides` 存的是带时间戳和 marker 的文本证据。`candidate_timeline`、`audiovisual_candidate_matrix` 和 `observer_notes` 是 v21/v22 后新增的结构化中间状态：它们帮助 agent 做时序 MCQ、音画差集和局部观察，但不会被当成最终答案直接输出。
 
 ### Graph 节点
 
@@ -291,10 +294,10 @@ Orchestrator 不是最终回答模型，它的首要职责是规划：
 - 先判断问题类型：overview、temporal_order、counting、comparison、visual_detail、text_ocr、existence 等。
 - 再选择 retrieval profile：focused、balanced、broad、temporal、detail、negative_check。
 - 根据问题决定先调视觉工具、字幕工具、PPT 工具，还是音画对齐工具。
-- 如果证据不足，按 `assess_evidence_sufficiency` 的建议继续查。
-- 最终必须调用 `answer_with_evidence`，然后调用 `verify_grounding`。
+- 如果证据不足，按 `assess_evidence_sufficiency` 的建议补对应模态。
+- 一旦证据够用，必须进入 `answer_with_evidence -> verify_grounding -> final`，不能继续做同类检索。
 
-对课堂、讲座、纪录片类视频，prompt 里有一条 **AUDIOVISUAL DUAL-PATH RULE**：通常至少查一次 transcript 和 slide，避免只看 PPT 漏掉口述内容，或者只看字幕漏掉屏幕上的公式/图表。
+对课堂、讲座、纪录片类视频，prompt 会偏向至少检查一次 transcript 和 slide，避免只看 PPT 漏掉口述内容，或者只看字幕漏掉屏幕上的公式/图表。这个规则只影响证据补全，不会把 agent 固定成单一路径。
 
 ---
 
@@ -308,18 +311,33 @@ Orchestrator 不是最终回答模型，它的首要职责是规划：
 | 2 | `retrieve_transcript_evidence` | 字幕检索 | 搜 ASR transcript chunks | `retrieved_transcripts` |
 | 3 | `search_transcript_keyword` | 精确字幕搜索 | 找精确术语，例如 REINFORCE / A2C | `retrieved_transcripts` |
 | 4 | `retrieve_slide_evidence` | PPT/OCR 检索 | 搜 OCR 到的 slide/whiteboard 文本 | `retrieved_slides` |
-| 5 | `align_audiovisual_evidence` | 音画对齐 | 给定时间点，取附近帧 + 字幕 + slide | `retrieved_frames`, `retrieved_transcripts`, `retrieved_slides` |
-| 6 | `build_timeline` | 时序整理 | 把已有 scene/frame 证据按时间排序，必要时扩附近帧 | `timeline`, `retrieved_frames` |
+| 5 | `align_audiovisual_evidence` | 音画对齐 | 给定时间点，取附近帧 + 字幕 + slide；音画差集题会生成候选矩阵 | `retrieved_frames`, `retrieved_transcripts`, `retrieved_slides`, `audiovisual_candidate_matrix` |
+| 6 | `build_timeline` | 时序整理 | 把已有 scene/frame/text 证据按时间排序；顺序 MCQ 会生成候选时间线和推荐选项 | `timeline`, `candidate_timeline`, `retrieved_frames` |
 | 7 | `retrieve_hypothesis_evidence` | 假设排除 | 针对一个具体假设二次检索，例如“是否戴帽子” | `hypotheses`, `retrieved_frames`, `retrieved_scene_hits` |
-| 8 | `segment_focus` | Observer | 围绕一个中心时刻密采短窗口，观察细节 | `retrieved_frames`, `draft_answer`, `subject_registry` |
+| 8 | `segment_focus` | Observer | 围绕一个中心时刻密采短窗口，观察细节 | `retrieved_frames`, `observer_notes`, `subject_registry` |
 | 9 | `expand_temporal_evidence` | legacy 扩窗 | 围绕已有时间戳补附近帧；现在更推荐 `segment_focus` | `retrieved_frames` |
-| 10 | `stitched_verify` | Observer | 对 2-4 个不连续时间窗做对比观察 | `retrieved_frames`, `draft_answer`, `subject_registry` |
-| 11 | `assess_evidence_sufficiency` | 元判断 | 用规则判断证据是否足够，推荐下一步 | `evidence_sufficiency` |
-| 12 | `answer_with_evidence` | 最终草稿 | 用当前所有视觉/字幕/PPT 证据调用 VLM 写答案 | `draft_answer`, `grounding_report`, `subject_registry` |
-| 13 | `verify_grounding` | 校验 | 检查引用 marker、视觉 claim、否定回答范围 | `grounding_report` |
+| 10 | `stitched_verify` | Observer | 对 2-4 个不连续时间窗做对比观察 | `retrieved_frames`, `observer_notes`, `subject_registry` |
+| 11 | `assess_evidence_sufficiency` | 元判断 | 用规则判断证据是否足够；对 temporal、audio-visual、OCR/slide 题检查对应结构化证据 | `evidence_sufficiency` |
+| 12 | `answer_with_evidence` | 最终草稿 | 用当前所有视觉/字幕/PPT 证据调用 VLM 写答案；MCQ 必须提交候选项 | `draft_answer`, `grounding_report`, `subject_registry` |
+| 13 | `verify_grounding` | 校验 | 检查引用 marker、视觉 claim、否定范围、MCQ 选项一致性和 unsupported brand guess | `grounding_report` |
 | 14 | `search_user_memories` | 长期记忆 | 从 LangMem store 搜用户历史偏好/上下文 | 不改 GraphState，只返回 ToolMessage |
 
 工具的返回值都是 LangGraph `Command(update=...)`，所以工具不仅会返回一条 ToolMessage 给 orchestrator，还能直接更新 GraphState。
+
+### v22 结构化推理：MCQ、temporal、audio-visual
+
+v22 的重点不是继续堆 prompt，而是把一些容易让模型“凭感觉选”的问题变成结构化中间结果：
+
+| 结构 | 来自哪里 | 用来解决什么 |
+| --- | --- | --- |
+| `candidate_timeline` | `build_timeline` + `app/mcq.py` | `(a)(b)(c)` 顺序题、ranking/top-N 题。每个候选事件记录首次时间戳、证据 marker、覆盖状态，并在可判定时给出 `recommended_option`。 |
+| `audiovisual_candidate_matrix` | `align_audiovisual_evidence` | “视频里出现但音频没提到”“音频提到但画面没出现”这类差集题。每个候选记录 `visual_seen`、`audio_mentioned` 和对应 marker。 |
+| MCQ helper | `app/mcq.py` | 解析 `Candidates:`、识别最终答案选择、检测“选项和解释互相矛盾”。 |
+
+这里有意保持 agenticity：orchestrator 仍然自己选择工具，不走固定 eval path。v22 只在两类位置收束：
+
+- 证据已经被工具结构化后，`answer_with_evidence` 必须服从高置信 `recommended_option`。
+- `answer_with_evidence` 已经成功后，runtime 只允许进入 `verify_grounding` 或最终输出，不再继续发散检索。
 
 ---
 
@@ -376,6 +394,7 @@ Orchestrator 调 `retrieve_video_evidence` 时可以带两个规划字段：
 - 不要选 MCQ 选项。
 - 不要写 `The correct answer is X)`。
 - 只描述这个窗口里看到的视觉事实。
+- 输出写入 `observer_notes`，不会写 `draft_answer`。
 
 ### stitched_verify
 
@@ -448,10 +467,15 @@ SUBJECT_DELTAS: {"deltas": [...]}
 2. `[TRANSCRIPT:t=...]` 是否匹配已检索字幕证据。
 3. `[SLIDE:t=...]` 是否落在已检索 slide/OCR 证据范围内。
 4. 视觉 claim 是否带 frame 或 slide 引用。
-5. 否定回答是否先走过 `negative_check`。
-6. 否定回答是否限定在“已检查证据中”，而不是武断说“整个视频都没有”。
+5. OCR、品牌、logo、屏幕文字、ranking 题是否有 slide/frame 证据，而不是只靠 transcript 或常识。
+6. MCQ 最终答案是否选了合法候选项，是否和 deterministic `recommended_option` 冲突。
+7. MCQ 解释是否明显否定了开头选择的选项。
+8. 否定回答是否先走过 `negative_check`。
+9. 否定回答是否限定在“已检查证据中”，而不是武断说“整个视频都没有”。
 
 这套规则不是完美语义验证，但它能拦住很多工程上常见的幻觉：乱编时间戳、说画面事实但不给引用、没做全局扫描就回答“不存在”。
+
+对普通视觉描述里的局部否定，例如“没有看到领带”，不会再自动升级成 whole-video absence 要求；只有原问题本身是 absence/existence/negative-check 类型时，才触发更严格的否定检索约束。
 
 ---
 
@@ -463,11 +487,14 @@ SUBJECT_DELTAS: {"deltas": [...]}
 | --- | --- | --- |
 | FINAL ANSWER PROTOCOL | prompt | 禁止把 `segment_focus` / `stitched_verify` 的 observation 直接当最终答案 |
 | MCQ HARD RULE | prompt | 多选题必须提交一个选项，不许用“证据不足/无法确定”拒答 |
-| AUDIOVISUAL DUAL-PATH RULE | prompt | 讲座/纪录片类问题要兼顾 transcript 和 slide，避免单模态漏证据 |
+| transcript/slide 双路检查倾向 | prompt | 讲座/纪录片类问题要兼顾 transcript 和 slide，避免单模态漏证据 |
 | 工具调用去重 | runtime | 同一 `(tool, args)` 已经调过就复用结果，避免死循环 |
 | tool-call 上限 | runtime | 默认最多 8 次工具调用，到上限就 salvage 或终止 |
+| answer 后收束 | runtime | `answer_with_evidence` 成功后强制进入 `verify_grounding` 或 final，禁止继续检索 |
+| 证据充足后强制答题 | runtime | `assess_evidence_sufficiency` 通过后直接调用 `answer_with_evidence` |
+| cap fallback 强制答题 | runtime | 到工具上限但已有 evidence 时，优先再调用一次 `answer_with_evidence`，MCQ 不允许空 final |
 | verify_grounding 停滞检测 | runtime | 连续两次校验同一个答案就短路，避免 verify 循环 |
-| 空回复 salvage | runtime | 模型空答时，从历史 `answer_with_evidence` 里抢救草稿 |
+| 空回复 salvage | runtime | 模型空答时，只从历史 `answer_with_evidence` 或真正 `draft_answer` 抢救草稿，不使用 observer note |
 | dangling tool-call 清理 | runtime | 上一轮异常中断后，清掉 checkpoint 里未配对的 tool_call，避免下轮 API 400 |
 
 这些护栏对应的回归测试主要在 `tests/test_graph_orchestrator.py`、`tests/test_tools_planner.py`、`tests/test_vqa.py` 和 `tests/test_main_stream_contract.py`。
@@ -661,11 +688,23 @@ python scripts/smoke_test.py \
 ```bash
 python -m app.eval_harness \
   --dataset audiovisual \
-  --n 20 \
-  --output data/eval/latest_report.json
+  --n 50 \
+  --prediction-cache data/eval/audiovisual_prediction_cache_v22b.jsonl \
+  --output data/eval/audiovisual_report_v22b.json
 ```
 
 如果不传 `--n`，会跑默认数据集文件中的全部 case。前提是对应视频已经上传/ingest，并且 `get_video_status(video_id) == "done"`。
+
+当前最新可复现实测：
+
+| Run | 样本数 | Pass rate | Answer pass | Agent loop pass | Judge mean |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| baseline `data/eval/audiovisual_report.json` | 20 | 0.55 | 0.55 | 1.00 | 2.95 |
+| v20 `data/eval/audiovisual_report_v20.json` | 20 | 0.70 | 0.75 | 0.95 | 3.00 |
+| v21 `data/eval/audiovisual_report_v21.json` | 50 | 0.86 | 0.86 | 1.00 | 3.70 |
+| v22b `data/eval/audiovisual_report_v22b.json` | 50 | 0.90 | 0.90 | 0.98 | 4.00 |
+
+v22b 剩余主要失败标签是 citation kind、frame/slide 证据缺失、少量 temporal/factual wrong option。也就是说，当前瓶颈已经从“agent loop 发散或不答题”转向“视觉/OCR 证据召回和引用质量”。
 
 ### 预测缓存
 
@@ -687,8 +726,10 @@ python -m app.eval_harness \
 当前版本在 `app/eval_fingerprint.py`：
 
 ```python
-AGENT_CODE_VERSION = "v18"
+AGENT_CODE_VERSION = "v22"
 ```
+
+评测结果 JSON 现在还会记录 `failure_tags`、`selected_option`、`recommended_option` 和 `reference_answer`，方便区分 resolver 错、模型没服从 resolver、citation kind 缺失，还是视觉品牌/OCR 证据不足。
 
 ### LLM judge 与 Soft-Waive
 
@@ -729,6 +770,7 @@ AGENT_CODE_VERSION = "v18"
 │   ├── retrieval.py            # 视觉两阶段检索：caption -> frame
 │   ├── text_assets.py          # transcript / slide 持久化、FTS5、dense index、RRF
 │   ├── asr.py                  # FSMN-VAD + SenseVoice-Small
+│   ├── mcq.py                  # MCQ candidate 解析、temporal option resolver、矛盾检测
 │   ├── cache.py                # video_id、cache_dir、status、meta、video profile
 │   ├── db.py                   # users / sessions / videos SQLite
 │   ├── memory.py               # LangMem store / manager / search / write
@@ -802,6 +844,19 @@ data/
 python -m pytest -q
 ```
 
+当前 v22 重点回归集：
+
+```bash
+PYTHONPATH=. /home/user/miniconda3/envs/mbe-phase2/bin/python -m pytest \
+  tests/test_tools_planner.py \
+  tests/test_graph_orchestrator.py \
+  tests/test_eval_converters.py \
+  tests/test_eval_harness.py \
+  tests/test_vqa.py
+```
+
+最近一次运行结果：`87 passed, 3 warnings`。
+
 当前测试覆盖的重点：
 
 - DB / cache / username 基础行为
@@ -811,6 +866,7 @@ python -m pytest -q
 - transcript / slide text assets
 - LangGraph orchestrator loop 和护栏
 - tool planner profile、evidence sufficiency、grounding report
+- MCQ candidate parsing、temporal recommended option、answer 后 runtime 收束
 - main SSE stream contract
 - eval converter、eval harness、prediction cache
 
@@ -887,9 +943,10 @@ MODELS_DEVICE=cpu
 4. `app/text_assets.py`：理解字幕/PPT 的文本检索。
 5. `app/tools.py`：理解 agent 能做什么。
 6. `app/graph.py`：理解 agent loop、prompt 和护栏。
-7. `app/vqa.py`：理解 VLM prompt、图片 payload、citation 协议。
-8. `app/static/app.js`：理解前端如何消费 SSE 和渲染引用。
-9. `tests/test_graph_orchestrator.py`、`tests/test_tools_planner.py`：看设计意图的最好补充。
+7. `app/mcq.py`：理解 MCQ 解析、temporal resolver 和选项矛盾检测。
+8. `app/vqa.py`：理解 VLM prompt、图片 payload、citation 协议。
+9. `app/static/app.js`：理解前端如何消费 SSE 和渲染引用。
+10. `tests/test_graph_orchestrator.py`、`tests/test_tools_planner.py`：看设计意图的最好补充。
 
 ---
 
@@ -897,5 +954,4 @@ MODELS_DEVICE=cpu
 
 Mr. Big-Eye is a browser-based long-video audiovisual QA system. It preprocesses each uploaded video into searchable visual, transcript, and slide/OCR assets, then uses a LangGraph tool-calling agent to retrieve evidence, inspect short temporal windows, align audio and visuals, draft an evidence-grounded answer, and verify citations before responding.
 
-The local stack runs retrieval/ingest models only: BGE-M3 for text embeddings, SigLIP2 for image-text frame retrieval, SenseVoice/FSMN-VAD for ASR, and RapidOCR for slides. Multimodal reasoning is delegated to a remote VLM API. The online agent currently exposes 14 registered tools and persists per-session state through a LangGraph SQLite checkpointer plus cross-session user memory through LangMem.
-
+The local stack runs retrieval/ingest models only: BGE-M3 for text embeddings, SigLIP2 for image-text frame retrieval, SenseVoice/FSMN-VAD for ASR, and RapidOCR for slides. Multimodal reasoning is delegated to a remote VLM API. The online agent currently exposes 14 registered tools, uses v22 structured MCQ/temporal/audio-visual diagnostics, and persists per-session state through a LangGraph SQLite checkpointer plus cross-session user memory through LangMem. The latest audiovisual smoke is 45/50 pass rate on n=50.

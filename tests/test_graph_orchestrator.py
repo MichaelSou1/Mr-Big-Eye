@@ -459,6 +459,176 @@ async def test_orchestrator_cap_signals_unanswered(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_orchestrator_cap_forces_answer_when_evidence_exists(monkeypatch):
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    class NeverCalledModel:
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages):  # pragma: no cover
+            raise AssertionError("orchestrator must not invoke model once cap is hit")
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: NeverCalledModel())
+    monkeypatch.setattr(graph.settings, "orchestrator_max_tool_calls", 2)
+
+    orchestrator = graph._make_orchestrator()
+    state = {
+        "messages": [
+            HumanMessage(content="Which option is correct?"),
+            AIMessage(content="", tool_calls=[{"name": "retrieve_video_evidence", "args": {}, "id": "a"}]),
+            ToolMessage(content='{"tool": "retrieve_video_evidence"}', tool_call_id="a"),
+            AIMessage(content="", tool_calls=[{"name": "retrieve_transcript_evidence", "args": {}, "id": "b"}]),
+            ToolMessage(content='{"tool": "retrieve_transcript_evidence"}', tool_call_id="b"),
+        ],
+        "retrieved_frames": [{"timestamp": 1.0, "image_b64": "x"}],
+        "draft_answer": "",
+        "user_id": "u",
+        "video_id": "v",
+    }
+
+    result = await orchestrator(state)
+    call = result["messages"][0].tool_calls[0]
+    assert call["name"] == "answer_with_evidence"
+    assert call["args"]["question"] == "Which option is correct?"
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_cap_forces_answer_when_prior_answer_tool_failed(monkeypatch):
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    class NeverCalledModel:
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages):  # pragma: no cover
+            raise AssertionError("orchestrator must not invoke model once cap is hit")
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: NeverCalledModel())
+    monkeypatch.setattr(graph.settings, "orchestrator_max_tool_calls", 2)
+
+    orchestrator = graph._make_orchestrator()
+    state = {
+        "messages": [
+            HumanMessage(content="Which option is correct?"),
+            AIMessage(content="", tool_calls=[{"name": "answer_with_evidence", "args": {}, "id": "a"}]),
+            ToolMessage(content='{"tool": "answer_with_evidence", "answer": "", "error": "empty_vlm_response"}', tool_call_id="a"),
+            AIMessage(content="", tool_calls=[{"name": "retrieve_transcript_evidence", "args": {}, "id": "b"}]),
+            ToolMessage(content='{"tool": "retrieve_transcript_evidence"}', tool_call_id="b"),
+        ],
+        "retrieved_transcripts": [{"text": "evidence"}],
+        "draft_answer": "",
+        "user_id": "u",
+        "video_id": "v",
+    }
+
+    result = await orchestrator(state)
+    call = result["messages"][0].tool_calls[0]
+    assert call["name"] == "answer_with_evidence"
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_forces_answer_after_sufficient_report(monkeypatch):
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    class NeverCalledModel:
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages):  # pragma: no cover
+            raise AssertionError("sufficient evidence should force answer_with_evidence")
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: NeverCalledModel())
+
+    orchestrator = graph._make_orchestrator()
+    state = {
+        "messages": [
+            HumanMessage(content="What happens?"),
+            AIMessage(content="", tool_calls=[{"name": "assess_evidence_sufficiency", "args": {}, "id": "s"}]),
+            ToolMessage(
+                content='{"tool": "assess_evidence_sufficiency", "sufficient": true}',
+                tool_call_id="s",
+            ),
+        ],
+        "retrieved_transcripts": [{"text": "evidence"}],
+        "retrieval_plan": {"question_type": "temporal_order"},
+        "draft_answer": "",
+        "user_id": "u",
+        "video_id": "v",
+    }
+
+    result = await orchestrator(state)
+    call = result["messages"][0].tool_calls[0]
+    assert call["name"] == "answer_with_evidence"
+    assert call["args"]["answer_mode"] == "temporal"
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_forces_verify_after_answer(monkeypatch):
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    class NeverCalledModel:
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages):  # pragma: no cover
+            raise AssertionError("answer_with_evidence must be followed by verify_grounding")
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: NeverCalledModel())
+
+    orchestrator = graph._make_orchestrator()
+    state = {
+        "messages": [
+            HumanMessage(content="Which option?"),
+            AIMessage(content="", tool_calls=[{"name": "answer_with_evidence", "args": {}, "id": "a"}]),
+            ToolMessage(
+                content='{"tool": "answer_with_evidence", "answer": "Answer: A) Cats. [FRAME:t=1.0]", "next": "verify_grounding"}',
+                tool_call_id="a",
+            ),
+        ],
+        "draft_answer": "Answer: A) Cats. [FRAME:t=1.0]",
+        "user_id": "u",
+        "video_id": "v",
+    }
+
+    result = await orchestrator(state)
+    call = result["messages"][0].tool_calls[0]
+    assert call["name"] == "verify_grounding"
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_finalizes_grounded_verify(monkeypatch):
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+    class NeverCalledModel:
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages):  # pragma: no cover
+            raise AssertionError("grounded verify should finalize without model call")
+
+    monkeypatch.setattr(graph, "_orchestrator_model", lambda: NeverCalledModel())
+
+    orchestrator = graph._make_orchestrator()
+    state = {
+        "messages": [
+            HumanMessage(content="Which option?"),
+            AIMessage(content="", tool_calls=[{"name": "verify_grounding", "args": {}, "id": "v"}]),
+            ToolMessage(
+                content='{"tool": "verify_grounding", "answer": "Answer: A) Cats. [FRAME:t=1.0]", "grounding_report": {"grounded": true}}',
+                tool_call_id="v",
+            ),
+        ],
+        "draft_answer": "Answer: A) Cats. [FRAME:t=1.0]",
+        "user_id": "u",
+        "video_id": "v",
+    }
+
+    result = await orchestrator(state)
+    assert result["messages"][0].content == "Answer: A) Cats. [FRAME:t=1.0]"
+
+
+@pytest.mark.asyncio
 async def test_orchestrator_salvages_when_final_ai_content_is_empty(monkeypatch):
     """If the model decides to stop (no tool_calls) but emits empty content,
     fall back to the prior answer_with_evidence draft instead of an empty answer."""

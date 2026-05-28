@@ -125,6 +125,11 @@ def test_grounding_report_flags_negative_answer_for_absence_question():
     assert "Negative/absence answer was produced without negative_check retrieval." in report["warnings"]
 
 
+def test_negative_question_detection_does_not_match_any_inside_company():
+    assert not tools._is_negative_question("Which company logo is shown on screen?", "text_ocr")
+    assert tools._is_negative_question("Are there any cats in the video?", "existence")
+
+
 def test_grounding_report_accepts_transcript_only_evidence():
     report = tools._grounding_report(
         "The lecturer compares REINFORCE and A2C. [TRANSCRIPT:t=10.0-14.0]",
@@ -155,6 +160,208 @@ def test_grounding_report_accepts_slide_citation_for_visual_claim():
 
     assert report["grounded"]
     assert report["valid_slide_markers"] == 1
+
+
+def test_candidate_timeline_extracts_labeled_events_from_text_evidence():
+    question = (
+        "What is the accurate sequence?\n"
+        "(a) Sunken cities.\n"
+        "(b) Sunken ships.\n"
+        "(c) Ancient people.\n\n"
+        "Candidates:\nA) (c)(b)(a).\nB) (a)(b)(c)."
+    )
+    timeline = tools._build_candidate_timeline(
+        question,
+        [],
+        [
+            {"kind": "transcript", "t_start": 30.0, "t_end": 35.0, "text": "sunken ships"},
+            {"kind": "transcript", "t_start": 10.0, "t_end": 12.0, "text": "sunken cities"},
+            {"kind": "transcript", "t_start": 50.0, "t_end": 55.0, "text": "ancient people"},
+        ],
+        [],
+    )
+
+    assert [item["label"] for item in timeline] == ["a", "b", "c"]
+    assert [item["first_timestamp"] for item in timeline] == [10.0, 30.0, 50.0]
+    assert tools._candidate_inferred_order(timeline) == ["a", "b", "c"]
+
+
+def test_candidate_timeline_payload_resolves_temporal_mcq_option():
+    question = (
+        "What is the accurate sequence?\n"
+        "(a) Cities.\n"
+        "(b) Ships.\n"
+        "(c) Artifacts.\n\n"
+        "Candidates:\nA) (c)(b)(a).\nB) (a)(b)(c)."
+    )
+    payload = tools._build_candidate_timeline_payload(
+        question,
+        [],
+        [
+            {"kind": "transcript", "t_start": 20.0, "t_end": 21.0, "text": "ships"},
+            {"kind": "transcript", "t_start": 10.0, "t_end": 11.0, "text": "cities"},
+            {"kind": "transcript", "t_start": 30.0, "t_end": 31.0, "text": "artifacts"},
+        ],
+        [],
+    )
+
+    assert payload["coverage_ok"] is True
+    assert payload["recommended_order"] == ["a", "b", "c"]
+    assert payload["recommended_option"]["label"] == "B"
+
+
+def test_parse_candidates_ignores_answer_instruction_tail():
+    from app.mcq import parse_candidates
+
+    question = (
+        "What happens?\n\n"
+        "Candidates:\nA) run\nB) walk\n\n"
+        "Answer the question and reference key frames with [FRAME:t=...] markers."
+    )
+    assert parse_candidates(question) == [
+        {"label": "A", "text": "run"},
+        {"label": "B", "text": "walk"},
+    ]
+
+
+def test_sufficiency_requires_candidate_timeline_for_temporal_candidates():
+    report = tools._sufficiency_report(
+        question="What is the order?\n(a) A.\n(b) B.\n\nCandidates:\nA) (a)(b).\nB) (b)(a).",
+        question_type="temporal_order",
+        retrieval_profile="temporal",
+        state={
+            "video_id": "vid",
+            "retrieved_frames": [{"timestamp": float(i)} for i in range(10)],
+            "retrieved_scene_hits": [{"start": 0.0, "end": 20.0}],
+            "retrieved_transcripts": [{"t_start": 1.0, "t_end": 2.0, "text": "A"}],
+            "candidate_timeline": [],
+        },
+    )
+
+    assert not report["sufficient"]
+    assert report["recommended_next_action"] == "build_timeline"
+    assert any("candidate_timeline" in item for item in report["missing_evidence"])
+
+
+def test_audiovisual_candidate_matrix_marks_visual_audio_difference():
+    question = (
+        "Which company is featured in the video but not mentioned in the audio?\n\n"
+        "Candidates:\nA) Dairy Queen.\nB) American Express."
+    )
+    matrix = tools._build_audiovisual_candidate_matrix(
+        question,
+        [{"kind": "transcript", "t_start": 1.0, "t_end": 2.0, "text": "Dairy Queen is mentioned."}],
+        [{"kind": "slide", "t_start": 5.0, "t_end": 5.0, "text": "American Express logo"}],
+    )
+
+    by_label = {item["label"]: item for item in matrix}
+    assert by_label["A"]["audio_mentioned"] is True
+    assert by_label["A"]["decision"] == "reject"
+    assert by_label["B"]["visual_seen"] is True
+    assert by_label["B"]["audio_mentioned"] is False
+    assert by_label["B"]["decision"] == "match"
+
+
+def test_sufficiency_requires_slide_for_ocr_question():
+    report = tools._sufficiency_report(
+        question="Which company logo is shown on screen?",
+        question_type="text_ocr",
+        retrieval_profile="balanced",
+        state={
+            "video_id": "vid",
+            "retrieved_frames": [{"timestamp": 1.0}],
+            "retrieved_scene_hits": [{"start": 0.0, "end": 2.0}],
+            "retrieved_transcripts": [{"t_start": 1.0, "t_end": 2.0, "text": "company"}],
+            "retrieved_slides": [],
+        },
+    )
+
+    assert not report["sufficient"]
+    assert report["recommended_next_action"] == "retrieve_slide_evidence"
+
+
+def test_grounding_report_flags_unclear_mcq_selection():
+    question = "Which option is true?\n\nCandidates:\nA) Cats.\nB) Dogs."
+    report = tools._grounding_report(
+        "The evidence is mixed. [FRAME:t=1.0]",
+        [1.0],
+        {"question": question, "retrieval_plan": {}},
+    )
+
+    assert not report["grounded"]
+    assert "MCQ answer does not clearly select one listed candidate." in report["warnings"]
+
+
+def test_answer_protocol_forces_recommended_temporal_option():
+    question = (
+        "What is the order?\n(a) A.\n(b) B.\n\n"
+        "Candidates:\nA) (b)(a).\nB) (a)(b)."
+    )
+    prompt = tools._question_with_answer_protocol(
+        question,
+        "temporal",
+        {
+            "candidate_timeline": {
+                "items": [],
+                "recommended_order": ["a", "b"],
+                "recommended_option": {"label": "B", "text": "(a)(b)."},
+                "coverage_ok": True,
+            },
+            "retrieval_plan": {"question_type": "temporal_order"},
+        },
+    )
+
+    assert "You MUST start with `Answer: B) (a)(b).`" in prompt
+
+
+def test_grounding_report_rejects_answer_against_recommended_option():
+    question = (
+        "What is the order?\n(a) A.\n(b) B.\n\n"
+        "Candidates:\nA) (b)(a).\nB) (a)(b)."
+    )
+    report = tools._grounding_report(
+        "Answer: A) (b)(a). [TRANSCRIPT:t=1.0-2.0]",
+        [],
+        {
+            "question": question,
+            "retrieved_transcripts": [{"t_start": 1.0, "t_end": 2.0, "text": "A B"}],
+            "candidate_timeline": {
+                "items": [],
+                "recommended_order": ["a", "b"],
+                "recommended_option": {"label": "B", "text": "(a)(b)."},
+                "coverage_ok": True,
+            },
+            "retrieval_plan": {"question_type": "temporal_order"},
+        },
+    )
+
+    assert not report["grounded"]
+    assert "MCQ answer contradicts the deterministic recommended option." in report["warnings"]
+    assert report["recommended_next_action"] == "answer_with_evidence"
+
+
+def test_grounding_report_rejects_contradicted_selected_option():
+    question = "Which is true?\n\nCandidates:\nA) Cats are present.\nB) Dogs are present."
+    report = tools._grounding_report(
+        "Answer: A) Cats are present. But A is not supported by the evidence. [FRAME:t=1.0]",
+        [1.0],
+        {"question": question, "retrieval_plan": {}},
+    )
+
+    assert not report["grounded"]
+    assert "MCQ explanation contradicts the selected option." in report["warnings"]
+
+
+def test_grounding_report_rejects_unsupported_brand_guess():
+    question = "What is the recommended brand of the shoe cleaner?\n\nCandidates:\nA) SNEAKER LAB.\nB) JASON MARKK."
+    report = tools._grounding_report(
+        "Answer: B) JASON MARKK. This is typical of the standard product. [FRAME:t=1.0]",
+        [1.0],
+        {"question": question, "retrieval_plan": {"question_type": "text_ocr"}},
+    )
+
+    assert not report["grounded"]
+    assert any("common-product guessing" in warning for warning in report["warnings"])
 
 
 @pytest.mark.asyncio

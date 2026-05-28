@@ -254,6 +254,8 @@ async def _run_predictions(
                 "retrieved_slides": [],
                 "retrieval_plan": {},
                 "timeline": [],
+                "candidate_timeline": [],
+                "audiovisual_candidate_matrix": [],
                 "hypotheses": [],
                 "evidence_sufficiency": {},
                 "draft_answer": "",
