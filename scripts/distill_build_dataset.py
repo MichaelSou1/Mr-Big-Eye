@@ -61,6 +61,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trajectories", required=True, help="Raw trajectory JSONL from Phase A.")
     parser.add_argument("--out-dir", default="data/distillation")
+    parser.add_argument(
+        "--cases",
+        default=None,
+        help="Original eval cases JSONL; if given, write eval_heldout.jsonl with the "
+        "cases for the held-out (val) videos for the Phase D comparison (spec §3.4).",
+    )
     parser.add_argument("--include-tier-2", action="store_true", help="Also use tier_2 trajectories.")
     parser.add_argument("--val-ratio", type=float, default=0.2)
     parser.add_argument("--val-videos", type=int, default=None, help="Explicit #videos held out for val.")
@@ -94,6 +100,13 @@ def main() -> int:
     out_dir = Path(args.out_dir)
     _write_jsonl(out_dir / "train.jsonl", train_samples)
     _write_jsonl(out_dir / "val.jsonl", val_samples)
+
+    heldout_n = 0
+    if args.cases:
+        cases = _read_jsonl(Path(args.cases))
+        heldout = [c for c in cases if str(c.get("video_id") or "") in val_videos]
+        _write_jsonl(out_dir / "eval_heldout.jsonl", heldout)
+        heldout_n = len(heldout)
     (out_dir / "tool_schemas.json").write_text(
         json.dumps({"agent_code_version": AGENT_CODE_VERSION, "n_tools": len(tools), "tools": tools}, ensure_ascii=False, indent=2),
         encoding="utf-8",
@@ -120,6 +133,7 @@ def main() -> int:
         "val_videos": len(val_videos),
         "train_samples": len(train_samples),
         "val_samples": len(val_samples),
+        "eval_heldout_cases": heldout_n,
         "train_target_kind": _kind_dist(train_samples),
         "val_target_kind": _kind_dist(val_samples),
         "train_target_tools": _tool_dist(train_samples),
