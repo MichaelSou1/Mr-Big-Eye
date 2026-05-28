@@ -110,6 +110,25 @@ async def main_async() -> int:
         default=0.0,
         help="Sleep this many seconds between cases. Use to stay under a provider's RPM (e.g. NIM = 40 RPM).",
     )
+    parser.add_argument(
+        "--save-full-trajectory",
+        dest="save_full_trajectory",
+        action="store_true",
+        default=False,
+        help=(
+            "Capture the full orchestrator message stream + system prompt + "
+            "guards per case and write them to a raw-trajectory JSONL for "
+            "distillation (Phase A). Off by default; backward-compatible."
+        ),
+    )
+    parser.add_argument(
+        "--trajectory-out",
+        default=None,
+        help=(
+            "Path for the raw-trajectory JSONL when --save-full-trajectory is set. "
+            "Defaults to <output>.trajectories.jsonl."
+        ),
+    )
     args = parser.parse_args()
 
     cases = load_cases(args.cases)
@@ -145,7 +164,10 @@ async def main_async() -> int:
         if args.prediction_cache:
             prediction_cache = PredictionCache(args.prediction_cache)
         predictions = await _run_predictions(
-            cases, prediction_cache, per_case_delay_sec=args.per_case_delay_sec
+            cases,
+            prediction_cache,
+            per_case_delay_sec=args.per_case_delay_sec,
+            capture=args.save_full_trajectory,
         )
 
     judge: JudgeClient | None = None
@@ -198,6 +220,10 @@ async def main_async() -> int:
     print(f"wrote {args.output}")
     print(f"wrote {markdown_path}")
 
+    if args.save_full_trajectory:
+        traj_path = _write_trajectories(args, cases, predictions, results)
+        print(f"wrote {traj_path} ({len(predictions)} trajectories)")
+
     if missing:
         print(f"missing predictions: {', '.join(missing)}", file=sys.stderr)
         return 2
@@ -208,6 +234,7 @@ async def _run_predictions(
     cases,
     prediction_cache: PredictionCache | None = None,
     per_case_delay_sec: float = 0.0,
+    capture: bool = False,
 ) -> dict[str, EvalPrediction]:
     from langgraph.checkpoint.memory import InMemorySaver
     from langgraph.store.memory import InMemoryStore
@@ -238,6 +265,11 @@ async def _run_predictions(
                 agent_code_version=AGENT_CODE_VERSION,
             )
             cached = prediction_cache.get(key)
+            if cached is not None and capture and not cached.get("messages"):
+                # Capture requested but this entry predates trajectory capture.
+                # Treat as a miss so we re-run and record the full message stream.
+                cached = None
+                print(f"[cache] stale-no-trajectory case={case.case_id}", flush=True)
             if cached is not None:
                 print(f"[cache] hit case={case.case_id}", flush=True)
                 predictions[case.case_id] = PredictionCache.prediction_from_dict(case.case_id, cached)
@@ -289,6 +321,22 @@ async def _run_predictions(
             evidence_sufficiency=evidence_sufficiency,
             grounding_report=state.get("grounding_report", {}),
         )
+        if capture:
+            from app.distill_trajectory import (
+                infer_guards,
+                render_orchestrator_system_prompt,
+                serialize_messages,
+            )
+
+            serialized = serialize_messages(state.get("messages", []))
+            prediction.messages = serialized
+            prediction.system_prompt = render_orchestrator_system_prompt(case.video_id)
+            prediction.guards_triggered = infer_guards(
+                serialized,
+                agent_terminated,
+                settings.orchestrator_max_tool_calls,
+            )
+            prediction.agent_terminated = agent_terminated
         predictions[case.case_id] = prediction
         if prediction_cache is not None:
             prediction_cache.put(key, PredictionCache.prediction_to_dict(prediction))
@@ -342,6 +390,36 @@ def _build_run_meta(args, cases, results, *, want_judge: bool) -> dict[str, Any]
         "n_cases_total": len(cases),
         "n_cases_predicted": len(results),
     }
+
+
+def _write_trajectories(args, cases, predictions, results) -> str:
+    """Write one raw-trajectory JSONL row per predicted case (Phase A, spec §4.1)."""
+    from app.distill_trajectory import build_trajectory_record
+
+    result_by_case = {r.get("case_id"): r for r in results}
+    traj_path = Path(
+        args.trajectory_out
+        or (str(Path(args.output).with_suffix("")) + ".trajectories.jsonl")
+    )
+    traj_path.parent.mkdir(parents=True, exist_ok=True)
+    orch_model = settings.orchestrator_model_name or settings.vlm_model_name
+    n = 0
+    with traj_path.open("w", encoding="utf-8") as fh:
+        for case in cases:
+            prediction = predictions.get(case.case_id)
+            if prediction is None or not prediction.messages:
+                continue
+            record = build_trajectory_record(
+                case=case,
+                prediction=prediction,
+                result=result_by_case.get(case.case_id, {}),
+                orchestrator_model=orch_model,
+                vlm_model=settings.vlm_model_name,
+            )
+            fh.write(json.dumps(record, ensure_ascii=False))
+            fh.write("\n")
+            n += 1
+    return str(traj_path)
 
 
 def _append_runs_index(

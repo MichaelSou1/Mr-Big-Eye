@@ -75,6 +75,12 @@ class EvalPrediction:
     agent_actions: list[str] = field(default_factory=list)
     evidence_sufficiency: dict[str, Any] = field(default_factory=dict)
     grounding_report: dict[str, Any] = field(default_factory=dict)
+    # Distillation trajectory capture (optional; populated only under
+    # --save-full-trajectory). Empty/None for ordinary eval runs and old caches.
+    messages: list[dict[str, Any]] = field(default_factory=list)
+    system_prompt: str = ""
+    guards_triggered: list[str] = field(default_factory=list)
+    agent_terminated: str | None = None
 
 
 def load_cases(path: str | Path) -> list[EvalCase]:
@@ -141,6 +147,10 @@ def parse_prediction(item: dict[str, Any]) -> EvalPrediction:
         agent_actions=[str(value) for value in item.get("agent_actions", [])],
         evidence_sufficiency=dict(item.get("evidence_sufficiency", {}) or {}),
         grounding_report=dict(item.get("grounding_report", {}) or {}),
+        messages=[dict(m) for m in item.get("messages", []) if isinstance(m, dict)],
+        system_prompt=str(item.get("system_prompt") or ""),
+        guards_triggered=[str(g) for g in item.get("guards_triggered", [])],
+        agent_terminated=item.get("agent_terminated"),
     )
 
 
@@ -979,7 +989,7 @@ class PredictionCache:
 
     @staticmethod
     def prediction_to_dict(prediction: "EvalPrediction") -> dict[str, Any]:
-        return {
+        payload = {
             "case_id": prediction.case_id,
             "retrieved_timestamps": list(prediction.retrieved_timestamps),
             "scene_hits": [dict(scene) for scene in prediction.scene_hits],
@@ -990,6 +1000,17 @@ class PredictionCache:
             "evidence_sufficiency": dict(prediction.evidence_sufficiency),
             "grounding_report": dict(prediction.grounding_report),
         }
+        # Only persist trajectory fields when captured, so ordinary eval cache
+        # entries stay small and old entries remain valid (backward-compatible).
+        if prediction.messages:
+            payload["messages"] = [dict(m) for m in prediction.messages]
+        if prediction.system_prompt:
+            payload["system_prompt"] = prediction.system_prompt
+        if prediction.guards_triggered:
+            payload["guards_triggered"] = list(prediction.guards_triggered)
+        if prediction.agent_terminated:
+            payload["agent_terminated"] = prediction.agent_terminated
+        return payload
 
     @staticmethod
     def prediction_from_dict(case_id: str, data: dict[str, Any]) -> "EvalPrediction":
@@ -1013,6 +1034,10 @@ class PredictionCache:
             agent_actions=[str(v) for v in data.get("agent_actions", [])],
             evidence_sufficiency=dict(data.get("evidence_sufficiency", {}) or {}),
             grounding_report=dict(data.get("grounding_report", {}) or {}),
+            messages=[dict(m) for m in data.get("messages", []) if isinstance(m, dict)],
+            system_prompt=str(data.get("system_prompt") or ""),
+            guards_triggered=[str(g) for g in data.get("guards_triggered", [])],
+            agent_terminated=data.get("agent_terminated"),
         )
 
 
