@@ -99,23 +99,6 @@ def _payload(record: dict[str, Any]) -> dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
-def _last_human_index(records: list[dict[str, Any]]) -> int:
-    idx = -1
-    for i, record in enumerate(records):
-        if record.get("role") == "user":
-            idx = i
-    return idx
-
-
-def _tool_call_count_after_last_human(records: list[dict[str, Any]]) -> int:
-    start = _last_human_index(records) + 1
-    total = 0
-    for record in records[start:]:
-        if record.get("role") == "assistant":
-            total += len(record.get("tool_calls") or [])
-    return total
-
-
 def _forced_guards(records: list[dict[str, Any]]) -> set[str]:
     found: set[str] = set()
     for record in records:
@@ -130,18 +113,25 @@ def _forced_guards(records: list[dict[str, Any]]) -> set[str]:
     return found
 
 
-def _has_duplicate_tool_content(records: list[dict[str, Any]]) -> bool:
-    """A dedup-synthesized ToolMessage reuses an earlier ToolMessage's content
-    verbatim, so two tool messages share identical content (graph.py
-    _dedup_tool_calls)."""
+def _has_duplicate_tool_call_signature(records: list[dict[str, Any]]) -> bool:
+    """The dedup guard fires when a tool_call's (name, args) signature repeats
+    (graph.py _tool_signature). Detect the same condition rather than identical
+    result content — two distinct calls can legitimately return the same empty
+    result without dedup having fired."""
     seen: set[str] = set()
     for record in records:
-        if record.get("role") != "tool":
+        if record.get("role") != "assistant":
             continue
-        content = str(record.get("content", ""))
-        if content in seen:
-            return True
-        seen.add(content)
+        for call in record.get("tool_calls") or []:
+            name = call.get("name")
+            try:
+                args = json.dumps(call.get("args") or {}, sort_keys=True, ensure_ascii=False)
+            except (TypeError, ValueError):
+                args = str(call.get("args"))
+            sig = f"{name}::{args}"
+            if sig in seen:
+                return True
+            seen.add(sig)
     return False
 
 
@@ -163,49 +153,6 @@ def _verify_grounding_stalled(records: list[dict[str, Any]]) -> bool:
     return False
 
 
-def _final_answer_text(records: list[dict[str, Any]]) -> str:
-    for record in reversed(records):
-        if record.get("role") == "assistant" and not (record.get("tool_calls") or []):
-            content = str(record.get("content", "")).strip()
-            if content:
-                return content
-    return ""
-
-
-def _last_tool_payload(records: list[dict[str, Any]]) -> dict[str, Any]:
-    for record in reversed(records):
-        if record.get("role") == "tool":
-            return _payload(record)
-    return {}
-
-
-def _looks_salvaged(records: list[dict[str, Any]]) -> bool:
-    """Final answer is a verbatim copy of an answer_with_evidence draft that was
-    NOT emitted via the clean grounded-verify path (graph.py _salvage_draft_answer
-    vs _grounded_verify_answer)."""
-    final = _final_answer_text(records)
-    if not final:
-        return False
-    drafts = set()
-    for record in records:
-        if record.get("role") != "tool":
-            continue
-        payload = _payload(record)
-        if payload.get("tool") == "answer_with_evidence" and not payload.get("error"):
-            answer = str(payload.get("answer") or "").strip()
-            if answer:
-                drafts.add(answer)
-    if final not in drafts:
-        return False
-    last = _last_tool_payload(records)
-    grounded_emit = (
-        last.get("tool") == "verify_grounding"
-        and (last.get("grounding_report") or {}).get("grounded") is True
-        and str(last.get("answer") or "").strip() == final
-    )
-    return not grounded_emit
-
-
 def infer_guards(
     records: list[dict[str, Any]],
     agent_terminated: str | None = None,
@@ -213,22 +160,30 @@ def infer_guards(
 ) -> list[str]:
     """Infer which deterministic guards fired, from the serialized stream.
 
-    Returns a stable-ordered, de-duplicated list drawn from:
-    cap, empty, forced_answer, forced_verify, dedup, stall, salvage.
+    Detection follows spec §4.1:
+    * cap / empty  ← agent_terminated (the only reliable signal; a clean
+      trajectory can naturally use the full tool budget and finish, so tool-call
+      count is NOT used here).
+    * forced_answer / forced_verify  ← harness-injected tool_call ids.
+    * dedup  ← a repeated (name, args) tool_call signature.
+    * stall  ← the last two verify_grounding answers are identical.
+
+    salvage is intentionally not inferred: it has no post-hoc signal distinct
+    from cap/stall, and the salvaged/draft-copy final message is already excluded
+    as a training target in app.distill_format. ``max_tool_calls`` is accepted
+    for signature stability but unused.
     """
     guards: list[str] = []
-    if agent_terminated == "cap" or _tool_call_count_after_last_human(records) >= max_tool_calls:
+    if agent_terminated == "cap":
         guards.append("cap")
     if agent_terminated == "empty":
         guards.append("empty")
     for forced in sorted(_forced_guards(records)):
         guards.append(forced)
-    if _has_duplicate_tool_content(records):
+    if _has_duplicate_tool_call_signature(records):
         guards.append("dedup")
     if _verify_grounding_stalled(records):
         guards.append("stall")
-    if _looks_salvaged(records):
-        guards.append("salvage")
     seen: set[str] = set()
     ordered: list[str] = []
     for guard in guards:

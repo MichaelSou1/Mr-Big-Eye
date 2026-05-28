@@ -56,12 +56,15 @@ def test_clean_grounded_trajectory_has_no_guards():
     assert infer_guards(records, None, max_tool_calls=8) == []
 
 
-def test_cap_guard_from_tool_call_count():
+def test_natural_full_budget_does_not_trigger_cap():
+    # A clean trajectory that uses many distinct tool calls and finishes must NOT
+    # be flagged cap — cap is only inferred from agent_terminated.
     records = [{"role": "user", "content": "q"}]
     for i in range(8):
         records.append({"role": "assistant", "content": "", "tool_calls": [{"id": f"c{i}", "name": "retrieve_video_evidence", "args": {"i": i}}]})
         records.append({"role": "tool", "content": _tool_content("retrieve_video_evidence", i=i), "tool_call_id": f"c{i}"})
-    assert "cap" in infer_guards(records, None, max_tool_calls=8)
+    records.append({"role": "assistant", "content": "final answer"})
+    assert infer_guards(records, None, max_tool_calls=8) == []
 
 
 def test_cap_and_empty_from_agent_terminated():
@@ -85,17 +88,29 @@ def test_forced_calls_detected_by_id():
     assert FORCED_CALL_IDS == {"force_answer_with_evidence", "force_verify_grounding"}
 
 
-def test_dedup_detected_from_duplicate_tool_content():
-    dup = _tool_content("retrieve_video_evidence", frames=2)
+def test_dedup_detected_from_repeated_call_signature():
     records = [
         {"role": "user", "content": "q"},
         {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "name": "retrieve_video_evidence", "args": {"q": "x"}}]},
-        {"role": "tool", "content": dup, "tool_call_id": "c1"},
+        {"role": "tool", "content": _tool_content("retrieve_video_evidence", frames=2), "tool_call_id": "c1"},
         {"role": "assistant", "content": "", "tool_calls": [{"id": "c2", "name": "retrieve_video_evidence", "args": {"q": "x"}}]},
-        {"role": "tool", "content": dup, "tool_call_id": "c2"},
+        {"role": "tool", "content": _tool_content("retrieve_video_evidence", frames=2), "tool_call_id": "c2"},
         {"role": "assistant", "content": "done"},
     ]
     assert "dedup" in infer_guards(records, None, max_tool_calls=8)
+
+
+def test_distinct_calls_with_same_empty_result_not_dedup():
+    empty = _tool_content("search_transcript_keyword", hits=[])
+    records = [
+        {"role": "user", "content": "q"},
+        {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "name": "search_transcript_keyword", "args": {"kw": "a"}}]},
+        {"role": "tool", "content": empty, "tool_call_id": "c1"},
+        {"role": "assistant", "content": "", "tool_calls": [{"id": "c2", "name": "search_transcript_keyword", "args": {"kw": "b"}}]},
+        {"role": "tool", "content": empty, "tool_call_id": "c2"},
+        {"role": "assistant", "content": "done"},
+    ]
+    assert "dedup" not in infer_guards(records, None, max_tool_calls=8)
 
 
 def test_stall_detected_from_repeated_verify_answer():
@@ -108,14 +123,3 @@ def test_stall_detected_from_repeated_verify_answer():
         {"role": "assistant", "content": "final"},
     ]
     assert "stall" in infer_guards(records, None, max_tool_calls=8)
-
-
-def test_salvage_detected_when_final_copies_draft_without_grounded_verify():
-    draft = "Best guess answer. [FRAME:t=3.0]"
-    records = [
-        {"role": "user", "content": "q"},
-        {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "name": "answer_with_evidence", "args": {}}]},
-        {"role": "tool", "content": _tool_content("answer_with_evidence", answer=draft), "tool_call_id": "c1"},
-        {"role": "assistant", "content": draft},
-    ]
-    assert "salvage" in infer_guards(records, None, max_tool_calls=8)
