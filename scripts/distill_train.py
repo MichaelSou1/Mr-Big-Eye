@@ -235,6 +235,7 @@ def main() -> int:
     targs = TrainingArguments(
         output_dir=args.output_dir,
         per_device_train_batch_size=args.batch_size,
+        per_device_eval_batch_size=1,  # eval logits are materialized per batch; keep tiny
         gradient_accumulation_steps=args.grad_accum,
         num_train_epochs=args.epochs,
         max_steps=args.max_steps,
