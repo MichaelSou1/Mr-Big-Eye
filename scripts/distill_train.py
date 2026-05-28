@@ -247,6 +247,10 @@ def main() -> int:
         save_total_limit=2,
         eval_strategy="steps" if val_ds else "no",
         eval_steps=args.save_steps if val_ds else None,
+        # Eval must not gather full-vocab logits (OOM at long seq); we only track
+        # eval loss. Liger falls back to non-fused CE in eval mode, so per-sample
+        # logits are still transient-only with this on.
+        prediction_loss_only=True,
         report_to=[],
         seed=args.seed,
         remove_unused_columns=False,
