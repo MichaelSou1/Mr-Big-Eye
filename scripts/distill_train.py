@@ -60,23 +60,40 @@ def _normalize_tool_calls(messages: list[dict]) -> list[dict]:
 
 
 def build_example(tokenizer, sample: dict, cutoff_len: int) -> dict | None:
-    """Tokenize one sample, masking everything but the final assistant message."""
+    """Tokenize one sample, masking everything but the final assistant message.
+
+    Renders to text first (apply_chat_template returns a BatchEncoding dict under
+    tokenize=True in transformers 5.x, so we tokenize the rendered string instead)
+    and masks the prompt prefix so loss falls only on the final assistant turn.
+    """
     messages = _normalize_tool_calls(sample["messages"])
     tools = sample.get("tools") or None
     try:
-        prompt_ids = tokenizer.apply_chat_template(
-            messages[:-1], tools=tools, add_generation_prompt=True, tokenize=True
+        prompt_text = tokenizer.apply_chat_template(
+            messages[:-1], tools=tools, add_generation_prompt=True, tokenize=False
         )
-        full_ids = tokenizer.apply_chat_template(
-            messages, tools=tools, add_generation_prompt=False, tokenize=True
+        full_text = tokenizer.apply_chat_template(
+            messages, tools=tools, add_generation_prompt=False, tokenize=False
         )
     except Exception:  # noqa: BLE001
         return None
+    prompt_ids = tokenizer(prompt_text, add_special_tokens=False)["input_ids"]
+    full_ids = tokenizer(full_text, add_special_tokens=False)["input_ids"]
     if len(full_ids) <= len(prompt_ids):
         return None
     if len(full_ids) > cutoff_len:
         return None  # never truncate the target; drop overlong samples
-    labels = [-100] * len(prompt_ids) + list(full_ids[len(prompt_ids):])
+    # The generation-prompt text is a prefix of the full text for chat templates
+    # like Qwen; clamp to the common length so the mask is never out of range.
+    n_prompt = len(prompt_ids)
+    if full_ids[:n_prompt] != prompt_ids:
+        common = 0
+        for a, b in zip(prompt_ids, full_ids):
+            if a != b:
+                break
+            common += 1
+        n_prompt = common
+    labels = [-100] * n_prompt + list(full_ids[n_prompt:])
     return {"input_ids": full_ids, "labels": labels, "attention_mask": [1] * len(full_ids)}
 
 
