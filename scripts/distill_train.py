@@ -139,6 +139,12 @@ def main() -> int:
         action="store_true",
         help="QLoRA: load the base model in 4-bit nf4 (fits 7B LoRA on a 20GB card).",
     )
+    parser.add_argument(
+        "--use-liger",
+        action="store_true",
+        help="Use Liger fused linear cross-entropy (avoids materializing full-vocab "
+        "fp32 logits — needed for long sequences on a 20GB card).",
+    )
     parser.add_argument("--logging-steps", type=int, default=1)
     parser.add_argument("--save-steps", type=int, default=200)
     parser.add_argument("--seed", type=int, default=0)
@@ -244,6 +250,7 @@ def main() -> int:
         report_to=[],
         seed=args.seed,
         remove_unused_columns=False,
+        use_liger_kernel=args.use_liger,
     )
     trainer = Trainer(
         model=model,
