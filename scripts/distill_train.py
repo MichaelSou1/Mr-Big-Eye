@@ -1,0 +1,217 @@
+#!/usr/bin/env python
+"""Phase C: LoRA SFT of the orchestrator on captured tool-call trajectories.
+
+Self-contained transformers + peft trainer that consumes the Phase B sharegpt/
+OpenAI dataset ({"messages":[...], "tools":[...]}) and trains with the model's
+own chat template (Qwen). Loss is computed ONLY on the final assistant message
+(completion-only masking) — the prefix/system/tool turns are masked, realizing
+spec §5.7/§6's "only the last assistant gets loss".
+
+Why not LLaMA-Factory here: the orchestrator emits *parallel* tool_calls in one
+message, which the bundled LLaMA-Factory-main glaive format (one function_call
+per turn) cannot represent. apply_chat_template handles it natively.
+
+Runs in an env with a CUDA-enabled torch + transformers + peft (e.g. vlm_dapo).
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+
+def _read_jsonl(path: Path) -> list[dict]:
+    rows = []
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if line:
+                rows.append(json.loads(line))
+    return rows
+
+
+def _normalize_tool_calls(messages: list[dict]) -> list[dict]:
+    """Ensure assistant tool_call arguments are dicts (chat templates json-encode
+    them); our Phase B output stores arguments as a JSON string."""
+    out = []
+    for m in messages:
+        m = dict(m)
+        if m.get("role") == "assistant" and m.get("tool_calls"):
+            calls = []
+            for tc in m["tool_calls"]:
+                fn = dict(tc.get("function", {}))
+                args = fn.get("arguments")
+                if isinstance(args, str):
+                    try:
+                        fn["arguments"] = json.loads(args)
+                    except (TypeError, ValueError, json.JSONDecodeError):
+                        fn["arguments"] = {}
+                calls.append({**tc, "function": fn})
+            m["tool_calls"] = calls
+        out.append(m)
+    return out
+
+
+def build_example(tokenizer, sample: dict, cutoff_len: int) -> dict | None:
+    """Tokenize one sample, masking everything but the final assistant message."""
+    messages = _normalize_tool_calls(sample["messages"])
+    tools = sample.get("tools") or None
+    try:
+        prompt_ids = tokenizer.apply_chat_template(
+            messages[:-1], tools=tools, add_generation_prompt=True, tokenize=True
+        )
+        full_ids = tokenizer.apply_chat_template(
+            messages, tools=tools, add_generation_prompt=False, tokenize=True
+        )
+    except Exception:  # noqa: BLE001
+        return None
+    if len(full_ids) <= len(prompt_ids):
+        return None
+    if len(full_ids) > cutoff_len:
+        return None  # never truncate the target; drop overlong samples
+    labels = [-100] * len(prompt_ids) + list(full_ids[len(prompt_ids):])
+    return {"input_ids": full_ids, "labels": labels, "attention_mask": [1] * len(full_ids)}
+
+
+@dataclass
+class PadCollator:
+    pad_token_id: int
+
+    def __call__(self, features: list[dict]) -> dict:
+        import torch
+
+        maxlen = max(len(f["input_ids"]) for f in features)
+        input_ids, labels, attn = [], [], []
+        for f in features:
+            pad = maxlen - len(f["input_ids"])
+            input_ids.append(f["input_ids"] + [self.pad_token_id] * pad)
+            labels.append(f["labels"] + [-100] * pad)
+            attn.append(f["attention_mask"] + [0] * pad)
+        return {
+            "input_ids": torch.tensor(input_ids, dtype=torch.long),
+            "labels": torch.tensor(labels, dtype=torch.long),
+            "attention_mask": torch.tensor(attn, dtype=torch.long),
+        }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model", required=True, help="Base model path (e.g. Qwen2.5-7B-Instruct).")
+    parser.add_argument("--train", default="data/distillation/train.jsonl")
+    parser.add_argument("--val", default="data/distillation/val.jsonl")
+    parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--epochs", type=float, default=3.0)
+    parser.add_argument("--max-steps", type=int, default=-1, help="Override epochs for a smoke run.")
+    parser.add_argument("--lora-rank", type=int, default=32)
+    parser.add_argument("--lora-alpha", type=int, default=64)
+    parser.add_argument("--lora-dropout", type=float, default=0.05)
+    parser.add_argument("--cutoff-len", type=int, default=6144)
+    parser.add_argument("--batch-size", type=int, default=1)
+    parser.add_argument("--grad-accum", type=int, default=32)
+    parser.add_argument("--lr", type=float, default=1e-4)
+    parser.add_argument("--warmup-ratio", type=float, default=0.03)
+    parser.add_argument("--logging-steps", type=int, default=1)
+    parser.add_argument("--save-steps", type=int, default=200)
+    parser.add_argument("--seed", type=int, default=0)
+    args = parser.parse_args()
+
+    import torch
+    from peft import LoraConfig, get_peft_model
+    from transformers import (
+        AutoModelForCausalLM,
+        AutoTokenizer,
+        Trainer,
+        TrainingArguments,
+    )
+
+    tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+    train_rows = _read_jsonl(Path(args.train))
+    val_rows = _read_jsonl(Path(args.val)) if Path(args.val).exists() else []
+
+    def encode(rows):
+        out = []
+        for r in rows:
+            ex = build_example(tokenizer, r, args.cutoff_len)
+            if ex is not None:
+                out.append(ex)
+        return out
+
+    train_ds = encode(train_rows)
+    val_ds = encode(val_rows)
+    print(f"encoded train={len(train_ds)}/{len(train_rows)} val={len(val_ds)}/{len(val_rows)} "
+          f"(dropped overlong/invalid)")
+    if not train_ds:
+        print("ERROR: no trainable samples after encoding.", file=sys.stderr)
+        return 2
+    lens = sorted(len(e["input_ids"]) for e in train_ds)
+    print(f"train seq_len: max={lens[-1]} p50={lens[len(lens)//2]} p95={lens[int(0.95*len(lens))-1]}")
+
+    try:
+        attn_impl = "flash_attention_2"
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model, dtype=torch.bfloat16, attn_implementation=attn_impl, trust_remote_code=True
+        )
+    except Exception as exc:  # noqa: BLE001
+        print(f"flash_attention_2 unavailable ({exc}); using sdpa")
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model, dtype=torch.bfloat16, attn_implementation="sdpa", trust_remote_code=True
+        )
+    model.config.use_cache = False
+    model.enable_input_require_grads()
+
+    lora = LoraConfig(
+        r=args.lora_rank,
+        lora_alpha=args.lora_alpha,
+        lora_dropout=args.lora_dropout,
+        bias="none",
+        task_type="CAUSAL_LM",
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+    )
+    model = get_peft_model(model, lora)
+    model.print_trainable_parameters()
+
+    targs = TrainingArguments(
+        output_dir=args.output_dir,
+        per_device_train_batch_size=args.batch_size,
+        gradient_accumulation_steps=args.grad_accum,
+        num_train_epochs=args.epochs,
+        max_steps=args.max_steps,
+        learning_rate=args.lr,
+        warmup_ratio=args.warmup_ratio,
+        bf16=True,
+        gradient_checkpointing=True,
+        logging_steps=args.logging_steps,
+        save_steps=args.save_steps,
+        save_total_limit=2,
+        eval_strategy="steps" if val_ds else "no",
+        eval_steps=args.save_steps if val_ds else None,
+        report_to=[],
+        seed=args.seed,
+        remove_unused_columns=False,
+    )
+    trainer = Trainer(
+        model=model,
+        args=targs,
+        train_dataset=train_ds,
+        eval_dataset=val_ds or None,
+        data_collator=PadCollator(tokenizer.pad_token_id),
+    )
+    trainer.train()
+    trainer.save_model(args.output_dir)
+    tokenizer.save_pretrained(args.output_dir)
+    print(f"saved LoRA adapter to {args.output_dir}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
