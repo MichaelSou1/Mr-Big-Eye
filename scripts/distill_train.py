@@ -134,6 +134,11 @@ def main() -> int:
     parser.add_argument("--grad-accum", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--warmup-ratio", type=float, default=0.03)
+    parser.add_argument(
+        "--load-4bit",
+        action="store_true",
+        help="QLoRA: load the base model in 4-bit nf4 (fits 7B LoRA on a 20GB card).",
+    )
     parser.add_argument("--logging-steps", type=int, default=1)
     parser.add_argument("--save-steps", type=int, default=200)
     parser.add_argument("--seed", type=int, default=0)
@@ -173,18 +178,42 @@ def main() -> int:
     lens = sorted(len(e["input_ids"]) for e in train_ds)
     print(f"train seq_len: max={lens[-1]} p50={lens[len(lens)//2]} p95={lens[int(0.95*len(lens))-1]}")
 
-    try:
-        attn_impl = "flash_attention_2"
-        model = AutoModelForCausalLM.from_pretrained(
-            args.model, dtype=torch.bfloat16, attn_implementation=attn_impl, trust_remote_code=True
+    quant_config = None
+    if args.load_4bit:
+        from transformers import BitsAndBytesConfig
+
+        quant_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_use_double_quant=True,
         )
+
+    def _load(attn: str):
+        kwargs: dict[str, Any] = {"attn_implementation": attn, "trust_remote_code": True}
+        if quant_config is not None:
+            kwargs["quantization_config"] = quant_config
+        else:
+            kwargs["dtype"] = torch.bfloat16
+        return AutoModelForCausalLM.from_pretrained(args.model, **kwargs)
+
+    try:
+        model = _load("flash_attention_2")
     except Exception as exc:  # noqa: BLE001
         print(f"flash_attention_2 unavailable ({exc}); using sdpa")
-        model = AutoModelForCausalLM.from_pretrained(
-            args.model, dtype=torch.bfloat16, attn_implementation="sdpa", trust_remote_code=True
-        )
+        model = _load("sdpa")
     model.config.use_cache = False
-    model.enable_input_require_grads()
+
+    if args.load_4bit:
+        from peft import prepare_model_for_kbit_training
+
+        model = prepare_model_for_kbit_training(
+            model, use_gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False}
+        )
+        trainer_gc = False  # already enabled by prepare_model_for_kbit_training
+    else:
+        model.enable_input_require_grads()
+        trainer_gc = True
 
     lora = LoraConfig(
         r=args.lora_rank,
@@ -206,7 +235,7 @@ def main() -> int:
         learning_rate=args.lr,
         warmup_ratio=args.warmup_ratio,
         bf16=True,
-        gradient_checkpointing=True,
+        gradient_checkpointing=trainer_gc,
         logging_steps=args.logging_steps,
         save_steps=args.save_steps,
         save_total_limit=2,
