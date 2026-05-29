@@ -146,6 +146,12 @@ def main() -> int:
         "fp32 logits — needed for long sequences on a 20GB card).",
     )
     parser.add_argument("--logging-steps", type=int, default=1)
+    parser.add_argument(
+        "--no-eval",
+        action="store_true",
+        help="Disable eval. Eval runs non-fused CE (Liger only fuses in train mode), "
+        "which OOMs on long val samples; train loss + the held-out comparison suffice.",
+    )
     parser.add_argument("--save-steps", type=int, default=200)
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
@@ -175,7 +181,7 @@ def main() -> int:
         return out
 
     train_ds = encode(train_rows)
-    val_ds = encode(val_rows)
+    val_ds = [] if args.no_eval else encode(val_rows)
     print(f"encoded train={len(train_ds)}/{len(train_rows)} val={len(val_ds)}/{len(val_rows)} "
           f"(dropped overlong/invalid)")
     if not train_ds:
