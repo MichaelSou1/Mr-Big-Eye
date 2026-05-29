@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -154,7 +155,13 @@ def main() -> int:
     )
     parser.add_argument("--save-steps", type=int, default=200)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--wandb", action="store_true", help="Log loss/lr/grad_norm/config to Weights & Biases.")
+    parser.add_argument("--wandb-project", default="mbe-distill")
+    parser.add_argument("--run-name", default=None, help="W&B run name (also the TrainingArguments run_name).")
     args = parser.parse_args()
+
+    if args.wandb:
+        os.environ.setdefault("WANDB_PROJECT", args.wandb_project)
 
     import torch
     from peft import LoraConfig, get_peft_model
@@ -258,7 +265,8 @@ def main() -> int:
         # eval loss. Liger falls back to non-fused CE in eval mode, so per-sample
         # logits are still transient-only with this on.
         prediction_loss_only=True,
-        report_to=[],
+        report_to=(["wandb"] if args.wandb else []),
+        run_name=args.run_name,
         seed=args.seed,
         remove_unused_columns=False,
         use_liger_kernel=args.use_liger,
