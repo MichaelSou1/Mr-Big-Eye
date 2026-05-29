@@ -24,8 +24,8 @@ CUDA_VISIBLE_DEVICES="$GPU" "$VLLM_PY" serve "$BASE" \
   --lora-modules "mrbigeye_orch=${ADAPTER}" \
   --max-lora-rank 32 \
   --host 0.0.0.0 --port "$PORT" \
-  --max-model-len 8192 \
-  --gpu-memory-utilization 0.90 \
+  --max-model-len 16384 \
+  --gpu-memory-utilization 0.95 \
   --dtype bfloat16 \
   --enable-auto-tool-choice \
   --tool-call-parser hermes

@@ -275,27 +275,35 @@ async def _run_predictions(
                 predictions[case.case_id] = PredictionCache.prediction_from_dict(case.case_id, cached)
                 continue
             print(f"[cache] miss case={case.case_id}", flush=True)
-        state = await app_graph.ainvoke(
-            {
-                "messages": [HumanMessage(content=case.question)],
-                "video_id": case.video_id,
-                "user_id": "eval",
-                "retrieved_frames": [],
-                "retrieved_scene_hits": [],
-                "retrieved_transcripts": [],
-                "retrieved_slides": [],
-                "retrieval_plan": {},
-                "timeline": [],
-                "candidate_timeline": [],
-                "audiovisual_candidate_matrix": [],
-                "hypotheses": [],
-                "evidence_sufficiency": {},
-                "draft_answer": "",
-                "observer_notes": [],
-                "grounding_report": {},
-            },
-            config={"configurable": {"thread_id": f"eval-{case.case_id}-{uuid4().hex}"}},
-        )
+        try:
+            state = await app_graph.ainvoke(
+                {
+                    "messages": [HumanMessage(content=case.question)],
+                    "video_id": case.video_id,
+                    "user_id": "eval",
+                    "retrieved_frames": [],
+                    "retrieved_scene_hits": [],
+                    "retrieved_transcripts": [],
+                    "retrieved_slides": [],
+                    "retrieval_plan": {},
+                    "timeline": [],
+                    "candidate_timeline": [],
+                    "audiovisual_candidate_matrix": [],
+                    "hypotheses": [],
+                    "evidence_sufficiency": {},
+                    "draft_answer": "",
+                    "observer_notes": [],
+                    "grounding_report": {},
+                },
+                config={"configurable": {"thread_id": f"eval-{case.case_id}-{uuid4().hex}"}},
+            )
+        except Exception as exc:  # noqa: BLE001
+            # One case (e.g. context-length 400 from a small student model) must
+            # not kill the whole eval. Record an empty prediction (counts as a
+            # failure) and move on; do not cache so it can be retried later.
+            print(f"[error] case={case.case_id}: {type(exc).__name__}: {str(exc)[:200]}", flush=True)
+            predictions[case.case_id] = EvalPrediction(case_id=case.case_id, answer="")
+            continue
         evidence_sufficiency = dict(state.get("evidence_sufficiency", {}) or {})
         agent_terminated = state.get("agent_terminated")
         if agent_terminated:
