@@ -5,6 +5,7 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from app.distill_trajectory import (
     FORCED_CALL_IDS,
     infer_guards,
+    recomputed_guards,
     serialize_message,
     serialize_messages,
 )
@@ -111,6 +112,19 @@ def test_distinct_calls_with_same_empty_result_not_dedup():
         {"role": "assistant", "content": "done"},
     ]
     assert "dedup" not in infer_guards(records, None, max_tool_calls=8)
+
+
+def test_recomputed_guards_overrides_stale_and_falls_back():
+    clean = [
+        {"role": "user", "content": "q"},
+        {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "name": "retrieve_video_evidence", "args": {}}]},
+        {"role": "tool", "content": _tool_content("retrieve_video_evidence", frames=1), "tool_call_id": "c1"},
+        {"role": "assistant", "content": "done"},
+    ]
+    # stale stored guards are overridden by recomputation from messages
+    assert recomputed_guards({"messages": clean, "guards_triggered": ["cap", "salvage"]}) == []
+    # no messages -> fall back to stored guards
+    assert recomputed_guards({"guards_triggered": ["dedup"]}) == ["dedup"]
 
 
 def test_stall_detected_from_repeated_verify_answer():

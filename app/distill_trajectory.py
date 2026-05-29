@@ -193,6 +193,20 @@ def infer_guards(
     return ordered
 
 
+def recomputed_guards(traj: dict[str, Any]) -> list[str]:
+    """Guards for a stored trajectory, recomputed from its message stream.
+
+    A trajectory's ``guards_triggered`` was computed by whatever infer_guards was
+    loaded when the teacher ran; recomputing from the (immutable) ``messages`` +
+    ``agent_terminated`` makes tiering deterministic w.r.t. the current logic.
+    Falls back to the stored value when messages are absent (old caches).
+    """
+    messages = traj.get("messages")
+    if not messages:
+        return list(traj.get("guards_triggered") or [])
+    return infer_guards(messages, traj.get("agent_terminated"))
+
+
 def render_orchestrator_system_prompt(video_id: str | None) -> str:
     """Re-compose the exact system prompt the orchestrator saw for this case.
 

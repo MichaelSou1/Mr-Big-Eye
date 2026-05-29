@@ -19,6 +19,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from app.distill_filter import classify_tier
+from app.distill_trajectory import recomputed_guards
 
 
 def _read_jsonl(path: Path) -> list[dict]:
@@ -44,6 +45,9 @@ def main() -> int:
 
     rows = _read_jsonl(Path(args.trajectories))
     n = len(rows)
+    # Normalize guards to current logic (recompute from message stream).
+    for r in rows:
+        r["guards_triggered"] = recomputed_guards(r)
 
     missing_fields = Counter()
     for r in rows:

@@ -25,6 +25,7 @@ from app.distill_format import (
     target_kind,
     target_tool_names,
 )
+from app.distill_trajectory import recomputed_guards
 from app.eval_fingerprint import AGENT_CODE_VERSION
 
 
@@ -79,6 +80,9 @@ def main() -> int:
     kept: list[dict] = []
     allowed = {"tier_1"} | ({"tier_2"} if args.include_tier_2 else set())
     for traj in trajs:
+        # Recompute guards from the message stream so tiering uses current logic
+        # regardless of which infer_guards version captured the trajectory.
+        traj["guards_triggered"] = recomputed_guards(traj)
         tier = classify_tier(traj)
         tier_counts[tier] += 1
         if tier in allowed and traj.get("messages") and traj.get("system_prompt"):
