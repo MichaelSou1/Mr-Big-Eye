@@ -148,12 +148,35 @@ def main() -> int:
     )
     parser.add_argument("--logging-steps", type=int, default=1)
     parser.add_argument(
+        "--eval-steps",
+        type=int,
+        default=None,
+        help="Run held-out eval every N steps and log eval_loss to W&B. "
+        "Defaults to --save-steps when eval is enabled.",
+    )
+    parser.add_argument(
+        "--eval-cutoff-len",
+        type=int,
+        default=4096,
+        help="Truncate val samples to this length when encoding for eval. Keeps the "
+        "per-step eval forward from materializing full-vocab logits at long seq "
+        "(OOM). Loss is on truncated seqs — a monitoring trend, not a leaderboard.",
+    )
+    parser.add_argument(
         "--no-eval",
         action="store_true",
         help="Disable eval. Eval runs non-fused CE (Liger only fuses in train mode), "
         "which OOMs on long val samples; train loss + the held-out comparison suffice.",
     )
     parser.add_argument("--save-steps", type=int, default=200)
+    parser.add_argument(
+        "--save-total-limit",
+        type=int,
+        default=3,
+        help="Max checkpoints to keep on disk (HF still protects the best one when "
+        "eval is on). Pass 0 to keep ALL checkpoints — e.g. to later pick the best by "
+        "hard-set pass_rate, not just eval_loss.",
+    )
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--wandb", action="store_true", help="Log loss/lr/grad_norm/config to Weights & Biases.")
     parser.add_argument("--wandb-project", default="mbe-distill")
@@ -179,16 +202,16 @@ def main() -> int:
     train_rows = _read_jsonl(Path(args.train))
     val_rows = _read_jsonl(Path(args.val)) if Path(args.val).exists() else []
 
-    def encode(rows):
+    def encode(rows, cutoff):
         out = []
         for r in rows:
-            ex = build_example(tokenizer, r, args.cutoff_len)
+            ex = build_example(tokenizer, r, cutoff)
             if ex is not None:
                 out.append(ex)
         return out
 
-    train_ds = encode(train_rows)
-    val_ds = [] if args.no_eval else encode(val_rows)
+    train_ds = encode(train_rows, args.cutoff_len)
+    val_ds = [] if args.no_eval else encode(val_rows, args.eval_cutoff_len)
     print(f"encoded train={len(train_ds)}/{len(train_rows)} val={len(val_ds)}/{len(val_rows)} "
           f"(dropped overlong/invalid)")
     if not train_ds:
@@ -245,6 +268,13 @@ def main() -> int:
     model = get_peft_model(model, lora)
     model.print_trainable_parameters()
 
+    # When eval is on, save on the same cadence as eval and keep the
+    # lowest-eval_loss checkpoint — otherwise save_total_limit can evict the best
+    # (pre-overfit) checkpoint, as happened on the first scale-up run.
+    eval_on = bool(val_ds)
+    eff_eval_steps = (args.eval_steps or args.save_steps) if eval_on else None
+    eff_save_steps = eff_eval_steps if eval_on else args.save_steps
+
     targs = TrainingArguments(
         output_dir=args.output_dir,
         per_device_train_batch_size=args.batch_size,
@@ -257,10 +287,13 @@ def main() -> int:
         bf16=True,
         gradient_checkpointing=trainer_gc,
         logging_steps=args.logging_steps,
-        save_steps=args.save_steps,
-        save_total_limit=2,
-        eval_strategy="steps" if val_ds else "no",
-        eval_steps=args.save_steps if val_ds else None,
+        save_steps=eff_save_steps,
+        save_total_limit=(args.save_total_limit or None),  # 0 -> None == keep all
+        eval_strategy="steps" if eval_on else "no",
+        eval_steps=eff_eval_steps,
+        load_best_model_at_end=eval_on,
+        metric_for_best_model="eval_loss" if eval_on else None,
+        greater_is_better=False if eval_on else None,
         # Eval must not gather full-vocab logits (OOM at long seq); we only track
         # eval loss. Liger falls back to non-fused CE in eval mode, so per-sample
         # logits are still transient-only with this on.

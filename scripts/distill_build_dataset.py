@@ -47,13 +47,23 @@ def _write_jsonl(path: Path, rows: list[dict]) -> None:
             handle.write("\n")
 
 
-def _split_videos(video_ids: list[str], val_ratio: float, val_videos: int | None, seed: int):
-    ordered = sorted(set(video_ids))
+def _split_videos(
+    video_ids: list[str],
+    val_ratio: float,
+    val_videos: int | None,
+    seed: int,
+    forced_holdout: set[str] | None = None,
+):
+    # forced_holdout videos always land in val (never trained on), so a model can
+    # be evaluated on a pre-existing held-out set for an apples-to-apples compare.
+    forced = (forced_holdout or set()) & set(video_ids)
+    ordered = sorted(set(video_ids) - forced)
     rng = random.Random(seed)
     rng.shuffle(ordered)
-    n_val = val_videos if val_videos is not None else max(1, round(len(ordered) * val_ratio))
-    n_val = min(n_val, len(ordered) - 1) if len(ordered) > 1 else 0
-    val = set(ordered[:n_val])
+    n_val = val_videos if val_videos is not None else max(1, round(len(set(video_ids)) * val_ratio))
+    n_val = max(0, n_val - len(forced))
+    n_val = min(n_val, len(ordered) - 1) if ordered else 0
+    val = forced | set(ordered[:n_val])
     train = set(ordered[n_val:])
     return train, val
 
@@ -71,7 +81,21 @@ def main() -> int:
     parser.add_argument("--include-tier-2", action="store_true", help="Also use tier_2 trajectories.")
     parser.add_argument("--val-ratio", type=float, default=0.2)
     parser.add_argument("--val-videos", type=int, default=None, help="Explicit #videos held out for val.")
+    parser.add_argument(
+        "--holdout-videos",
+        default=None,
+        help="Path to a JSONL of eval cases (or a file of video_ids) whose videos must "
+        "be forced into val/held-out (never trained on) — for matched-set comparison.",
+    )
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--max-train-samples",
+        type=int,
+        default=None,
+        help="Cap #train samples (spec C1: keep ~1500-1700). If the build overshoots, "
+        "drop whole videos (deterministic shuffle by --seed) until under the cap, so no "
+        "trajectory is split across the cap. Val is untouched.",
+    )
     parser.add_argument("--no-truncate", action="store_true", help="Skip base64 truncation (debug).")
     args = parser.parse_args()
 
@@ -89,17 +113,48 @@ def main() -> int:
             kept.append(traj)
 
     video_ids = [str(t.get("video_id") or "") for t in kept]
-    train_videos, val_videos = _split_videos(video_ids, args.val_ratio, args.val_videos, args.seed)
+    forced_holdout: set[str] = set()
+    if args.holdout_videos:
+        for row in _read_jsonl(Path(args.holdout_videos)):
+            vid = str(row.get("video_id") or "").strip()
+            if vid:
+                forced_holdout.add(vid)
+        print(f"forcing {len(forced_holdout)} videos into held-out (never trained)")
+    train_videos, val_videos = _split_videos(
+        video_ids, args.val_ratio, args.val_videos, args.seed, forced_holdout
+    )
 
     tools = export_tool_schemas()
-    train_samples: list[dict] = []
     val_samples: list[dict] = []
     per_video_samples: dict[str, int] = defaultdict(int)
+    train_by_video: dict[str, list[dict]] = defaultdict(list)
     for traj in kept:
         vid = str(traj.get("video_id") or "")
         samples = slice_trajectory(traj, tools, truncate=not args.no_truncate)
         per_video_samples[vid] += len(samples)
-        (val_samples if vid in val_videos else train_samples).extend(samples)
+        if vid in val_videos:
+            val_samples.extend(samples)
+        else:
+            train_by_video[vid].extend(samples)
+
+    # Honor C1 (~1500-1700 train samples): if over --max-train-samples, drop whole
+    # videos (deterministic shuffle) until under the cap. Never split a trajectory.
+    dropped_videos = 0
+    if args.max_train_samples is not None:
+        order = sorted(train_by_video)
+        random.Random(args.seed).shuffle(order)
+        kept_train: dict[str, list[dict]] = {}
+        running = 0
+        for vid in order:
+            n = len(train_by_video[vid])
+            if running + n > args.max_train_samples and kept_train:
+                dropped_videos += 1
+                continue
+            kept_train[vid] = train_by_video[vid]
+            running += n
+        train_by_video = kept_train
+    train_videos = set(train_by_video)
+    train_samples: list[dict] = [s for vid in train_by_video for s in train_by_video[vid]]
 
     out_dir = Path(args.out_dir)
     _write_jsonl(out_dir / "train.jsonl", train_samples)
@@ -135,6 +190,8 @@ def main() -> int:
         "videos_total": len(set(video_ids)),
         "train_videos": len(train_videos),
         "val_videos": len(val_videos),
+        "max_train_samples": args.max_train_samples,
+        "dropped_videos_over_cap": dropped_videos,
         "train_samples": len(train_samples),
         "val_samples": len(val_samples),
         "eval_heldout_cases": heldout_n,

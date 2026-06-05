@@ -11,18 +11,19 @@ Output:
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from pathlib import Path
 
 import pandas as pd
 
-CACHE = Path("/home/user/Mr-Big-Eye/data/hf_cache/videomme")
-VIDEOS = Path("/home/user/Mr-Big-Eye/data/videomme_videos")
-EVAL_DIR = Path("/home/user/Mr-Big-Eye/eval/audiovisual")
-EVAL_DIR.mkdir(parents=True, exist_ok=True)
+ROOT = Path(os.environ.get("MBE_ROOT", Path(__file__).resolve().parents[1]))
+CACHE = ROOT / "data" / "videomme_src"
+VIDEOS = ROOT / "data" / "videomme_videos"
 
 # Video-MME task_type -> our modality_tag
 TASK_TYPE_TO_MODALITY = {
@@ -113,8 +114,24 @@ def compute_video_id(mp4_path: Path) -> str:
 
 
 def main() -> int:
-    df = pd.read_parquet(CACHE / "test.parquet")
-    with (CACHE / "sampled_videos.json").open() as f:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--sampled-file", default=str(CACHE / "sampled_videos.json"),
+                    help="JSON list of YouTube videoIDs to build cases for.")
+    ap.add_argument("--out-dir", default=str(ROOT / "eval" / "audiovisual"),
+                    help="Output dir for questions.jsonl + video_manifest.json.")
+    args = ap.parse_args()
+    eval_dir = Path(args.out_dir)
+    eval_dir.mkdir(parents=True, exist_ok=True)
+
+    parquet_path = CACHE / "test.parquet"
+    if not parquet_path.exists():
+        # ModelScope lays the file out as videomme/test-00000-of-00001.parquet
+        candidates = sorted(CACHE.rglob("test-*.parquet"))
+        if not candidates:
+            raise FileNotFoundError(f"no Video-MME parquet found under {CACHE}")
+        parquet_path = candidates[0]
+    df = pd.read_parquet(parquet_path)
+    with open(args.sampled_file) as f:
         sampled = set(json.load(f))
 
     rows = df[df["videoID"].isin(sampled)].copy()
@@ -147,7 +164,7 @@ def main() -> int:
             return 1
 
     # Write manifest
-    with (EVAL_DIR / "video_manifest.json").open("w") as f:
+    with (eval_dir / "video_manifest.json").open("w") as f:
         json.dump(manifest, f, indent=2, sort_keys=True)
     print(f"wrote video_manifest.json ({len(manifest)} entries)", flush=True)
 
@@ -193,7 +210,7 @@ def main() -> int:
 
     cases.sort(key=lambda c: c["question_id"])
 
-    out = EVAL_DIR / "questions.jsonl"
+    out = eval_dir / "questions.jsonl"
     with out.open("w") as f:
         for c in cases:
             f.write(json.dumps(c, ensure_ascii=False) + "\n")

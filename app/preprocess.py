@@ -18,7 +18,7 @@ from app.config import settings
 from app.models import get_bge, get_siglip, release_bge, release_siglip
 from app.progress import stage_label
 from app.text_assets import build_text_indexes, write_slides, write_transcripts
-from app.vqa import generate_caption
+from app.vqa import VLMAPIError, generate_caption
 
 logger = logging.getLogger(__name__)
 
@@ -259,6 +259,21 @@ def _extract_scene_frame(vr: decord.VideoReader, fps: float, t_mid: float) -> Im
     return Image.fromarray(vr[idx].asnumpy()).convert("RGB")
 
 
+async def _caption_one_tolerant(item: dict[str, Any]) -> str | None:
+    """Caption a scene frame; a per-frame VLM-API rejection (e.g. the provider's
+    content filter, 4xx data_inspection_failed) drops that one caption instead of
+    failing the whole video's ingest."""
+    try:
+        return await generate_caption(item["frame"])
+    except VLMAPIError as exc:
+        logger.warning(
+            "scene %s caption rejected by VLM API (%s); continuing without it",
+            item.get("scene_id"),
+            exc,
+        )
+        return None
+
+
 async def _caption_scenes(
     scenes_with_frames: list[dict[str, Any]],
     progress_callback: ProgressCallback | None = None,
@@ -269,9 +284,11 @@ async def _caption_scenes(
         batch = scenes_with_frames[start : start + 8]
         _emit(progress_callback, "captions", 0.30 + 0.36 * (start / max(total, 1)))
         captions = await asyncio.gather(
-            *(generate_caption(item["frame"]) for item in batch)
+            *(_caption_one_tolerant(item) for item in batch)
         )
         for item, caption in zip(batch, captions, strict=False):
+            if caption is None:
+                continue
             results.append(
                 {
                     "scene_id": item["scene_id"],

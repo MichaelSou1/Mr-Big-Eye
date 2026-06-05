@@ -49,7 +49,15 @@ from app.cache import get_video_status  # noqa: E402
 from app.preprocess import preprocess_video  # noqa: E402
 
 UPLOADS = ROOT / "data" / "uploads"
-MANIFEST_PATH = ROOT / "eval" / "audiovisual" / "video_manifest.json"
+# MBE_MANIFEST lets a run target an alternate manifest (e.g. eval/audiovisual/v2/
+# video_manifest.json) without disturbing the global one. Relative paths resolve
+# against ROOT. Already-ingested videos are skipped, so overlapping sets are safe.
+_manifest_env = os.environ.get("MBE_MANIFEST", "").strip()
+MANIFEST_PATH = (
+    (ROOT / _manifest_env if not os.path.isabs(_manifest_env) else Path(_manifest_env))
+    if _manifest_env
+    else ROOT / "eval" / "audiovisual" / "video_manifest.json"
+)
 
 
 def parse_shard() -> tuple[int, int]:
