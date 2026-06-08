@@ -23,7 +23,7 @@ from pathlib import Path
 
 import pandas as pd
 
-ROOT = Path("/home/user/Mr-Big-Eye")
+ROOT = Path(os.environ.get("MBE_ROOT", Path(__file__).resolve().parents[1]))
 DATA = ROOT / "data"
 EVAL_DIR = ROOT / "eval" / "audiovisual"
 QUESTIONS_PATH = EVAL_DIR / "questions.jsonl"

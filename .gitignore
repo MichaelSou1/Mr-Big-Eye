@@ -1,4 +1,6 @@
 .env
+.env.local*
+.env.*.bak
 .venv/
 venv/
 env/
@@ -14,8 +16,18 @@ htmlcov/
 
 data/
 models/
+wandb/
 docs/*.gif
 docs/*.mp4
+
+# local/generated backups
+*.bak
+*_backup_*/
+
+# raw evaluation run artifacts
+reports/**/*.log
+reports/**/pred_*.jsonl
+reports/**/judge_*.jsonl
 
 .DS_Store
 Thumbs.db

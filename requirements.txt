@@ -17,7 +17,10 @@ numpy>=1.24.0
 imageio-ffmpeg>=0.4.9
 
 # ASR (local SenseVoice-Small + FSMN-VAD via FunASR)
-funasr>=1.3.0
+# Pin 1.2.6: funasr 1.3.x (incl. 1.3.9) ships a broken package — `model="fsmn-vad"`
+# fails to build and `funasr.utils.modelscope_file` is missing. 1.2.6 resolves both.
+funasr==1.2.6
+einops>=0.7.0  # required by SenseVoice; not pulled in transitively
 soundfile>=0.12.1
 
 # OCR (slide / whiteboard text via RapidOCR — PP-OCRv4 weights on onnxruntime,
