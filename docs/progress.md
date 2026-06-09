@@ -22,10 +22,15 @@ inference; (2) causal verification. Two hard constraints: (1) **self-improvement
 may be larger text-only); (2) only internalize **type-1** (single-forward-doable)
 steps. Scope: **vision-only** (frames only).
 
-**Active pivot (2026-06-08):** moving toward **Option B / reflection** — hold
-frames constant (same uniform-16 for tool-agent and free-form) so the controlled
-variable is the agent's *reflection* (self-re-examine / revise), and test whether
-that reflection ability can be internalized. See Exp-3.
+**STATUS (2026-06-09):** all exploratory/diagnostic experiments are DONE (Exp-0..8).
+Training (SFT/RL) and causal probes were never run — deliberately gated: every
+diagnostic converged on *no internalizable reasoning headroom* on the tested data
+(video = perception wall; reflection net-negative). The one regime with genuine
+reasoning headroom found is **32B + chart/numerical reasoning** (Exp-8), which needs
+the 32B base and leaves the video-agent narrative. Net result = a strong,
+mechanism-backed **internalizability-boundary** finding. See §5 for the open fork.
+(The 2026-06-08 "Option B / reflection" pivot below was tested in Exp-3/4 and found
+to have 0 headroom — kept for the record.)
 
 ---
 
@@ -327,6 +332,61 @@ internalization result would require either (a) a much stronger base VLM whose
 perception is reliable on the target tasks, or (b) redefining scope to internalize
 perception-routing (which contradicts the no-tool-at-inference premise).
 
+### Exp-8 — scaling sweep (4B/8B/30B-A3B/32B) + per-case failure analysis (2026-06-09)
+**Setup:** pulled AWQ-4bit Qwen3-VL **32B (dense)** and **30B-A3B (MoE)** from HF
+(QuantTrio), served TP=2 on 2×3080 alongside the 30B-A3B text orchestrator. Ran
+free-form + 30B-orchestrated reflection on NExT(50)/CLEVRER(70)/ChartQA(60), AND
+dumped FULL per-case outputs ([scripts/dump_case_outputs.py](../scripts/dump_case_outputs.py)
+→ `data/distill/analysis/dump_<model>_<ds>.jsonl`: free_answer, critic sub-questions,
+per-sub-question VLM reads, final answer). Note: 30B-A3B is MoE (3B active) ≈ 8B
+perception; the dense 32B is the real "stronger perception" test. 32B needed
+gpu-mem-util 0.85 (0.90 → vllm masked_scatter crash).
+
+**Scaling table — free-form / orchestrated accuracy:**
+| dataset | 4B | 8B | 30B-A3B | 32B |
+|---|---|---|---|---|
+| NExT (video temporal) | .70/.70 | .64/.62 | .68/.62 | .70/.64 |
+| CLEVRER (collisions) | .43/.43 | .50/.50 | .50/.47 | .50/.50 |
+| ChartQA (static charts) | .65/.52 | .63/.55 | .63/.42 | **.80/.75** |
+
+**Per-case failure analysis (from the full-output dumps):**
+- **NExT — perception / temporal-localization (NOT reasoning).** Model reads the
+  scene right but picks the wrong brief/specific action (sees "smile", misses the
+  "clap"; "swimming" vs "swim back out"); the decisive frame is often not in the
+  uniform-16 sample. **~40% of "errors" are label ambiguity** (grazing=feeding,
+  excited≈enjoying-music, near-duplicate MCQ distractors) — not real model errors.
+  Almost zero "reads-right-reasons-wrong" cases. Flat across scale (4B=32B=.70).
+- **CLEVRER — pure perception/tracking wall.** Reasoning structure is fine but the
+  *perceptual premises are wrong*: from 16 sparse frames the model misidentifies
+  which objects collide and when. ≈chance at every scale; 32B doesn't track better.
+- **ChartQA — the ONE place reasoning becomes the bottleneck, but only at 32B.**
+  4B/8B (~.64) fail on *reading* values/rankings; the dense 32B solves reading
+  (.80) and its residual 12 failures are genuine **multi-step arithmetic**
+  (difference/ratio/count-above-threshold over correctly-read values). 8B→32B fixes
+  are all perception fixes (incl. 8B giving up with "证据不足"); 32B's remainder is
+  arithmetic CoT.
+- **Orchestrated reflection HURTS everywhere, less as the model strengthens**
+  (ChartQA orch penalty −13%/−8%/−5% for 4B/8B/32B). Two mechanisms, both shown
+  with receipts in the dumps: (1) *video* — leading sub-questions make the
+  suggestible VLM emit contradictory NEW reads ("a football on the grass" → final
+  "pick something from grass"), drifting a correct answer to wrong; (2) *charts* —
+  decompose+re-integrate corrupts the answer (final picks the wrong option/format
+  even when sub-reads were correct). Multi-step orchestration adds more failure
+  points than it fixes; single forward pass is more robust. (The earlier 8B-NExT
+  "+8% orch" was run-variance — did not reproduce here or on 30B-A3B/32B.)
+- **Matcher caveat:** correctness is by MCQ letter; ~2 of 50 32B-NExT "correct" are
+  letter-luck (right letter, wrong option text). Use the answer TEXT for fine analysis.
+
+**Conclusion update:** scaling perception (→32B) does NOT break the wall on VIDEO
+(NExT/CLEVRER flat) — the bottleneck there is temporal tracking/localization, which
+is the agent's type-2 frame-selection edge (non-internalizable). It DOES break the
+wall on static charts, and there — and only there, and only on a strong-enough base
+— do the residual failures become genuine multi-step reasoning (arithmetic CoT),
+i.e. the one regime where internalizing reasoning could have headroom. That regime
+needs the 32B base and leaves the video-agent narrative.
+Artifacts: `data/distill/analysis/dump_{4b,8b,32b}_{next,clevrer,chartqa}.jsonl` +
+`*_percase.csv`.
+
 ## 4. Key decisions to date
 - Local-only serving (4B VLM + 30B text); VLM cannot be an online API for the backbone.
 - Vision-only ingest; full pipeline (Phase 0–4) code-complete + unit-tested.
@@ -342,20 +402,45 @@ perception-routing (which contradicts the no-tool-at-inference premise).
   (give up the "no stronger teacher" point). Next: Exp-4 isolates whether the
   30B-orchestrated reflection over FIXED uniform-16 frames beats free-form 68%.
 
-## 5. Open questions / next steps
-1. Exp-3 reflection gap number → decide B viability.
-2. If B: design reflection-trajectory generator (multi-turn 4B self-reflection,
-   tool-free, fixed frames) as the trajectory source; rewrite reflection→single-
-   forward CoT; consistency gate (reflect-right ∧ free-wrong); SFT + causal probes
-   (does internalized single-forward recover the multi-turn reflection gain?).
-3. Strict filter for distillation: relax to answer-correct + grounding-hit (drop
-   product citation/agent-loop tags) — recovers the few process-dropped candidates.
-4. GPU-accelerated ingest (SigLIP segfault) before any 567-video scale-up.
-5. Training side (SFT LoRA / GRPO) stays gated until a real signal pool exists.
+## 5. Open questions / next steps (as of 2026-06-09)
+
+**Done:** Exp-0..8 — pipeline (Phase 0–4, unit-tested) + the full diagnostic sweep
+(pilot, free-form, self/orchestrated reflection, perception-headroom) across
+**4B/8B/30B-A3B/32B** on **NExT-GQA / CLEVRER / ChartQA**, full per-case output
+dumps, and the per-case failure analysis.
+
+**Never run (deliberately gated):** Phase 5 SFT (LoRA), Phase 6 GRPO/RL, Phase 7
+causal probes on a trained model. No trained model exists — every gate showed no
+internalizable reasoning signal, so training would be on absent signal. Trainer
+stack is also author-owned per SPEC §10.
+
+**The fork (author's call):**
+1. **Publish the boundary result** — "internalizing agentic/orchestrated reasoning
+   into a small VLM has ~0 headroom on video QA; the bottleneck is perception
+   fidelity (temporal tracking/localization), the agent's only edge is type-2
+   frame-selection". Mechanism-backed, 4 datasets × 4 scales. Challenges the
+   agentic-video-reasoning narrative. (Strongest honest deliverable.)
+2. **Pursue the one positive lead:** 32B + ChartQA/numerical — perception solved at
+   32B, residual = multi-step **arithmetic CoT**. Run a real SFT to internalize the
+   CoT here. Cost: needs the 32B base, leaves the video narrative.
+3. **Auxiliary:** judge-auto-label the 9 dumps' failures
+   (perception/temporal/arithmetic/suggestibility/label-ambiguity) into one CSV.
+
+**Reusable infra notes:** GPU-accelerated ingest still blocked by the BGE/SigLIP
+fp16-on-CUDA segfault (CPU fp32 works, ~70 s/video) before any 567-video scale-up;
+32B vllm needs `--gpu-memory-utilization 0.85` (0.90 → masked_scatter crash);
+localhost VLM calls must bypass the clash proxy (HF downloads via hf-mirror, not
+clash — clash gave 0.5 MB/s and stalled).
 
 ## 6. Reproducibility quick-ref
 - Env: `conda activate mbe-ingest` (ingest/harness/distill); serving in `vllm-qwen`.
 - Start servers: `bash scripts/serve/serve_vlm_4b.sh`; `CUDA_VISIBLE_DEVICES=1,2 TP_SIZE=2 bash scripts/serve/serve_text_30b.sh`.
 - Pilot: `python -m app.distill.pilot --cases data/eval/datasets/nextgqa_pilot/cases.train.jsonl --n 50`.
-- Diagnostics: `scripts/diag_base_freeform.py`, `scripts/diag_reflection_gap.py`.
-- Artifacts under `data/distill/pilot/` (trajectories/, cot/, *_report.json, *_diag.json).
+- Diagnostics: `scripts/diag_{base_freeform,reflection_gap,orch_reflection,perception_headroom,clevrer_gap,chartqa_gap}.py`.
+- Full per-case output dumps: `scripts/dump_case_outputs.py --dataset next|clevrer|chartqa --tag <model>`
+  (point `LOCAL_VLM_BASE_URL`/`LOCAL_VLM_MODEL_NAME` at the served VLM).
+- Serving (the sweep): `scripts/serve/serve_vlm_4b.sh`; for 8B/30B-A3B/32B see the
+  vllm launch commands (TP=2, `--gpu-memory-utilization 0.85`, `--limit-mm-per-prompt '{"image":18}'`).
+- Cross-model joins/insights: `scripts/build_percase_analysis.py`.
+- Artifacts: `data/distill/pilot/` (pilot), `data/distill/{clevrer,chartqa}/` (gaps),
+  `data/distill/analysis/` (dump_*.jsonl full outputs + *_percase.csv).
