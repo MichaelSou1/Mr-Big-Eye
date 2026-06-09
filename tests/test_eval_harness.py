@@ -389,6 +389,40 @@ def test_evaluate_case_soft_waives_retrieval_when_judge_passes():
     assert result["passed"] is True
 
 
+def test_evaluate_case_distill_strict_disables_soft_waive():
+    case = EvalCase(
+        case_id="strict-soft-1",
+        video_id="v",
+        question="Q",
+        reference_answer="ok",
+        gold_timestamps=[10.0],
+    )
+    prediction = EvalPrediction(
+        case_id="strict-soft-1",
+        retrieved_timestamps=[50.0],
+        answer="Semantically ok but no valid citation.",
+    )
+
+    class FakeJudge:
+        model = "fake"
+
+        def grade(self, *, question, reference, answer):
+            return {"correct": True, "score": 5, "justification": "ok"}
+
+    result = evaluate_case(
+        case,
+        prediction,
+        judge=FakeJudge(),
+        tolerance_sec=2.0,
+        distill_strict=True,
+    )
+
+    assert result["answer"]["llm_judge"]["correct"] is True
+    assert result["answer"]["citation_soft_waived"] is False
+    assert result["retrieval"]["soft_waived"] is False
+    assert result["passed"] is False
+
+
 def test_evaluate_case_keeps_retrieval_strict_when_judge_fails():
     case = EvalCase(
         case_id="ret-strict-1",

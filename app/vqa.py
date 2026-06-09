@@ -23,7 +23,8 @@ import base64
 import io
 import json
 import logging
-from typing import Any, AsyncIterator
+from dataclasses import dataclass
+from typing import Any, AsyncIterator, Literal, Protocol
 
 import httpx
 from PIL import Image
@@ -31,6 +32,49 @@ from PIL import Image
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+
+VLMAPIFormat = Literal["responses", "chat_completions"]
+
+
+@dataclass(frozen=True)
+class VLMEndpointConfig:
+    api_format: VLMAPIFormat
+    base_url: str
+    api_key: str
+    model_name: str
+    timeout: int
+
+
+class VLMBackbone(Protocol):
+    async def generate_caption(self, image: Image.Image) -> str:
+        """Generate a concise caption for one frame."""
+
+    async def answer_question(
+        self,
+        question: str,
+        frames: list[Image.Image],
+        timestamps: list[float],
+        history: list[dict[str, Any]] | None = None,
+        *,
+        system_prompt: str | None = None,
+        subject_registry: list[dict[str, Any]] | None = None,
+        text_evidence: list[dict[str, Any]] | None = None,
+    ) -> str:
+        """Answer from sampled frames."""
+
+    def stream_answer_question(
+        self,
+        question: str,
+        frames: list[Image.Image],
+        timestamps: list[float],
+        history: list[dict[str, Any]] | None = None,
+        *,
+        system_prompt: str | None = None,
+        subject_registry: list[dict[str, Any]] | None = None,
+        text_evidence: list[dict[str, Any]] | None = None,
+    ) -> AsyncIterator[str]:
+        """Yield answer tokens from sampled frames."""
 
 
 CAPTION_SYSTEM_PROMPT = (
@@ -137,26 +181,54 @@ class VLMAPIError(RuntimeError):
     """Raised when the VLM API returns a non-2xx response."""
 
 
-def _headers() -> dict[str, str]:
-    if not settings.vlm_api_key:
+def _remote_endpoint_config() -> VLMEndpointConfig:
+    return VLMEndpointConfig(
+        api_format=settings.vlm_api_format,
+        base_url=settings.vlm_api_base_url,
+        api_key=settings.vlm_api_key,
+        model_name=settings.vlm_model_name,
+        timeout=settings.vlm_api_timeout,
+    )
+
+
+def _local_endpoint_config() -> VLMEndpointConfig:
+    if not settings.local_vlm_base_url or not settings.local_vlm_model_name:
+        raise VLMAPIError(
+            "LOCAL_VLM_BASE_URL and LOCAL_VLM_MODEL_NAME must be set when "
+            "AGENT_VLM_BACKEND=local."
+        )
+    return VLMEndpointConfig(
+        api_format="chat_completions",
+        base_url=settings.local_vlm_base_url,
+        api_key=settings.local_vlm_api_key or "EMPTY",
+        model_name=settings.local_vlm_model_name,
+        timeout=settings.vlm_api_timeout,
+    )
+
+
+def _headers(config: VLMEndpointConfig | None = None) -> dict[str, str]:
+    endpoint = config or _remote_endpoint_config()
+    if not endpoint.api_key:
         raise VLMAPIError(
             "VLM_API_KEY is empty. Set it in .env (or the environment) to call the VLM provider."
         )
     return {
-        "Authorization": f"Bearer {settings.vlm_api_key}",
+        "Authorization": f"Bearer {endpoint.api_key}",
         "Content-Type": "application/json",
     }
 
 
-def _endpoint() -> str:
-    base = settings.vlm_api_base_url.rstrip("/")
-    if settings.vlm_api_format == "responses":
+def _endpoint(config: VLMEndpointConfig | None = None) -> str:
+    endpoint = config or _remote_endpoint_config()
+    base = endpoint.base_url.rstrip("/")
+    if endpoint.api_format == "responses":
         return f"{base}/responses"
     return f"{base}/chat/completions"
 
 
-def _client(*, stream: bool = False) -> httpx.AsyncClient:
-    return httpx.AsyncClient(timeout=settings.vlm_api_timeout)
+def _client(*, stream: bool = False, config: VLMEndpointConfig | None = None) -> httpx.AsyncClient:
+    endpoint = config or _remote_endpoint_config()
+    return httpx.AsyncClient(timeout=endpoint.timeout)
 
 
 # ---------------------------------------------------------------------------
@@ -229,14 +301,23 @@ def _select_evidence_frames(
 # ---------------------------------------------------------------------------
 
 
-def _image_part(url: str) -> dict[str, Any]:
-    if settings.vlm_api_format == "responses":
+def _active_api_format(config: VLMEndpointConfig | None = None) -> VLMAPIFormat:
+    return (config or _remote_endpoint_config()).api_format
+
+
+def _image_part(url: str, config: VLMEndpointConfig | None = None) -> dict[str, Any]:
+    if _active_api_format(config) == "responses":
         return {"type": "input_image", "image_url": url}
     return {"type": "image_url", "image_url": {"url": url}}
 
 
-def _text_part(text: str, *, assistant: bool = False) -> dict[str, Any]:
-    if settings.vlm_api_format == "responses":
+def _text_part(
+    text: str,
+    *,
+    assistant: bool = False,
+    config: VLMEndpointConfig | None = None,
+) -> dict[str, Any]:
+    if _active_api_format(config) == "responses":
         return {
             "type": "output_text" if assistant else "input_text",
             "text": text,
@@ -244,7 +325,10 @@ def _text_part(text: str, *, assistant: bool = False) -> dict[str, Any]:
     return {"type": "text", "text": text}
 
 
-def _history_to_input(history: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _history_to_input(
+    history: list[dict[str, Any]],
+    config: VLMEndpointConfig | None = None,
+) -> list[dict[str, Any]]:
     """Convert plain {role, content} history to the active wire format."""
     output: list[dict[str, Any]] = []
     for item in history:
@@ -252,10 +336,10 @@ def _history_to_input(history: list[dict[str, Any]]) -> list[dict[str, Any]]:
         text = item.get("content")
         if text is None:
             continue
-        if settings.vlm_api_format == "responses":
+        if _active_api_format(config) == "responses":
             item: dict[str, Any] = {
                 "role": role,
-                "content": [_text_part(str(text), assistant=role == "assistant")],
+                "content": [_text_part(str(text), assistant=role == "assistant", config=config)],
             }
             if role == "assistant":
                 # Volcengine ARK rejects replayed assistant items without status.
@@ -267,22 +351,26 @@ def _history_to_input(history: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return output
 
 
-def _build_caption_payload(image: Image.Image) -> dict[str, Any]:
-    if settings.vlm_api_format == "responses":
+def _build_caption_payload(
+    image: Image.Image,
+    config: VLMEndpointConfig | None = None,
+) -> dict[str, Any]:
+    endpoint = config or _remote_endpoint_config()
+    if endpoint.api_format == "responses":
         return {
-            "model": settings.vlm_model_name,
+            "model": endpoint.model_name,
             "input": [
-                {"role": "system", "content": [_text_part(CAPTION_SYSTEM_PROMPT)]},
-                {"role": "user", "content": [_image_part(_pil_to_data_url(image))]},
+                {"role": "system", "content": [_text_part(CAPTION_SYSTEM_PROMPT, config=config)]},
+                {"role": "user", "content": [_image_part(_pil_to_data_url(image), config=config)]},
             ],
             "temperature": 0.1,
             "max_output_tokens": 120,
         }
     return {
-        "model": settings.vlm_model_name,
+        "model": endpoint.model_name,
         "messages": [
             {"role": "system", "content": CAPTION_SYSTEM_PROMPT},
-            {"role": "user", "content": [_image_part(_pil_to_data_url(image))]},
+            {"role": "user", "content": [_image_part(_pil_to_data_url(image), config=config)]},
         ],
         "temperature": 0.1,
         "max_tokens": 120,
@@ -301,7 +389,9 @@ def _build_qa_payload(
     system_prompt: str | None = None,
     subject_registry: list[dict[str, Any]] | None = None,
     text_evidence: list[dict[str, Any]] | None = None,
+    config: VLMEndpointConfig | None = None,
 ) -> dict[str, Any]:
+    endpoint = config or _remote_endpoint_config()
     evidence_frames, evidence_timestamps = _select_evidence_frames(
         frames,
         timestamps,
@@ -323,20 +413,20 @@ def _build_qa_payload(
             "[TRANSCRIPT:t=...] or [SLIDE:t=...] marker shown when using it.\n"
             f"{evidence_text}"
         )
-    user_content: list[dict[str, Any]] = [_text_part(prompt_text)]
+    user_content: list[dict[str, Any]] = [_text_part(prompt_text, config=config)]
     for frame, timestamp in zip(evidence_frames, evidence_timestamps, strict=False):
-        user_content.append(_text_part(f"[t={timestamp:.1f}s]"))
+        user_content.append(_text_part(f"[t={timestamp:.1f}s]", config=config))
         user_content.append(
-            _image_part(_pil_to_data_url(frame, quality=quality, max_side=image_side))
+            _image_part(_pil_to_data_url(frame, quality=quality, max_side=image_side), config=config)
         )
 
-    history_messages = _history_to_input(history or [])
+    history_messages = _history_to_input(history or [], config=config)
 
-    if settings.vlm_api_format == "responses":
+    if endpoint.api_format == "responses":
         return {
-            "model": settings.vlm_model_name,
+            "model": endpoint.model_name,
             "input": [
-                {"role": "system", "content": [_text_part(prompt)]},
+                {"role": "system", "content": [_text_part(prompt, config=config)]},
                 *history_messages,
                 {"role": "user", "content": user_content},
             ],
@@ -345,7 +435,7 @@ def _build_qa_payload(
             "stream": stream,
         }
     return {
-        "model": settings.vlm_model_name,
+        "model": endpoint.model_name,
         "messages": [
             {"role": "system", "content": prompt},
             *history_messages,
@@ -407,8 +497,8 @@ def _format_registry_time(value: Any) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _extract_text(payload: dict[str, Any]) -> str:
-    if settings.vlm_api_format == "responses":
+def _extract_text(payload: dict[str, Any], config: VLMEndpointConfig | None = None) -> str:
+    if _active_api_format(config) == "responses":
         if isinstance(payload.get("output_text"), str):
             return payload["output_text"].strip()
         chunks: list[str] = []
@@ -432,8 +522,11 @@ def _extract_text(payload: dict[str, Any]) -> str:
     return str(content or "").strip()
 
 
-def _streamed_delta(event: dict[str, Any]) -> str | None:
-    if settings.vlm_api_format == "responses":
+def _streamed_delta(
+    event: dict[str, Any],
+    config: VLMEndpointConfig | None = None,
+) -> str | None:
+    if _active_api_format(config) == "responses":
         event_type = event.get("type") or ""
         if event_type.endswith("output_text.delta") or event_type == "response.output_text.delta":
             delta = event.get("delta")
@@ -468,11 +561,18 @@ _TRANSIENT_HTTP_ERRORS: tuple[type[Exception], ...] = (
 )
 
 
-async def _post_json(payload: dict[str, Any]) -> dict[str, Any]:
+async def _post_json(
+    payload: dict[str, Any],
+    config: VLMEndpointConfig | None = None,
+) -> dict[str, Any]:
     for attempt in range(MAX_RETRY_TIME + 1):
         try:
-            async with _client() as client:
-                response = await client.post(_endpoint(), headers=_headers(), json=payload)
+            async with _client(config=config) as client:
+                response = await client.post(
+                    _endpoint(config),
+                    headers=_headers(config),
+                    json=payload,
+                )
         except _TRANSIENT_HTTP_ERRORS as exc:
             if attempt >= MAX_RETRY_TIME:
                 raise
@@ -511,15 +611,18 @@ async def _post_json(payload: dict[str, Any]) -> dict[str, Any]:
     raise RuntimeError("unreachable")  # pragma: no cover
 
 
-async def _stream_sse(payload: dict[str, Any]) -> AsyncIterator[str]:
+async def _stream_sse(
+    payload: dict[str, Any],
+    config: VLMEndpointConfig | None = None,
+) -> AsyncIterator[str]:
     for attempt in range(MAX_RETRY_TIME + 1):
         yielded_any = False
         try:
-            async with _client(stream=True) as client:
+            async with _client(stream=True, config=config) as client:
                 async with client.stream(
                     "POST",
-                    _endpoint(),
-                    headers=_headers(),
+                    _endpoint(config),
+                    headers=_headers(config),
                     json=payload,
                 ) as response:
                     if response.status_code >= 400:
@@ -544,7 +647,7 @@ async def _stream_sse(payload: dict[str, Any]) -> AsyncIterator[str]:
                         except json.JSONDecodeError:
                             logger.debug("Skipping non-JSON SSE chunk: %s", data[:120])
                             continue
-                        delta = _streamed_delta(event)
+                        delta = _streamed_delta(event, config=config)
                         if delta:
                             yielded_any = True
                             yield delta
@@ -572,16 +675,157 @@ def _is_multimodal_prompt_too_long(exc: Exception) -> bool:
     )
 
 
+async def _post_json_for_config(
+    payload: dict[str, Any],
+    config: VLMEndpointConfig,
+) -> dict[str, Any]:
+    if config == _remote_endpoint_config():
+        return await _post_json(payload)
+    return await _post_json(payload, config=config)
+
+
+async def _stream_sse_for_config(
+    payload: dict[str, Any],
+    config: VLMEndpointConfig,
+) -> AsyncIterator[str]:
+    if config == _remote_endpoint_config():
+        async for delta in _stream_sse(payload):
+            yield delta
+        return
+    async for delta in _stream_sse(payload, config=config):
+        yield delta
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
 
+class RemoteVLMBackbone:
+    def __init__(self, config: VLMEndpointConfig | None = None):
+        self.config = config or _remote_endpoint_config()
+
+    async def generate_caption(self, image: Image.Image) -> str:
+        payload = _build_caption_payload(image, config=self.config)
+        data = await _post_json_for_config(payload, self.config)
+        return _extract_text(data, config=self.config)
+
+    async def answer_question(
+        self,
+        question: str,
+        frames: list[Image.Image],
+        timestamps: list[float],
+        history: list[dict[str, Any]] | None = None,
+        *,
+        system_prompt: str | None = None,
+        subject_registry: list[dict[str, Any]] | None = None,
+        text_evidence: list[dict[str, Any]] | None = None,
+    ) -> str:
+        frame_limit = settings.vqa_max_frames if settings.vqa_max_frames > 0 else len(frames)
+        image_side = settings.vqa_max_image_side
+        attempt = 0
+        while True:
+            try:
+                payload = _build_qa_payload(
+                    question,
+                    frames,
+                    timestamps,
+                    history,
+                    max_frames=frame_limit,
+                    max_image_side=image_side,
+                    image_quality=settings.vqa_image_quality,
+                    stream=False,
+                    system_prompt=system_prompt,
+                    subject_registry=subject_registry,
+                    text_evidence=text_evidence,
+                    config=self.config,
+                )
+                data = await _post_json_for_config(payload, self.config)
+                text = _extract_text(data, config=self.config)
+                if text:
+                    return text
+                # Empty completion: some VLMs (Qwen3-VL, doubao) occasionally return
+                # an empty string for valid prompts. Retry once before giving up.
+                logger.warning("VLM returned empty answer; retrying once.")
+                data = await _post_json_for_config(payload, self.config)
+                return _extract_text(data, config=self.config)
+            except VLMAPIError as exc:
+                if not _is_multimodal_prompt_too_long(exc) or attempt >= 3:
+                    raise
+
+                next_frame_limit = max(1, min(frame_limit, len(frames)) // 2)
+                next_image_side = 320 if image_side <= 0 else max(224, int(image_side * 0.75))
+                if next_frame_limit == frame_limit and next_image_side == image_side:
+                    raise
+
+                logger.warning(
+                    "VQA prompt exceeded multimodal budget; retrying with "
+                    "%s frame(s), max image side %s",
+                    next_frame_limit,
+                    next_image_side,
+                )
+                frame_limit = next_frame_limit
+                image_side = next_image_side
+                attempt += 1
+
+    async def stream_answer_question(
+        self,
+        question: str,
+        frames: list[Image.Image],
+        timestamps: list[float],
+        history: list[dict[str, Any]] | None = None,
+        *,
+        system_prompt: str | None = None,
+        subject_registry: list[dict[str, Any]] | None = None,
+        text_evidence: list[dict[str, Any]] | None = None,
+    ) -> AsyncIterator[str]:
+        payload = _build_qa_payload(
+            question,
+            frames,
+            timestamps,
+            history,
+            max_frames=settings.vqa_max_frames if settings.vqa_max_frames > 0 else len(frames),
+            max_image_side=settings.vqa_max_image_side,
+            image_quality=settings.vqa_image_quality,
+            stream=True,
+            system_prompt=system_prompt,
+            subject_registry=subject_registry,
+            text_evidence=text_evidence,
+            config=self.config,
+        )
+        async for delta in _stream_sse_for_config(payload, self.config):
+            yield delta
+
+
+class LocalVLMBackbone(RemoteVLMBackbone):
+    def __init__(self, config: VLMEndpointConfig | None = None):
+        super().__init__(config or _local_endpoint_config())
+
+
+def get_agent_vlm_backbone() -> VLMBackbone:
+    if settings.agent_vlm_backend == "local":
+        return LocalVLMBackbone()
+    return RemoteVLMBackbone()
+
+
+def current_agent_vlm_name() -> str:
+    if settings.agent_vlm_backend == "local":
+        return settings.local_vlm_model_name or ""
+    return settings.vlm_model_name
+
+
+def current_agent_vlm_cache_label() -> str:
+    backend = settings.agent_vlm_backend
+    model = current_agent_vlm_name()
+    if backend == "local":
+        base = settings.local_vlm_base_url.rstrip("/")
+        return f"{backend}:{model}@{base}"
+    return f"{backend}:{model}@{settings.vlm_api_base_url.rstrip('/')}"
+
+
 async def generate_caption(image: Image.Image) -> str:
     """Generate a concise English caption for a single frame."""
-    payload = _build_caption_payload(image)
-    data = await _post_json(payload)
-    return _extract_text(data)
+    return await get_agent_vlm_backbone().generate_caption(image)
 
 
 async def answer_question(
@@ -595,52 +839,15 @@ async def answer_question(
     text_evidence: list[dict[str, Any]] | None = None,
 ) -> str:
     """Answer a question using sampled keyframes sorted by timestamp."""
-    frame_limit = settings.vqa_max_frames if settings.vqa_max_frames > 0 else len(frames)
-    image_side = settings.vqa_max_image_side
-    attempt = 0
-    while True:
-        try:
-            payload = _build_qa_payload(
-                question,
-                frames,
-                timestamps,
-                history,
-                max_frames=frame_limit,
-                max_image_side=image_side,
-                image_quality=settings.vqa_image_quality,
-                stream=False,
-                system_prompt=system_prompt,
-                subject_registry=subject_registry,
-                text_evidence=text_evidence,
-            )
-            data = await _post_json(payload)
-            text = _extract_text(data)
-            if text:
-                return text
-            # Empty completion: some VLMs (Qwen3-VL, doubao) occasionally return
-            # an empty string for valid prompts. Retry once before giving up;
-            # callers downstream (D2 salvage) cannot recover an empty draft.
-            logger.warning("VLM returned empty answer; retrying once.")
-            data = await _post_json(payload)
-            return _extract_text(data)
-        except VLMAPIError as exc:
-            if not _is_multimodal_prompt_too_long(exc) or attempt >= 3:
-                raise
-
-            next_frame_limit = max(1, min(frame_limit, len(frames)) // 2)
-            next_image_side = 320 if image_side <= 0 else max(224, int(image_side * 0.75))
-            if next_frame_limit == frame_limit and next_image_side == image_side:
-                raise
-
-            logger.warning(
-                "VQA prompt exceeded multimodal budget; retrying with "
-                "%s frame(s), max image side %s",
-                next_frame_limit,
-                next_image_side,
-            )
-            frame_limit = next_frame_limit
-            image_side = next_image_side
-            attempt += 1
+    return await get_agent_vlm_backbone().answer_question(
+        question,
+        frames,
+        timestamps,
+        history,
+        system_prompt=system_prompt,
+        subject_registry=subject_registry,
+        text_evidence=text_evidence,
+    )
 
 
 async def stream_answer_question(
@@ -654,18 +861,13 @@ async def stream_answer_question(
     text_evidence: list[dict[str, Any]] | None = None,
 ) -> AsyncIterator[str]:
     """Yield VQA answer tokens using sampled keyframes."""
-    payload = _build_qa_payload(
+    async for delta in get_agent_vlm_backbone().stream_answer_question(
         question,
         frames,
         timestamps,
         history,
-        max_frames=settings.vqa_max_frames if settings.vqa_max_frames > 0 else len(frames),
-        max_image_side=settings.vqa_max_image_side,
-        image_quality=settings.vqa_image_quality,
-        stream=True,
         system_prompt=system_prompt,
         subject_registry=subject_registry,
         text_evidence=text_evidence,
-    )
-    async for delta in _stream_sse(payload):
+    ):
         yield delta

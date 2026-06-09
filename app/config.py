@@ -18,6 +18,21 @@ class Settings(BaseSettings):
     vlm_model_name: str = "doubao-seed-2-0-pro-260215"
     vlm_api_timeout: int = 120
 
+    # Distillation / research backbone split. The agent VLM can be switched to a
+    # local OpenAI-compatible 4B endpoint without changing the text orchestrator.
+    agent_vlm_backend: Literal["remote", "local"] = "remote"
+    local_vlm_base_url: str = ""
+    local_vlm_model_name: str = ""
+    local_vlm_api_key: str = "EMPTY"
+    rewriter_api_base_url: str = ""
+    rewriter_api_key: str = ""
+    rewriter_model_name: str = ""
+    train_modality: Literal["frames_only"] = "frames_only"
+    # Fixed uniform frame sampler budget for the no-tool single-forward study.
+    # Identical at trajectory generation, CoT rewrite, consistency filter, SFT,
+    # and inference so frame *selection* is held constant (not internalized).
+    distill_sampler_frames: int = 16
+
     # Tool-aware text orchestrator. It must speak an OpenAI-compatible
     # Chat Completions API because LangChain binds tools through that surface.
     # Empty values default to the VLM API settings above.

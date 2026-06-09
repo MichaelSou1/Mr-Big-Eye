@@ -219,9 +219,10 @@ async def _run_predictions(
     # Compose both orchestrator and VLM into the cache key so swapping either
     # one invalidates affected entries (VLM-only swap was previously a silent
     # cache hit because only orchestrator name was keyed).
+    from app.vqa import current_agent_vlm_cache_label
+
     orch_name = (settings.orchestrator_model_name or settings.vlm_model_name or "")
-    vlm_name = (settings.vlm_model_name or "")
-    model_name = f"{orch_name}|vlm={vlm_name}"
+    model_name = f"{orch_name}|agent_vlm={current_agent_vlm_cache_label()}"
     predictions = {}
     for case in cases:
         if get_video_status(case.video_id) != "done":

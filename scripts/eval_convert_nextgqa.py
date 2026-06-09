@@ -29,6 +29,7 @@ DEFAULT_OUTPUT_CASES = ROOT_DIR / "tests" / "fixtures" / "eval_cases_nextgqa.jso
 DEFAULT_OUTPUT_MANIFEST = ROOT_DIR / "data" / "eval" / "datasets" / "nextgqa" / "manifest.json"
 
 TEMPORAL_TYPES = {"TN", "TC", "TP"}
+VISION_ONLY_QTYPES = {"TN", "TC", "TP", "CH", "CW", "DL", "DO", "DC"}
 
 STOPWORDS = {
     "the", "a", "an", "of", "to", "in", "on", "for", "and", "or", "is", "are",
@@ -65,6 +66,8 @@ def convert_row(
     row: dict[str, str],
     gsub: dict,
     vid_to_vidor: dict[str, str],
+    *,
+    vision_only_prescreen: bool = True,
 ) -> tuple[dict, dict] | None:
     qid = row.get("qid")
     video_id = row.get("video_id")
@@ -73,6 +76,8 @@ def convert_row(
     qtype = row.get("type") or "misc"
     candidates = [row.get(f"a{i}") or "" for i in range(5)]
     if not qid or not video_id or not question or not answer:
+        return None
+    if vision_only_prescreen and qtype and qtype not in VISION_ONLY_QTYPES:
         return None
 
     video_record = gsub.get(video_id) or {}
@@ -101,6 +106,8 @@ def convert_row(
         "forbidden_keywords": [],
         "gold_timestamps": gold_timestamps,
         "gold_scenes": gold_scenes,
+        "question_type": qtype,
+        "qtype": qtype,
     }
     if qtype in TEMPORAL_TYPES:
         case["expected_action"] = "build_timeline"
@@ -122,6 +129,11 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=17)
     parser.add_argument("--output-cases", default=str(DEFAULT_OUTPUT_CASES))
     parser.add_argument("--output-manifest", default=str(DEFAULT_OUTPUT_MANIFEST))
+    parser.add_argument(
+        "--no-vision-only-prescreen",
+        action="store_true",
+        help="Keep all qtypes instead of the distillation vision-only pre-screen.",
+    )
     args = parser.parse_args()
 
     source_dir = Path(args.source_dir)
@@ -140,7 +152,12 @@ def main() -> int:
     with val_csv.open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
         for row in reader:
-            result = convert_row(row, gsub, vid_to_vidor)
+            result = convert_row(
+                row,
+                gsub,
+                vid_to_vidor,
+                vision_only_prescreen=not args.no_vision_only_prescreen,
+            )
             if result is None:
                 continue
             case, manifest_entry = result

@@ -61,10 +61,18 @@ class BgeM3Wrapper:
         source = _model_source(settings.bge_m3_local_dir, model_name)
         use_fp16 = self.device.startswith("cuda")
         logger.info("Loading bge-m3 from %s on %s", source, self.device)
+        # Pin a SINGLE device. FlagEmbedding's `devices` kwarg (plural) controls
+        # this; when omitted it auto-detects ALL GPUs, making encode() spawn a
+        # multi-process pool whose model.share_memory() fails in this env
+        # ("random_device could not be read"). Pinning one device keeps encode()
+        # on the single-device path. Tolerate older signatures (`device=`/none).
         try:
-            self.model = BGEM3FlagModel(source, use_fp16=use_fp16, device=self.device)
+            self.model = BGEM3FlagModel(source, use_fp16=use_fp16, devices=self.device)
         except TypeError:
-            self.model = BGEM3FlagModel(source, use_fp16=use_fp16)
+            try:
+                self.model = BGEM3FlagModel(source, use_fp16=use_fp16, device=self.device)
+            except TypeError:
+                self.model = BGEM3FlagModel(source, use_fp16=use_fp16)
 
     def encode_text(self, texts: list[str]) -> np.ndarray:
         if not texts:

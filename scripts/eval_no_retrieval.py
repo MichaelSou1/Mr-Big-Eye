@@ -17,66 +17,16 @@ import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
-from PIL import Image
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from app.cache import get_video_status, load_meta, video_cache_dir
+from app.cache import get_video_status
 from app.config import settings
+from app.distill.frames import load_uniform_frames as _load_uniform_frames
 from app.eval_harness import load_cases
 from app.vqa import answer_question
-
-
-def _uniform_timestamps(duration: float, n: int) -> list[float]:
-    if n <= 0 or duration <= 0:
-        return []
-    if n == 1:
-        return [duration / 2.0]
-    step = duration / (n + 1)
-    return [round(step * (i + 1), 1) for i in range(n)]
-
-
-def _nearest_dense_frame(cache_root: Path, target: float) -> tuple[Path, float] | None:
-    """Pick the dense-sampled frame closest to `target` seconds."""
-    dense_dir = cache_root / "frames_dense"
-    if not dense_dir.is_dir():
-        return None
-    best: tuple[Path, float] | None = None
-    best_dist = float("inf")
-    for path in dense_dir.glob("t*.jpg"):
-        try:
-            ts = float(path.stem.lstrip("t"))
-        except ValueError:
-            continue
-        dist = abs(ts - target)
-        if dist < best_dist:
-            best_dist = dist
-            best = (path, ts)
-    return best
-
-
-def _load_uniform_frames(video_id: str, n: int) -> tuple[list[Image.Image], list[float]]:
-    meta = load_meta(video_id)
-    duration = float(meta.get("duration") or 0.0)
-    cache_root = video_cache_dir(video_id)
-    targets = _uniform_timestamps(duration, n)
-    frames: list[Image.Image] = []
-    timestamps: list[float] = []
-    seen_paths: set[Path] = set()
-    for target in targets:
-        picked = _nearest_dense_frame(cache_root, target)
-        if picked is None:
-            continue
-        path, actual_ts = picked
-        if path in seen_paths:
-            continue
-        seen_paths.add(path)
-        frames.append(Image.open(path).convert("RGB"))
-        timestamps.append(actual_ts)
-    order = sorted(range(len(timestamps)), key=lambda i: timestamps[i])
-    return [frames[i] for i in order], [timestamps[i] for i in order]
 
 
 async def main_async() -> int:

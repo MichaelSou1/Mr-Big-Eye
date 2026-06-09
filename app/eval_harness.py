@@ -152,6 +152,7 @@ def evaluate_case(
     recall_k: int | None = None,
     judge: "JudgeClient | None" = None,
     judge_cache: "JudgeCache | None" = None,
+    distill_strict: bool = False,
 ) -> dict[str, Any]:
     retrieval = evaluate_retrieval(
         gold_timestamps=case.gold_timestamps,
@@ -188,7 +189,7 @@ def evaluate_case(
         # requirements (they were instrumentation, not correctness). Still
         # require hallucination_free + uncertainty_ok regardless.
         judge_pass = bool(judge_result.get("correct"))
-        if judge_pass:
+        if judge_pass and not distill_strict:
             answer["citation_soft_waived"] = not answer["citation_correct"]
             answer["passed"] = answer["hallucination_free"] and answer["uncertainty_ok"]
         else:
@@ -209,14 +210,22 @@ def evaluate_case(
     # has accepted the answer, the prescribed-tool path was instrumentation,
     # not correctness. Outcome > process. Keep the strict signal for forensics.
     agent["soft_waived"] = False
-    if judge is not None and bool((answer.get("llm_judge") or {}).get("correct")):
+    if (
+        judge is not None
+        and not distill_strict
+        and bool((answer.get("llm_judge") or {}).get("correct"))
+    ):
         if agent["passed"] is False:
             agent["soft_waived"] = True
     # Soft-waive retrieval the same way we soft-waive citation and agent: when
     # the judge accepts the answer, a strict retrieval-gate FAIL is
     # instrumentation, not correctness. Keep the strict signal in the JSON.
     retrieval["soft_waived"] = False
-    if judge is not None and bool((answer.get("llm_judge") or {}).get("correct")):
+    if (
+        judge is not None
+        and not distill_strict
+        and bool((answer.get("llm_judge") or {}).get("correct"))
+    ):
         if retrieval["passed"] is False:
             retrieval["soft_waived"] = True
     # retrieval["passed"] may be None when the case has no gold timestamps
@@ -1351,9 +1360,10 @@ async def _run_local_predictions(
 
     app_graph = build_graph(InMemorySaver(), InMemoryStore(), memory_manager=_NoopMemoryManager())
     fingerprint = prompt_fingerprint() if prediction_cache is not None else ""
+    from app.vqa import current_agent_vlm_cache_label
+
     orch_name = (settings.orchestrator_model_name or settings.vlm_model_name or "")
-    vlm_name = (settings.vlm_model_name or "")
-    model_name = f"{orch_name}|vlm={vlm_name}"
+    model_name = f"{orch_name}|agent_vlm={current_agent_vlm_cache_label()}"
     predictions: dict[str, EvalPrediction] = {}
 
     for case in cases:

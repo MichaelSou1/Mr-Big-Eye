@@ -19,10 +19,10 @@ from pathlib import Path
 
 import pandas as pd
 
-CACHE = Path("/home/user/Mr-Big-Eye/data/hf_cache/videomme")
-VIDEOS = Path("/home/user/Mr-Big-Eye/data/videomme_videos")
-EVAL_DIR = Path("/home/user/Mr-Big-Eye/eval/audiovisual")
-EVAL_DIR.mkdir(parents=True, exist_ok=True)
+ROOT_DIR = Path(__file__).resolve().parents[1]
+CACHE = ROOT_DIR / "data" / "hf_cache" / "videomme"
+VIDEOS = ROOT_DIR / "data" / "videomme_videos"
+EVAL_DIR = ROOT_DIR / "eval" / "audiovisual"
 
 # Video-MME task_type -> our modality_tag
 TASK_TYPE_TO_MODALITY = {
@@ -113,6 +113,7 @@ def compute_video_id(mp4_path: Path) -> str:
 
 
 def main() -> int:
+    EVAL_DIR.mkdir(parents=True, exist_ok=True)
     df = pd.read_parquet(CACHE / "test.parquet")
     with (CACHE / "sampled_videos.json").open() as f:
         sampled = set(json.load(f))

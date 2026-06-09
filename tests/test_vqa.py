@@ -129,3 +129,32 @@ def test_answer_question_accepts_custom_system_prompt(monkeypatch):
     import asyncio
 
     asyncio.run(run())
+
+
+def test_local_vlm_backbone_uses_chat_completions_config(monkeypatch):
+    monkeypatch.setattr(settings, "local_vlm_base_url", "http://127.0.0.1:30000/v1")
+    monkeypatch.setattr(settings, "local_vlm_model_name", "Qwen3-VL-4B-Instruct")
+    monkeypatch.setattr(settings, "local_vlm_api_key", "EMPTY")
+
+    config = vqa._local_endpoint_config()
+    payload = vqa._build_qa_payload(
+        "What color is it?",
+        [Image.new("RGB", (32, 32), "white")],
+        [1.0],
+        config=config,
+    )
+
+    assert payload["model"] == "Qwen3-VL-4B-Instruct"
+    assert "messages" in payload
+    assert "input" not in payload
+    assert vqa._endpoint(config) == "http://127.0.0.1:30000/v1/chat/completions"
+
+
+def test_current_agent_vlm_cache_label_includes_backend(monkeypatch):
+    monkeypatch.setattr(settings, "agent_vlm_backend", "local")
+    monkeypatch.setattr(settings, "local_vlm_base_url", "http://sglang.local/v1")
+    monkeypatch.setattr(settings, "local_vlm_model_name", "qwen4b")
+
+    label = vqa.current_agent_vlm_cache_label()
+
+    assert label == "local:qwen4b@http://sglang.local/v1"
