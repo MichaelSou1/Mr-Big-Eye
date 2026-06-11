@@ -1,0 +1,62 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "2f84ff86dbc9356e",
+  "case_id": "nextgqa-4650556666-2",
+  "question": "why is the child on the floor near the end of the video\n\nCandidates:\nA) cry\nB) to rest\nC) take a drink\nD) lose balance\nE) playing with dog\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    1.0,
+    3.0,
+    4.0,
+    5.0,
+    7.0,
+    8.0,
+    9.0,
+    11.0,
+    12.0,
+    13.0,
+    15.0,
+    16.0,
+    17.0,
+    19.0,
+    20.0,
+    21.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0001.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0003.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0004.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0005.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0007.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0008.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0009.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0011.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0012.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0013.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0015.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0016.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0017.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0019.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0020.0.jpg",
+    "/home/gpus/mbe_data/cache/2f84ff86dbc9356e/frames_dense/t0021.0.jpg"
+  ],
+  "cot": "[\"At [FRAME:t=19.0], the child is standing on the wooden floor, holding the adult's hand, but appears unsteady with a wobbly posture, suggesting difficulty maintaining balance.\", 'At [FRAME:t=20.0], the child is no longer visible in the frame, indicating a fall or sudden movement, consistent with losing balance during assistance.', 'No visual evidence shows the child crying, resting, drinking, or interacting with a dog in any frame.', 'The context of the child being guided by an adult and then falling supports the interpretation of losing balance as the cause of being on the floor.']",
+  "answer": "D) lose balance",
+  "gold_timestamps": [
+    20.1
+  ],
+  "gold_scenes": [
+    {
+      "start": 17.7,
+      "end": 22.5
+    }
+  ],
+  "source_traj_hash": "9b35de8c4be2eff6bee9ff7d05cfb97913c18823",
+  "validation_report": {
+    "ok": true,
+    "errors": [],
+    "frame_markers": [
+      19.0,
+      20.0
+    ]
+  }
+}

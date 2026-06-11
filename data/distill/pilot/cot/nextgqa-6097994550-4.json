@@ -1,0 +1,64 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "bb13d595f11b2144",
+  "case_id": "nextgqa-6097994550-4",
+  "question": "how does the man with spectacles move at the end of the video\n\nCandidates:\nA) walk\nB) caress his head\nC) count with fingers\nD) crawls\nE) strolls around\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0,
+    11.0,
+    12.0,
+    13.0,
+    14.0,
+    16.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0001.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0002.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0003.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0004.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0005.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0006.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0007.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0008.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0009.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0010.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0011.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0012.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0013.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0014.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0016.0.jpg"
+  ],
+  "cot": "['At [FRAME:t=14.0], the man with spectacles is on his hands and knees, body low to the ground, with his head and shoulders close to the floor, indicating a crawling motion.', 'At [FRAME:t=14.0], the posture is maintained: hands and knees remain in contact with the ground, and the body is angled forward, consistent with continuous crawling.', 'At [FRAME:t=16.0], the man continues in the same low, forward-leaning position, with no evidence of standing, walking, or hand gestures such as counting or touching the head.', 'The motion is not consistent with walking, strolling, or caressing the head; the body position and limb placement confirm crawling as the only plausible movement.', 'The visual evidence across [FRAME:t=14.0], [FRAME:t=14.0], and [FRAME:t=16.0] supports that the man with spectacles crawls at the end of the video.']",
+  "answer": "D) crawls",
+  "gold_timestamps": [
+    14.25
+  ],
+  "gold_scenes": [
+    {
+      "start": 10.9,
+      "end": 17.6
+    }
+  ],
+  "source_traj_hash": "625c8570a6d2eaeb7e109b42eadf77a9649726d2",
+  "validation_report": {
+    "ok": true,
+    "errors": [],
+    "frame_markers": [
+      14.0,
+      14.0,
+      16.0,
+      14.0,
+      14.0,
+      16.0
+    ]
+  }
+}

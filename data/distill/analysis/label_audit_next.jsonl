@@ -1,0 +1,417 @@
+{
+  "summary": {
+    "n": 50,
+    "counts": {
+      "clean": 47,
+      "ambiguous": 3,
+      "wrong_gold": 0
+    },
+    "clean_rate": 0.94,
+    "noise_rate": 0.06000000000000005,
+    "clean_rate_ci": [
+      0.86,
+      1.0
+    ]
+  },
+  "clean_ids": [
+    "nextgqa-10309542255-4",
+    "nextgqa-10727696143-5",
+    "nextgqa-11276567104-3",
+    "nextgqa-14012319794-4",
+    "nextgqa-2547885226-4",
+    "nextgqa-2614918961-2",
+    "nextgqa-2782658657-0",
+    "nextgqa-2868183184-7",
+    "nextgqa-2984974097-8",
+    "nextgqa-3026084730-11",
+    "nextgqa-3078294001-3",
+    "nextgqa-3376544720-9",
+    "nextgqa-3429509208-1",
+    "nextgqa-3441428429-9",
+    "nextgqa-3524939594-2",
+    "nextgqa-3741143820-8",
+    "nextgqa-3943634344-10",
+    "nextgqa-3960291106-7",
+    "nextgqa-4087013668-8",
+    "nextgqa-4123915842-7",
+    "nextgqa-4244817395-3",
+    "nextgqa-4336654741-7",
+    "nextgqa-4367056464-2",
+    "nextgqa-4378803532-8",
+    "nextgqa-4419096437-1",
+    "nextgqa-4443526735-3",
+    "nextgqa-4650556666-2",
+    "nextgqa-4838145161-0",
+    "nextgqa-4838145161-2",
+    "nextgqa-4968805923-4",
+    "nextgqa-4970148391-9",
+    "nextgqa-5056964274-5",
+    "nextgqa-5138093706-1",
+    "nextgqa-5421648216-5",
+    "nextgqa-5658916668-8",
+    "nextgqa-5803861992-1",
+    "nextgqa-5803861992-9",
+    "nextgqa-5840177726-0",
+    "nextgqa-5945172741-7",
+    "nextgqa-6018514357-6",
+    "nextgqa-6097994550-4",
+    "nextgqa-6516459343-4",
+    "nextgqa-7001078933-1",
+    "nextgqa-8177965766-0",
+    "nextgqa-8252088130-4",
+    "nextgqa-8797589693-3",
+    "nextgqa-9408800471-6"
+  ],
+  "rows": [
+    {
+      "case_id": "nextgqa-10309542255-4",
+      "qtype": "tc",
+      "gold": "push back",
+      "verdict": "clean",
+      "reason": "Each option describes a distinct animal response; 'push back' is physically pushing, while 'snarl', 'shout', 'run away', and 'bite' are clearly different action"
+    },
+    {
+      "case_id": "nextgqa-10727696143-5",
+      "qtype": "tn",
+      "gold": "talk to person outside door",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions with no overlap or synonymy with the gold option."
+    },
+    {
+      "case_id": "nextgqa-11276567104-3",
+      "qtype": "tn",
+      "gold": "pat her shoulders and talk",
+      "verdict": "clean",
+      "reason": "Each option describes a distinct action with no overlap or near-synonyms; for example, 'pat her shoulders and talk' is clearly different from 'clap again' or 'h"
+    },
+    {
+      "case_id": "nextgqa-14012319794-4",
+      "qtype": "cw",
+      "gold": "try to take flag on top",
+      "verdict": "clean",
+      "reason": "parse_fail"
+    },
+    {
+      "case_id": "nextgqa-2547885226-4",
+      "qtype": "tp",
+      "gold": "looks at the camera",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions without overlap or synonymy."
+    },
+    {
+      "case_id": "nextgqa-2614918961-2",
+      "qtype": "cw",
+      "gold": "playing with the toys",
+      "verdict": "clean",
+      "reason": "parse_fail"
+    },
+    {
+      "case_id": "nextgqa-2669452260-4",
+      "qtype": "tn",
+      "gold": "put down the can",
+      "verdict": "ambiguous",
+      "reason": "Options B and C are near-synonyms (cap vs close bottle), making them potentially overlapping for the same action."
+    },
+    {
+      "case_id": "nextgqa-2782658657-0",
+      "qtype": "cw",
+      "gold": "ready to run",
+      "verdict": "clean",
+      "reason": "All options describe distinct physical actions (running, cleaning, pulling, arranging, pedalling) with no semantic overlap or synonymy, making them cleanly sepa"
+    },
+    {
+      "case_id": "nextgqa-2868183184-7",
+      "qtype": "tn",
+      "gold": "look closer",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions with no overlap or synonymy."
+    },
+    {
+      "case_id": "nextgqa-2984974097-8",
+      "qtype": "ch",
+      "gold": "smile brightly",
+      "verdict": "clean",
+      "reason": "All options are distinct actions or objects with no semantic overlap, so a single video can clearly support only one as the best answer."
+    },
+    {
+      "case_id": "nextgqa-3026084730-11",
+      "qtype": "tn",
+      "gold": "walks away",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions; 'walks away' does not overlap with any other option."
+    },
+    {
+      "case_id": "nextgqa-3078294001-3",
+      "qtype": "cw",
+      "gold": "starts walking while talking",
+      "verdict": "clean",
+      "reason": "Each option describes a distinct action; none are near-synonyms or overlapping with 'starts walking while talking'."
+    },
+    {
+      "case_id": "nextgqa-3376544720-9",
+      "qtype": "ch",
+      "gold": "spin and  up and down",
+      "verdict": "clean",
+      "reason": "Option D is a specific combination of spinning and vertical motion, while other options describe distinct single actions (galloping, turning, jumping, running i"
+    },
+    {
+      "case_id": "nextgqa-3429509208-1",
+      "qtype": "cw",
+      "gold": "push it",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions or reasons for touching the vacuum cleaner, with no overlap or near-synonyms that could both apply to the same video."
+    },
+    {
+      "case_id": "nextgqa-3441428429-9",
+      "qtype": "tn",
+      "gold": "get up",
+      "verdict": "clean",
+      "reason": "The options describe distinct actions: 'get up' is specifically about rising, while the others involve different activities like looking, turning, wiping, or ta"
+    },
+    {
+      "case_id": "nextgqa-3524939594-2",
+      "qtype": "tc",
+      "gold": "thrilled",
+      "verdict": "clean",
+      "reason": "The options represent distinct emotional states (sleepy, adorable, calmer/happier, thrilled, curious/happy) with no near-synonyms or overlapping meanings that w"
+    },
+    {
+      "case_id": "nextgqa-3741143820-8",
+      "qtype": "tn",
+      "gold": "put hand on forehead",
+      "verdict": "clean",
+      "reason": "The gold option 'put hand on forehead' is distinct from all other options, which describe different actions like eating, putting something on a table, talking, "
+    },
+    {
+      "case_id": "nextgqa-3943634344-10",
+      "qtype": "tn",
+      "gold": "holds the book",
+      "verdict": "clean",
+      "reason": "Each option describes a distinct action with no semantic overlap; 'holds the book' is clearly separable from eating, walking away, looking around, or making fac"
+    },
+    {
+      "case_id": "nextgqa-3960291106-7",
+      "qtype": "tn",
+      "gold": "claps",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions (walking, pointing, clapping, talking, walking backwards) with no overlapping or synonymous meanings."
+    },
+    {
+      "case_id": "nextgqa-4087013668-8",
+      "qtype": "tn",
+      "gold": "clap hands",
+      "verdict": "clean",
+      "reason": "All options describe distinct physical actions (moving, looking, clapping, smiling, touching) with no overlapping or synonymous meanings."
+    },
+    {
+      "case_id": "nextgqa-4123915842-7",
+      "qtype": "tc",
+      "gold": "stand up",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions; none are near-synonyms or overlapping with 'stand up'."
+    },
+    {
+      "case_id": "nextgqa-4244817395-3",
+      "qtype": "cw",
+      "gold": "signal him something inside drinking machine",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions without overlap or ambiguity."
+    },
+    {
+      "case_id": "nextgqa-4336654741-7",
+      "qtype": "tn",
+      "gold": "imitate her",
+      "verdict": "clean",
+      "reason": "parse_fail"
+    },
+    {
+      "case_id": "nextgqa-4367056464-2",
+      "qtype": "cw",
+      "gold": "excited",
+      "verdict": "clean",
+      "reason": "Options are distinct concepts; 'excited' and 'enjoying with the piano music' are not synonymous or overlapping."
+    },
+    {
+      "case_id": "nextgqa-4378803532-8",
+      "qtype": "tn",
+      "gold": "walk away",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions or states; 'walk away' is clearly separable from the others without overlap or near-synonymy."
+    },
+    {
+      "case_id": "nextgqa-4419096437-1",
+      "qtype": "cw",
+      "gold": "put cat to sleep",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions with no overlap or near-synonyms."
+    },
+    {
+      "case_id": "nextgqa-4443526735-3",
+      "qtype": "ch",
+      "gold": "in a swing",
+      "verdict": "clean",
+      "reason": "All options describe distinct modes of baby movement (swing, carried by man, in arms, pram, crawl) with no overlap or synonymy."
+    },
+    {
+      "case_id": "nextgqa-4650556666-2",
+      "qtype": "cw",
+      "gold": "lose balance",
+      "verdict": "clean",
+      "reason": "All options describe distinct reasons for a child being on the floor, with no overlapping or synonymous meanings."
+    },
+    {
+      "case_id": "nextgqa-4674481985-2",
+      "qtype": "tn",
+      "gold": "swim back out",
+      "verdict": "ambiguous",
+      "reason": "'swim back out' is a specific instance of 'swimming', so both options could be correct for the same video, causing overlap."
+    },
+    {
+      "case_id": "nextgqa-4838145161-0",
+      "qtype": "cw",
+      "gold": "for cat to drink",
+      "verdict": "clean",
+      "reason": "Options are distinct; only one purpose matches a video of a cat drinking."
+    },
+    {
+      "case_id": "nextgqa-4838145161-2",
+      "qtype": "cw",
+      "gold": "swat water from face",
+      "verdict": "clean",
+      "reason": "Options are distinct actions; 'swat water from face' is specific to face, while 'remove water from his body' is general, and others are unrelated."
+    },
+    {
+      "case_id": "nextgqa-4942054721-4",
+      "qtype": "tc",
+      "gold": "feeding",
+      "verdict": "ambiguous",
+      "reason": "'Grazing' and 'feeding' are near-synonyms; if goats are eating grass, both could apply, making them overlapping."
+    },
+    {
+      "case_id": "nextgqa-4968805923-4",
+      "qtype": "ch",
+      "gold": "throw his cap onto the floor",
+      "verdict": "clean",
+      "reason": "Each option describes a distinct physical action with no overlap or synonymity."
+    },
+    {
+      "case_id": "nextgqa-4970148391-9",
+      "qtype": "tn",
+      "gold": "remove spectacles",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions with no semantic overlap or synonymy; each can be uniquely identified in a video clip."
+    },
+    {
+      "case_id": "nextgqa-5056964274-5",
+      "qtype": "tn",
+      "gold": "eats the food",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions or states (e.g., saying, eating, drinking, standing, referencing a case) with no overlapping meanings, so a single best an"
+    },
+    {
+      "case_id": "nextgqa-5138093706-1",
+      "qtype": "ch",
+      "gold": "crawl up",
+      "verdict": "clean",
+      "reason": "Each option describes a distinct method of moving up stairs (carrying, walking, running, holding hands, crawling) with no overlap or synonymy between them."
+    },
+    {
+      "case_id": "nextgqa-5421648216-5",
+      "qtype": "tn",
+      "gold": "stands next to him",
+      "verdict": "clean",
+      "reason": "All options describe distinct, non-overlapping actions; 'stands next to him' is uniquely different from flapping wings, letting go, looking at bottle, or chasin"
+    },
+    {
+      "case_id": "nextgqa-5658916668-8",
+      "qtype": "cw",
+      "gold": "fell from his board",
+      "verdict": "clean",
+      "reason": "Options describe distinct actions/intentions (sleeping, catching dog, checking camera, cushioning fall, falling) with no near-synonyms or overlaps, so gold is u"
+    },
+    {
+      "case_id": "nextgqa-5803861992-1",
+      "qtype": "ch",
+      "gold": "hit face gently with fan",
+      "verdict": "clean",
+      "reason": "All options describe distinct physical actions with no semantic overlap or near-synonymy."
+    },
+    {
+      "case_id": "nextgqa-5803861992-9",
+      "qtype": "tc",
+      "gold": "laugh",
+      "verdict": "clean",
+      "reason": "All options describe distinct, non-overlapping reactions (no response, head touch, shirt adjust, laugh, body shake) with no near-synonyms or ambiguity."
+    },
+    {
+      "case_id": "nextgqa-5840177726-0",
+      "qtype": "ch",
+      "gold": "cycle up slope",
+      "verdict": "clean",
+      "reason": "parse_fail"
+    },
+    {
+      "case_id": "nextgqa-5945172741-7",
+      "qtype": "ch",
+      "gold": "kiss her",
+      "verdict": "clean",
+      "reason": "All options describe distinct specific actions (caressing hair, kissing, playing with baby, pointing, patting back) with no overlap or synonymy; the gold option"
+    },
+    {
+      "case_id": "nextgqa-6018514357-6",
+      "qtype": "cw",
+      "gold": "to support the baby",
+      "verdict": "clean",
+      "reason": "Options are distinct actions (supporting, carrying, taking a photo, washing, sliding down) with no near-synonyms or overlapping meanings."
+    },
+    {
+      "case_id": "nextgqa-6097994550-4",
+      "qtype": "ch",
+      "gold": "crawls",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions: locomotion (walk, crawl, stroll) vs. hand gestures (caress head, count fingers), with 'crawls' uniquely referring to movi"
+    },
+    {
+      "case_id": "nextgqa-6516459343-4",
+      "qtype": "cw",
+      "gold": "cut the shoe",
+      "verdict": "clean",
+      "reason": "Options are distinct: 'cut the shoe' is a specific action not overlapping with reacting to bread, being bloodied, celebrating, or cutting vegetables."
+    },
+    {
+      "case_id": "nextgqa-7001078933-1",
+      "qtype": "cw",
+      "gold": "getting into position",
+      "verdict": "clean",
+      "reason": "parse_fail"
+    },
+    {
+      "case_id": "nextgqa-8177965766-0",
+      "qtype": "tn",
+      "gold": "switch to the other hand",
+      "verdict": "clean",
+      "reason": "Each option describes a distinct physical action (walk away, smiles, talks to others, switch hands, talks) with no overlap or synonymy."
+    },
+    {
+      "case_id": "nextgqa-8252088130-4",
+      "qtype": "tn",
+      "gold": "walk to show camera",
+      "verdict": "clean",
+      "reason": "Each option describes a distinct action (touching bag, poking face, picking up dog, walking to show camera, reaching for something) with no overlaps or near-syn"
+    },
+    {
+      "case_id": "nextgqa-8797589693-3",
+      "qtype": "cw",
+      "gold": "talk to lady",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions or intents (talking, hugging, passing something, audience, better view), with no near-synonymy or overlap that could make "
+    },
+    {
+      "case_id": "nextgqa-9408800471-6",
+      "qtype": "cw",
+      "gold": "follow the ball",
+      "verdict": "clean",
+      "reason": "All options describe distinct actions or states, with 'follow the ball' being clearly separable from the others."
+    }
+  ]
+}

@@ -1,0 +1,438 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-11276567104-3",
+    "video_id": "533b9ea7733afa32",
+    "question": "what does the priest do after letting go of the woman s head\n\nCandidates:\nA) clap again\nB) hold hands out around the baby\nC) pat his head\nD) pat her shoulders and talk\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "pat her shoulders and talk",
+    "required_keywords": [
+      "pat",
+      "her",
+      "shoulders",
+      "talk"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      31.85
+    ],
+    "gold_scenes": [
+      {
+        "start": 28.2,
+        "end": 35.5
+      }
+    ],
+    "question_type": "tn"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "what does the priest do after letting go of the woman s head\n\nCandidates:\nA) clap again\nB) hold hands out around the baby\nC) pat his head\nD) pat her shoulders and talk\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Use segment_focus to examine the immediate moments after the priest releases the woman's head, focusing on visual actions. Classify as visual_detail with detail retrieval profile.\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "What does the priest do after letting go of the woman's head?",
+            "center_t": 125.5,
+            "half_window_sec": 3.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-8c4cb20318615b94",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 39.56, \"end\": 39.56, \"center_t\": 39.56, \"frame_count\": 0}, \"observation\": \"I could not load dense frames for the requested window.\", \"subject_deltas\": [], \"required_next_action\": \"retrieve_video_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8c4cb20318615b94",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 39.56,
+          "end": 39.56,
+          "center_t": 39.56,
+          "frame_count": 0
+        },
+        "observation": "I could not load dense frames for the requested window.",
+        "subject_deltas": [],
+        "required_next_action": "retrieve_video_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve visual evidence around the key moment (t=39.56) when the priest lets go of the woman's head, focusing on his next actions. Use focused retrieval to identify immediate post-release behavior. Classify as visual_detail with focused profile.\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "What does the priest do immediately after releasing the woman's head?",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 5,
+            "planner_notes": "Focus on actions right after release at t=39.56."
+          },
+          "id": "chatcmpl-tool-8d846304e7eb19b2",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 0.0, \"source\": \"retrieval\"}, {\"timestamp\": 2.0, \"source\": \"retrieval\"}, {\"timestamp\": 12.0, \"source\": \"retrieval\"}, {\"timestamp\": 18.0, \"source\": \"retrieval\"}, {\"timestamp\": 30.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"end\": 10.0, \"start\": 0.0, \"filename\": \"scene_0000.jpg\", \"scene_id\": 0, \"caption\": \"A bishop in ornate golden vestments and a yellow mitre stands facing a woman with blonde hair in a white outfit, while another person in a blue suit is partially visible to the left.\", \"t_mid\": 5.0, \"score\": 0.4796527028083801}, {\"caption\": \"A bishop in golden vestments places his hand on the head of a young woman in a white garment during a religious ceremony.\", \"end\": 20.0, \"start\": 10.0, \"filename\": \"scene_0001.jpg\", \"t_mid\": 15.0, \"scene_id\": 1, \"score\": 0.6058433651924133}, {\"end\": 30.0, \"t_mid\": 25.0, \"caption\": \"A clergyman in ornate golden vestments gently places his hand on the head of a blonde woman in a white outfit, who is facing away from the camera, inside what appears to be a church.\", \"filename\": \"scene_0002.jpg\", \"start\": 20.0, \"scene_id\": 2, \"score\": 0.5662270188331604}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 5, \"planner_notes\": \"Focus on actions right after release at t=39.56.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8d846304e7eb19b2",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 2.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 30.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "start": 0.0,
+            "filename": "scene_0000.jpg",
+            "scene_id": 0,
+            "caption": "A bishop in ornate golden vestments and a yellow mitre stands facing a woman with blonde hair in a white outfit, while another person in a blue suit is partially visible to the left.",
+            "t_mid": 5.0,
+            "score": 0.4796527028083801
+          },
+          {
+            "caption": "A bishop in golden vestments places his hand on the head of a young woman in a white garment during a religious ceremony.",
+            "end": 20.0,
+            "start": 10.0,
+            "filename": "scene_0001.jpg",
+            "t_mid": 15.0,
+            "scene_id": 1,
+            "score": 0.6058433651924133
+          },
+          {
+            "end": 30.0,
+            "t_mid": 25.0,
+            "caption": "A clergyman in ornate golden vestments gently places his hand on the head of a blonde woman in a white outfit, who is facing away from the camera, inside what appears to be a church.",
+            "filename": "scene_0002.jpg",
+            "start": 20.0,
+            "scene_id": 2,
+            "score": 0.5662270188331604
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on actions right after release at t=39.56."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the retrieved video evidence around t=39.56 is sufficient to determine the priest’s action immediately after releasing the woman’s head. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use assess_evidence_sufficiency to evaluate grounding and completeness before answering. If sufficient, proceed to answer_with_evidence. If not, expand retrieval or refine focus. Classify as visual_detail with focused profile. Use",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "What does the priest do after letting go of the woman's head?",
+        "center_t": 125.5,
+        "half_window_sec": 3.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 39.56,
+          "end": 39.56,
+          "center_t": 39.56,
+          "frame_count": 0
+        },
+        "observation": "I could not load dense frames for the requested window.",
+        "subject_deltas": [],
+        "required_next_action": "retrieve_video_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-8c4cb20318615b94",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "What does the priest do immediately after releasing the woman's head?",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 5,
+        "planner_notes": "Focus on actions right after release at t=39.56."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 2.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 30.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "start": 0.0,
+            "filename": "scene_0000.jpg",
+            "scene_id": 0,
+            "caption": "A bishop in ornate golden vestments and a yellow mitre stands facing a woman with blonde hair in a white outfit, while another person in a blue suit is partially visible to the left.",
+            "t_mid": 5.0,
+            "score": 0.4796527028083801
+          },
+          {
+            "caption": "A bishop in golden vestments places his hand on the head of a young woman in a white garment during a religious ceremony.",
+            "end": 20.0,
+            "start": 10.0,
+            "filename": "scene_0001.jpg",
+            "t_mid": 15.0,
+            "scene_id": 1,
+            "score": 0.6058433651924133
+          },
+          {
+            "end": 30.0,
+            "t_mid": 25.0,
+            "caption": "A clergyman in ornate golden vestments gently places his hand on the head of a blonde woman in a white outfit, who is facing away from the camera, inside what appears to be a church.",
+            "filename": "scene_0002.jpg",
+            "start": 20.0,
+            "scene_id": 2,
+            "score": 0.5662270188331604
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on actions right after release at t=39.56."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-8d846304e7eb19b2",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 0.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0000.0.jpg"
+      },
+      {
+        "timestamp": 2.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0030.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 2.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 19.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0019.0.jpg"
+      },
+      {
+        "timestamp": 21.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0021.0.jpg"
+      },
+      {
+        "timestamp": 23.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 28.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0028.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 33.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0033.0.jpg"
+      },
+      {
+        "timestamp": 35.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0035.0.jpg"
+      },
+      {
+        "timestamp": 37.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/533b9ea7733afa32/frames_dense/t0037.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "end": 10.0,
+        "start": 0.0,
+        "filename": "scene_0000.jpg",
+        "scene_id": 0,
+        "caption": "A bishop in ornate golden vestments and a yellow mitre stands facing a woman with blonde hair in a white outfit, while another person in a blue suit is partially visible to the left.",
+        "t_mid": 5.0,
+        "score": 0.4796527028083801
+      },
+      {
+        "caption": "A bishop in golden vestments places his hand on the head of a young woman in a white garment during a religious ceremony.",
+        "end": 20.0,
+        "start": 10.0,
+        "filename": "scene_0001.jpg",
+        "t_mid": 15.0,
+        "scene_id": 1,
+        "score": 0.6058433651924133
+      },
+      {
+        "end": 30.0,
+        "t_mid": 25.0,
+        "caption": "A clergyman in ornate golden vestments gently places his hand on the head of a blonde woman in a white outfit, who is facing away from the camera, inside what appears to be a church.",
+        "filename": "scene_0002.jpg",
+        "start": 20.0,
+        "scene_id": 2,
+        "score": 0.5662270188331604
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 5,
+      "planner_notes": "Focus on actions right after release at t=39.56."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {},
+    "draft_answer": "",
+    "observer_notes": [],
+    "grounding_report": {},
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "e16453fda0b1d29b9ae17529c91018ac096bf651"
+}

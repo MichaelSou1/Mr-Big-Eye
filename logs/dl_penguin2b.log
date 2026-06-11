@@ -1,0 +1,758 @@
+
+ _   .-')                _ .-') _     ('-.             .-')                              _ (`-.    ('-.
+( '.( OO )_             ( (  OO) )  _(  OO)           ( OO ).                           ( (OO  ) _(  OO)
+ ,--.   ,--.).-'),-----. \     .'_ (,------.,--.     (_)---\_)   .-----.  .-'),-----.  _.`     \(,------.
+ |   `.'   |( OO'  .-.  ',`'--..._) |  .---'|  |.-') /    _ |   '  .--./ ( OO'  .-.  '(__...--'' |  .---'
+ |         |/   |  | |  ||  |  \  ' |  |    |  | OO )\  :` `.   |  |('-. /   |  | |  | |  /  | | |  |
+ |  |'.'|  |\_) |  |\|  ||  |   ' |(|  '--. |  |`-' | '..`''.) /_) |OO  )\_) |  |\|  | |  |_.' |(|  '--.
+ |  |   |  |  \ |  | |  ||  |   / : |  .--'(|  '---.'.-._)   \ ||  |`-'|   \ |  | |  | |  .___.' |  .--'
+ |  |   |  |   `'  '-'  '|  '--'  / |  `---.|      | \       /(_'  '--'\    `'  '-'  ' |  |      |  `---.
+ `--'   `--'     `-----' `-------'  `------'`------'  `-----'    `-----'      `-----'  `--'      `------'
+
+Downloading Model from https://www.modelscope.cn to directory: /home/gpus/models/Penguin-VL-2B
+Processing 21 items:   0%|          | 0.00/21.0 [00:00<?, ?it/s]
+Downloading [added_tokens.json]:   0%|          | 0.00/865 [00:00<?, ?B/s][A
+
+Downloading [chat_template.json]:   0%|          | 0.00/1.93k [00:00<?, ?B/s][A[A
+
+
+Downloading [config.json]:   0%|          | 0.00/1.69k [00:00<?, ?B/s][A[A[A
+
+
+
+Downloading [configuration.json]:   0%|          | 0.00/76.0 [00:00<?, ?B/s][A[A[A[A
+
+
+
+
+Downloading [configuration_penguinvl.py]:   0%|          | 0.00/1.69k [00:00<?, ?B/s][A[A[A[A[A
+
+
+
+
+
+Downloading [configuration_penguinvl_encoder.py]:   0%|          | 0.00/963 [00:00<?, ?B/s][A[A[A[A[A[A
+
+
+
+
+
+
+Downloading [generation_config.json]:   0%|          | 0.00/214 [00:00<?, ?B/s][A[A[A[A[A[A[A
+
+
+
+
+
+
+
+Downloading [image_processing_penguinvl.py]:   0%|          | 0.00/24.9k [00:00<?, ?B/s][A[A[A[A[A[A[A[A
+
+
+
+Downloading [configuration.json]: 100%|██████████| 76.0/76.0 [00:01<00:00, 38.6B/s][A[A[A[ADownloading [configuration.json]: 100%|██████████| 76.0/76.0 [00:01<00:00, 38.6B/s]
+
+
+
+
+Downloading [LICENSE.txt]:   0%|          | 0.00/22.3k [00:00<?, ?B/s][A[A[A[AProcessing 21 items:   5%|▍         | 1.00/21.0 [00:01<00:39, 1.99s/it]
+
+
+
+
+
+
+
+Downloading [image_processing_penguinvl.py]:  15%|█▌        | 3.81k/24.9k [00:02<00:11, 1.94kB/s][A[A[A[A[A[A[A[ADownloading [image_processing_penguinvl.py]: 100%|██████████| 24.9k/24.9k [00:02<00:00, 12.7kB/s]
+
+
+
+
+
+
+
+
+Downloading [merges.txt]:   0%|          | 0.00/1.59M [00:00<?, ?B/s][A[A[A[A[A[A[A[A
+
+
+Downloading [config.json]: 100%|██████████| 1.69k/1.69k [00:02<00:00, 808B/s][A[A[ADownloading [config.json]: 100%|██████████| 1.69k/1.69k [00:02<00:00, 808B/s]
+
+
+
+Downloading [model.safetensors]:   0%|          | 0.00/4.04G [00:00<?, ?B/s][A[A[AProcessing 21 items:  14%|█▍        | 3.00/21.0 [00:02<00:10, 1.73it/s]
+
+
+
+
+Downloading [configuration_penguinvl.py]: 100%|██████████| 1.69k/1.69k [00:02<00:00, 801B/s][A[A[A[A[ADownloading [configuration_penguinvl.py]: 100%|██████████| 1.69k/1.69k [00:02<00:00, 801B/s]
+
+
+
+
+
+Downloading [modeling_penguinvl_encoder.py]:   0%|          | 0.00/23.9k [00:00<?, ?B/s][A[A[A[A[A
+
+
+
+
+
+
+Downloading [generation_config.json]: 100%|██████████| 214/214 [00:02<00:00, 84.3B/s][A[A[A[A[A[A[ADownloading [generation_config.json]: 100%|██████████| 214/214 [00:02<00:00, 84.2B/s]
+
+
+
+
+
+
+
+Downloading [modeling_penguinvl_qwen3.py]:   0%|          | 0.00/18.1k [00:00<?, ?B/s][A[A[A[A[A[A[AProcessing 21 items:  24%|██▍       | 5.00/21.0 [00:02<00:06, 2.59it/s]
+
+Downloading [chat_template.json]: 100%|██████████| 1.93k/1.93k [00:03<00:00, 634B/s][A[ADownloading [chat_template.json]: 100%|██████████| 1.93k/1.93k [00:03<00:00, 634B/s]
+
+
+Downloading [preprocessor_config.json]:   0%|          | 0.00/584 [00:00<?, ?B/s][A[AProcessing 21 items:  29%|██▊       | 6.00/21.0 [00:03<00:06, 2.32it/s]
+
+
+
+Downloading [LICENSE.txt]:  17%|█▋        | 3.81k/22.3k [00:01<00:05, 3.32kB/s][A[A[A[ADownloading [LICENSE.txt]: 100%|██████████| 22.3k/22.3k [00:01<00:00, 19.4kB/s]
+
+
+
+
+Downloading [processing_penguinvl.py]:   0%|          | 0.00/65.6k [00:00<?, ?B/s][A[A[A[A
+
+
+
+
+
+
+
+Downloading [merges.txt]:   0%|          | 3.80k/1.59M [00:01<09:01, 3.08kB/s][A[A[A[A[A[A[A[A
+
+
+
+
+Downloading [modeling_penguinvl_encoder.py]:  16%|█▌        | 3.81k/23.9k [00:01<00:06, 3.38kB/s][A[A[A[A[ADownloading [modeling_penguinvl_encoder.py]: 100%|██████████| 23.9k/23.9k [00:01<00:00, 21.2kB/s]
+
+
+
+
+
+Downloading [processor_config.json]:   0%|          | 0.00/223 [00:00<?, ?B/s][A[A[A[A[AProcessing 21 items:  38%|███▊      | 8.00/21.0 [00:03<00:03, 3.43it/s]
+
+
+
+
+
+
+
+Downloading [merges.txt]:   1%|▏         | 23.8k/1.59M [00:01<01:14, 22.2kB/s][A[A[A[A[A[A[A[A
+
+
+
+
+
+
+
+Downloading [merges.txt]:   5%|▍         | 75.8k/1.59M [00:01<00:20, 77.9kB/s][A[A[A[A[A[A[A[A
+
+
+
+
+
+
+Downloading [modeling_penguinvl_qwen3.py]:  21%|██        | 3.81k/18.1k [00:01<00:04, 3.35kB/s][A[A[A[A[A[A[ADownloading [modeling_penguinvl_qwen3.py]: 100%|██████████| 18.1k/18.1k [00:01<00:00, 16.0kB/s]
+
+
+
+
+
+
+
+Downloading [README.md]:   0%|          | 0.00/6.90k [00:00<?, ?B/s][A[A[A[A[A[A[AProcessing 21 items:  43%|████▎     | 9.00/21.0 [00:03<00:03, 3.17it/s]
+
+
+
+
+
+
+
+Downloading [merges.txt]:  11%|█         | 176k/1.59M [00:01<00:07, 192kB/s]  [A[A[A[A[A[A[A[A
+
+
+
+
+
+
+
+Downloading [merges.txt]:  17%|█▋        | 276k/1.59M [00:01<00:04, 293kB/s][A[A[A[A[A[A[A[A
+
+
+
+
+
+
+
+Downloading [merges.txt]:  23%|██▎       | 372k/1.59M [00:02<00:03, 370kB/s][A[A[A[A[A[A[A[A
+
+Downloading [preprocessor_config.json]: 100%|██████████| 584/584 [00:01<00:00, 569B/s][A[ADownloading [preprocessor_config.json]: 100%|██████████| 584/584 [00:01<00:00, 569B/s]
+
+
+Downloading [special_tokens_map.json]:   0%|          | 0.00/613 [00:00<?, ?B/s][A[AProcessing 21 items:  48%|████▊     | 10.0/21.0 [00:04<00:03, 2.92it/s]
+Downloading [added_tokens.json]: 100%|██████████| 865/865 [00:04<00:00, 208B/s][ADownloading [added_tokens.json]: 100%|██████████| 865/865 [00:04<00:00, 208B/s]
+
+Downloading [tokenizer.json]:   0%|          | 0.00/10.9M [00:00<?, ?B/s][A
+
+
+
+Downloading [processing_penguinvl.py]:   6%|▌         | 3.81k/65.6k [00:01<00:17, 3.61kB/s][A[A[A[A
+
+
+
+
+
+
+
+Downloading [merges.txt]:  29%|██▉       | 472k/1.59M [00:02<00:02, 439kB/s][A[A[A[A[A[A[A[A
+
+
+
+
+
+Downloading [configuration_penguinvl_encoder.py]: 100%|██████████| 963/963 [00:04<00:00, 223B/s][A[A[A[A[A[ADownloading [configuration_penguinvl_encoder.py]: 100%|██████████| 963/963 [00:04<00:00, 223B/s]
+
+
+
+
+
+
+Downloading [tokenizer_config.json]:   0%|          | 0.00/8.32k [00:00<?, ?B/s][A[A[A[A[A[AProcessing 21 items:  57%|█████▋    | 12.0/21.0 [00:04<00:02, 4.22it/s]
+
+
+
+Downloading [processing_penguinvl.py]:  55%|█████▍    | 35.8k/65.6k [00:01<00:00, 38.8kB/s][A[A[A[ADownloading [processing_penguinvl.py]: 100%|██████████| 65.6k/65.6k [00:01<00:00, 54.2kB/s]
+
+
+
+
+Downloading [vocab.json]:   0%|          | 0.00/2.65M [00:00<?, ?B/s][A[A[A[A
+
+
+
+
+
+
+
+Downloading [merges.txt]:  35%|███▍      | 568k/1.59M [00:02<00:02, 485kB/s][A[A[A[A[A[A[A[A
+
+
+
+
+Downloading [processor_config.json]: 100%|██████████| 223/223 [00:01<00:00, 197B/s][A[A[A[A[ADownloading [processor_config.json]: 100%|██████████| 223/223 [00:01<00:00, 197B/s]
+Processing 21 items:  67%|██████▋   | 14.0/21.0 [00:04<00:01, 5.72it/s]
+
+
+
+
+
+
+
+Downloading [merges.txt]:  48%|████▊     | 788k/1.59M [00:02<00:01, 739kB/s][A[A[A[A[A[A[A[A
+
+
+
+
+
+
+
+Downloading [merges.txt]:  82%|████████▏ | 1.31M/1.59M [00:02<00:00, 1.54MB/s][A[A[A[A[A[A[A[ADownloading [merges.txt]: 100%|██████████| 1.59M/1.59M [00:02<00:00, 613kB/s] 
+Processing 21 items:  71%|███████▏  | 15.0/21.0 [00:04<00:01, 4.95it/s]
+
+
+
+
+
+
+Downloading [README.md]:  55%|█████▌    | 3.81k/6.90k [00:01<00:00, 3.68kB/s][A[A[A[A[A[A[ADownloading [README.md]: 100%|██████████| 6.90k/6.90k [00:01<00:00, 6.66kB/s]
+
+Downloading [tokenizer.json]:   0%|          | 3.80k/10.9M [00:01<55:14, 3.45kB/s][A
+Downloading [tokenizer.json]:   0%|          | 43.8k/10.9M [00:01<04:05, 46.3kB/s][A
+
+
+
+Downloading [vocab.json]:   0%|          | 3.80k/2.65M [00:01<12:42, 3.64kB/s][A[A[A[A
+
+
+
+
+
+Downloading [tokenizer_config.json]:  46%|████▌     | 3.81k/8.32k [00:01<00:01, 3.31kB/s][A[A[A[A[A[ADownloading [tokenizer_config.json]: 100%|██████████| 8.32k/8.32k [00:01<00:00, 7.23kB/s]
+Processing 21 items:  81%|████████  | 17.0/21.0 [00:05<00:01, 3.78it/s]
+
+Downloading [special_tokens_map.json]: 100%|██████████| 613/613 [00:01<00:00, 448B/s][A[ADownloading [special_tokens_map.json]: 100%|██████████| 613/613 [00:01<00:00, 448B/s]
+
+Downloading [tokenizer.json]:   1%|          | 124k/10.9M [00:01<01:21, 138kB/s]  [A
+
+
+
+Downloading [vocab.json]:   1%|          | 23.8k/2.65M [00:01<01:47, 25.7kB/s][A[A[A[A
+Downloading [tokenizer.json]:   3%|▎         | 284k/10.9M [00:01<00:33, 335kB/s][A
+Downloading [tokenizer.json]:   4%|▍         | 440k/10.9M [00:01<00:21, 500kB/s][A
+Downloading [tokenizer.json]:   5%|▌         | 596k/10.9M [00:01<00:17, 635kB/s][A
+Downloading [tokenizer.json]:   9%|▉         | 1.01M/10.9M [00:02<00:08, 1.23MB/s][A
+
+
+
+Downloading [vocab.json]:   3%|▎         | 79.8k/2.65M [00:01<00:46, 58.6kB/s][A[A[A[A
+Downloading [tokenizer.json]:  14%|█▍        | 1.54M/10.9M [00:02<00:06, 1.48MB/s][A
+
+
+
+Downloading [vocab.json]:   3%|▎         | 91.8k/2.65M [00:02<00:49, 53.7kB/s][A[A[A[A
+Downloading [tokenizer.json]:  18%|█▊        | 1.93M/10.9M [00:02<00:05, 1.76MB/s][A
+
+
+
+Downloading [vocab.json]:   4%|▎         | 99.8k/2.65M [00:02<00:49, 53.7kB/s][A[A[A[A
+Downloading [tokenizer.json]:  20%|██        | 2.23M/10.9M [00:02<00:04, 1.84MB/s][A
+
+
+
+Downloading [vocab.json]:   4%|▍         | 120k/2.65M [00:02<00:38, 68.2kB/s] [A[A[A[A
+Downloading [tokenizer.json]:  24%|██▍       | 2.63M/10.9M [00:02<00:04, 2.08MB/s][A
+
+
+
+Downloading [vocab.json]:   6%|▌         | 156k/2.65M [00:02<00:25, 103kB/s] [A[A[A[A
+
+
+
+Downloading [vocab.json]:   7%|▋         | 200k/2.65M [00:02<00:17, 147kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  10%|█         | 284k/2.65M [00:02<00:10, 248kB/s][A[A[A[A
+Downloading [tokenizer.json]:  26%|██▌       | 2.85M/10.9M [00:03<00:06, 1.23MB/s][A
+
+
+
+Downloading [vocab.json]:  14%|█▎        | 368k/2.65M [00:03<00:08, 269kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  18%|█▊        | 484k/2.65M [00:03<00:05, 387kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  20%|██        | 548k/2.65M [00:03<00:05, 397kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  22%|██▏       | 596k/2.65M [00:03<00:05, 361kB/s][A[A[A[A
+Downloading [tokenizer.json]:  28%|██▊       | 3.01M/10.9M [00:04<00:12, 670kB/s] [A
+
+
+
+Downloading [vocab.json]:  23%|██▎       | 636k/2.65M [00:03<00:06, 349kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  26%|██▌       | 712k/2.65M [00:03<00:05, 396kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  28%|██▊       | 760k/2.65M [00:04<00:05, 374kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  30%|██▉       | 812k/2.65M [00:04<00:05, 366kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  32%|███▏      | 864k/2.65M [00:04<00:05, 360kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  33%|███▎      | 908k/2.65M [00:04<00:07, 262kB/s][A[A[A[A
+Downloading [tokenizer.json]:  29%|██▉       | 3.13M/10.9M [00:05<00:20, 399kB/s][A
+
+
+
+Downloading [vocab.json]:  35%|███▌      | 956k/2.65M [00:04<00:06, 276kB/s][A[A[A[A
+Downloading [tokenizer.json]:  30%|██▉       | 3.22M/10.9M [00:05<00:19, 420kB/s][A
+
+
+
+Downloading [vocab.json]:  37%|███▋      | 0.99M/2.65M [00:05<00:05, 309kB/s][A[A[A[A
+Downloading [tokenizer.json]:  30%|███       | 3.30M/10.9M [00:05<00:18, 434kB/s][A
+
+
+
+Downloading [vocab.json]:  39%|███▉      | 1.03M/2.65M [00:05<00:06, 276kB/s][A[A[A[A
+Downloading [tokenizer.json]:  31%|███       | 3.37M/10.9M [00:05<00:20, 383kB/s][A
+
+
+
+Downloading [vocab.json]:  40%|███▉      | 1.06M/2.65M [00:05<00:06, 260kB/s][A[A[A[A
+Downloading [tokenizer.json]:  31%|███▏      | 3.43M/10.9M [00:05<00:20, 386kB/s][A
+
+
+
+Downloading [vocab.json]:  41%|████      | 1.09M/2.65M [00:05<00:06, 239kB/s][A[A[A[A
+Downloading [tokenizer.json]:  33%|███▎      | 3.57M/10.9M [00:05<00:15, 494kB/s][A
+
+
+
+Downloading [vocab.json]:  42%|████▏     | 1.11M/2.65M [00:05<00:07, 217kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  43%|████▎     | 1.13M/2.65M [00:05<00:07, 200kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  44%|████▍     | 1.16M/2.65M [00:06<00:07, 196kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  45%|████▍     | 1.19M/2.65M [00:06<00:07, 193kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  46%|████▌     | 1.22M/2.65M [00:06<00:07, 199kB/s][A[A[A[A
+Downloading [tokenizer.json]:  33%|███▎      | 3.64M/10.9M [00:06<00:28, 264kB/s][A
+
+
+
+Downloading [vocab.json]:  47%|████▋     | 1.25M/2.65M [00:06<00:07, 203kB/s][A[A[A[A
+Downloading [tokenizer.json]:  34%|███▍      | 3.68M/10.9M [00:06<00:27, 272kB/s][A
+
+
+
+Downloading [vocab.json]:  49%|████▊     | 1.28M/2.65M [00:06<00:06, 214kB/s][A[A[A[A
+Downloading [tokenizer.json]:  34%|███▍      | 3.73M/10.9M [00:07<00:27, 276kB/s][A
+
+
+
+Downloading [vocab.json]:  50%|████▉     | 1.32M/2.65M [00:06<00:06, 214kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  51%|█████     | 1.35M/2.65M [00:06<00:06, 213kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  52%|█████▏    | 1.39M/2.65M [00:07<00:05, 229kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  53%|█████▎    | 1.41M/2.65M [00:07<00:07, 179kB/s][A[A[A[A
+Downloading [tokenizer.json]:  36%|███▌      | 3.88M/10.9M [00:07<00:27, 270kB/s][A
+
+
+
+Downloading [vocab.json]:  55%|█████▌    | 1.46M/2.65M [00:07<00:05, 231kB/s][A[A[A[A
+Downloading [tokenizer.json]:  36%|███▌      | 3.92M/10.9M [00:07<00:31, 231kB/s][A
+Downloading [tokenizer.json]:  36%|███▌      | 3.95M/10.9M [00:08<00:31, 229kB/s][A
+Downloading [tokenizer.json]:  37%|███▋      | 4.01M/10.9M [00:08<00:27, 265kB/s][A
+Downloading [tokenizer.json]:  38%|███▊      | 4.12M/10.9M [00:08<00:19, 364kB/s][A
+Downloading [tokenizer.json]:  39%|███▉      | 4.25M/10.9M [00:08<00:14, 482kB/s][A
+
+
+
+Downloading [vocab.json]:  56%|█████▋    | 1.49M/2.65M [00:08<00:12, 94.9kB/s][A[A[A[A
+Downloading [tokenizer.json]:  40%|████      | 4.39M/10.9M [00:08<00:11, 599kB/s][A
+
+
+
+Downloading [vocab.json]:  57%|█████▋    | 1.51M/2.65M [00:08<00:11, 101kB/s] [A[A[A[A
+Downloading [tokenizer.json]:  42%|████▏     | 4.53M/10.9M [00:08<00:09, 686kB/s][A
+
+
+
+Downloading [vocab.json]:  58%|█████▊    | 1.53M/2.65M [00:08<00:11, 106kB/s][A[A[A[A
+Downloading [tokenizer.json]:  43%|████▎     | 4.68M/10.9M [00:09<00:08, 782kB/s][A
+
+
+
+Downloading [vocab.json]:  58%|█████▊    | 1.55M/2.65M [00:08<00:10, 106kB/s][A[A[A[A
+Downloading [tokenizer.json]:  44%|████▍     | 4.83M/10.9M [00:09<00:07, 846kB/s][A
+Downloading [tokenizer.json]:  46%|████▌     | 4.98M/10.9M [00:09<00:06, 894kB/s][A
+
+
+
+Downloading [vocab.json]:  59%|█████▉    | 1.57M/2.65M [00:09<00:17, 62.8kB/s][A[A[A[A
+Downloading [tokenizer.json]:  46%|████▋     | 5.07M/10.9M [00:09<00:13, 447kB/s][A
+Downloading [tokenizer.json]:  47%|████▋     | 5.17M/10.9M [00:10<00:12, 498kB/s][A
+
+
+
+Downloading [vocab.json]:  60%|█████▉    | 1.59M/2.65M [00:10<00:21, 51.0kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  60%|██████    | 1.60M/2.65M [00:10<00:20, 54.9kB/s][A[A[A[A
+Downloading [tokenizer.json]:  48%|████▊     | 5.24M/10.9M [00:10<00:17, 348kB/s][A
+
+
+
+Downloading [vocab.json]:  61%|██████▏   | 1.62M/2.65M [00:10<00:14, 76.0kB/s][A[A[A[A
+Downloading [tokenizer.json]:  49%|████▊     | 5.30M/10.9M [00:10<00:16, 353kB/s][A
+
+
+
+Downloading [vocab.json]:  62%|██████▏   | 1.64M/2.65M [00:10<00:12, 86.6kB/s][A[A[A[A
+Downloading [tokenizer.json]:  50%|█████     | 5.46M/10.9M [00:10<00:11, 506kB/s][A
+
+
+
+Downloading [vocab.json]:  63%|██████▎   | 1.66M/2.65M [00:10<00:10, 96.4kB/s][A[A[A[A
+Downloading [tokenizer.json]:  51%|█████     | 5.53M/10.9M [00:10<00:11, 507kB/s][A
+
+
+
+Downloading [vocab.json]:  64%|██████▎   | 1.69M/2.65M [00:10<00:09, 111kB/s] [A[A[A[A
+Downloading [tokenizer.json]:  51%|█████▏    | 5.60M/10.9M [00:11<00:11, 485kB/s][A
+
+
+
+Downloading [vocab.json]:  65%|██████▍   | 1.71M/2.65M [00:11<00:07, 123kB/s][A[A[A[A
+Downloading [tokenizer.json]:  52%|█████▏    | 5.65M/10.9M [00:11<00:12, 458kB/s][A
+
+
+
+Downloading [vocab.json]:  66%|██████▌   | 1.74M/2.65M [00:11<00:06, 147kB/s][A[A[A[A
+Downloading [tokenizer.json]:  52%|█████▏    | 5.70M/10.9M [00:11<00:12, 428kB/s][A
+
+
+
+Downloading [vocab.json]:  67%|██████▋   | 1.77M/2.65M [00:11<00:05, 157kB/s][A[A[A[A
+Downloading [tokenizer.json]:  53%|█████▎    | 5.76M/10.9M [00:11<00:13, 414kB/s][A
+Downloading [tokenizer.json]:  53%|█████▎    | 5.82M/10.9M [00:11<00:11, 444kB/s][A
+
+
+
+Downloading [vocab.json]:  68%|██████▊   | 1.80M/2.65M [00:11<00:05, 173kB/s][A[A[A[A
+Downloading [tokenizer.json]:  54%|█████▍    | 5.89M/10.9M [00:11<00:11, 464kB/s][A
+
+
+
+Downloading [vocab.json]:  69%|██████▉   | 1.83M/2.65M [00:11<00:04, 184kB/s][A[A[A[A
+Downloading [tokenizer.json]:  55%|█████▍    | 5.97M/10.9M [00:12<00:10, 485kB/s][A
+
+
+
+Downloading [vocab.json]:  71%|███████   | 1.87M/2.65M [00:11<00:04, 200kB/s][A[A[A[A
+Downloading [tokenizer.json]:  56%|█████▌    | 6.05M/10.9M [00:12<00:10, 508kB/s][A
+Downloading [tokenizer.json]:  56%|█████▋    | 6.13M/10.9M [00:12<00:09, 524kB/s][A
+Downloading [tokenizer.json]:  57%|█████▋    | 6.21M/10.9M [00:12<00:09, 535kB/s][A
+Downloading [tokenizer.json]:  58%|█████▊    | 6.29M/10.9M [00:12<00:09, 534kB/s][A
+
+
+
+Downloading [vocab.json]:  72%|███████▏  | 1.90M/2.65M [00:12<00:06, 112kB/s][A[A[A[A
+Downloading [tokenizer.json]:  59%|█████▊    | 6.37M/10.9M [00:12<00:08, 542kB/s][A
+Downloading [tokenizer.json]:  59%|█████▉    | 6.46M/10.9M [00:12<00:08, 548kB/s][A
+
+
+
+Downloading [vocab.json]:  72%|███████▏  | 1.92M/2.65M [00:12<00:08, 93.9kB/s][A[A[A[A
+Downloading [tokenizer.json]:  60%|██████    | 6.55M/10.9M [00:13<00:08, 569kB/s][A
+
+
+
+Downloading [vocab.json]:  73%|███████▎  | 1.93M/2.65M [00:12<00:07, 96.1kB/s][A[A[A[A
+Downloading [tokenizer.json]:  61%|██████    | 6.64M/10.9M [00:13<00:07, 582kB/s][A
+
+
+
+Downloading [vocab.json]:  74%|███████▎  | 1.95M/2.65M [00:13<00:07, 98.3kB/s][A[A[A[A
+Downloading [tokenizer.json]:  62%|██████▏   | 6.72M/10.9M [00:13<00:07, 584kB/s][A
+
+
+
+Downloading [vocab.json]:  75%|███████▍  | 1.98M/2.65M [00:13<00:05, 118kB/s] [A[A[A[A
+
+
+
+Downloading [vocab.json]:  76%|███████▌  | 2.01M/2.65M [00:13<00:04, 141kB/s][A[A[A[A
+Downloading [tokenizer.json]:  62%|██████▏   | 6.78M/10.9M [00:13<00:10, 406kB/s][A
+
+
+
+Downloading [vocab.json]:  77%|███████▋  | 2.04M/2.65M [00:13<00:03, 167kB/s][A[A[A[A
+Downloading [tokenizer.json]:  63%|██████▎   | 6.90M/10.9M [00:14<00:10, 404kB/s][A
+
+
+
+Downloading [vocab.json]:  79%|███████▊  | 2.08M/2.65M [00:13<00:04, 144kB/s][A[A[A[A
+Downloading [tokenizer.json]:  64%|██████▎   | 6.94M/10.9M [00:14<00:10, 380kB/s][A
+
+
+
+Downloading [vocab.json]:  79%|███████▉  | 2.10M/2.65M [00:14<00:04, 142kB/s][A[A[A[A
+Downloading [tokenizer.json]:  64%|██████▍   | 6.98M/10.9M [00:14<00:11, 361kB/s][A
+
+
+
+Downloading [vocab.json]:  81%|████████  | 2.15M/2.65M [00:14<00:02, 185kB/s][A[A[A[A
+Downloading [tokenizer.json]:  64%|██████▍   | 7.02M/10.9M [00:14<00:12, 328kB/s][A
+Downloading [tokenizer.json]:  65%|██████▍   | 7.05M/10.9M [00:14<00:12, 312kB/s][A
+Downloading [tokenizer.json]:  65%|██████▌   | 7.09M/10.9M [00:14<00:14, 278kB/s][A
+Downloading [tokenizer.json]:  65%|██████▌   | 7.12M/10.9M [00:14<00:15, 260kB/s][A
+
+
+
+Downloading [vocab.json]:  82%|████████▏ | 2.17M/2.65M [00:14<00:05, 96.9kB/s][A[A[A[A
+Downloading [tokenizer.json]:  66%|██████▌   | 7.16M/10.9M [00:15<00:14, 262kB/s][A
+Downloading [tokenizer.json]:  66%|██████▌   | 7.19M/10.9M [00:15<00:15, 256kB/s][A
+
+
+
+Downloading [vocab.json]:  82%|████████▏ | 2.18M/2.65M [00:15<00:05, 84.1kB/s][A[A[A[A
+Downloading [tokenizer.json]:  66%|██████▋   | 7.24M/10.9M [00:15<00:13, 283kB/s][A
+
+
+
+Downloading [vocab.json]:  83%|████████▎ | 2.21M/2.65M [00:15<00:04, 102kB/s] [A[A[A[A
+
+
+
+Downloading [vocab.json]:  84%|████████▍ | 2.23M/2.65M [00:15<00:04, 103kB/s][A[A[A[A
+Downloading [tokenizer.json]:  67%|██████▋   | 7.27M/10.9M [00:15<00:19, 196kB/s][A
+
+
+
+Downloading [vocab.json]:  85%|████████▍ | 2.25M/2.65M [00:15<00:03, 109kB/s][A[A[A[A
+Downloading [tokenizer.json]:  67%|██████▋   | 7.35M/10.9M [00:15<00:13, 286kB/s][A
+
+
+
+Downloading [vocab.json]:  86%|████████▌ | 2.27M/2.65M [00:15<00:03, 115kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  86%|████████▋ | 2.28M/2.65M [00:15<00:03, 120kB/s][A[A[A[A
+Downloading [tokenizer.json]:  68%|██████▊   | 7.44M/10.9M [00:16<00:12, 289kB/s][A
+
+
+
+Downloading [vocab.json]:  87%|████████▋ | 2.31M/2.65M [00:16<00:02, 130kB/s][A[A[A[A
+Downloading [tokenizer.json]:  69%|██████▉   | 7.56M/10.9M [00:16<00:08, 418kB/s][A
+
+
+
+Downloading [vocab.json]:  88%|████████▊ | 2.34M/2.65M [00:16<00:02, 146kB/s][A[A[A[A
+Downloading [tokenizer.json]:  70%|██████▉   | 7.61M/10.9M [00:16<00:08, 401kB/s][A
+
+
+
+Downloading [vocab.json]:  89%|████████▉ | 2.36M/2.65M [00:16<00:01, 157kB/s][A[A[A[A
+Downloading [tokenizer.json]:  70%|███████   | 7.67M/10.9M [00:16<00:08, 394kB/s][A
+Downloading [tokenizer.json]:  71%|███████   | 7.71M/10.9M [00:16<00:08, 379kB/s][A
+Downloading [tokenizer.json]:  71%|███████▏  | 7.77M/10.9M [00:16<00:08, 377kB/s][A
+Downloading [tokenizer.json]:  72%|███████▏  | 7.81M/10.9M [00:17<00:11, 293kB/s][A
+Downloading [tokenizer.json]:  72%|███████▏  | 7.89M/10.9M [00:17<00:08, 356kB/s][A
+
+
+
+Downloading [vocab.json]:  90%|█████████ | 2.39M/2.65M [00:17<00:03, 74.0kB/s][A[A[A[A
+Downloading [tokenizer.json]:  73%|███████▎  | 7.93M/10.9M [00:17<00:09, 339kB/s][A
+Downloading [tokenizer.json]:  73%|███████▎  | 7.98M/10.9M [00:17<00:08, 341kB/s][A
+
+
+
+Downloading [vocab.json]:  91%|█████████ | 2.41M/2.65M [00:17<00:03, 68.6kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  92%|█████████▏| 2.43M/2.65M [00:17<00:03, 74.5kB/s][A[A[A[A
+Downloading [tokenizer.json]:  74%|███████▎  | 8.02M/10.9M [00:17<00:12, 243kB/s][A
+
+
+
+Downloading [vocab.json]:  92%|█████████▏| 2.45M/2.65M [00:17<00:02, 85.2kB/s][A[A[A[A
+Downloading [tokenizer.json]:  75%|███████▍  | 8.12M/10.9M [00:18<00:08, 351kB/s][A
+
+
+
+Downloading [vocab.json]:  93%|█████████▎| 2.47M/2.65M [00:17<00:01, 101kB/s] [A[A[A[A
+Downloading [tokenizer.json]:  75%|███████▍  | 8.16M/10.9M [00:18<00:08, 330kB/s][A
+
+
+
+Downloading [vocab.json]:  94%|█████████▍| 2.49M/2.65M [00:18<00:01, 108kB/s][A[A[A[A
+Downloading [tokenizer.json]:  75%|███████▌  | 8.20M/10.9M [00:18<00:08, 327kB/s][A
+
+
+
+Downloading [vocab.json]:  95%|█████████▍| 2.52M/2.65M [00:18<00:01, 127kB/s][A[A[A[A
+Downloading [tokenizer.json]:  76%|███████▌  | 8.26M/10.9M [00:18<00:07, 348kB/s][A
+Downloading [tokenizer.json]:  76%|███████▋  | 8.32M/10.9M [00:18<00:06, 403kB/s][A
+
+
+
+Downloading [vocab.json]:  96%|█████████▌| 2.54M/2.65M [00:18<00:00, 136kB/s][A[A[A[A
+
+
+
+Downloading [vocab.json]:  97%|█████████▋| 2.57M/2.65M [00:18<00:00, 157kB/s][A[A[A[A
+Downloading [tokenizer.json]:  77%|███████▋  | 8.37M/10.9M [00:18<00:08, 302kB/s][A
+
+
+
+Downloading [vocab.json]:  98%|█████████▊| 2.60M/2.65M [00:18<00:00, 172kB/s][A[A[A[A
+Downloading [tokenizer.json]:  78%|███████▊  | 8.46M/10.9M [00:19<00:06, 402kB/s][A
+
+
+
+Downloading [vocab.json]:  99%|█████████▉| 2.63M/2.65M [00:18<00:00, 184kB/s][A[A[A[ADownloading [vocab.json]: 100%|██████████| 2.65M/2.65M [00:18<00:00, 147kB/s]
+Processing 21 items:  90%|█████████ | 19.0/21.0 [00:23<00:06, 3.28s/it]
+Downloading [tokenizer.json]:  78%|███████▊  | 8.50M/10.9M [00:19<00:06, 405kB/s][A
+Downloading [tokenizer.json]:  78%|███████▊  | 8.55M/10.9M [00:19<00:06, 379kB/s][A
+Downloading [tokenizer.json]:  79%|███████▉  | 8.59M/10.9M [00:19<00:09, 249kB/s][A
+Downloading [tokenizer.json]:  80%|███████▉  | 8.69M/10.9M [00:19<00:06, 340kB/s][A
+Downloading [tokenizer.json]:  80%|████████  | 8.73M/10.9M [00:19<00:06, 328kB/s][A
+Downloading [tokenizer.json]:  81%|████████  | 8.78M/10.9M [00:20<00:06, 326kB/s][A
+Downloading [tokenizer.json]:  81%|████████  | 8.82M/10.9M [00:20<00:06, 325kB/s][A
+Downloading [tokenizer.json]:  82%|████████▏ | 8.89M/10.9M [00:20<00:05, 361kB/s][A
+Downloading [tokenizer.json]:  82%|████████▏ | 8.96M/10.9M [00:20<00:05, 388kB/s][A
+Downloading [tokenizer.json]:  83%|████████▎ | 9.02M/10.9M [00:20<00:04, 407kB/s][A
+Downloading [tokenizer.json]:  83%|████████▎ | 9.09M/10.9M [00:20<00:04, 413kB/s][A
+Downloading [tokenizer.json]:  84%|████████▍ | 9.15M/10.9M [00:21<00:04, 425kB/s][A
+Downloading [tokenizer.json]:  85%|████████▍ | 9.22M/10.9M [00:21<00:03, 450kB/s][A
+Downloading [tokenizer.json]:  85%|████████▌ | 9.28M/10.9M [00:21<00:03, 474kB/s][A
+Downloading [tokenizer.json]:  86%|████████▋ | 9.41M/10.9M [00:21<00:02, 605kB/s][A
+Downloading [tokenizer.json]:  87%|████████▋ | 9.53M/10.9M [00:21<00:02, 676kB/s][A
+Downloading [tokenizer.json]:  88%|████████▊ | 9.62M/10.9M [00:21<00:01, 673kB/s][A
+Downloading [tokenizer.json]:  89%|████████▉ | 9.72M/10.9M [00:21<00:01, 663kB/s][A
+Downloading [tokenizer.json]:  90%|█████████ | 9.82M/10.9M [00:22<00:01, 664kB/s][A
+Downloading [tokenizer.json]:  91%|█████████ | 9.91M/10.9M [00:22<00:01, 657kB/s][A
+Downloading [tokenizer.json]:  92%|█████████▏| 10.0M/10.9M [00:22<00:01, 660kB/s][A
+Downloading [tokenizer.json]:  93%|█████████▎| 10.1M/10.9M [00:22<00:01, 666kB/s][A
+Downloading [tokenizer.json]:  94%|█████████▎| 10.2M/10.9M [00:22<00:01, 675kB/s][A
+Downloading [tokenizer.json]:  95%|█████████▍| 10.3M/10.9M [00:22<00:00, 683kB/s][A
+Downloading [tokenizer.json]:  96%|█████████▌| 10.4M/10.9M [00:22<00:00, 745kB/s][A
+Downloading [tokenizer.json]:  96%|█████████▌| 10.5M/10.9M [00:23<00:00, 728kB/s][A
+Downloading [tokenizer.json]:  97%|█████████▋| 10.6M/10.9M [00:23<00:00, 545kB/s][A
+Downloading [tokenizer.json]:  99%|█████████▊| 10.8M/10.9M [00:23<00:00, 780kB/s][A
+Downloading [tokenizer.json]: 100%|█████████▉| 10.9M/10.9M [00:23<00:00, 889kB/s][ADownloading [tokenizer.json]: 100%|██████████| 10.9M/10.9M [00:23<00:00, 482kB/s]
+Processing 21 items:  95%|█████████▌| 20.0/21.0 [00:27<00:03, 3.53s/it]
+
+
+Downloading [model.safetensors]:   0%|          | 1.00M/4.04G [00:30<35:18:15, 34.1kB/s][A[A[A
+
+
+Downloading [model.safetensors]:   0%|          | 1.00M/4.04G [00:47<35:18:15, 34.1kB/s][A[A[A
+
+
+Downloading [model.safetensors]:   0%|          | 2.00M/4.04G [00:52<28:57:23, 41.6kB/s][A[A[A
+
+
+Downloading [model.safetensors]:   0%|          | 2.00M/4.04G [01:07<28:57:23, 41.6kB/s][A[A[A
+
+
+Downloading [model.safetensors]:   0%|          | 3.00M/4.04G [01:14<27:41:13, 43.5kB/s][A[A[A
+
+
+Downloading [model.safetensors]:   0%|          | 3.00M/4.04G [01:27<27:41:13, 43.5kB/s][A[A[A

@@ -1,0 +1,16 @@
+=== variance gate: model=internvl n=47 cases (EVIDENCE_IN∩CLEAN) ===
+  [free_form seed0] 20/47
+  [free_form seed0] 40/47
+[internvl/next/free_form seed0] free=0.702 method=0.702 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0
+  [orch_reflect_blind seed0] 20/47
+  [orch_reflect_blind seed0] 40/47
+[internvl/next/orch_reflect_blind seed0] free=0.702 method=0.468 net=-0.234 CI[-0.362,-0.128] gain=0 lost=11
+  [orch_reflect_blind seed1] 20/47
+  [orch_reflect_blind seed1] 40/47
+[internvl/next/orch_reflect_blind seed1] free=0.702 method=0.596 net=-0.106 CI[-0.234,+0.021] gain=2 lost=7
+  [orch_reflect_blind seed2] 20/47
+  [orch_reflect_blind seed2] 40/47
+[internvl/next/orch_reflect_blind seed2] free=0.702 method=0.553 net=-0.149 CI[-0.277,-0.021] gain=2 lost=9
+
+=== SUMMARY (NExT CLEAN∩EVIDENCE_IN) ===
+  orch_reflect_blind     net_mean=-0.163 ± seedstd 0.065 (k=3)  verdict=effect  per_seed=['-0.23', '-0.11', '-0.15']

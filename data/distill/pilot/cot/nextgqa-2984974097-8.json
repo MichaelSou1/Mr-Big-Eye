@@ -1,0 +1,63 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "ce82cb8da378cfe4",
+  "case_id": "nextgqa-2984974097-8",
+  "question": "how does the girl express her excitement while cycling\n\nCandidates:\nA) smile brightly\nB) jump\nC) cycling outfit\nD) run around\nE) claps\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    2.0,
+    3.0,
+    5.0,
+    7.0,
+    9.0,
+    11.0,
+    12.0,
+    14.0,
+    16.0,
+    18.0,
+    19.0,
+    21.0,
+    23.0,
+    25.0,
+    26.0,
+    28.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0002.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0003.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0005.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0007.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0009.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0011.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0012.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0014.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0016.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0018.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0019.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0021.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0023.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0025.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0026.0.jpg",
+    "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0028.0.jpg"
+  ],
+  "cot": "At [FRAME:t=12.0], the girl is observed smiling broadly while cycling, with her mouth open and eyes bright. This expression is consistent and visible in the subsequent frame at [FRAME:t=12.0], where the smile remains wide and expressive. At [FRAME:t=14.0], the girl continues to smile brightly while maintaining balance on the bicycle. No other actions such as jumping, clapping, running, or outfit-related behavior indicate excitement. The smile is the only dynamic facial expression tied to excitement across the frames.",
+  "answer": "A) smile brightly",
+  "gold_timestamps": [
+    13.5
+  ],
+  "gold_scenes": [
+    {
+      "start": 10.7,
+      "end": 16.3
+    }
+  ],
+  "source_traj_hash": "d8c820206643c24dd9e64c03f6cc3e652a82be45",
+  "validation_report": {
+    "ok": true,
+    "errors": [],
+    "frame_markers": [
+      12.0,
+      12.0,
+      14.0
+    ]
+  }
+}

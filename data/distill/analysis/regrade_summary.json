@@ -1,0 +1,83 @@
+{
+  "4b_next": {
+    "n": 50,
+    "free_acc_letter": 0.7,
+    "free_acc_text": 0.7,
+    "orch_acc_letter": 0.7,
+    "orch_acc_text": 0.7,
+    "free_letter_luck": 0,
+    "orch_letter_luck": 0
+  },
+  "4b_clevrer": {
+    "n": 70,
+    "free_acc_letter": 0.42857142857142855,
+    "free_acc_text": 0.42857142857142855,
+    "orch_acc_letter": 0.42857142857142855,
+    "orch_acc_text": 0.42857142857142855,
+    "free_letter_luck": 0,
+    "orch_letter_luck": 0
+  },
+  "4b_chartqa": {
+    "n": 60,
+    "free_acc_letter": 0.65,
+    "free_acc_text": 0.65,
+    "orch_acc_letter": 0.5166666666666667,
+    "orch_acc_text": 0.5166666666666667,
+    "free_letter_luck": 0,
+    "orch_letter_luck": 0
+  },
+  "8b_next": {
+    "n": 50,
+    "free_acc_letter": 0.64,
+    "free_acc_text": 0.64,
+    "orch_acc_letter": 0.62,
+    "orch_acc_text": 0.62,
+    "free_letter_luck": 0,
+    "orch_letter_luck": 0
+  },
+  "8b_clevrer": {
+    "n": 70,
+    "free_acc_letter": 0.5,
+    "free_acc_text": 0.5,
+    "orch_acc_letter": 0.5,
+    "orch_acc_text": 0.5,
+    "free_letter_luck": 0,
+    "orch_letter_luck": 0
+  },
+  "8b_chartqa": {
+    "n": 60,
+    "free_acc_letter": 0.6333333333333333,
+    "free_acc_text": 0.6333333333333333,
+    "orch_acc_letter": 0.55,
+    "orch_acc_text": 0.55,
+    "free_letter_luck": 0,
+    "orch_letter_luck": 0
+  },
+  "32b_next": {
+    "n": 50,
+    "free_acc_letter": 0.7,
+    "free_acc_text": 0.7,
+    "orch_acc_letter": 0.64,
+    "orch_acc_text": 0.64,
+    "free_letter_luck": 0,
+    "orch_letter_luck": 0
+  },
+  "32b_clevrer": {
+    "n": 70,
+    "free_acc_letter": 0.5,
+    "free_acc_text": 0.5,
+    "orch_acc_letter": 0.5,
+    "orch_acc_text": 0.5,
+    "free_letter_luck": 0,
+    "orch_letter_luck": 0
+  },
+  "32b_chartqa": {
+    "n": 60,
+    "free_acc_letter": 0.8,
+    "free_acc_text": 0.8,
+    "orch_acc_letter": 0.75,
+    "orch_acc_text": 0.75,
+    "free_letter_luck": 0,
+    "orch_letter_luck": 0
+  }
+}

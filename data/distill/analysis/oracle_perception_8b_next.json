@@ -1,0 +1,137 @@
+{
+  "summary": {
+    "n_free_wrong": 18,
+    "n_scored": 18,
+    "oracle_recovered": 6,
+    "oracle_recovery_rate": 0.3333333333333333,
+    "note": "NEAR-ORACLE: GT-frame caption by strong VLM, not human GT caption"
+  },
+  "rows": [
+    {
+      "case_id": "nextgqa-14012319794-4",
+      "qtype": "cw",
+      "oracle_correct": true,
+      "caption": "[t=53.0s] A red and yellow striped children’s play tent is in the foreground, partially obscuring the view. A child with light brown hair, wearing a pink top, is visible from the back and side, bending down near the tent. In the background, a small basketball hoop with a red rim and white net is mounted on a wooden stand. Behind it, a fireplace with a black metal frame and tiled surround is visible. Various toys, including a wooden block structure and a green toy, are scattered on the carpeted f",
+      "oracle_answer": "B) try to take flag on top"
+    },
+    {
+      "case_id": "nextgqa-2547885226-4",
+      "qtype": "tp",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=5.0s] A young child is crouched on a sandy, gravelly ground. The child has short black hair and is wearing a black short-sleeved t-shirt and blue patterned shorts. The child’s right hand is touching a red plastic dinosaur toy, which resembles a Tyrannosaurus Rex. The toy has yellow stripes along its back and white teeth visible in its open mouth. The child’s left hand is not visible. The ground is uneven, with small stones and scattered dry leaves. The lighting is bright, suggesting out",
+      "oracle_answer": "D) play with toy"
+    },
+    {
+      "case_id": "nextgqa-2782658657-0",
+      "qtype": "cw",
+      "oracle_correct": true,
+      "caption": "[FRAME:t=0.0] A wide outdoor scene shows a set of weathered stone steps ascending from the foreground toward a shaded area under large trees. At the bottom of the steps, a small child in a light-colored dress stands facing the camera. The steps are flanked by green shrubbery and large rocks. The background includes dense foliage, trees, and a grassy slope. The lighting is bright daylight, casting shadows from the trees onto the steps and surrounding area. The child appears small in scale relativ",
+      "oracle_answer": "A) ready to run"
+    },
+    {
+      "case_id": "nextgqa-2868183184-7",
+      "qtype": "tn",
+      "oracle_correct": true,
+      "caption": "[t=22.0s] The scene is set in a rustic, semi-outdoor kitchen with walls made of woven bamboo or reed. A woman in the foreground is crouched, wearing a white tank top, olive green shorts, and a black shoulder bag. She has dark hair tied in a high ponytail. In front of her is a large, round, shallow metal pan placed over a low, open fire or stove, covered with a large, domed metal lid. To her right, standing, is another woman with dark hair, wearing a pink and white floral sleeveless dress. Behind",
+      "oracle_answer": "E) look closer"
+    },
+    {
+      "case_id": "nextgqa-3026084730-11",
+      "qtype": "tn",
+      "oracle_correct": true,
+      "caption": "[FRAME:t=69.0s]  \nThree men in formal attire stand side-by-side in an ornate interior space. The man on the left wears a black suit, white shirt, red patterned tie, and glasses; he stands with his body angled slightly toward the center, hands at his sides. The central man wears a dark navy suit, white shirt, blue tie, and a white pocket square; he holds a small object (possibly a phone or remote) in his right hand, and his left hand is near his waist. He is looking slightly downward. The man on ",
+      "oracle_answer": "D) walks away"
+    },
+    {
+      "case_id": "nextgqa-3078294001-3",
+      "qtype": "cw",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=3.0] The scene is an indoor setting, likely a room with dark blue walls. Two men are present. The man in the foreground is seated, wearing a black zip-up hoodie, and has short, light brown hair and a beard. He is smiling and giving a thumbs-up gesture with his right hand. Behind him and to the right stands another man, taller, wearing a white dress shirt, dark trousers, and a purple and black striped bow tie. He has short brown hair and is smiling broadly, with his left hand resting on ",
+      "oracle_answer": ""
+    },
+    {
+      "case_id": "nextgqa-3376544720-9",
+      "qtype": "ch",
+      "oracle_correct": true,
+      "caption": "[t=57.0s] The frame shows an indoor or tented environment with a red inflatable or padded floor. In the foreground, a man wearing a black-and-white horizontally striped shirt and a dark cap is seated, facing slightly left. He appears to be observing something. Behind him and slightly elevated, a second person, bald and wearing a dark long-sleeved shirt and dark pants, is riding a mechanical bull. The bull is brown with a lighter underbelly and is mounted on a circular base. The rider has one arm",
+      "oracle_answer": "D) spin and up and down"
+    },
+    {
+      "case_id": "nextgqa-3429509208-1",
+      "qtype": "cw",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=0.0] A red upright vacuum cleaner is positioned on a polished hardwood floor in a domestic interior. The vacuum has a red fabric-covered dust bag with white text reading \"HOOVER\" and \"BROOM & VACUUM\" visible on the front. The vacuum’s base is red and black, with a black handle extending upward. To the left, a wooden kitchen island with a stainless steel countertop is visible, along with two wooden bar stools. In the background, a doorway leads to another room, where a dark wooden door a",
+      "oracle_answer": "C) show interest"
+    },
+    {
+      "case_id": "nextgqa-3943634344-10",
+      "qtype": "tn",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=18.0] A woman and a young child are seated on a light-colored, textured carpet. The woman, on the right, has shoulder-length dark hair and wears a light gray short-sleeved top with a dark trim around the neckline and light pink pants. She is holding an open board book with colorful illustrations of food items (including a slice of pizza, a cupcake, a hot dog, a green vegetable, and a yellow fruit or dessert) on the right-hand page. Her right hand points to the book, and her left hand re",
+      "oracle_answer": "C) look around"
+    },
+    {
+      "case_id": "nextgqa-4087013668-8",
+      "qtype": "tn",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=55.0] A shirtless toddler with light blonde hair sits on a table covered with newspapers. The child wears black shorts and is positioned in front of a large stainless steel mixing bowl filled with orange pumpkin pulp. The toddler’s right hand is raised mid-motion, appearing to reach toward or interact with the bowl. To the left, an adult woman (partially visible) with short blonde hair and wearing a light pink short-sleeved top is seated, her hands resting on the table. On the right sid",
+      "oracle_answer": "D) smiles"
+    },
+    {
+      "case_id": "nextgqa-4123915842-7",
+      "qtype": "tc",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=6.0] A young girl stands in the center of the frame, wearing a pink kimono with a floral pattern in shades of red, yellow, and green. The kimono has wide sleeves and is tied with a white obi sash at the waist. She has dark hair styled with a large red bow and a matching decorative hairpiece. Behind her, an older woman with glasses, wearing a black patterned top, is adjusting the girl’s hair with both hands. To the right, a woman in a black top and white pants is partially visible, kneel",
+      "oracle_answer": ""
+    },
+    {
+      "case_id": "nextgqa-4674481985-2",
+      "qtype": "tn",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=12.0] A waterfall cascades vertically from the top left of the frame into a dark, rippling pool below. The water strikes the surface with force, creating white splashes and ripples that spread outward. The background consists of a rocky cliff face, predominantly gray and brown with some green vegetation clinging to the upper right portion. The lighting is dim, suggesting an overcast sky or shaded environment.\n\n[FRAME:t=13.0] The waterfall continues to flow into the pool, with the splash",
+      "oracle_answer": "B) swimming"
+    },
+    {
+      "case_id": "nextgqa-4838145161-2",
+      "qtype": "cw",
+      "oracle_correct": false,
+      "caption": "[t=8.0s] A black and white cat is positioned on the left side of a beige double-basin kitchen sink. The cat’s front paws are placed on the edge of the left basin, and its head is lowered toward the faucet. The faucet is chrome and has a single handle on the left side. Water is flowing from the faucet into the right basin. On the sink’s edge, to the right of the faucet, there is a blue sponge resting on an orange sponge. Behind the sink, a window allows natural light to enter, illuminating the sc",
+      "oracle_answer": "A) to remove water from his body"
+    },
+    {
+      "case_id": "nextgqa-4942054721-4",
+      "qtype": "tc",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=5.0] A sloped, grassy hillside is visible, covered in green and brownish-yellow vegetation with scattered low shrubs. In the foreground, out-of-focus light-green leafy branches partially obscure the view. Five white animals, resembling sheep or goats, are present. One is at the top left, walking away from the camera. Two are in the center: one standing upright, the other grazing with head lowered. Two more are in the lower center, partially hidden by foliage, both grazing. The animals h",
+      "oracle_answer": ""
+    },
+    {
+      "case_id": "nextgqa-5945172741-7",
+      "qtype": "ch",
+      "oracle_correct": true,
+      "caption": "[FRAME:t=8.0] A man and a young child are lying on a bed covered with a light blue patterned sheet. The man, wearing a light gray short-sleeved shirt and dark shorts, is lying on his back with his legs extended toward the left side of the frame. His feet are near a window with patterned curtains. The child, wearing a black-and-white striped sleeveless outfit, is sitting upright on the man’s chest, facing him. The child holds an orange ball in their right hand. The man is looking at the child wit",
+      "oracle_answer": "B) kiss her"
+    },
+    {
+      "case_id": "nextgqa-6097994550-4",
+      "qtype": "ch",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=10.0] An indoor training environment with a dark mat floor and beige brick walls. A man in a U.S. Army digital camouflage uniform lies on his back on the mat, legs raised and bent at the knees, feet near his head. He wears glasses and has short dark hair. Another man in similar camouflage uniform is positioned above him, partially blurred due to motion, appearing to perform a leg or body maneuver onto the man on the floor. In the background, a yellow cabinet and a black storage unit are",
+      "oracle_answer": ""
+    },
+    {
+      "case_id": "nextgqa-6516459343-4",
+      "qtype": "cw",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=37.0] Two men are standing outdoors beside a dark wooden picnic table. The man on the left wears a bright yellow short-sleeved t-shirt with black text reading \"trope 75\" and smaller text below, along with dark pants. The man on the right wears a white short-sleeved t-shirt with red and black text reading \"ALMA MATER\" and dark pants. On the table lies a single athletic shoe with a black upper, red laces, and a bright neon green sole. The man on the right is leaning over the shoe, holding",
+      "oracle_answer": "C) proceed with next part of celebration"
+    },
+    {
+      "case_id": "nextgqa-8252088130-4",
+      "qtype": "tn",
+      "oracle_correct": false,
+      "caption": "[FRAME:t=8.0] A woman with brown hair tied back in a braid, wearing dark sunglasses and a light olive-green button-up shirt, is shown from the chest up on the left side of the frame. She is holding a large bird of prey on her left hand, which is covered with a thick black leather glove. The bird has a white head and underbelly, with dark gray wings and tail feathers. Its beak is hooked and light-colored, and its eyes are dark. The bird is perched upright, facing slightly upward and to the right.",
+      "oracle_answer": "E) reach for something"
+    }
+  ]
+}

@@ -1,0 +1,352 @@
+{
+  "summary": {
+    "total": 3,
+    "passed": 1,
+    "pass_rate": 0.3333333333333333,
+    "out_of_scope": 0,
+    "evidence_uncovered": 0,
+    "no_grounding_gt": 0,
+    "bad_process": 2
+  },
+  "passed_trajectories": [
+    "data/distill/pilot_smoke/trajectories/nextgqa-5945172741-7.json"
+  ],
+  "results": [
+    {
+      "case_id": "nextgqa-4838145161-0",
+      "video_id": "09354c9c0dec47cf",
+      "passed": false,
+      "drop_reasons": [
+        "grounding_report_failed",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4838145161-0",
+        "video_id": "09354c9c0dec47cf",
+        "question": "why is there water flowing from the tap\n\nCandidates:\nA) to prevent babies from drowning\nB) pipe is open\nC) for cat to drink\nD) raining\nE) soapy\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "C",
+          "text": "for cat to drink"
+        },
+        "recommended_option": {
+          "label": "C",
+          "text": "for cat to drink"
+        },
+        "reference_answer": "for cat to drink",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 11.7,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 11,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "cat": true,
+            "drink": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            10.0,
+            12.0,
+            13.0,
+            14.0,
+            15.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is C) for cat to drink.\n\nEvidence:\n- [FRAME:t=10.0] shows the cat positioned directly under the running water from the tap, with its head lowered toward the stream.\n- [FRAME:t=12.0] and [FRAME:t=13.0] show the cat observing the water flow, consistent with anticipation of drinking.\n- [FRAME:t=14.0] and [FRAME:t=15.0] show the cat actively reaching toward the water, with its mouth near the stream — behavior indicative of drinking.\n- The cat is explicitly labeled as “in drinking” and “observing the tap” in the subject registration table, reinforcing the causal link between the water flow and the cat’s behavior.\n- Options A, B, D, and E are not supported by any visual evidence or context in the frames.",
+        "retrieved_timestamps": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          53.0,
+          54.0,
+          60.0,
+          61.0,
+          62.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot_smoke/trajectories/nextgqa-4838145161-0.json"
+    },
+    {
+      "case_id": "nextgqa-5945172741-7",
+      "video_id": "4dd172f915a5cdb1",
+      "passed": true,
+      "drop_reasons": [],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-5945172741-7",
+        "video_id": "4dd172f915a5cdb1",
+        "question": "how did the man show affection to the girl when he held her\n\nCandidates:\nA) caress her hairs\nB) kiss her\nC) play with baby\nD) lady point towards it\nE) pat her back\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": true,
+        "failure_tags": [],
+        "selected_option": {
+          "label": "B",
+          "text": "kiss her"
+        },
+        "recommended_option": {
+          "label": "B",
+          "text": "kiss her"
+        },
+        "reference_answer": "kiss her",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.5,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 13,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "kiss": true,
+            "her": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            12.0,
+            21.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is B) kiss her.\n\nEvidence:\n- At [FRAME:t=12.0], the man is holding the girl close, and his face is near hers. His mouth is open and he appears to be kissing her on the forehead or cheek area. The girl is looking up at him with a happy expression.\n- At [FRAME:t=21.0], the man is still holding the girl, and his face is close to hers, with his lips near her face, consistent with a kiss.\n- The other options are not supported by the visual evidence: there is no visible caressing of hair, no baby being played with, no lady pointing, and no patting of the back.",
+        "retrieved_timestamps": [
+          0.0,
+          12.0,
+          21.0,
+          41.0,
+          42.0,
+          43.0,
+          44.0,
+          45.0,
+          46.0,
+          47.0,
+          48.0,
+          49.0,
+          54.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence"
+      ],
+      "trajectory_path": "data/distill/pilot_smoke/trajectories/nextgqa-5945172741-7.json"
+    },
+    {
+      "case_id": "nextgqa-8177965766-0",
+      "video_id": "07fb0c0a456d94d8",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-8177965766-0",
+        "video_id": "07fb0c0a456d94d8",
+        "question": "what did the woman do to the microphone after awhile\n\nCandidates:\nA) walk away\nB) smiles\nC) she talks to the other people\nD) switch to the other hand\nE) talks\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "switch to the other hand"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "switch to the other hand"
+        },
+        "reference_answer": "switch to the other hand",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.15000000000000036,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 8,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "switch": true,
+            "other": true,
+            "hand": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            9.0,
+            10.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) switch to the other hand.\n\nEvidence:\n- At [FRAME:t=9.0], the woman is holding the microphone in her right hand.\n- At [FRAME:t=10.0], she is seen holding the microphone in her left hand, having switched it to the other hand.\n- This action is clearly visible and consistent across the frames.",
+        "retrieved_timestamps": [
+          0.0,
+          5.0,
+          9.0,
+          10.0,
+          19.0,
+          23.0,
+          25.0,
+          29.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence"
+      ],
+      "trajectory_path": "data/distill/pilot_smoke/trajectories/nextgqa-8177965766-0.json"
+    }
+  ]
+}

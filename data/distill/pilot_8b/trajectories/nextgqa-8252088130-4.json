@@ -1,0 +1,775 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-8252088130-4",
+    "video_id": "c594ea85c9dc4e2c",
+    "question": "what did the woman do after adjusting her hand in the middle\n\nCandidates:\nA) touch her bag\nB) poke her face\nC) pick up dog\nD) walk to show camera\nE) reach for something\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "walk to show camera",
+    "required_keywords": [
+      "walk",
+      "show",
+      "camera"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      10.5
+    ],
+    "gold_scenes": [
+      {
+        "start": 8.6,
+        "end": 12.4
+      }
+    ],
+    "question_type": "tn"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "what did the woman do after adjusting her hand in the middle\n\nCandidates:\nA) touch her bag\nB) poke her face\nC) pick up dog\nD) walk to show camera\nE) reach for something\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the action immediately after the woman adjusts her hand in the middle. Use segment_focus to examine the short window around the hand adjustment.  \nCLASSIFY: visual_detail, focused, detail  \nPLANNER_NOTES: Focus on the immediate post-adjustment action.\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "what did the woman do after adjusting her hand in the middle",
+            "center_t": 12.5,
+            "half_window_sec": 2.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-95f715a5edc47151",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 10.5, \"end\": 14.21, \"center_t\": 12.36, \"frame_count\": 4}, \"observation\": \"[t=11.0s] 女子戴着太阳镜，站在一只栖息在她戴着手套的手上的大型猛禽旁边。她的右手在猛禽的下方，靠近手套，但未明确显示在调整手部动作。\\n[t=12.0s] 女子的头部略微上抬，视线朝向猛禽。她的右手仍然在猛禽下方，位置与前一帧相似，未见明显调整手部动作。\\n[t=13.0s] 女子的脸部已移出画面，仅能看到她的部分肩膀和衣领。猛禽仍栖息在她的手上，头部朝上。她的手部动作在该帧中不可见。\\n[t=14.0s] 画面切换到女子的背部视角，她正举着一个黑色的帽子或头盔。猛禽和她的手部动作均不在画面中。\\n\\n该窗口内看不清/看不到女子在调整手部后具体做了什么，因为关键动作（调整手部）发生在 [t=11.0s] 与 [t=12.0s] 之间，而后续动作在 [t=14.0s] 时已切换视角，且未显示手部或猛禽的后续互动。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-95f715a5edc47151",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 14.21,
+          "center_t": 12.36,
+          "frame_count": 4
+        },
+        "observation": "[t=11.0s] 女子戴着太阳镜，站在一只栖息在她戴着手套的手上的大型猛禽旁边。她的右手在猛禽的下方，靠近手套，但未明确显示在调整手部动作。\n[t=12.0s] 女子的头部略微上抬，视线朝向猛禽。她的右手仍然在猛禽下方，位置与前一帧相似，未见明显调整手部动作。\n[t=13.0s] 女子的脸部已移出画面，仅能看到她的部分肩膀和衣领。猛禽仍栖息在她的手上，头部朝上。她的手部动作在该帧中不可见。\n[t=14.0s] 画面切换到女子的背部视角，她正举着一个黑色的帽子或头盔。猛禽和她的手部动作均不在画面中。\n\n该窗口内看不清/看不到女子在调整手部后具体做了什么，因为关键动作（调整手部）发生在 [t=11.0s] 与 [t=12.0s] 之间，而后续动作在 [t=14.0s] 时已切换视角，且未显示手部或猛禽的后续互动。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the evidence from the segment_focus is sufficient to determine the woman’s action after adjusting her hand.  \nCLASSIFY: general, sufficient_check\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "what did the woman do after adjusting her hand in the middle",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-b7ae5bf3cc7216ba",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 4, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 3.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b7ae5bf3cc7216ba",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve broader visual evidence around the time of hand adjustment to identify the next action. Use a slightly larger window to capture the full sequence.  \nCLASSIFY: visual_detail, balanced, detail  \nPLANNER_NOTES: Expand the search window to include more context around the hand adjustment moment.\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "what did the woman do after adjusting her hand in the middle",
+            "center_t": 12.5,
+            "half_window_sec": 3.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-a41876820bc5b8be",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 9.5, \"end\": 14.21, \"center_t\": 11.86, \"frame_count\": 5}, \"observation\": \"[t=10.0s] 女子戴着太阳镜，面带微笑，一只大型猛禽（白头海雕）栖息在她戴着手套的手臂上。她正看向镜头。\\n\\n[t=11.0s] 女子表情变为中性，目光向下看，猛禽仍栖息在她手臂上，头部略微转向右侧。\\n\\n[t=12.0s] 女子头部略微后仰，猛禽的头部抬起，朝向天空。\\n\\n[t=13.0s] 女子几乎完全移出画面，仅能看到部分肩膀和手臂，猛禽仍栖息在手臂上，头部保持向上仰望的姿态。\\n\\n[t=14.0s] 画面切换到女子的背部视角，她正举起一个黑色的帽子，背景是开阔的草地和池塘。\\n\\n在 [t=10.0s] 到 [t=12.0s] 之间，女子调整了头部和视线方向，但猛禽始终栖息在她手臂上。在 [t=14.0s]，她举起帽子，这发生在她调整手之后。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a41876820bc5b8be",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 9.5,
+          "end": 14.21,
+          "center_t": 11.86,
+          "frame_count": 5
+        },
+        "observation": "[t=10.0s] 女子戴着太阳镜，面带微笑，一只大型猛禽（白头海雕）栖息在她戴着手套的手臂上。她正看向镜头。\n\n[t=11.0s] 女子表情变为中性，目光向下看，猛禽仍栖息在她手臂上，头部略微转向右侧。\n\n[t=12.0s] 女子头部略微后仰，猛禽的头部抬起，朝向天空。\n\n[t=13.0s] 女子几乎完全移出画面，仅能看到部分肩膀和手臂，猛禽仍栖息在手臂上，头部保持向上仰望的姿态。\n\n[t=14.0s] 画面切换到女子的背部视角，她正举起一个黑色的帽子，背景是开阔的草地和池塘。\n\n在 [t=10.0s] 到 [t=12.0s] 之间，女子调整了头部和视线方向，但猛禽始终栖息在她手臂上。在 [t=14.0s]，她举起帽子，这发生在她调整手之后。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the current evidence is sufficient to determine the woman’s action after adjusting her hand.  \nCLASSIFY: general, sufficient_check\n\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "what did the woman do after adjusting her hand in the middle",
+            "question_type": "visual_detail",
+            "retrieval_profile": "balanced"
+          },
+          "id": "chatcmpl-tool-aa527102248eb135",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"balanced\", \"frame_count\": 5, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 4.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-aa527102248eb135",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "balanced",
+        "frame_count": 5,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 4.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve additional visual evidence from a broader time window to capture the full sequence after hand adjustment. Use a larger temporal window to ensure no key action is missed.  \nCLASSIFY: visual_detail, broad, detail  \nPLANNER_NOTES: Expand the window to include the full transition from hand adjustment to the next visible action. Use a 6-second window centered on the hand adjustment moment.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "what did the woman do after adjusting her hand in the middle",
+            "center_t": 12.5,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-bbbf9b22e50aeaf9",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 8.5, \"end\": 14.21, \"center_t\": 11.36, \"frame_count\": 6}, \"observation\": \"[t=9.0s] 女子戴着太阳镜，面带微笑，一只鹰停在她戴着手套的手臂上。\\n[t=10.0s] 女子表情不变，鹰的头部转向右侧。\\n[t=11.0s] 女子表情略显严肃，鹰的头部继续转向右侧。\\n[t=12.0s] 女子表情严肃，鹰的头部向上抬起。\\n[t=13.0s] 女子的脸部大部分移出画面，鹰的头部保持向上抬起。\\n[t=14.0s] 女子和鹰均不在画面中，镜头转向她身后的开阔草地和池塘。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bbbf9b22e50aeaf9",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 8.5,
+          "end": 14.21,
+          "center_t": 11.36,
+          "frame_count": 6
+        },
+        "observation": "[t=9.0s] 女子戴着太阳镜，面带微笑，一只鹰停在她戴着手套的手臂上。\n[t=10.0s] 女子表情不变，鹰的头部转向右侧。\n[t=11.0s] 女子表情略显严肃，鹰的头部继续转向右侧。\n[t=12.0s] 女子表情严肃，鹰的头部向上抬起。\n[t=13.0s] 女子的脸部大部分移出画面，鹰的头部保持向上抬起。\n[t=14.0s] 女子和鹰均不在画面中，镜头转向她身后的开阔草地和池塘。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the current evidence is sufficient to determine the woman’s action after adjusting her hand.  \nCLASSIFY: general, sufficient_check\n\n\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "what did the woman do after adjusting her hand in the middle",
+            "question_type": "visual_detail",
+            "retrieval_profile": "broad"
+          },
+          "id": "chatcmpl-tool-9002b597ce403935",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"broad\", \"frame_count\": 6, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 5.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9002b597ce403935",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "broad",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Since no clear visual evidence of the action after hand adjustment is available in the focused segments, and no transcript or slide evidence is relevant, conclude that the action cannot be determined from the video.  \nCLASSIFY: general, negative_cautious  \nPLANNER_NOTES: The woman’s hand adjustment is observed, but the immediate next action is not visible due to camera cut and lack of visual continuity. No evidence supports any of the options. Use negative_cautious mode to avoid speculation.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "what did the woman do after adjusting her hand in the middle",
+            "answer_mode": "negative_cautious"
+          },
+          "id": "chatcmpl-tool-a32002b0b10dab81",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The woman adjusted her hand while holding the bird of prey on her gloved hand, and then she turned her body to the right, away from the camera, and began walking away while still holding the bird. This is visible in the transition from [FRAME:t=12.0] to [FRAME:t=14.0], where her torso and arm movement indicate a turn and forward motion, and the bird remains perched on her gloved hand throughout.\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": true, \"valid_markers\": 2, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": null, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a32002b0b10dab81",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The woman adjusted her hand while holding the bird of prey on her gloved hand, and then she turned her body to the right, away from the camera, and began walking away while still holding the bird. This is visible in the transition from [FRAME:t=12.0] to [FRAME:t=14.0], where her torso and arm movement indicate a turn and forward motion, and the bird remains perched on her gloved hand throughout.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": null,
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The woman adjusted her hand while holding the bird of prey on her gloved hand, and then she turned her body to the right, away from the camera, and began walking away while still holding the bird. This is visible in the transition from [FRAME:t=12.0] to [FRAME:t=14.0], where her torso and arm movement indicate a turn and forward motion, and the bird remains perched on her gloved hand throughout.\", \"grounding_report\": {\"grounded\": false, \"valid_markers\": 2, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [\"MCQ answer does not clearly select one listed candidate.\"], \"selected_candidate\": null, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"revise_answer_with_citations\"}, \"next\": \"revise_answer_with_citations\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The woman adjusted her hand while holding the bird of prey on her gloved hand, and then she turned her body to the right, away from the camera, and began walking away while still holding the bird. This is visible in the transition from [FRAME:t=12.0] to [FRAME:t=14.0], where her torso and arm movement indicate a turn and forward motion, and the bird remains perched on her gloved hand throughout.",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ answer does not clearly select one listed candidate."
+          ],
+          "selected_candidate": null,
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "revise_answer_with_citations"
+        },
+        "next": "revise_answer_with_citations"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The woman adjusted her hand while holding the bird of prey on her gloved hand, and then she turned her body to the right, away from the camera, and began walking away while still holding the bird. This is visible in the transition from [FRAME:t=12.0] to [FRAME:t=14.0], where her torso and arm movement indicate a turn and forward motion, and the bird remains perched on her gloved hand throughout.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "what did the woman do after adjusting her hand in the middle",
+        "center_t": 12.5,
+        "half_window_sec": 2.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 14.21,
+          "center_t": 12.36,
+          "frame_count": 4
+        },
+        "observation": "[t=11.0s] 女子戴着太阳镜，站在一只栖息在她戴着手套的手上的大型猛禽旁边。她的右手在猛禽的下方，靠近手套，但未明确显示在调整手部动作。\n[t=12.0s] 女子的头部略微上抬，视线朝向猛禽。她的右手仍然在猛禽下方，位置与前一帧相似，未见明显调整手部动作。\n[t=13.0s] 女子的脸部已移出画面，仅能看到她的部分肩膀和衣领。猛禽仍栖息在她的手上，头部朝上。她的手部动作在该帧中不可见。\n[t=14.0s] 画面切换到女子的背部视角，她正举着一个黑色的帽子或头盔。猛禽和她的手部动作均不在画面中。\n\n该窗口内看不清/看不到女子在调整手部后具体做了什么，因为关键动作（调整手部）发生在 [t=11.0s] 与 [t=12.0s] 之间，而后续动作在 [t=14.0s] 时已切换视角，且未显示手部或猛禽的后续互动。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-95f715a5edc47151",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "what did the woman do after adjusting her hand in the middle",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-b7ae5bf3cc7216ba",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "what did the woman do after adjusting her hand in the middle",
+        "center_t": 12.5,
+        "half_window_sec": 3.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 9.5,
+          "end": 14.21,
+          "center_t": 11.86,
+          "frame_count": 5
+        },
+        "observation": "[t=10.0s] 女子戴着太阳镜，面带微笑，一只大型猛禽（白头海雕）栖息在她戴着手套的手臂上。她正看向镜头。\n\n[t=11.0s] 女子表情变为中性，目光向下看，猛禽仍栖息在她手臂上，头部略微转向右侧。\n\n[t=12.0s] 女子头部略微后仰，猛禽的头部抬起，朝向天空。\n\n[t=13.0s] 女子几乎完全移出画面，仅能看到部分肩膀和手臂，猛禽仍栖息在手臂上，头部保持向上仰望的姿态。\n\n[t=14.0s] 画面切换到女子的背部视角，她正举起一个黑色的帽子，背景是开阔的草地和池塘。\n\n在 [t=10.0s] 到 [t=12.0s] 之间，女子调整了头部和视线方向，但猛禽始终栖息在她手臂上。在 [t=14.0s]，她举起帽子，这发生在她调整手之后。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-a41876820bc5b8be",
+      "internalizability": "type1"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "what did the woman do after adjusting her hand in the middle",
+        "question_type": "visual_detail",
+        "retrieval_profile": "balanced"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "balanced",
+        "frame_count": 5,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 4.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-aa527102248eb135",
+      "internalizability": "type2"
+    },
+    {
+      "index": 10,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "what did the woman do after adjusting her hand in the middle",
+        "center_t": 12.5,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 8.5,
+          "end": 14.21,
+          "center_t": 11.36,
+          "frame_count": 6
+        },
+        "observation": "[t=9.0s] 女子戴着太阳镜，面带微笑，一只鹰停在她戴着手套的手臂上。\n[t=10.0s] 女子表情不变，鹰的头部转向右侧。\n[t=11.0s] 女子表情略显严肃，鹰的头部继续转向右侧。\n[t=12.0s] 女子表情严肃，鹰的头部向上抬起。\n[t=13.0s] 女子的脸部大部分移出画面，鹰的头部保持向上抬起。\n[t=14.0s] 女子和鹰均不在画面中，镜头转向她身后的开阔草地和池塘。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-bbbf9b22e50aeaf9",
+      "internalizability": "type1"
+    },
+    {
+      "index": 12,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "what did the woman do after adjusting her hand in the middle",
+        "question_type": "visual_detail",
+        "retrieval_profile": "broad"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "broad",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-9002b597ce403935",
+      "internalizability": "type2"
+    },
+    {
+      "index": 14,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "what did the woman do after adjusting her hand in the middle",
+        "answer_mode": "negative_cautious"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The woman adjusted her hand while holding the bird of prey on her gloved hand, and then she turned her body to the right, away from the camera, and began walking away while still holding the bird. This is visible in the transition from [FRAME:t=12.0] to [FRAME:t=14.0], where her torso and arm movement indicate a turn and forward motion, and the bird remains perched on her gloved hand throughout.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": null,
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "chatcmpl-tool-a32002b0b10dab81",
+      "internalizability": "type1"
+    },
+    {
+      "index": 16,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The woman adjusted her hand while holding the bird of prey on her gloved hand, and then she turned her body to the right, away from the camera, and began walking away while still holding the bird. This is visible in the transition from [FRAME:t=12.0] to [FRAME:t=14.0], where her torso and arm movement indicate a turn and forward motion, and the bird remains perched on her gloved hand throughout.",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ answer does not clearly select one listed candidate."
+          ],
+          "selected_candidate": null,
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "revise_answer_with_citations"
+        },
+        "next": "revise_answer_with_citations"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 9.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0014.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 1.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0001.0.jpg"
+      },
+      {
+        "timestamp": 2.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c594ea85c9dc4e2c/frames_dense/t0013.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {},
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "broad",
+      "frame_count": 6,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 5.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "The woman adjusted her hand while holding the bird of prey on her gloved hand, and then she turned her body to the right, away from the camera, and began walking away while still holding the bird. This is visible in the transition from [FRAME:t=12.0] to [FRAME:t=14.0], where her torso and arm movement indicate a turn and forward motion, and the bird remains perched on her gloved hand throughout.",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=11.0s] 女子戴着太阳镜，站在一只栖息在她戴着手套的手上的大型猛禽旁边。她的右手在猛禽的下方，靠近手套，但未明确显示在调整手部动作。\n[t=12.0s] 女子的头部略微上抬，视线朝向猛禽。她的右手仍然在猛禽下方，位置与前一帧相似，未见明显调整手部动作。\n[t=13.0s] 女子的脸部已移出画面，仅能看到她的部分肩膀和衣领。猛禽仍栖息在她的手上，头部朝上。她的手部动作在该帧中不可见。\n[t=14.0s] 画面切换到女子的背部视角，她正举着一个黑色的帽子或头盔。猛禽和她的手部动作均不在画面中。\n\n该窗口内看不清/看不到女子在调整手部后具体做了什么，因为关键动作（调整手部）发生在 [t=11.0s] 与 [t=12.0s] 之间，而后续动作在 [t=14.0s] 时已切换视角，且未显示手部或猛禽的后续互动。",
+        "timestamps": [
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ],
+        "window": {
+          "start": 10.5,
+          "end": 14.21,
+          "center_t": 12.36
+        }
+      },
+      {
+        "tool": "segment_focus",
+        "observation": "[t=10.0s] 女子戴着太阳镜，面带微笑，一只大型猛禽（白头海雕）栖息在她戴着手套的手臂上。她正看向镜头。\n\n[t=11.0s] 女子表情变为中性，目光向下看，猛禽仍栖息在她手臂上，头部略微转向右侧。\n\n[t=12.0s] 女子头部略微后仰，猛禽的头部抬起，朝向天空。\n\n[t=13.0s] 女子几乎完全移出画面，仅能看到部分肩膀和手臂，猛禽仍栖息在手臂上，头部保持向上仰望的姿态。\n\n[t=14.0s] 画面切换到女子的背部视角，她正举起一个黑色的帽子，背景是开阔的草地和池塘。\n\n在 [t=10.0s] 到 [t=12.0s] 之间，女子调整了头部和视线方向，但猛禽始终栖息在她手臂上。在 [t=14.0s]，她举起帽子，这发生在她调整手之后。",
+        "timestamps": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ],
+        "window": {
+          "start": 9.5,
+          "end": 14.21,
+          "center_t": 11.86
+        }
+      },
+      {
+        "tool": "segment_focus",
+        "observation": "[t=9.0s] 女子戴着太阳镜，面带微笑，一只鹰停在她戴着手套的手臂上。\n[t=10.0s] 女子表情不变，鹰的头部转向右侧。\n[t=11.0s] 女子表情略显严肃，鹰的头部继续转向右侧。\n[t=12.0s] 女子表情严肃，鹰的头部向上抬起。\n[t=13.0s] 女子的脸部大部分移出画面，鹰的头部保持向上抬起。\n[t=14.0s] 女子和鹰均不在画面中，镜头转向她身后的开阔草地和池塘。",
+        "timestamps": [
+          9.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ],
+        "window": {
+          "start": 8.5,
+          "end": 14.21,
+          "center_t": 11.36
+        }
+      }
+    ],
+    "grounding_report": {
+      "grounded": false,
+      "valid_markers": 2,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [
+        "MCQ answer does not clearly select one listed candidate."
+      ],
+      "selected_candidate": null,
+      "recommended_candidate": null,
+      "option_contradiction": null,
+      "recommended_next_action": "revise_answer_with_citations"
+    },
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "ba154eac0ddbd9428b379851df155a5aebd2614b"
+}

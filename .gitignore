@@ -12,7 +12,11 @@ __pycache__/
 .coverage
 htmlcov/
 
-data/
+# Track experiment results under data/ (jsonl/json/csv), but not bulky regenerable
+# model artifacts: the LoRA safetensors (167M, >GitHub limit) + its tokenizer copy.
+# Re-create via scripts/poc_sft.py. Raw frames/images live outside the repo (mbe_data cache).
+data/distill/poc/lora_8b_chartqa/adapter_model.safetensors
+data/distill/poc/lora_8b_chartqa/tokenizer.json
 models/
 docs/*.gif
 docs/*.mp4

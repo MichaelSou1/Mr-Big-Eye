@@ -1,0 +1,38 @@
+=== Penguin gate: penguin2b / chartqa n=60 ===
+/home/gpus/anaconda3/envs/penguin/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:631: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/home/gpus/anaconda3/envs/penguin/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+/home/gpus/anaconda3/envs/penguin/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `20` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+  warnings.warn(
+Detected nested encoder keys in checkpoint, adding key mapping for vision_encoder
+  [free_form seed0] 10/60
+  [free_form seed0] 20/60
+  [free_form seed0] 30/60
+  [free_form seed0] 40/60
+  [free_form seed0] 50/60
+  [free_form seed0] 60/60
+[penguin2b/chartqa/free_form seed0] free=0.817 method=0.817 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0
+  free_form              net_mean=+0.000 ± 0.000 (k=1)
+  [orch_reflect_blind seed0] 10/60
+  [orch_reflect_blind seed0] 20/60
+  [orch_reflect_blind seed0] 30/60
+  [orch_reflect_blind seed0] 40/60
+  [orch_reflect_blind seed0] 50/60
+  [orch_reflect_blind seed0] 60/60
+[penguin2b/chartqa/orch_reflect_blind seed0] free=0.817 method=0.767 net=-0.050 CI[-0.117,+0.017] gain=1 lost=4
+  [orch_reflect_blind seed1] 10/60
+  [orch_reflect_blind seed1] 20/60
+  [orch_reflect_blind seed1] 30/60
+  [orch_reflect_blind seed1] 40/60
+  [orch_reflect_blind seed1] 50/60
+  [orch_reflect_blind seed1] 60/60
+[penguin2b/chartqa/orch_reflect_blind seed1] free=0.817 method=0.700 net=-0.117 CI[-0.217,-0.033] gain=1 lost=8
+  [orch_reflect_blind seed2] 10/60
+  [orch_reflect_blind seed2] 20/60
+  [orch_reflect_blind seed2] 30/60
+  [orch_reflect_blind seed2] 40/60
+  [orch_reflect_blind seed2] 50/60
+  [orch_reflect_blind seed2] 60/60
+[penguin2b/chartqa/orch_reflect_blind seed2] free=0.817 method=0.750 net=-0.067 CI[-0.167,+0.017] gain=2 lost=6
+  orch_reflect_blind     net_mean=-0.078 ± 0.035 (k=3)

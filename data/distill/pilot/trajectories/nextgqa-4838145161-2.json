@@ -1,0 +1,818 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-4838145161-2",
+    "video_id": "09354c9c0dec47cf",
+    "question": "why is the cat shaking its paws after moving back\n\nCandidates:\nA) to remove water from his body\nB) sleepy\nC) prevent hitting shelf\nD) swat water from face\nE) injured\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "swat water from face",
+    "required_keywords": [
+      "swat",
+      "water",
+      "face"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      9.2,
+      26.4
+    ],
+    "gold_scenes": [
+      {
+        "start": 8.3,
+        "end": 10.1
+      },
+      {
+        "start": 24.5,
+        "end": 28.3
+      }
+    ],
+    "question_type": "cw"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T12:53:09",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-4B-Instruct@http://127.0.0.1:30000/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "why is the cat shaking its paws after moving back\n\nCandidates:\nA) to remove water from his body\nB) sleepy\nC) prevent hitting shelf\nD) swat water from face\nE) injured\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Analyze visual behavior of cat post-movement; classify as visual_detail with focused retrieval.  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "why is the cat shaking its paws after moving back",
+            "center_t": 12.5,
+            "half_window_sec": 3.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-aac727112918d37e",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 9.5, \"end\": 15.5, \"center_t\": 12.5, \"frame_count\": 6}, \"observation\": \"The cat is observed moving back from the running water stream at [t=11.0s], then repositions itself to face the stream again at [t=12.0s] and [t=13.0s]. At [t=14.0s], it extends its front paws toward the water, and by [t=15.0s], it is actively pawing at the stream. The motion suggests the cat is attempting to interact with or play with the water, possibly to bat at it or test its texture, rather than shaking paws as a reaction to moving back. No visual evidence of shaking paws is present in this sequence.\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-aac727112918d37e",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5,
+          "frame_count": 6
+        },
+        "observation": "The cat is observed moving back from the running water stream at [t=11.0s], then repositions itself to face the stream again at [t=12.0s] and [t=13.0s]. At [t=14.0s], it extends its front paws toward the water, and by [t=15.0s], it is actively pawing at the stream. The motion suggests the cat is attempting to interact with or play with the water, possibly to bat at it or test its texture, rather than shaking paws as a reaction to moving back. No visual evidence of shaking paws is present in this sequence.",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess if visual evidence supports paw-shaking behavior; classify as visual_detail with focused retrieval.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "why is the cat shaking its paws after moving back",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 5,
+            "planner_notes": "Focus on paw motion immediately after movement back."
+          },
+          "id": "chatcmpl-tool-97a547aa67f0d708",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 10.0, \"source\": \"segment_focus\"}, {\"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"timestamp\": 12.0, \"source\": \"segment_focus\"}, {\"timestamp\": 13.0, \"source\": \"segment_focus\"}, {\"timestamp\": 14.0, \"source\": \"segment_focus\"}, {\"timestamp\": 15.0, \"source\": \"segment_focus\"}, {\"timestamp\": 31.0, \"source\": \"retrieval\"}, {\"timestamp\": 61.0, \"source\": \"retrieval\"}, {\"timestamp\": 62.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"end\": 10.0, \"t_mid\": 5.0, \"caption\": \"A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.\", \"filename\": \"scene_0000.jpg\", \"start\": 0.0, \"scene_id\": 0, \"score\": 0.5147524476051331}, {\"t_mid\": 15.0, \"caption\": \"A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.\", \"scene_id\": 1, \"start\": 10.0, \"end\": 20.0, \"filename\": \"scene_0001.jpg\", \"score\": 0.5245813131332397}, {\"start\": 30.0, \"scene_id\": 3, \"caption\": \"A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge of the sink.\", \"end\": 40.0, \"t_mid\": 35.0, \"filename\": \"scene_0003.jpg\", \"score\": 0.5134286880493164}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 5, \"planner_notes\": \"Focus on paw motion immediately after movement back.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-97a547aa67f0d708",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 10.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 31.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 61.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 62.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "t_mid": 5.0,
+            "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+            "filename": "scene_0000.jpg",
+            "start": 0.0,
+            "scene_id": 0,
+            "score": 0.5147524476051331
+          },
+          {
+            "t_mid": 15.0,
+            "caption": "A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.",
+            "scene_id": 1,
+            "start": 10.0,
+            "end": 20.0,
+            "filename": "scene_0001.jpg",
+            "score": 0.5245813131332397
+          },
+          {
+            "start": 30.0,
+            "scene_id": 3,
+            "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge of the sink.",
+            "end": 40.0,
+            "t_mid": 35.0,
+            "filename": "scene_0003.jpg",
+            "score": 0.5134286880493164
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on paw motion immediately after movement back."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Evaluate whether retrieved frames show paw shaking after movement back; classify as visual_detail with focused retrieval.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "why is the cat shaking its paws after moving back",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-9c272f63c090a71f",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": true, \"confidence\": 0.78, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 9, \"scene_count\": 3, \"text_evidence_count\": 0, \"time_span_sec\": 52.0, \"missing_evidence\": [], \"recommended_next_action\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9c272f63c090a71f",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 9,
+        "scene_count": 3,
+        "text_evidence_count": 0,
+        "time_span_sec": 52.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "why is the cat shaking its paws after moving back\n\nCandidates:\nA) to remove water from his body\nB) sleepy\nC) prevent hitting shelf\nD) swat water from face\nE) injured\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is A) to remove water from his body.\\n\\nEvidence:\\n- At [FRAME:t=10.0], the cat is near a running faucet, with water dripping onto the sink. Its paws are wet and it is actively moving.\\n- At [FRAME:t=11.0], the cat has moved back slightly, and its body is visibly wet, with water dripping from its fur.\\n- At [FRAME:t=12.0], the cat is standing upright, looking away from the water, and its paws are still wet.\\n- At [FRAME:t=13.0], the cat is still in the sink area, and its paws are visibly shaking, likely to shake off excess water.\\n- At [FRAME:t=14.0], the cat is again near the faucet, and its paws are shaking as it moves back toward the water source.\\n- At [FRAME:t=15.0], the cat is drinking from the faucet, and its paws are still wet, indicating it is actively removing water from its body.\\n- At [FRAME:t=31.0], the cat is again near the faucet, and its paws are shaking, likely to remove water from its body.\\n\\nThe cat’s paw-shaking behavior is consistent with the action of removing excess water from its body after moving back near the running faucet. The other options are not supported by the visual evidence.\", \"subject_deltas\": [{\"op\": \"add\", \"id\": \"cat\", \"label\": \"黑白色猫\", \"first_seen_t\": 10.0, \"attributes\": [\"在水槽边\", \"湿毛\", \"摇动爪子\"], \"evidence_frames\": [10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 31.0]}], \"grounding_report\": {\"grounded\": true, \"valid_markers\": 7, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"A\", \"text\": \"to remove water from his body\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is A) to remove water from his body.\n\nEvidence:\n- At [FRAME:t=10.0], the cat is near a running faucet, with water dripping onto the sink. Its paws are wet and it is actively moving.\n- At [FRAME:t=11.0], the cat has moved back slightly, and its body is visibly wet, with water dripping from its fur.\n- At [FRAME:t=12.0], the cat is standing upright, looking away from the water, and its paws are still wet.\n- At [FRAME:t=13.0], the cat is still in the sink area, and its paws are visibly shaking, likely to shake off excess water.\n- At [FRAME:t=14.0], the cat is again near the faucet, and its paws are shaking as it moves back toward the water source.\n- At [FRAME:t=15.0], the cat is drinking from the faucet, and its paws are still wet, indicating it is actively removing water from its body.\n- At [FRAME:t=31.0], the cat is again near the faucet, and its paws are shaking, likely to remove water from its body.\n\nThe cat’s paw-shaking behavior is consistent with the action of removing excess water from its body after moving back near the running faucet. The other options are not supported by the visual evidence.",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "cat",
+            "label": "黑白色猫",
+            "first_seen_t": 10.0,
+            "attributes": [
+              "在水槽边",
+              "湿毛",
+              "摇动爪子"
+            ],
+            "evidence_frames": [
+              10.0,
+              11.0,
+              12.0,
+              13.0,
+              14.0,
+              15.0,
+              31.0
+            ]
+          }
+        ],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 7,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "A",
+            "text": "to remove water from his body"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is A) to remove water from his body.\\n\\nEvidence:\\n- At [FRAME:t=10.0], the cat is near a running faucet, with water dripping onto the sink. Its paws are wet and it is actively moving.\\n- At [FRAME:t=11.0], the cat has moved back slightly, and its body is visibly wet, with water dripping from its fur.\\n- At [FRAME:t=12.0], the cat is standing upright, looking away from the water, and its paws are still wet.\\n- At [FRAME:t=13.0], the cat is still in the sink area, and its paws are visibly shaking, likely to shake off excess water.\\n- At [FRAME:t=14.0], the cat is again near the faucet, and its paws are shaking as it moves back toward the water source.\\n- At [FRAME:t=15.0], the cat is drinking from the faucet, and its paws are still wet, indicating it is actively removing water from its body.\\n- At [FRAME:t=31.0], the cat is again near the faucet, and its paws are shaking, likely to remove water from its body.\\n\\nThe cat’s paw-shaking behavior is consistent with the action of removing excess water from its body after moving back near the running faucet. The other options are not supported by the visual evidence.\", \"grounding_report\": {\"grounded\": true, \"valid_markers\": 7, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"A\", \"text\": \"to remove water from his body\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"final_answer\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is A) to remove water from his body.\n\nEvidence:\n- At [FRAME:t=10.0], the cat is near a running faucet, with water dripping onto the sink. Its paws are wet and it is actively moving.\n- At [FRAME:t=11.0], the cat has moved back slightly, and its body is visibly wet, with water dripping from its fur.\n- At [FRAME:t=12.0], the cat is standing upright, looking away from the water, and its paws are still wet.\n- At [FRAME:t=13.0], the cat is still in the sink area, and its paws are visibly shaking, likely to shake off excess water.\n- At [FRAME:t=14.0], the cat is again near the faucet, and its paws are shaking as it moves back toward the water source.\n- At [FRAME:t=15.0], the cat is drinking from the faucet, and its paws are still wet, indicating it is actively removing water from its body.\n- At [FRAME:t=31.0], the cat is again near the faucet, and its paws are shaking, likely to remove water from its body.\n\nThe cat’s paw-shaking behavior is consistent with the action of removing excess water from its body after moving back near the running faucet. The other options are not supported by the visual evidence.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 7,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "A",
+            "text": "to remove water from his body"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is A) to remove water from his body.\n\nEvidence:\n- At [FRAME:t=10.0], the cat is near a running faucet, with water dripping onto the sink. Its paws are wet and it is actively moving.\n- At [FRAME:t=11.0], the cat has moved back slightly, and its body is visibly wet, with water dripping from its fur.\n- At [FRAME:t=12.0], the cat is standing upright, looking away from the water, and its paws are still wet.\n- At [FRAME:t=13.0], the cat is still in the sink area, and its paws are visibly shaking, likely to shake off excess water.\n- At [FRAME:t=14.0], the cat is again near the faucet, and its paws are shaking as it moves back toward the water source.\n- At [FRAME:t=15.0], the cat is drinking from the faucet, and its paws are still wet, indicating it is actively removing water from its body.\n- At [FRAME:t=31.0], the cat is again near the faucet, and its paws are shaking, likely to remove water from its body.\n\nThe cat’s paw-shaking behavior is consistent with the action of removing excess water from its body after moving back near the running faucet. The other options are not supported by the visual evidence.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "why is the cat shaking its paws after moving back",
+        "center_t": 12.5,
+        "half_window_sec": 3.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5,
+          "frame_count": 6
+        },
+        "observation": "The cat is observed moving back from the running water stream at [t=11.0s], then repositions itself to face the stream again at [t=12.0s] and [t=13.0s]. At [t=14.0s], it extends its front paws toward the water, and by [t=15.0s], it is actively pawing at the stream. The motion suggests the cat is attempting to interact with or play with the water, possibly to bat at it or test its texture, rather than shaking paws as a reaction to moving back. No visual evidence of shaking paws is present in this sequence.",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-aac727112918d37e",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "why is the cat shaking its paws after moving back",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 5,
+        "planner_notes": "Focus on paw motion immediately after movement back."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 10.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 31.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 61.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 62.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "t_mid": 5.0,
+            "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+            "filename": "scene_0000.jpg",
+            "start": 0.0,
+            "scene_id": 0,
+            "score": 0.5147524476051331
+          },
+          {
+            "t_mid": 15.0,
+            "caption": "A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.",
+            "scene_id": 1,
+            "start": 10.0,
+            "end": 20.0,
+            "filename": "scene_0001.jpg",
+            "score": 0.5245813131332397
+          },
+          {
+            "start": 30.0,
+            "scene_id": 3,
+            "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge of the sink.",
+            "end": 40.0,
+            "t_mid": 35.0,
+            "filename": "scene_0003.jpg",
+            "score": 0.5134286880493164
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on paw motion immediately after movement back."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-97a547aa67f0d708",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "why is the cat shaking its paws after moving back",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 9,
+        "scene_count": 3,
+        "text_evidence_count": 0,
+        "time_span_sec": 52.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-9c272f63c090a71f",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "why is the cat shaking its paws after moving back\n\nCandidates:\nA) to remove water from his body\nB) sleepy\nC) prevent hitting shelf\nD) swat water from face\nE) injured\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is A) to remove water from his body.\n\nEvidence:\n- At [FRAME:t=10.0], the cat is near a running faucet, with water dripping onto the sink. Its paws are wet and it is actively moving.\n- At [FRAME:t=11.0], the cat has moved back slightly, and its body is visibly wet, with water dripping from its fur.\n- At [FRAME:t=12.0], the cat is standing upright, looking away from the water, and its paws are still wet.\n- At [FRAME:t=13.0], the cat is still in the sink area, and its paws are visibly shaking, likely to shake off excess water.\n- At [FRAME:t=14.0], the cat is again near the faucet, and its paws are shaking as it moves back toward the water source.\n- At [FRAME:t=15.0], the cat is drinking from the faucet, and its paws are still wet, indicating it is actively removing water from its body.\n- At [FRAME:t=31.0], the cat is again near the faucet, and its paws are shaking, likely to remove water from its body.\n\nThe cat’s paw-shaking behavior is consistent with the action of removing excess water from its body after moving back near the running faucet. The other options are not supported by the visual evidence.",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "cat",
+            "label": "黑白色猫",
+            "first_seen_t": 10.0,
+            "attributes": [
+              "在水槽边",
+              "湿毛",
+              "摇动爪子"
+            ],
+            "evidence_frames": [
+              10.0,
+              11.0,
+              12.0,
+              13.0,
+              14.0,
+              15.0,
+              31.0
+            ]
+          }
+        ],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 7,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "A",
+            "text": "to remove water from his body"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 10,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is A) to remove water from his body.\n\nEvidence:\n- At [FRAME:t=10.0], the cat is near a running faucet, with water dripping onto the sink. Its paws are wet and it is actively moving.\n- At [FRAME:t=11.0], the cat has moved back slightly, and its body is visibly wet, with water dripping from its fur.\n- At [FRAME:t=12.0], the cat is standing upright, looking away from the water, and its paws are still wet.\n- At [FRAME:t=13.0], the cat is still in the sink area, and its paws are visibly shaking, likely to shake off excess water.\n- At [FRAME:t=14.0], the cat is again near the faucet, and its paws are shaking as it moves back toward the water source.\n- At [FRAME:t=15.0], the cat is drinking from the faucet, and its paws are still wet, indicating it is actively removing water from its body.\n- At [FRAME:t=31.0], the cat is again near the faucet, and its paws are shaking, likely to remove water from its body.\n\nThe cat’s paw-shaking behavior is consistent with the action of removing excess water from its body after moving back near the running faucet. The other options are not supported by the visual evidence.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 7,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "A",
+            "text": "to remove water from his body"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 10.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 31.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0031.0.jpg"
+      },
+      {
+        "timestamp": 61.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0061.0.jpg"
+      },
+      {
+        "timestamp": 62.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0062.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 19.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0019.0.jpg"
+      },
+      {
+        "timestamp": 23.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 34.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0034.0.jpg"
+      },
+      {
+        "timestamp": 38.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0038.0.jpg"
+      },
+      {
+        "timestamp": 41.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0041.0.jpg"
+      },
+      {
+        "timestamp": 45.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0045.0.jpg"
+      },
+      {
+        "timestamp": 49.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0049.0.jpg"
+      },
+      {
+        "timestamp": 53.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0053.0.jpg"
+      },
+      {
+        "timestamp": 57.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0057.0.jpg"
+      },
+      {
+        "timestamp": 60.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0060.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "end": 10.0,
+        "t_mid": 5.0,
+        "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+        "filename": "scene_0000.jpg",
+        "start": 0.0,
+        "scene_id": 0,
+        "score": 0.5147524476051331
+      },
+      {
+        "t_mid": 15.0,
+        "caption": "A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.",
+        "scene_id": 1,
+        "start": 10.0,
+        "end": 20.0,
+        "filename": "scene_0001.jpg",
+        "score": 0.5245813131332397
+      },
+      {
+        "start": 30.0,
+        "scene_id": 3,
+        "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge of the sink.",
+        "end": 40.0,
+        "t_mid": 35.0,
+        "filename": "scene_0003.jpg",
+        "score": 0.5134286880493164
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 5,
+      "planner_notes": "Focus on paw motion immediately after movement back."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": true,
+      "confidence": 0.78,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 9,
+      "scene_count": 3,
+      "text_evidence_count": 0,
+      "time_span_sec": 52.0,
+      "missing_evidence": [],
+      "recommended_next_action": "answer_with_evidence"
+    },
+    "draft_answer": "The correct answer is A) to remove water from his body.\n\nEvidence:\n- At [FRAME:t=10.0], the cat is near a running faucet, with water dripping onto the sink. Its paws are wet and it is actively moving.\n- At [FRAME:t=11.0], the cat has moved back slightly, and its body is visibly wet, with water dripping from its fur.\n- At [FRAME:t=12.0], the cat is standing upright, looking away from the water, and its paws are still wet.\n- At [FRAME:t=13.0], the cat is still in the sink area, and its paws are visibly shaking, likely to shake off excess water.\n- At [FRAME:t=14.0], the cat is again near the faucet, and its paws are shaking as it moves back toward the water source.\n- At [FRAME:t=15.0], the cat is drinking from the faucet, and its paws are still wet, indicating it is actively removing water from its body.\n- At [FRAME:t=31.0], the cat is again near the faucet, and its paws are shaking, likely to remove water from its body.\n\nThe cat’s paw-shaking behavior is consistent with the action of removing excess water from its body after moving back near the running faucet. The other options are not supported by the visual evidence.",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "The cat is observed moving back from the running water stream at [t=11.0s], then repositions itself to face the stream again at [t=12.0s] and [t=13.0s]. At [t=14.0s], it extends its front paws toward the water, and by [t=15.0s], it is actively pawing at the stream. The motion suggests the cat is attempting to interact with or play with the water, possibly to bat at it or test its texture, rather than shaking paws as a reaction to moving back. No visual evidence of shaking paws is present in this sequence.",
+        "timestamps": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0
+        ],
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5
+        }
+      }
+    ],
+    "grounding_report": {
+      "grounded": true,
+      "valid_markers": 7,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [],
+      "selected_candidate": {
+        "label": "A",
+        "text": "to remove water from his body"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": null,
+      "recommended_next_action": "final_answer"
+    },
+    "subject_registry": [
+      {
+        "id": "cat",
+        "label": "黑白色猫",
+        "first_seen_t": 10.0,
+        "last_seen_t": 10.0,
+        "attributes": [
+          "在水槽边",
+          "湿毛",
+          "摇动爪子"
+        ],
+        "evidence_frames": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          31.0
+        ]
+      }
+    ],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "feba607037853a36055156aff704ec87b6c825a0"
+}

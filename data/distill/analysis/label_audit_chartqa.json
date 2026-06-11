@@ -1,0 +1,471 @@
+{
+  "summary": {
+    "n": 60,
+    "counts": {
+      "clean": 31,
+      "ambiguous": 2,
+      "wrong_gold": 27
+    },
+    "clean_rate": 0.5166666666666667,
+    "noise_rate": 0.4833333333333333,
+    "clean_rate_ci": [
+      0.4,
+      0.6333333333333333
+    ]
+  },
+  "clean_ids": [
+    "chartqa-0",
+    "chartqa-2",
+    "chartqa-4",
+    "chartqa-6",
+    "chartqa-7",
+    "chartqa-10",
+    "chartqa-12",
+    "chartqa-14",
+    "chartqa-16",
+    "chartqa-17",
+    "chartqa-24",
+    "chartqa-25",
+    "chartqa-26",
+    "chartqa-30",
+    "chartqa-34",
+    "chartqa-35",
+    "chartqa-40",
+    "chartqa-42",
+    "chartqa-43",
+    "chartqa-44",
+    "chartqa-46",
+    "chartqa-47",
+    "chartqa-48",
+    "chartqa-49",
+    "chartqa-50",
+    "chartqa-52",
+    "chartqa-53",
+    "chartqa-54",
+    "chartqa-55",
+    "chartqa-58",
+    "chartqa-59"
+  ],
+  "rows": [
+    {
+      "case_id": "chartqa-0",
+      "qtype": "chart",
+      "gold": "14",
+      "verdict": "clean",
+      "reason": "parse_fail"
+    },
+    {
+      "case_id": "chartqa-1",
+      "qtype": "chart",
+      "gold": "0.57",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence shows the difference as 1.24, not 0.57, making the gold answer incorrect."
+    },
+    {
+      "case_id": "chartqa-2",
+      "qtype": "chart",
+      "gold": "3",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly states the correct answer is 3, and no other option is supported or ambiguous."
+    },
+    {
+      "case_id": "chartqa-3",
+      "qtype": "chart",
+      "gold": "No",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence explicitly states the correct answer is 'Yes', contradicting the gold answer 'No'."
+    },
+    {
+      "case_id": "chartqa-4",
+      "qtype": "chart",
+      "gold": "23",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly confirms the gold answer 23 as correct, with no ambiguity or conflicting information."
+    },
+    {
+      "case_id": "chartqa-5",
+      "qtype": "chart",
+      "gold": "6",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence shows the difference is 6 percentage points, but the gold answer is 6, which is correct. However, the model reading incorrectly states the an"
+    },
+    {
+      "case_id": "chartqa-6",
+      "qtype": "chart",
+      "gold": "62",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly states the correct answer is 62%, matching the gold answer without ambiguity."
+    },
+    {
+      "case_id": "chartqa-7",
+      "qtype": "chart",
+      "gold": "Yes",
+      "verdict": "clean",
+      "reason": "The sum of 39% and 26% (65%) is greater than 55%, clearly supporting the gold answer 'Yes'."
+    },
+    {
+      "case_id": "chartqa-8",
+      "qtype": "chart",
+      "gold": "Inspired",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence explicitly states the correct answer is D) Depressed, contradicting the gold answer 'Inspired'."
+    },
+    {
+      "case_id": "chartqa-9",
+      "qtype": "chart",
+      "gold": "0.03",
+      "verdict": "wrong_gold",
+      "reason": "The gold answer 0.03 is incorrect; the actual difference is 3%, not 0.03."
+    },
+    {
+      "case_id": "chartqa-10",
+      "qtype": "chart",
+      "gold": "1",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly states the correct answer is 1.0 GPI, which matches the gold answer of 1."
+    },
+    {
+      "case_id": "chartqa-11",
+      "qtype": "chart",
+      "gold": "0.08",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence shows the actual difference is 0.08 (0.79 - 0.71), and the gold answer is 0.08. However, the model incorrectly claims the correct answer is 0"
+    },
+    {
+      "case_id": "chartqa-12",
+      "qtype": "chart",
+      "gold": "17",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly states the correct answer is 17%, matching the gold answer and confirming it as the leftmost value on the bar for China."
+    },
+    {
+      "case_id": "chartqa-13",
+      "qtype": "chart",
+      "gold": "21.6",
+      "verdict": "wrong_gold",
+      "reason": "The calculated average is 21.7, not 21.6, so the gold answer is incorrect."
+    },
+    {
+      "case_id": "chartqa-14",
+      "qtype": "chart",
+      "gold": "2",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly states the correct answer is 2%, matching the gold answer."
+    },
+    {
+      "case_id": "chartqa-15",
+      "qtype": "chart",
+      "gold": "2",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence states the correct answer is 2%, not 2. The gold answer should be 2% to match the evidence."
+    },
+    {
+      "case_id": "chartqa-16",
+      "qtype": "chart",
+      "gold": "2014",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly confirms 2014 as the correct answer, with no ambiguity or conflicting interpretation."
+    },
+    {
+      "case_id": "chartqa-17",
+      "qtype": "chart",
+      "gold": "2011",
+      "verdict": "clean",
+      "reason": "The scene evidence confirms the sharpest increase occurs between 2010 and 2011, matching the gold answer."
+    },
+    {
+      "case_id": "chartqa-18",
+      "qtype": "chart",
+      "gold": "1",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence states the correct answer is 2 colors, contradicting the gold answer of 1."
+    },
+    {
+      "case_id": "chartqa-19",
+      "qtype": "chart",
+      "gold": "No",
+      "verdict": "wrong_gold",
+      "reason": "The gold answer is No, but the evidence shows the sum of the largest two bars (185%) is less than the sum of the smallest three bars (231%), so the correct answ"
+    },
+    {
+      "case_id": "chartqa-20",
+      "qtype": "chart",
+      "gold": "green line",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence indicates the green line corresponds to 'Child Labor (Boys, World, 2000-2012) (ILO)', which directly represents data about boys. However, the"
+    },
+    {
+      "case_id": "chartqa-21",
+      "qtype": "chart",
+      "gold": "2008",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence explicitly states the correct answer is 2004, contradicting the gold answer of 2008."
+    },
+    {
+      "case_id": "chartqa-22",
+      "qtype": "chart",
+      "gold": "29",
+      "verdict": "ambiguous",
+      "reason": "No visible scene evidence supports the sequence; the question is purely mathematical and lacks visual context, making the gold answer not uniquely verifiable."
+    },
+    {
+      "case_id": "chartqa-23",
+      "qtype": "chart",
+      "gold": "1.216666667",
+      "verdict": "wrong_gold",
+      "reason": "The scene shows the lowest green bar (U.S.) at 58% and the lowest blue bar (New Zealand) at 24%. The ratio of green to blue is 58/24 ≈ 2.4167, not 1.216666667. "
+    },
+    {
+      "case_id": "chartqa-24",
+      "qtype": "chart",
+      "gold": "Yes",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly confirms the gold answer 'Yes' as correct, with no ambiguity or conflicting information."
+    },
+    {
+      "case_id": "chartqa-25",
+      "qtype": "chart",
+      "gold": "Yes",
+      "verdict": "clean",
+      "reason": "The largest segment (STEM at 52%) is greater than the sum of all other segments (48%), making 'Yes' the unambiguously correct answer."
+    },
+    {
+      "case_id": "chartqa-26",
+      "qtype": "chart",
+      "gold": "80",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly states the correct answer is 80%, and no other option is supported or comparable."
+    },
+    {
+      "case_id": "chartqa-27",
+      "qtype": "chart",
+      "gold": "77",
+      "verdict": "wrong_gold",
+      "reason": "The model states the correct answer is 73%, contradicting the gold answer of 77."
+    },
+    {
+      "case_id": "chartqa-28",
+      "qtype": "chart",
+      "gold": "0.6",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence states the correct answer is 23%, contradicting the gold answer of 0.6."
+    },
+    {
+      "case_id": "chartqa-29",
+      "qtype": "chart",
+      "gold": "61",
+      "verdict": "wrong_gold",
+      "reason": "The gold answer is 61, but the scene evidence shows the difference is 56 percentage points (64% - 8% = 56). The closest option is 55, not 61, making the gold in"
+    },
+    {
+      "case_id": "chartqa-30",
+      "qtype": "chart",
+      "gold": "13",
+      "verdict": "clean",
+      "reason": "The x-axis spans from 2007 to 2019 inclusive, which is exactly 13 years, making the gold answer unambiguously correct."
+    },
+    {
+      "case_id": "chartqa-31",
+      "qtype": "chart",
+      "gold": "5",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence states the correct answer is 2, contradicting the gold answer of 5."
+    },
+    {
+      "case_id": "chartqa-32",
+      "qtype": "chart",
+      "gold": "24",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence shows 21%, contradicting the gold answer of 24."
+    },
+    {
+      "case_id": "chartqa-33",
+      "qtype": "chart",
+      "gold": "No",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence shows 'Not at all' for 'Use military force wisely' is 51% and for 'Handle an international crisis' is 54%. Since 51% is not more than 54%, th"
+    },
+    {
+      "case_id": "chartqa-34",
+      "qtype": "chart",
+      "gold": "Italy",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly confirms Italy as the correct answer, with no ambiguity or conflicting information."
+    },
+    {
+      "case_id": "chartqa-35",
+      "qtype": "chart",
+      "gold": "Mexico",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly confirms Mexico as the correct answer, and no other option is equally defensible."
+    },
+    {
+      "case_id": "chartqa-36",
+      "qtype": "chart",
+      "gold": "33",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence explicitly states the correct answer is 14, contradicting the gold answer of 33."
+    },
+    {
+      "case_id": "chartqa-37",
+      "qtype": "chart",
+      "gold": "Over 30 mins",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence states the correct answer is 30 minutes, not 'Over 30 mins', making the gold answer incorrect."
+    },
+    {
+      "case_id": "chartqa-38",
+      "qtype": "chart",
+      "gold": "4",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence states the correct answer is 3, contradicting the gold answer of 4."
+    },
+    {
+      "case_id": "chartqa-39",
+      "qtype": "chart",
+      "gold": "22",
+      "verdict": "wrong_gold",
+      "reason": "The gold answer '22' is not a valid option or interpretation of the question. The scene evidence states that Asians have a higher percentage of bachelor's degre"
+    },
+    {
+      "case_id": "chartqa-40",
+      "qtype": "chart",
+      "gold": "92",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly confirms the gold answer 92 as correct, with no ambiguity or conflicting information."
+    },
+    {
+      "case_id": "chartqa-41",
+      "qtype": "chart",
+      "gold": "96",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence shows the smallest value on the blue bar is 8 and on the upper bar is 86, giving a product of 72, not 96. The gold answer is incorrect."
+    },
+    {
+      "case_id": "chartqa-42",
+      "qtype": "chart",
+      "gold": "21",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly states the correct answer is 21, and the gold answer matches exactly."
+    },
+    {
+      "case_id": "chartqa-43",
+      "qtype": "chart",
+      "gold": "12",
+      "verdict": "clean",
+      "reason": "The scene evidence confirms a clear 12 percentage point decrease from 33% in Jul 2015 to 21% in Sep 2015, making the gold answer unambiguously correct."
+    },
+    {
+      "case_id": "chartqa-44",
+      "qtype": "chart",
+      "gold": "2009",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly confirms 2009 as the correct answer, and no other option is supported or equally defensible."
+    },
+    {
+      "case_id": "chartqa-45",
+      "qtype": "chart",
+      "gold": "28.6",
+      "verdict": "ambiguous",
+      "reason": "Calculated average is 28.7, not 28.6; gold answer is off by 0.1, making it less precise than expected."
+    },
+    {
+      "case_id": "chartqa-46",
+      "qtype": "chart",
+      "gold": "68",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly states the correct answer is 68%, matching the gold answer without ambiguity."
+    },
+    {
+      "case_id": "chartqa-47",
+      "qtype": "chart",
+      "gold": "2019",
+      "verdict": "clean",
+      "reason": "The scene evidence confirms 2019 as the correct answer, with no ambiguity or conflicting interpretation."
+    },
+    {
+      "case_id": "chartqa-48",
+      "qtype": "chart",
+      "gold": "83",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly states the correct answer is 83%, matching the gold option without ambiguity."
+    },
+    {
+      "case_id": "chartqa-49",
+      "qtype": "chart",
+      "gold": "2.13",
+      "verdict": "clean",
+      "reason": "The gold answer 2.13 matches the ratio of 62% to 29% (62/29 ≈ 2.14), which is consistent with the scene evidence."
+    },
+    {
+      "case_id": "chartqa-50",
+      "qtype": "chart",
+      "gold": "Simulation",
+      "verdict": "clean",
+      "reason": "The scene evidence confirms Simulation is the least popular game, matching the gold answer."
+    },
+    {
+      "case_id": "chartqa-51",
+      "qtype": "chart",
+      "gold": "4",
+      "verdict": "wrong_gold",
+      "reason": "The model evidence states the correct answer is 2, contradicting the gold answer of 4."
+    },
+    {
+      "case_id": "chartqa-52",
+      "qtype": "chart",
+      "gold": "Yes",
+      "verdict": "clean",
+      "reason": "The scene evidence confirms the gold answer 'Yes' is correct, with no ambiguity or conflicting interpretation."
+    },
+    {
+      "case_id": "chartqa-53",
+      "qtype": "chart",
+      "gold": "No",
+      "verdict": "clean",
+      "reason": "parse_fail"
+    },
+    {
+      "case_id": "chartqa-54",
+      "qtype": "chart",
+      "gold": "Yes",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly confirms the gold answer as correct, with no ambiguity or conflicting interpretation."
+    },
+    {
+      "case_id": "chartqa-55",
+      "qtype": "chart",
+      "gold": "0.33333333",
+      "verdict": "clean",
+      "reason": "The scene evidence confirms the smallest segment (7%) and second largest (21%) match the gold answer's ratio of 1:3, equivalent to 7:21, making the gold unambig"
+    },
+    {
+      "case_id": "chartqa-56",
+      "qtype": "chart",
+      "gold": "Democrat (scores 60 to 100)",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence explicitly states the correct answer is Republican, contradicting the gold answer of Democrat."
+    },
+    {
+      "case_id": "chartqa-57",
+      "qtype": "chart",
+      "gold": "0.01",
+      "verdict": "wrong_gold",
+      "reason": "The scene evidence states the correct answer is 60%, contradicting the gold answer of 0.01."
+    },
+    {
+      "case_id": "chartqa-58",
+      "qtype": "chart",
+      "gold": "Libya",
+      "verdict": "clean",
+      "reason": "The scene evidence explicitly confirms Libya as the correct answer, with no ambiguity or conflicting information."
+    },
+    {
+      "case_id": "chartqa-59",
+      "qtype": "chart",
+      "gold": "0.23",
+      "verdict": "clean",
+      "reason": "The scene evidence confirms the maximum HDI is 0.81 (Denmark) and minimum is 0.58 (Botswana), yielding a difference of 0.23, which matches the gold answer."
+    }
+  ]
+}

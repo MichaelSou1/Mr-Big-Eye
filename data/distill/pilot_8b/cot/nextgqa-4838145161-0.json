@@ -1,0 +1,65 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "09354c9c0dec47cf",
+  "case_id": "nextgqa-4838145161-0",
+  "question": "why is there water flowing from the tap\n\nCandidates:\nA) to prevent babies from drowning\nB) pipe is open\nC) for cat to drink\nD) raining\nE) soapy\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    4.0,
+    7.0,
+    11.0,
+    15.0,
+    19.0,
+    23.0,
+    26.0,
+    30.0,
+    34.0,
+    38.0,
+    41.0,
+    45.0,
+    49.0,
+    53.0,
+    57.0,
+    60.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0004.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0007.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0011.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0015.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0019.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0023.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0026.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0030.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0034.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0038.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0041.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0045.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0049.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0053.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0057.0.jpg",
+    "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0060.0.jpg"
+  ],
+  "cot": "[\"At [FRAME:t=19.0], a black and white cat is seen standing at the edge of a sink, head lowered and focused on a stream of water flowing from the tap. The cat's posture indicates active engagement with the water.\", \"At [FRAME:t=19.0], the cat maintains the same focused posture, with its head close to the water stream. The water continues to flow steadily, and the cat's whiskers are visible near the flow.\", \"At [FRAME:t=19.0], the cat's mouth is near the water stream, suggesting it is drinking or licking the water. The cat's front paws are firmly placed on the sink edge, indicating stability.\", \"At [FRAME:t=23.0], the cat remains in a consistent position, still focused on the water. The tap is visibly open, but the cat's behavior is the primary visual focus.\", \"At [FRAME:t=26.0], the cat's head is still close to the water stream, and its attention remains fixed. No other animals, people, or environmental factors such as rain or soap are visible.\", \"The presence of the cat drinking from the tap is directly observed across multiple frames. No evidence supports options A (babies), D (raining), or E (soapy). Option B (pipe is open) is true but secondary; the primary reason for the water flow in context is the cat's drinking.\", 'The most directly supported and least contradicted option is C) for cat to drink.']",
+  "answer": "C",
+  "gold_timestamps": [
+    26.7
+  ],
+  "gold_scenes": [
+    {
+      "start": 0.0,
+      "end": 53.4
+    }
+  ],
+  "source_traj_hash": "27d1cb6be9195f43bb5d026d84b6f36583388e2c",
+  "validation_report": {
+    "ok": true,
+    "errors": [],
+    "frame_markers": [
+      19.0,
+      19.0,
+      19.0,
+      23.0,
+      26.0
+    ]
+  }
+}

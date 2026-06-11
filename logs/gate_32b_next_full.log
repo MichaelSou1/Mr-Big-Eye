@@ -1,0 +1,18 @@
+=== variance gate: model=32b n=47 cases (EVIDENCE_IN∩CLEAN) ===
+[32b/next/free_form seed0] free=0.702 method=0.702 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0
+[32b/next/self_reflect seed0] free=0.702 method=0.745 net=+0.043 CI[-0.064,+0.170] gain=5 lost=3
+[32b/next/self_reflect seed1] free=0.702 method=0.702 net=+0.000 CI[-0.106,+0.106] gain=3 lost=3
+[32b/next/self_reflect seed2] free=0.702 method=0.702 net=+0.000 CI[-0.106,+0.106] gain=3 lost=3
+[32b/next/self_reflect seed3] free=0.702 method=0.681 net=-0.021 CI[-0.128,+0.085] gain=3 lost=4
+[32b/next/self_reflect seed4] free=0.702 method=0.702 net=+0.000 CI[-0.085,+0.085] gain=2 lost=2
+[32b/next/self_reflect seed5] free=0.702 method=0.681 net=-0.021 CI[-0.106,+0.064] gain=2 lost=3
+[32b/next/orch_reflect_blind seed0] free=0.702 method=0.745 net=+0.043 CI[-0.043,+0.128] gain=3 lost=1
+[32b/next/orch_reflect_blind seed1] free=0.681 method=0.723 net=+0.043 CI[-0.043,+0.128] gain=3 lost=1
+[32b/next/orch_reflect_blind seed2] free=0.702 method=0.681 net=-0.021 CI[-0.149,+0.106] gain=4 lost=5
+[32b/next/orch_reflect_blind seed3] free=0.702 method=0.745 net=+0.043 CI[-0.043,+0.128] gain=3 lost=1
+[32b/next/orch_reflect_blind seed4] free=0.702 method=0.766 net=+0.064 CI[-0.043,+0.170] gain=5 lost=2
+[32b/next/orch_reflect_blind seed5] free=0.702 method=0.766 net=+0.064 CI[-0.021,+0.149] gain=4 lost=1
+
+=== SUMMARY (NExT CLEAN∩EVIDENCE_IN) ===
+  self_reflect           net_mean=+0.000 ± seedstd 0.023 (k=6)  verdict=within-variance  per_seed=['+0.04', '+0.00', '+0.00', '-0.02', '+0.00', '-0.02']
+  orch_reflect_blind     net_mean=+0.039 ± seedstd 0.031 (k=6)  verdict=within-variance  per_seed=['+0.04', '+0.04', '-0.02', '+0.04', '+0.06', '+0.06']

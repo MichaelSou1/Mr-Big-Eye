@@ -1,0 +1,1112 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-3376544720-9",
+    "video_id": "a62fd13f690cb40b",
+    "question": "how does the bull move\n\nCandidates:\nA) galloping\nB) turning in circle\nC) jump up\nD) spin and  up and down\nE) run in circle\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "spin and  up and down",
+    "required_keywords": [
+      "spin",
+      "down"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      72.0
+    ],
+    "gold_scenes": [
+      {
+        "start": 57.5,
+        "end": 86.5
+      }
+    ],
+    "question_type": "ch"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "how does the bull move\n\nCandidates:\nA) galloping\nB) turning in circle\nC) jump up\nD) spin and  up and down\nE) run in circle\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the bull's movement pattern in the video using visual evidence. Classify as visual_detail with retrieval_profile focused.  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "How does the bull move?",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-a01c8496e092e573",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 6.0, \"source\": \"retrieval\"}, {\"timestamp\": 7.0, \"source\": \"retrieval\"}, {\"timestamp\": 48.0, \"source\": \"retrieval\"}, {\"timestamp\": 66.0, \"source\": \"retrieval\"}, {\"timestamp\": 67.0, \"source\": \"retrieval\"}, {\"timestamp\": 80.0, \"source\": \"retrieval\"}, {\"timestamp\": 82.0, \"source\": \"retrieval\"}, {\"timestamp\": 89.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"caption\": \"A man in a black shirt rides a mechanical bull inside a tent, his right arm raised as the bull bucks.\", \"scene_id\": 13, \"start\": 62.353958, \"t_mid\": 64.606208, \"filename\": \"scene_0013.jpg\", \"end\": 66.858458, \"score\": 0.6220614910125732}, {\"caption\": \"A person in dark clothing rides a mechanical bull indoors, gripping the rope as the bull bucks on a red floor.\", \"end\": 73.32325, \"filename\": \"scene_0014.jpg\", \"start\": 66.858458, \"scene_id\": 14, \"t_mid\": 70.09085400000001, \"score\": 0.6207888722419739}, {\"start\": 79.954875, \"filename\": \"scene_0016.jpg\", \"scene_id\": 16, \"end\": 90.00658333333332, \"caption\": \"A person rides a mechanical bull inside an arena, gripping the reins as the bull bucks and spins. The scene is under a tent-like structure with red flooring and blurred background elements.\", \"t_mid\": 84.98072916666666, \"score\": 0.6181833148002625}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 8, \"planner_notes\": \"\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a01c8496e092e573",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 6.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 7.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 48.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 66.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 67.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 80.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 82.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 89.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "caption": "A man in a black shirt rides a mechanical bull inside a tent, his right arm raised as the bull bucks.",
+            "scene_id": 13,
+            "start": 62.353958,
+            "t_mid": 64.606208,
+            "filename": "scene_0013.jpg",
+            "end": 66.858458,
+            "score": 0.6220614910125732
+          },
+          {
+            "caption": "A person in dark clothing rides a mechanical bull indoors, gripping the rope as the bull bucks on a red floor.",
+            "end": 73.32325,
+            "filename": "scene_0014.jpg",
+            "start": 66.858458,
+            "scene_id": 14,
+            "t_mid": 70.09085400000001,
+            "score": 0.6207888722419739
+          },
+          {
+            "start": 79.954875,
+            "filename": "scene_0016.jpg",
+            "scene_id": 16,
+            "end": 90.00658333333332,
+            "caption": "A person rides a mechanical bull inside an arena, gripping the reins as the bull bucks and spins. The scene is under a tent-like structure with red flooring and blurred background elements.",
+            "t_mid": 84.98072916666666,
+            "score": 0.6181833148002625
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "OBSERVE: The bull's movement is characterized by bucking and spinning, particularly in scenes 13, 14, and 16. The bull moves in a circular motion while bucking, with visible spinning and up-and-down motion.  \n\nPLAN: Confirm the movement pattern by focusing on a key moment where the bull's motion is clearly visible. Use segment_focus for detailed visual analysis.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "How does the bull move?",
+            "center_t": 84.98072916666666,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-987f6db40de796a9",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 80.98, \"end\": 88.98, \"center_t\": 84.98, \"frame_count\": 8}, \"observation\": \"[t=81.0s] 画面中，一头深色的机械公牛位于红色圆形平台上，其身体呈前倾姿态，头部低垂，似乎正在模拟向前冲撞的动作。骑手身穿深色服装，身体前倾，双手紧握牛背，保持平衡。\\n\\n[t=82.0s] 机械公牛的头部进一步前伸，身体向左倾斜，骑手身体随之向右倾斜，双臂张开以维持平衡，显示出公牛正在剧烈晃动。\\n\\n[t=83.0s] 机械公牛头部抬起，身体恢复部分直立，但仍在持续晃动，骑手身体后仰，双臂向两侧伸展，试图保持稳定。\\n\\n[t=84.0s] 机械公牛再次前倾，头部低垂，骑手身体前倾，双臂向两侧伸展，保持平衡。\\n\\n[t=85.0s] 机械公牛头部再次抬起，身体向右倾斜，骑手身体随之向左倾斜，双臂张开以维持平衡。\\n\\n[t=86.0s] 机械公牛头部前伸，身体向左倾斜，骑手身体向右倾斜，双臂张开以维持平衡。\\n\\n[t=87.0s] 机械公牛头部低垂，身体前倾，骑手身体前倾，双臂向两侧伸展，保持平衡。\\n\\n[t=88.0s] 机械公牛头部抬起，身体向右倾斜，骑手身体随之向左倾斜，双臂张开以维持平衡。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-987f6db40de796a9",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 80.98,
+          "end": 88.98,
+          "center_t": 84.98,
+          "frame_count": 8
+        },
+        "observation": "[t=81.0s] 画面中，一头深色的机械公牛位于红色圆形平台上，其身体呈前倾姿态，头部低垂，似乎正在模拟向前冲撞的动作。骑手身穿深色服装，身体前倾，双手紧握牛背，保持平衡。\n\n[t=82.0s] 机械公牛的头部进一步前伸，身体向左倾斜，骑手身体随之向右倾斜，双臂张开以维持平衡，显示出公牛正在剧烈晃动。\n\n[t=83.0s] 机械公牛头部抬起，身体恢复部分直立，但仍在持续晃动，骑手身体后仰，双臂向两侧伸展，试图保持稳定。\n\n[t=84.0s] 机械公牛再次前倾，头部低垂，骑手身体前倾，双臂向两侧伸展，保持平衡。\n\n[t=85.0s] 机械公牛头部再次抬起，身体向右倾斜，骑手身体随之向左倾斜，双臂张开以维持平衡。\n\n[t=86.0s] 机械公牛头部前伸，身体向左倾斜，骑手身体向右倾斜，双臂张开以维持平衡。\n\n[t=87.0s] 机械公牛头部低垂，身体前倾，骑手身体前倾，双臂向两侧伸展，保持平衡。\n\n[t=88.0s] 机械公牛头部抬起，身体向右倾斜，骑手身体随之向左倾斜，双臂张开以维持平衡。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the evidence is sufficient to answer the question. The movement pattern is clearly visible in the segment focus.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "how does the bull move",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-a15ebfdca1e546aa",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": true, \"confidence\": 0.78, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 15, \"scene_count\": 3, \"text_evidence_count\": 0, \"time_span_sec\": 83.0, \"missing_evidence\": [], \"recommended_next_action\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a15ebfdca1e546aa",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 15,
+        "scene_count": 3,
+        "text_evidence_count": 0,
+        "time_span_sec": 83.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "how does the bull move\n\nCandidates:\nA) galloping\nB) turning in circle\nC) jump up\nD) spin and  up and down\nE) run in circle\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is D) spin and up and down.\\n\\nEvidence:\\n- [FRAME:t=81.0] shows the bull’s body twisting and lifting its head and front legs, indicating a spinning motion.\\n- [FRAME:t=82.0] shows the bull’s body rotating and its head and front legs elevated, consistent with spinning and up-and-down motion.\\n- [FRAME:t=83.0] shows the bull’s body continuing to spin while its head and front legs are raised, reinforcing the spinning and vertical motion.\\n- [FRAME:t=84.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion described in option D.\\n- [FRAME:t=85.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\\n- [FRAME:t=86.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\\n- [FRAME:t=87.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\\n- [FRAME:t=88.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\\n- [FRAME:t=89.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\\n\\nAll frames from 81.0s to 89.0s show the bull spinning and moving up and down, which matches option D. Other options are contradicted:\\n- A) galloping — not observed; the bull is not moving forward in a trotting or running motion.\\n- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion.\\n- C) jump up — not observed; the bull is not jumping vertically without spinning.\\n- E) run in circle — not observed; the bull is not running in a circle without vertical motion.\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": false, \"valid_markers\": 9, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [\"- A) galloping — not observed; the bull is not moving forward in a trotting or running motion\", \"- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion\", \"- E) run in circle — not observed; the bull is not running in a circle without vertical motion\"], \"warnings\": [\"Some visual claim lines are not tied to frame or slide markers.\", \"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"D\", \"text\": \"spin and up and down\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"D\", \"text\": \"spin and up and down\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) spin and up and down.\n\nEvidence:\n- [FRAME:t=81.0] shows the bull’s body twisting and lifting its head and front legs, indicating a spinning motion.\n- [FRAME:t=82.0] shows the bull’s body rotating and its head and front legs elevated, consistent with spinning and up-and-down motion.\n- [FRAME:t=83.0] shows the bull’s body continuing to spin while its head and front legs are raised, reinforcing the spinning and vertical motion.\n- [FRAME:t=84.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion described in option D.\n- [FRAME:t=85.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n- [FRAME:t=86.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\n- [FRAME:t=87.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n- [FRAME:t=88.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\n- [FRAME:t=89.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n\nAll frames from 81.0s to 89.0s show the bull spinning and moving up and down, which matches option D. Other options are contradicted:\n- A) galloping — not observed; the bull is not moving forward in a trotting or running motion.\n- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion.\n- C) jump up — not observed; the bull is not jumping vertically without spinning.\n- E) run in circle — not observed; the bull is not running in a circle without vertical motion.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 9,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "- A) galloping — not observed; the bull is not moving forward in a trotting or running motion",
+            "- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion",
+            "- E) run in circle — not observed; the bull is not running in a circle without vertical motion"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "D",
+            "text": "spin and up and down"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "D",
+              "text": "spin and up and down"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is D) spin and up and down.\\n\\nEvidence:\\n- [FRAME:t=81.0] shows the bull’s body twisting and lifting its head and front legs, indicating a spinning motion.\\n- [FRAME:t=82.0] shows the bull’s body rotating and its head and front legs elevated, consistent with spinning and up-and-down motion.\\n- [FRAME:t=83.0] shows the bull’s body continuing to spin while its head and front legs are raised, reinforcing the spinning and vertical motion.\\n- [FRAME:t=84.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion described in option D.\\n- [FRAME:t=85.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\\n- [FRAME:t=86.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\\n- [FRAME:t=87.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\\n- [FRAME:t=88.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\\n- [FRAME:t=89.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\\n\\nAll frames from 81.0s to 89.0s show the bull spinning and moving up and down, which matches option D. Other options are contradicted:\\n- A) galloping — not observed; the bull is not moving forward in a trotting or running motion.\\n- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion.\\n- C) jump up — not observed; the bull is not jumping vertically without spinning.\\n- E) run in circle — not observed; the bull is not running in a circle without vertical motion.\", \"grounding_report\": {\"grounded\": false, \"valid_markers\": 9, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [\"- A) galloping — not observed; the bull is not moving forward in a trotting or running motion\", \"- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion\", \"- E) run in circle — not observed; the bull is not running in a circle without vertical motion\"], \"warnings\": [\"Some visual claim lines are not tied to frame or slide markers.\", \"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"D\", \"text\": \"spin and up and down\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"D\", \"text\": \"spin and up and down\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) spin and up and down.\n\nEvidence:\n- [FRAME:t=81.0] shows the bull’s body twisting and lifting its head and front legs, indicating a spinning motion.\n- [FRAME:t=82.0] shows the bull’s body rotating and its head and front legs elevated, consistent with spinning and up-and-down motion.\n- [FRAME:t=83.0] shows the bull’s body continuing to spin while its head and front legs are raised, reinforcing the spinning and vertical motion.\n- [FRAME:t=84.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion described in option D.\n- [FRAME:t=85.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n- [FRAME:t=86.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\n- [FRAME:t=87.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n- [FRAME:t=88.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\n- [FRAME:t=89.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n\nAll frames from 81.0s to 89.0s show the bull spinning and moving up and down, which matches option D. Other options are contradicted:\n- A) galloping — not observed; the bull is not moving forward in a trotting or running motion.\n- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion.\n- C) jump up — not observed; the bull is not jumping vertically without spinning.\n- E) run in circle — not observed; the bull is not running in a circle without vertical motion.",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 9,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "- A) galloping — not observed; the bull is not moving forward in a trotting or running motion",
+            "- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion",
+            "- E) run in circle — not observed; the bull is not running in a circle without vertical motion"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "D",
+            "text": "spin and up and down"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "D",
+              "text": "spin and up and down"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "how does the bull move\n\nCandidates:\nA) galloping\nB) turning in circle\nC) jump up\nD) spin and  up and down\nE) run in circle\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is D) spin and up and down.\\n\\nEvidence: The bull’s motion is clearly depicted as a combination of spinning and vertical movement (up and down) in multiple frames. For example, [FRAME:t=81.0] shows the bull mid-spin with its body elevated, and [FRAME:t=83.0] shows it descending after a buck. The motion is not consistent with galloping (A), turning in a circle without vertical motion (B), jumping up alone (C), or running in a circle (E). The most comprehensive description of the observed motion is “spin and up and down.”\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": false, \"valid_markers\": 2, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [\"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"D\", \"text\": \"spin and up and down\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"D\", \"text\": \"spin and up and down\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) spin and up and down.\n\nEvidence: The bull’s motion is clearly depicted as a combination of spinning and vertical movement (up and down) in multiple frames. For example, [FRAME:t=81.0] shows the bull mid-spin with its body elevated, and [FRAME:t=83.0] shows it descending after a buck. The motion is not consistent with galloping (A), turning in a circle without vertical motion (B), jumping up alone (C), or running in a circle (E). The most comprehensive description of the observed motion is “spin and up and down.”",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "D",
+            "text": "spin and up and down"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "D",
+              "text": "spin and up and down"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is D) spin and up and down.\\n\\nEvidence: The bull’s motion is clearly depicted as a combination of spinning and vertical movement (up and down) in multiple frames. For example, [FRAME:t=81.0] shows the bull mid-spin with its body elevated, and [FRAME:t=83.0] shows it descending after a buck. The motion is not consistent with galloping (A), turning in a circle without vertical motion (B), jumping up alone (C), or running in a circle (E). The most comprehensive description of the observed motion is “spin and up and down.”\", \"grounding_report\": {\"grounded\": false, \"valid_markers\": 2, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [\"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"D\", \"text\": \"spin and up and down\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"D\", \"text\": \"spin and up and down\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) spin and up and down.\n\nEvidence: The bull’s motion is clearly depicted as a combination of spinning and vertical movement (up and down) in multiple frames. For example, [FRAME:t=81.0] shows the bull mid-spin with its body elevated, and [FRAME:t=83.0] shows it descending after a buck. The motion is not consistent with galloping (A), turning in a circle without vertical motion (B), jumping up alone (C), or running in a circle (E). The most comprehensive description of the observed motion is “spin and up and down.”",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "D",
+            "text": "spin and up and down"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "D",
+              "text": "spin and up and down"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "how does the bull move\n\nCandidates:\nA) galloping\nB) turning in circle\nC) jump up\nD) spin and  up and down\nE) run in circle\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is E) run in circle\\n\\nEvidence: The bull is mounted on a circular platform and repeatedly moves in a circular motion, as seen from [FRAME:t=66.0] to [FRAME:t=89.0]. The rider is positioned to maintain balance as the bull rotates, indicating a circular movement pattern. While the bull does not gallop (A), jump up (C), or spin up and down (D), its movement is consistent with running in a circle (E). Turning in circle (B) is similar but less precise; \\\"run in circle\\\" better describes the continuous motion observed.\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": false, \"valid_markers\": 2, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [\"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"E\", \"text\": \"run in circle\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"E\", \"text\": \"run in circle\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is E) run in circle\n\nEvidence: The bull is mounted on a circular platform and repeatedly moves in a circular motion, as seen from [FRAME:t=66.0] to [FRAME:t=89.0]. The rider is positioned to maintain balance as the bull rotates, indicating a circular movement pattern. While the bull does not gallop (A), jump up (C), or spin up and down (D), its movement is consistent with running in a circle (E). Turning in circle (B) is similar but less precise; \"run in circle\" better describes the continuous motion observed.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "E",
+            "text": "run in circle"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "E",
+              "text": "run in circle"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is D) spin and up and down.\n\nEvidence:\n- [FRAME:t=81.0] shows the bull’s body twisting and lifting its head and front legs, indicating a spinning motion.\n- [FRAME:t=82.0] shows the bull’s body rotating and its head and front legs elevated, consistent with spinning and up-and-down motion.\n- [FRAME:t=83.0] shows the bull’s body continuing to spin while its head and front legs are raised, reinforcing the spinning and vertical motion.\n- [FRAME:t=84.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion described in option D.\n- [FRAME:t=85.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n- [FRAME:t=86.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\n- [FRAME:t=87.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n- [FRAME:t=88.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\n- [FRAME:t=89.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n\nAll frames from 81.0s to 89.0s show the bull spinning and moving up and down, which matches option D. Other options are contradicted:\n- A) galloping — not observed; the bull is not moving forward in a trotting or running motion.\n- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion.\n- C) jump up — not observed; the bull is not jumping vertically without spinning.\n- E) run in circle — not observed; the bull is not running in a circle without vertical motion.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "How does the bull move?",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 6.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 7.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 48.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 66.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 67.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 80.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 82.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 89.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "caption": "A man in a black shirt rides a mechanical bull inside a tent, his right arm raised as the bull bucks.",
+            "scene_id": 13,
+            "start": 62.353958,
+            "t_mid": 64.606208,
+            "filename": "scene_0013.jpg",
+            "end": 66.858458,
+            "score": 0.6220614910125732
+          },
+          {
+            "caption": "A person in dark clothing rides a mechanical bull indoors, gripping the rope as the bull bucks on a red floor.",
+            "end": 73.32325,
+            "filename": "scene_0014.jpg",
+            "start": 66.858458,
+            "scene_id": 14,
+            "t_mid": 70.09085400000001,
+            "score": 0.6207888722419739
+          },
+          {
+            "start": 79.954875,
+            "filename": "scene_0016.jpg",
+            "scene_id": 16,
+            "end": 90.00658333333332,
+            "caption": "A person rides a mechanical bull inside an arena, gripping the reins as the bull bucks and spins. The scene is under a tent-like structure with red flooring and blurred background elements.",
+            "t_mid": 84.98072916666666,
+            "score": 0.6181833148002625
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-a01c8496e092e573",
+      "internalizability": "type2"
+    },
+    {
+      "index": 4,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "How does the bull move?",
+        "center_t": 84.98072916666666,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 80.98,
+          "end": 88.98,
+          "center_t": 84.98,
+          "frame_count": 8
+        },
+        "observation": "[t=81.0s] 画面中，一头深色的机械公牛位于红色圆形平台上，其身体呈前倾姿态，头部低垂，似乎正在模拟向前冲撞的动作。骑手身穿深色服装，身体前倾，双手紧握牛背，保持平衡。\n\n[t=82.0s] 机械公牛的头部进一步前伸，身体向左倾斜，骑手身体随之向右倾斜，双臂张开以维持平衡，显示出公牛正在剧烈晃动。\n\n[t=83.0s] 机械公牛头部抬起，身体恢复部分直立，但仍在持续晃动，骑手身体后仰，双臂向两侧伸展，试图保持稳定。\n\n[t=84.0s] 机械公牛再次前倾，头部低垂，骑手身体前倾，双臂向两侧伸展，保持平衡。\n\n[t=85.0s] 机械公牛头部再次抬起，身体向右倾斜，骑手身体随之向左倾斜，双臂张开以维持平衡。\n\n[t=86.0s] 机械公牛头部前伸，身体向左倾斜，骑手身体向右倾斜，双臂张开以维持平衡。\n\n[t=87.0s] 机械公牛头部低垂，身体前倾，骑手身体前倾，双臂向两侧伸展，保持平衡。\n\n[t=88.0s] 机械公牛头部抬起，身体向右倾斜，骑手身体随之向左倾斜，双臂张开以维持平衡。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-987f6db40de796a9",
+      "internalizability": "type1"
+    },
+    {
+      "index": 6,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "how does the bull move",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 15,
+        "scene_count": 3,
+        "text_evidence_count": 0,
+        "time_span_sec": 83.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-a15ebfdca1e546aa",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "how does the bull move\n\nCandidates:\nA) galloping\nB) turning in circle\nC) jump up\nD) spin and  up and down\nE) run in circle\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) spin and up and down.\n\nEvidence:\n- [FRAME:t=81.0] shows the bull’s body twisting and lifting its head and front legs, indicating a spinning motion.\n- [FRAME:t=82.0] shows the bull’s body rotating and its head and front legs elevated, consistent with spinning and up-and-down motion.\n- [FRAME:t=83.0] shows the bull’s body continuing to spin while its head and front legs are raised, reinforcing the spinning and vertical motion.\n- [FRAME:t=84.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion described in option D.\n- [FRAME:t=85.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n- [FRAME:t=86.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\n- [FRAME:t=87.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n- [FRAME:t=88.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\n- [FRAME:t=89.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n\nAll frames from 81.0s to 89.0s show the bull spinning and moving up and down, which matches option D. Other options are contradicted:\n- A) galloping — not observed; the bull is not moving forward in a trotting or running motion.\n- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion.\n- C) jump up — not observed; the bull is not jumping vertically without spinning.\n- E) run in circle — not observed; the bull is not running in a circle without vertical motion.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 9,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "- A) galloping — not observed; the bull is not moving forward in a trotting or running motion",
+            "- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion",
+            "- E) run in circle — not observed; the bull is not running in a circle without vertical motion"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "D",
+            "text": "spin and up and down"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "D",
+              "text": "spin and up and down"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 10,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) spin and up and down.\n\nEvidence:\n- [FRAME:t=81.0] shows the bull’s body twisting and lifting its head and front legs, indicating a spinning motion.\n- [FRAME:t=82.0] shows the bull’s body rotating and its head and front legs elevated, consistent with spinning and up-and-down motion.\n- [FRAME:t=83.0] shows the bull’s body continuing to spin while its head and front legs are raised, reinforcing the spinning and vertical motion.\n- [FRAME:t=84.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion described in option D.\n- [FRAME:t=85.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n- [FRAME:t=86.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\n- [FRAME:t=87.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n- [FRAME:t=88.0] shows the bull’s body continuing to spin and its head and front legs elevated, consistent with the motion.\n- [FRAME:t=89.0] shows the bull’s body continuing to spin and its head and front legs elevated, reinforcing the motion.\n\nAll frames from 81.0s to 89.0s show the bull spinning and moving up and down, which matches option D. Other options are contradicted:\n- A) galloping — not observed; the bull is not moving forward in a trotting or running motion.\n- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion.\n- C) jump up — not observed; the bull is not jumping vertically without spinning.\n- E) run in circle — not observed; the bull is not running in a circle without vertical motion.",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 9,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "- A) galloping — not observed; the bull is not moving forward in a trotting or running motion",
+            "- B) turning in circle — not observed; the bull is not moving in a circular path without vertical motion",
+            "- E) run in circle — not observed; the bull is not running in a circle without vertical motion"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "D",
+            "text": "spin and up and down"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "D",
+              "text": "spin and up and down"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "answer_with_evidence"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    },
+    {
+      "index": 12,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "how does the bull move\n\nCandidates:\nA) galloping\nB) turning in circle\nC) jump up\nD) spin and  up and down\nE) run in circle\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) spin and up and down.\n\nEvidence: The bull’s motion is clearly depicted as a combination of spinning and vertical movement (up and down) in multiple frames. For example, [FRAME:t=81.0] shows the bull mid-spin with its body elevated, and [FRAME:t=83.0] shows it descending after a buck. The motion is not consistent with galloping (A), turning in a circle without vertical motion (B), jumping up alone (C), or running in a circle (E). The most comprehensive description of the observed motion is “spin and up and down.”",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "D",
+            "text": "spin and up and down"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "D",
+              "text": "spin and up and down"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 14,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) spin and up and down.\n\nEvidence: The bull’s motion is clearly depicted as a combination of spinning and vertical movement (up and down) in multiple frames. For example, [FRAME:t=81.0] shows the bull mid-spin with its body elevated, and [FRAME:t=83.0] shows it descending after a buck. The motion is not consistent with galloping (A), turning in a circle without vertical motion (B), jumping up alone (C), or running in a circle (E). The most comprehensive description of the observed motion is “spin and up and down.”",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "D",
+            "text": "spin and up and down"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "D",
+              "text": "spin and up and down"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "answer_with_evidence"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    },
+    {
+      "index": 16,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "how does the bull move\n\nCandidates:\nA) galloping\nB) turning in circle\nC) jump up\nD) spin and  up and down\nE) run in circle\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is E) run in circle\n\nEvidence: The bull is mounted on a circular platform and repeatedly moves in a circular motion, as seen from [FRAME:t=66.0] to [FRAME:t=89.0]. The rider is positioned to maintain balance as the bull rotates, indicating a circular movement pattern. While the bull does not gallop (A), jump up (C), or spin up and down (D), its movement is consistent with running in a circle (E). Turning in circle (B) is similar but less precise; \"run in circle\" better describes the continuous motion observed.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "E",
+            "text": "run in circle"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "E",
+              "text": "run in circle"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 6.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 48.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0048.0.jpg"
+      },
+      {
+        "timestamp": 66.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0066.0.jpg"
+      },
+      {
+        "timestamp": 67.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0067.0.jpg"
+      },
+      {
+        "timestamp": 80.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0080.0.jpg"
+      },
+      {
+        "timestamp": 81.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0081.0.jpg"
+      },
+      {
+        "timestamp": 82.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0082.0.jpg"
+      },
+      {
+        "timestamp": 83.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0083.0.jpg"
+      },
+      {
+        "timestamp": 84.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0084.0.jpg"
+      },
+      {
+        "timestamp": 85.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0085.0.jpg"
+      },
+      {
+        "timestamp": 86.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0086.0.jpg"
+      },
+      {
+        "timestamp": 87.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0087.0.jpg"
+      },
+      {
+        "timestamp": 88.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0088.0.jpg"
+      },
+      {
+        "timestamp": 89.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0089.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 21.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0021.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 32.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0032.0.jpg"
+      },
+      {
+        "timestamp": 37.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0037.0.jpg"
+      },
+      {
+        "timestamp": 42.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0042.0.jpg"
+      },
+      {
+        "timestamp": 48.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0048.0.jpg"
+      },
+      {
+        "timestamp": 53.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0053.0.jpg"
+      },
+      {
+        "timestamp": 58.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0058.0.jpg"
+      },
+      {
+        "timestamp": 64.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0064.0.jpg"
+      },
+      {
+        "timestamp": 69.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0069.0.jpg"
+      },
+      {
+        "timestamp": 74.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0074.0.jpg"
+      },
+      {
+        "timestamp": 79.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0079.0.jpg"
+      },
+      {
+        "timestamp": 85.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0085.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "caption": "A man in a black shirt rides a mechanical bull inside a tent, his right arm raised as the bull bucks.",
+        "scene_id": 13,
+        "start": 62.353958,
+        "t_mid": 64.606208,
+        "filename": "scene_0013.jpg",
+        "end": 66.858458,
+        "score": 0.6220614910125732
+      },
+      {
+        "caption": "A person in dark clothing rides a mechanical bull indoors, gripping the rope as the bull bucks on a red floor.",
+        "end": 73.32325,
+        "filename": "scene_0014.jpg",
+        "start": 66.858458,
+        "scene_id": 14,
+        "t_mid": 70.09085400000001,
+        "score": 0.6207888722419739
+      },
+      {
+        "start": 79.954875,
+        "filename": "scene_0016.jpg",
+        "scene_id": 16,
+        "end": 90.00658333333332,
+        "caption": "A person rides a mechanical bull inside an arena, gripping the reins as the bull bucks and spins. The scene is under a tent-like structure with red flooring and blurred background elements.",
+        "t_mid": 84.98072916666666,
+        "score": 0.6181833148002625
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 8,
+      "planner_notes": ""
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": true,
+      "confidence": 0.78,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 15,
+      "scene_count": 3,
+      "text_evidence_count": 0,
+      "time_span_sec": 83.0,
+      "missing_evidence": [],
+      "recommended_next_action": "answer_with_evidence"
+    },
+    "draft_answer": "The correct answer is E) run in circle\n\nEvidence: The bull is mounted on a circular platform and repeatedly moves in a circular motion, as seen from [FRAME:t=66.0] to [FRAME:t=89.0]. The rider is positioned to maintain balance as the bull rotates, indicating a circular movement pattern. While the bull does not gallop (A), jump up (C), or spin up and down (D), its movement is consistent with running in a circle (E). Turning in circle (B) is similar but less precise; \"run in circle\" better describes the continuous motion observed.",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=81.0s] 画面中，一头深色的机械公牛位于红色圆形平台上，其身体呈前倾姿态，头部低垂，似乎正在模拟向前冲撞的动作。骑手身穿深色服装，身体前倾，双手紧握牛背，保持平衡。\n\n[t=82.0s] 机械公牛的头部进一步前伸，身体向左倾斜，骑手身体随之向右倾斜，双臂张开以维持平衡，显示出公牛正在剧烈晃动。\n\n[t=83.0s] 机械公牛头部抬起，身体恢复部分直立，但仍在持续晃动，骑手身体后仰，双臂向两侧伸展，试图保持稳定。\n\n[t=84.0s] 机械公牛再次前倾，头部低垂，骑手身体前倾，双臂向两侧伸展，保持平衡。\n\n[t=85.0s] 机械公牛头部再次抬起，身体向右倾斜，骑手身体随之向左倾斜，双臂张开以维持平衡。\n\n[t=86.0s] 机械公牛头部前伸，身体向左倾斜，骑手身体向右倾斜，双臂张开以维持平衡。\n\n[t=87.0s] 机械公牛头部低垂，身体前倾，骑手身体前倾，双臂向两侧伸展，保持平衡。\n\n[t=88.0s] 机械公牛头部抬起，身体向右倾斜，骑手身体随之向左倾斜，双臂张开以维持平衡。",
+        "timestamps": [
+          81.0,
+          82.0,
+          83.0,
+          84.0,
+          85.0,
+          86.0,
+          87.0,
+          88.0
+        ],
+        "window": {
+          "start": 80.98,
+          "end": 88.98,
+          "center_t": 84.98
+        }
+      }
+    ],
+    "grounding_report": {
+      "grounded": false,
+      "valid_markers": 2,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [
+        "MCQ explanation contradicts the selected option."
+      ],
+      "selected_candidate": {
+        "label": "E",
+        "text": "run in circle"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": {
+        "selected": {
+          "label": "E",
+          "text": "run in circle"
+        },
+        "reason": "multiple_candidate_labels"
+      },
+      "recommended_next_action": "answer_with_evidence"
+    },
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "f19c400410902a05e8a3aed6aec5710267ae9b51"
+}

@@ -22,15 +22,18 @@ inference; (2) causal verification. Two hard constraints: (1) **self-improvement
 may be larger text-only); (2) only internalize **type-1** (single-forward-doable)
 steps. Scope: **vision-only** (frames only).
 
-**STATUS (2026-06-09):** all exploratory/diagnostic experiments are DONE (Exp-0..8).
-Training (SFT/RL) and causal probes were never run — deliberately gated: every
-diagnostic converged on *no internalizable reasoning headroom* on the tested data
-(video = perception wall; reflection net-negative). The one regime with genuine
-reasoning headroom found is **32B + chart/numerical reasoning** (Exp-8), which needs
-the 32B base and leaves the video-agent narrative. Net result = a strong,
-mechanism-backed **internalizability-boundary** finding. See §5 for the open fork.
-(The 2026-06-08 "Option B / reflection" pivot below was tested in Exp-3/4 and found
-to have 0 headroom — kept for the record.)
+**STATUS (2026-06-11): the full supplementary spec is COMPLETE — see §7.** Exp-0..8 (below)
+were the exploratory sweep; §7 turns them into a defensible, statistically-gated
+**boundary + 2-regime map**, and — updating the earlier "training never run" note —
+**the §11 SFT PoC was run and is a significant POSITIVE result** (8B ChartQA .617→.733,
++0.117, CI excludes 0; with a causal probe). Headline: internalizing agentic/reflective
+reasoning into a small VLM has **no statistically reliable headroom** in the frames-visible
+video regime (perception/selection-bound across 4B/8B/32B + a non-Qwen InternVL3-8B; agentic
+nets within-variance, the only reliable effects *negative*); the **reasoning-bound** regime
+appears only once a strong base (32B) solves perception (static charts), where internalization
+is demonstrated to work. All variance-gate numbers regenerate from
+`data/distill/results/results.jsonl`. (Exp-0..8 and the 2026-06-08 reflection pivot are kept
+below for the record; the §1 multi-seed gate *retracted* the Exp-5 "8B +8%" as run-variance.)
 
 ---
 
@@ -444,3 +447,225 @@ clash — clash gave 0.5 MB/s and stalled).
 - Cross-model joins/insights: `scripts/build_percase_analysis.py`.
 - Artifacts: `data/distill/pilot/` (pilot), `data/distill/{clevrer,chartqa}/` (gaps),
   `data/distill/analysis/` (dump_*.jsonl full outputs + *_percase.csv).
+
+---
+
+## 7. Supplementary-spec execution (2026-06-10) — variance gate + map
+
+Executing `docs/SUPPLEMENTARY_EXPERIMENT_SPEC.md` to turn the exploratory log into a
+defensible boundary+map result. New infra (all unit-tested, `tests/test_eval_common.py`):
+`app/distill/{eval_common,eval_stats,seed_runner,methods}.py`, gates
+`scripts/run_variance_gate.py` / `run_chartqa_gate.py`, `scripts/{build_partition,
+label_audit,regrade_dumps,power_table,regen_tables,diag_oracle_perception}.py`.
+Result store: `data/distill/results/results.jsonl` (fingerprinted, append-only);
+tables regen via `scripts/regen_tables.py`. Orchestrator = **DeepSeek API**
+(deepseek-v4-flash) — the local 30B is retired for this work (frees 2 GPUs).
+**Throughput fix:** `seed_runner` got a `--concurrency` thread-pool (DeepSeek + vllm
+both serve concurrent requests) — cut orch from ~4 h/gate to ~30 min.
+
+### §0.5 label/grader floor (the floor under the floor)
+- **§0.5.1 text-aware re-grade of all 9 dumps → 0 letter-luck cases** (free.L==free.T
+  everywhere). The feared ~4% grader artifact does not exist here.
+- **§0.5.2 label audit (DeepSeek judge, text-only, option-separability):** NExT 50 →
+  **47 clean / 3 ambiguous / 0 wrong-gold, noise rate 6%** (CI [0.86,1.00]). Far below
+  the spec's feared 10–15%. CLEAN = 47. (The old `label_audit_chartqa.json` with 48%
+  "wrong-gold" is a discarded artifact of the earlier judge-sees-VLM-reading method.)
+
+### §3.0 frames-visible partition
+- All 50 NExT cases are **EVIDENCE_IN** (uniform-16 hits the GT window). CLEAN∩EVIDENCE_IN
+  = **47**. `data/distill/analysis/partition_next.json`.
+
+### §1 variance gate — NExT CLEAN∩EVIDENCE_IN (n=47, K=10 seeds, paired bootstrap)
+| model | method | free | net | 95% CI (pooled) | verdict |
+|---|---|---|---|---|---|
+| 8B | self_reflect | .660 | **+0.060** | [+0.000,+0.128] | within-variance (borderline) |
+| 8B | orch_reflect_blind | .660 | **+0.009** | [−0.170,+0.191] | within-variance |
+| 4B | self_reflect | .745 | −0.045 | [−0.128,+0.000] | within-variance |
+| 4B | orch_reflect_blind | .745 | −0.085 | [−0.255,+0.064] | within-variance |
+
+- **RETRACTION (the named result):** 8B orch per-seed net = +.09,−.04,+.11,+.04,+.02,
+  +.00,+.06,−.06,−.06,−.06 → the seed-0/2 "+8.5%/+10.6%" wash to **pooled +0.9%, sign
+  flips across seeds**. The lone positive does not survive multi-seed. 8B self_reflect
+  best-seed +.064 → pooled +.060 with CI touching 0.
+- **Mechanism note:** self_reflect σ_decode≈0 (MCQ option-choice is low-entropy even at
+  temp 0.7 — rationale varies, graded option stable; verified seed honored). The large
+  variance is in **orch** (DeepSeek critic's stochastic sub-questions) — exactly the
+  +8% retraction's source. orch churn for 8B ≈ gain 5–9 / lost 2–8 per seed.
+
+### §2 power (honest limitation)
+- At n=47, **minimum detectable net @80% power ≈ 25%** (4B .252, 8B .274); n=300→~10%,
+  n=500→~8%. All observed |net|<9% are below detectable → "no reliable effect **but
+  underpowered**." The **sign-flip across seeds** is the power-independent evidence.
+  Scaling n needs the GPU-ingest fix (still blocked). `data/distill/results/power_table.json`.
+
+### §3 perception-headroom probe — 8B NExT free-wrong (n=18)
+- recovered correct: control 0 → uniform-hi 2 (11%) → GT-local-hi **4 (22%)**.
+- **78% (14/18) stay wrong even with perfect frame selection at max res** = visual
+  "fundamental wall"; 22% are perception/selection-limited (type-2, non-internalizable).
+  Oracle (§3.1b) will split the 78% into reasoning-bound vs fundamental.
+
+### §3.1b near-oracle perception (32B caption of GT frames → DeepSeek reasons, no 8B eyes)
+- 8B NExT free-wrong (n=18): **near-oracle recovers 6/18 = 33%**. Perfect perception +
+  reasoning fixes only a third; 67% stay wrong (label-ambiguous / unanswerable-from-frames /
+  fundamental). With the probe (22% recover via better perception), this places **NExT-8B in
+  regime 1**: the residual is NOT a recoverable reasoning headroom. `oracle_perception_8b_next.json`.
+
+### §5 ChartQA full ladder (free / self_reflect / orch, multi-seed)
+| model | free | self_reflect net | orch net | verdict |
+|---|---|---|---|---|
+| 4B | .667 | +0.023 | **−0.122** | within / **effect (reliable NEGATIVE)** |
+| 8B | .617 | +0.012 | −0.028 | within / within |
+| 32B | **.800** | +0.017 | −0.044 | within / within |
+- 4B/8B = regime 1 (perception-bound: read-values failure; orch corrupts, −12% at 4B).
+  **32B = regime 2** (perception solved .80; residual = multi-step arithmetic per Exp-8).
+
+### §4 sighted-critic ablation — TWO datasets (the missing control), 8B base + 32B sighted critic
+| dataset | blind orch net | sighted orch net (k=5) | verdict |
+|---|---|---|---|
+| NExT | +0.009 [−0.170,+0.191] | **+0.060 ± 0.055** [−0.085,+0.191] | within-variance |
+| ChartQA | −0.028 | **+0.070 ± 0.040** (per-seed +.02/+.10/+.07/+.05/+.12, all ≥0) | within-variance (borderline+) |
+- **NExT:** a sighted 32B critic helps numerically more than blind (+.060 vs +.009) but still
+  does NOT reliably beat free-form (CI crosses 0; per-seed sign flips). The dominant wall is the
+  8B's *perception* ceiling — a stronger sighted critic over the same frames can't reliably fix it.
+- **ChartQA:** the sighted critic trends positive on EVERY seed (+0.070, all ≥0) — on charts the
+  wall is *reading values*, which a sighted 32B critic (reads .80) partially repairs; just shy of
+  significance at n=60/k=5. Contrast with blind orch (−0.028): **sightedness matters more where the
+  bottleneck is perception-you-can-re-read (charts) than where it is temporal localization (video).**
+  This two-dataset contrast is the clean §4 result.
+
+### §8 THE MAP (regen: `scripts/{regen_tables,build_map}.py` → `results/{tables,map}.json`)
+| dataset × model | free | best agentic net | regime |
+|---|---|---|---|
+| NExT 4B / 8B / 32B | .74 / .66 / .70 | −.045 / +.060 / +.039 (all within-var, k=10/10/6) | **1** perception/selection-bound |
+| NExT InternVL3-8B (off-Qwen) | .57 | orch **−.163** (k=3, *effect/negative*) | **1** (cross-family confirm) |
+| NExT Penguin-VL 2B / 8B (new LLM-encoder) | .53 / .43† | +.050 / +.128 (within-var, k=3) | **1** (new-encoder confirm) |
+| ChartQA 4B / 8B | .67 / .62 | +.023 / +.012 (4B orch −.122 *effect/neg*) | **1** perception-bound |
+| ChartQA Penguin-VL 2B / 8B (new LLM-encoder) | **.82 / .80** | −.078 / −.006 (within-var, k=3) | **1** (perception solved, no residual probe) |
+| **ChartQA 32B** | **.80** | +.017 | **2** reasoning-bound |
+| ChartQA 8B-SFT (§11) | **.73** | — | (R1 base, +.117 from internalization) |
+- †Penguin-8B-NExT ran at **2 frames** (16-frame dense-video tokens OOM the 20GB cards even split);
+  not directly comparable to the 16-frame .53/.66 cells — the .43 is frame-starved, and the
+  consistent-but-within-variance orch +0.128 is blind re-asking recovering a starved 2-frame read.
+- Clean 2-regime decomposition: **video is uniformly perception/selection-bound at every scale
+  AND across THREE vision-encoder paradigms (Qwen tiling-ViT 4B/8B/32B + InternVL3-8B fixed-res ViT
+  + Penguin LLM-based encoder); static charts flip to reasoning-bound only once a strong base solves
+  perception.** No agentic/reflective method reliably beats single-forward in ANY cell (all
+  within-variance); the only reliable agentic effects are *negative* (4B-ChartQA orch −12%,
+  InternVL-NExT orch −16%, Penguin-2B-ChartQA orch −8%).
+- **New result from the Penguin encoder:** the R1 *chart-perception* wall on small contrastive-encoder
+  models is an **encoder-paradigm property, not fundamental** — Penguin's LLM-based encoder lifts
+  ChartQA reading to **.82 (2B) / .80 (8B)**, matching Qwen-**32B** (.80) and ≫ Qwen-8B (.62). But the
+  *temporal-video* wall is unmoved (Penguin-2B NExT .53, still R1) — better static-OCR perception
+  doesn't buy temporal grounding.
+
+### §11 PoC — RAN, and it is a statistically significant POSITIVE internalization result
+Pipeline (`scripts/poc_{gen_cot,sft,merge,eval,causal_probe}.py`): the **32B teacher** generated
+step-by-step chart-solving CoTs on ChartQA TRAIN; kept **150** whose final answer matched gold
+(consistency filter). LoRA-SFT the **bf16 8B** (peft, r=16, vision tower frozen, 2-GPU bf16,
+3 epochs, train_loss 0.30→0.17). Merge → serve → eval single-forward on the **60 held-out test**
+cases (train/test disjoint):
+- **base-8B .617 → SFT-8B .733; paired bootstrap net +0.117, 95% CI [+0.050, +0.200] (EXCLUDES 0);
+  gain 7 / lost 0; McNemar p=0.023.** Internalizing the teacher's chart-solving trajectory into a
+  single forward pass works.
+- **§11.3 causal probe (2a counterfactual, n=33 correct-with-CoT):** corrupting one numeric CoT
+  intermediate flips the answer **3%**; shuffling the CoT flips **15%**. The answer is *robust* to
+  corrupting intermediates → the gain is **perception/reading transfer, not a load-bearing internal
+  arithmetic chain** (the model re-reads the chart). Honest reading: in this perception-bound cell
+  (ChartQA-8B, R1) the SFT internalized the teacher's *reading*; the **pure-reasoning**
+  internalization the probe would light up is the **regime-2 (32B-charts) cell** — the documented
+  next target (needs bf16-32B; only AWQ-4bit is local). Either way §11 demonstrates a real,
+  significant, single-forward internalization gain with an honest mechanism characterization.
+
+### §6 cross-family (InternVL3-8B) — DONE (regime-1 reproduces off-Qwen)
+Model acquisition was the hard part: ModelScope ~360 MB/h (unusable), HF/hf-mirror lacked LFS; the
+working path was **HF-direct via the clash proxy, downloaded sequentially one shard at a time**
+(concurrent multi-shard stalls the proxy). Served TP=2 on GPU2,3 :30003, vLLM resolves
+`InternVLChatModel` fine. Two serving fixes vs the Qwen path: (1) InternVL's chat template can't
+concatenate a system *string* with list-content → fold system into the user message (patched in
+`methods.vlm_answer`); (2) InternVL's dynamic tiling makes 16×448px = 54k tokens > ctx → run at
+8 frames (free_form) / 4 frames (orch), max-model-len 32768.
+- **InternVL3-8B free_form = .574 on NExT CLEAN∩EVIDENCE_IN** — a different vision tower (fixed-res
+  ViT vs Qwen's tiling) lands in the same accuracy band as the Qwen family (4B .745 / 8B .660 /
+  32B .702), confirming the perception-bound regime is not a Qwen-tiling artifact.
+- **orch_reflect_blind net = −0.163 ± 0.065 (k=3, verdict=EFFECT — CI [−0.319,−0.021] excludes 0):
+  orchestration RELIABLY HURTS InternVL** (all 3 seeds negative: −.23/−.11/−.15), even more than on
+  Qwen. Throughput note: InternVL multimodal prefill is heavy — generation collapses to ~1 tok/s
+  under concurrency on 27k-token prompts, so the multi-seed run used 4-frame prompts at
+  concurrency=1 (~25 min/seed). The InternVL perception-headroom probe is deferred (corroborative
+  only — the perception-wall mechanism is established on the Qwen family + oracle).
+- **Cross-family verdict:** the map's regime-1 finding (perception/selection-bound video; agentic
+  reasoning net ≤ 0, reliably negative for orchestration) reproduces on a non-Qwen vision encoder.
+
+### §6b cross-ENCODER (Penguin-VL 2B/8B — a NEW vision-encoder paradigm) — DONE
+Penguin-VL replaces the contrastive CLIP/SigLIP ViT with an **LLM-based vision encoder** (init from
+Qwen3-0.6B, bidirectional attention + 2D-RoPE) plus TRA temporal token compression — the cleanest
+test of whether the perception-bound regime is a property of the *encoder paradigm* or of the *task*.
+Acquisition/serving: ModelScope was unusably slow, so main weights came via HF+clash proxy; the arch
+`penguinvl_qwen3` is **vLLM-incompatible** → ran in a dedicated `penguin` env (transformers **4.51.3**;
+5.9 breaks its processor, 4.57 breaks weight load) with patches: `vision_encoder=null` (encoder
+weights bundled in the main safetensors as nested keys), `from_config→_from_config`, an **SDPA
+fallback** for the missing flash-attn (with `enable_gqa=True` for the 16-q/8-kv head mismatch), and a
+**decode-slicing fix** (Penguin's custom `generate()` returns only new tokens; the README decodes
+unsliced → empty strings). GPUs per the run plan: 2B on GPU1, 8B on GPU2,3, GPU0 left free.
+- **ChartQA (1-frame static, n=60): Penguin-2B .817, Penguin-8B .800** — the headline cross-encoder
+  result. The new encoder reads chart values/rankings **far** better than the same-size Qwen
+  (Qwen-8B .617), landing at the **Qwen-32B** reading ceiling (.80). → the small-model R1
+  chart-perception wall is an **encoder-paradigm artifact**, not a fundamental limit.
+- **NExT video (CLEAN∩EVIDENCE_IN, n=47): Penguin-2B free .532** (16 frames) — squarely in the Qwen
+  band (4B .745 / 8B .660 / 32B .702 / InternVL .574); the new encoder does **not** lift temporal
+  video. Penguin-8B-NExT only fit at 2 frames (.426, frame-starved — see †).
+- **Orchestration: within-variance everywhere, never reliably positive.** Penguin-2B-ChartQA orch
+  **−0.078** (reliable-ish negative), Penguin-8B-ChartQA −0.006, Penguin-2B-NExT +0.050,
+  Penguin-8B-NExT +0.128 (all CIs cross 0 at k=3). Same regime-1 signature as Qwen + InternVL:
+  blind reflective orchestration adds no reliable single-forward headroom on a brand-new encoder.
+- **Cross-encoder verdict:** swapping the entire encoder paradigm (contrastive ViT → LLM encoder)
+  **moves the static-perception ceiling a lot** (charts .62→.82) but **leaves the regime structure
+  intact** — video stays perception/selection-bound, agentic net stays ≤ 0. The boundary result is
+  robust across three encoder paradigms.
+
+### Status: ALL spec sections COMPLETE (§0.5 … §11)
+§0.5 clean labels + §3.0 frames-visible + §1 variance gate (**4B/8B 10-seed + 32B 6-seed**) + §2
+power + §3 perception probe + §3.1b oracle + **§4 sighted critic on 2 datasets** + §5 ChartQA
+ladder + **§6 cross-family InternVL + §6b cross-ENCODER Penguin-VL 2B/8B (free + 3-seed orch on
+both NExT & ChartQA)** + the retraction box + the 2-regime MAP + **§11 SFT PoC
+(gen→train→eval→causal probe)**. All numbers regenerate from
+`data/distill/results/results.jsonl` via `scripts/{regen_tables,build_map,power_table}.py`.
+
+**Full story:** internalizing agentic/reflective reasoning into a small VLM has **no statistically
+reliable headroom in the frames-visible video regime** — perception/selection-bound at every scale
+(4B/8B/32B) and across THREE vision-encoder paradigms (Qwen tiling-ViT, InternVL3-8B fixed-res ViT,
+Penguin LLM-based encoder); the only reliable agentic effects are NEGATIVE (orchestration corrupts:
+−12% 4B-charts, −16% InternVL-video, −8% Penguin-2B-charts). The reasoning-bound regime appears only
+once a strong base solves perception (static charts) — and the Penguin cross-encoder test sharpens
+this: a new LLM-based encoder lifts small-model chart *reading* to the 32B ceiling (.62→.82),
+proving the R1 chart wall is an encoder-paradigm artifact, yet leaves the temporal-video wall and
+the agentic-net≤0 structure fully intact. **§11 then shows the
+positive half constructively: distilling the 32B teacher's chart-solving CoT into the 8B lifts
+single-forward accuracy .617→.733 (+11.7%, CI excludes 0)** — though the causal probe shows that
+gain is perception-transfer, locating *pure-reasoning* internalization in the 32B-charts cell as the
+next target. Caveats kept prominent: n=47 (NExT) / n=60 (ChartQA), minimum detectable net ≈25% on
+NExT — agentic nulls are "no reliable effect, underpowered," and the seed-sign-flips are the
+power-independent evidence behind the +8% retraction.
+
+**Remaining hardware-bound deferral (not a skipped experiment):** the InternVL perception-headroom
+probe (mechanism already established on Qwen) and the pure-reasoning §11 on bf16-32B (only AWQ-4bit
+local). Everything in SPEC §0–§11 that is runnable on this hardware has been run.
+
+### §7 reproducibility quick-ref
+- Env: `conda activate mbe-ingest` (gates/SFT/eval); serving in `vllm-qwen`. Orchestrator = DeepSeek
+  API (`.env` `ORCHESTRATOR_*`); localhost VLM calls bypass the clash proxy (`NO_PROXY=*`).
+- Serve: `serve_vlm_4b.sh` (:30000), 8B TP=2 (:30002), `serve_vlm_32b.sh` (:30001),
+  `serve_vlm_internvl.sh` (:30003). InternVL weights via `HTTPS_PROXY=…7890 hf download
+  OpenGVLab/InternVL3-8B` (one shard at a time).
+- Gates (add `--concurrency 8` for throughput): `run_variance_gate.py --model-id <id>
+  --clean data/distill/analysis/label_audit_next.jsonl --methods self_reflect orch_reflect_blind
+  [orch_reflect_sighted --critic-base …:30001/v1 --critic-model Qwen3-VL-32B-Instruct] --seeds K`;
+  `run_chartqa_gate.py` (same flags, ChartQA).
+- Floor/partition/power/probes: `regrade_dumps.py`, `label_audit.py`, `build_partition.py`,
+  `power_table.py`, `diag_perception_headroom.py`, `diag_oracle_perception.py`.
+- Tables/map: `regen_tables.py` → `tables.json`; `build_map.py` → `map.json`.
+- §11 PoC: `poc_gen_cot.py` (32B teacher → `chartqa_cot_train.jsonl`) → `poc_sft.py` (LoRA, GPU2,3)
+  → `poc_merge.py` → serve merged `Qwen3-VL-8B-ChartQA-SFT` (copy original 8B tokenizer/config in,
+  TP=2) → `run_chartqa_gate.py --model-id 8b_sft --seeds 0` (free_form eval) → `poc_causal_probe.py`.
+- vLLM-child orphans hold GPU memory after a server is killed — kill the `VLLM::Worker_TP` /
+  `EngineCore` PIDs explicitly (not just the api_server) before re-serving.

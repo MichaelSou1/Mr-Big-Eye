@@ -1,0 +1,73 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "e8a25a32eed93730",
+  "case_id": "nextgqa-4443526735-3",
+  "question": "how does the baby move\n\nCandidates:\nA) in a swing\nB) carry by man\nC) in lady s arms\nD) in pram\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    1.0,
+    2.0,
+    3.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0,
+    12.0,
+    13.0,
+    14.0,
+    15.0,
+    16.0,
+    17.0,
+    18.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0001.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0002.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0003.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0005.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0006.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0007.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0008.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0009.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0010.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0012.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0013.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0014.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0015.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0016.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0017.0.jpg",
+    "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0018.0.jpg"
+  ],
+  "cot": "['At [FRAME:t=1.0], the baby is seated in a bouncer-style baby seat with colorful hanging toys, indicating a stationary, enclosed seating device.', 'At [FRAME:t=2.0], the baby is still seated in the same device, hands reaching toward toys, showing no movement beyond the seat.', 'At [FRAME:t=3.0], the baby remains in the seat, body slightly swaying, consistent with bouncing motion.', 'At [FRAME:t=5.0], the baby is still in the seat, bouncing gently, with no indication of being carried or crawling.', 'At [FRAME:t=12.0], the baby is seated, body leaning forward, feet on the floor, and the seat is moving slightly, indicating active bouncing.', 'At [FRAME:t=13.0], the baby’s head lifts, body sways forward and backward, confirming continuous movement within the seat.', 'At [FRAME:t=14.0], the baby turns head to the right, body sways more, and the seat moves slightly, reinforcing motion within a fixed structure.', 'At [FRAME:t=15.0], the baby leans forward significantly, feet lift off the floor, and the seat moves forward, showing dynamic motion.', 'At [FRAME:t=16.0], the baby continues forward lean, seat moves forward, head turns left, confirming sustained movement in the seat.', 'At [FRAME:t=17.0], the baby’s body is deeply inclined, seat continues moving, head turns right, indicating consistent motion within the device.', 'At [FRAME:t=18.0], the baby remains in the seat, body forward, head turning left, confirming ongoing movement in the same device.', 'The device is a bouncer-style seat with hanging toys, which matches the description of a pram or jumperoo, not a swing, carry, arms, or crawling.', 'The baby is not being carried, not crawling, not in a swing (which would have a different structure), and not in a lady’s arms.']",
+  "answer": "The correct answer is D) in pram",
+  "gold_timestamps": [
+    9.95
+  ],
+  "gold_scenes": [
+    {
+      "start": 0.5,
+      "end": 19.4
+    }
+  ],
+  "source_traj_hash": "2f01d4c5b025e80e653f79b3b2063d22a0a42173",
+  "validation_report": {
+    "ok": false,
+    "errors": [
+      "forbidden_token:fts"
+    ],
+    "frame_markers": [
+      1.0,
+      2.0,
+      3.0,
+      5.0,
+      12.0,
+      13.0,
+      14.0,
+      15.0,
+      16.0,
+      17.0,
+      18.0
+    ]
+  }
+}

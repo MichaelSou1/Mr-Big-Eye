@@ -1,0 +1,41 @@
+  chartqa-0: corrupt_flip=False shuffle_flip=False
+  chartqa-1: corrupt_flip=False shuffle_flip=False
+  chartqa-2: corrupt_flip=False shuffle_flip=False
+  chartqa-3: corrupt_flip=False shuffle_flip=True
+  chartqa-4: corrupt_flip=False shuffle_flip=False
+  chartqa-5: corrupt_flip=False shuffle_flip=False
+  chartqa-6: corrupt_flip=False shuffle_flip=False
+  chartqa-7: corrupt_flip=False shuffle_flip=False
+  chartqa-8: corrupt_flip=False shuffle_flip=False
+  chartqa-10: corrupt_flip=False shuffle_flip=False
+  chartqa-11: corrupt_flip=False shuffle_flip=False
+  chartqa-12: corrupt_flip=False shuffle_flip=False
+  chartqa-13: corrupt_flip=False shuffle_flip=True
+  chartqa-14: corrupt_flip=False shuffle_flip=False
+  chartqa-15: corrupt_flip=False shuffle_flip=False
+  chartqa-16: corrupt_flip=False shuffle_flip=False
+  chartqa-17: corrupt_flip=False shuffle_flip=True
+  chartqa-18: corrupt_flip=False shuffle_flip=False
+  chartqa-19: corrupt_flip=False shuffle_flip=True
+  chartqa-21: corrupt_flip=False shuffle_flip=True
+  chartqa-24: corrupt_flip=False shuffle_flip=False
+  chartqa-25: corrupt_flip=False shuffle_flip=False
+  chartqa-26: corrupt_flip=False shuffle_flip=False
+  chartqa-27: corrupt_flip=True shuffle_flip=False
+  chartqa-29: corrupt_flip=False shuffle_flip=False
+  chartqa-30: corrupt_flip=False shuffle_flip=False
+  chartqa-33: corrupt_flip=False shuffle_flip=False
+  chartqa-34: corrupt_flip=False shuffle_flip=False
+  chartqa-35: corrupt_flip=False shuffle_flip=False
+  chartqa-36: corrupt_flip=False shuffle_flip=False
+  chartqa-37: corrupt_flip=False shuffle_flip=False
+  chartqa-38: corrupt_flip=False shuffle_flip=False
+  chartqa-39: corrupt_flip=False shuffle_flip=False
+
+=== CAUSAL PROBE (2a) ===
+{
+  "n_eval": 33,
+  "flip_rate_corrupt": 0.030303030303030304,
+  "flip_rate_shuffle": 0.15151515151515152
+}
+Real reasoning: flip_rate_corrupt notably > 0 (a load-bearing intermediate matters); interpret vs shuffle control.

@@ -1,0 +1,2 @@
+=== variance gate: model=internvl n=47 cases (EVIDENCE_IN∩CLEAN) ===
+[internvl/next/free_form seed0] free=0.702 method=0.702 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0

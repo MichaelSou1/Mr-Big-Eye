@@ -1,0 +1,682 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-4244817395-3",
+    "video_id": "2a4ba7469fb8f2f3",
+    "question": "why does the lady in strip touch the cheeck of the boy near the end\n\nCandidates:\nA) make boy laugh\nB) want to kiss boy\nC) signal him something inside drinking machine\nD) wipe tears for boy\nE) wipd off the food\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "signal him something inside drinking machine",
+    "required_keywords": [
+      "signal",
+      "him",
+      "something",
+      "inside",
+      "drinking"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      50.3
+    ],
+    "gold_scenes": [
+      {
+        "start": 47.2,
+        "end": 53.4
+      }
+    ],
+    "question_type": "cw"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "why does the lady in strip touch the cheeck of the boy near the end\n\nCandidates:\nA) make boy laugh\nB) want to kiss boy\nC) signal him something inside drinking machine\nD) wipe tears for boy\nE) wipd off the food\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the visual context and action of the lady touching the boy's cheek near the end of the video. Use segment_focus to examine the final moments closely. (visual_detail, focused, negative_check)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "why does the lady in strip touch the cheek of the boy near the end",
+            "center_t": 120.0,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-8fb0bf38e1d542cc",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 67.32, \"end\": 67.32, \"center_t\": 67.32, \"frame_count\": 0}, \"observation\": \"I could not load dense frames for the requested window.\", \"subject_deltas\": [], \"required_next_action\": \"retrieve_video_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8fb0bf38e1d542cc",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 67.32,
+          "end": 67.32,
+          "center_t": 67.32,
+          "frame_count": 0
+        },
+        "observation": "I could not load dense frames for the requested window.",
+        "subject_deltas": [],
+        "required_next_action": "retrieve_video_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve visual evidence around the final moments to confirm the lady's action and context. (visual_detail, focused, negative_check)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "why does the lady in strip touch the cheek of the boy near the end",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 5,
+            "planner_notes": "Focus on the final 10 seconds of the video."
+          },
+          "id": "chatcmpl-tool-bb1d76b5209a1c12",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 11.0, \"source\": \"retrieval\"}, {\"timestamp\": 27.0, \"source\": \"retrieval\"}, {\"timestamp\": 45.0, \"source\": \"retrieval\"}, {\"timestamp\": 51.0, \"source\": \"retrieval\"}, {\"timestamp\": 60.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"filename\": \"scene_0003.jpg\", \"caption\": \"A woman with blonde hair stands indoors, facing away from the camera, while a young boy in a blue and white shirt is positioned in the foreground, looking toward her.\", \"scene_id\": 3, \"start\": 9.6, \"t_mid\": 10.44, \"end\": 11.28, \"score\": 0.485329806804657}, {\"caption\": \"A young boy in blue pants and a white shirt stands at a toy kitchen set, reaching toward its sink, while a woman with blonde hair leans over beside him, observing.\", \"start\": 17.64, \"end\": 29.52, \"filename\": \"scene_0005.jpg\", \"t_mid\": 23.58, \"scene_id\": 5, \"score\": 0.5044587850570679}, {\"end\": 52.68, \"caption\": \"A young child in a blue and white shirt is pouring liquid from a glass pitcher into a bowl, while an adult in striped pajamas stands beside them.\", \"start\": 50.08, \"t_mid\": 51.379999999999995, \"filename\": \"scene_0013.jpg\", \"scene_id\": 13, \"score\": 0.44775813817977905}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 5, \"planner_notes\": \"Focus on the final 10 seconds of the video.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bb1d76b5209a1c12",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 11.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 27.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 45.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 51.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 60.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "filename": "scene_0003.jpg",
+            "caption": "A woman with blonde hair stands indoors, facing away from the camera, while a young boy in a blue and white shirt is positioned in the foreground, looking toward her.",
+            "scene_id": 3,
+            "start": 9.6,
+            "t_mid": 10.44,
+            "end": 11.28,
+            "score": 0.485329806804657
+          },
+          {
+            "caption": "A young boy in blue pants and a white shirt stands at a toy kitchen set, reaching toward its sink, while a woman with blonde hair leans over beside him, observing.",
+            "start": 17.64,
+            "end": 29.52,
+            "filename": "scene_0005.jpg",
+            "t_mid": 23.58,
+            "scene_id": 5,
+            "score": 0.5044587850570679
+          },
+          {
+            "end": 52.68,
+            "caption": "A young child in a blue and white shirt is pouring liquid from a glass pitcher into a bowl, while an adult in striped pajamas stands beside them.",
+            "start": 50.08,
+            "t_mid": 51.379999999999995,
+            "filename": "scene_0013.jpg",
+            "scene_id": 13,
+            "score": 0.44775813817977905
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the final 10 seconds of the video."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the retrieved visual evidence is sufficient to determine why the lady touched the boy’s cheek. (general, sufficient_check)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "why does the lady in strip touch the cheek of the boy near the end",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-90086d9cf79339b3",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": true, \"confidence\": 0.78, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 5, \"scene_count\": 3, \"text_evidence_count\": 0, \"time_span_sec\": 49.0, \"missing_evidence\": [], \"recommended_next_action\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-90086d9cf79339b3",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 5,
+        "scene_count": 3,
+        "text_evidence_count": 0,
+        "time_span_sec": 49.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "why does the lady in strip touch the cheeck of the boy near the end\n\nCandidates:\nA) make boy laugh\nB) want to kiss boy\nC) signal him something inside drinking machine\nD) wipe tears for boy\nE) wipd off the food\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is D) wipe tears for boy.\\n\\n[FRAME:t=51.0] shows the boy with his head bowed and eyes closed, appearing distressed or upset. [FRAME:t=60.0] shows the lady in striped pajamas leaning in close to the boy’s face, with her hand positioned near his cheek and eye area — consistent with an attempt to wipe away tears or comfort him. The boy’s posture and the lady’s proximity and gesture strongly suggest an emotional moment requiring comfort, not laughter, a kiss, a signal, or food removal.\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": true, \"valid_markers\": 2, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"D\", \"text\": \"wipe tears for boy\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) wipe tears for boy.\n\n[FRAME:t=51.0] shows the boy with his head bowed and eyes closed, appearing distressed or upset. [FRAME:t=60.0] shows the lady in striped pajamas leaning in close to the boy’s face, with her hand positioned near his cheek and eye area — consistent with an attempt to wipe away tears or comfort him. The boy’s posture and the lady’s proximity and gesture strongly suggest an emotional moment requiring comfort, not laughter, a kiss, a signal, or food removal.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "wipe tears for boy"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is D) wipe tears for boy.\\n\\n[FRAME:t=51.0] shows the boy with his head bowed and eyes closed, appearing distressed or upset. [FRAME:t=60.0] shows the lady in striped pajamas leaning in close to the boy’s face, with her hand positioned near his cheek and eye area — consistent with an attempt to wipe away tears or comfort him. The boy’s posture and the lady’s proximity and gesture strongly suggest an emotional moment requiring comfort, not laughter, a kiss, a signal, or food removal.\", \"grounding_report\": {\"grounded\": true, \"valid_markers\": 2, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"D\", \"text\": \"wipe tears for boy\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"final_answer\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) wipe tears for boy.\n\n[FRAME:t=51.0] shows the boy with his head bowed and eyes closed, appearing distressed or upset. [FRAME:t=60.0] shows the lady in striped pajamas leaning in close to the boy’s face, with her hand positioned near his cheek and eye area — consistent with an attempt to wipe away tears or comfort him. The boy’s posture and the lady’s proximity and gesture strongly suggest an emotional moment requiring comfort, not laughter, a kiss, a signal, or food removal.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "wipe tears for boy"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is D) wipe tears for boy.\n\n[FRAME:t=51.0] shows the boy with his head bowed and eyes closed, appearing distressed or upset. [FRAME:t=60.0] shows the lady in striped pajamas leaning in close to the boy’s face, with her hand positioned near his cheek and eye area — consistent with an attempt to wipe away tears or comfort him. The boy’s posture and the lady’s proximity and gesture strongly suggest an emotional moment requiring comfort, not laughter, a kiss, a signal, or food removal.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "why does the lady in strip touch the cheek of the boy near the end",
+        "center_t": 120.0,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 67.32,
+          "end": 67.32,
+          "center_t": 67.32,
+          "frame_count": 0
+        },
+        "observation": "I could not load dense frames for the requested window.",
+        "subject_deltas": [],
+        "required_next_action": "retrieve_video_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-8fb0bf38e1d542cc",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "why does the lady in strip touch the cheek of the boy near the end",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 5,
+        "planner_notes": "Focus on the final 10 seconds of the video."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 11.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 27.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 45.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 51.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 60.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "filename": "scene_0003.jpg",
+            "caption": "A woman with blonde hair stands indoors, facing away from the camera, while a young boy in a blue and white shirt is positioned in the foreground, looking toward her.",
+            "scene_id": 3,
+            "start": 9.6,
+            "t_mid": 10.44,
+            "end": 11.28,
+            "score": 0.485329806804657
+          },
+          {
+            "caption": "A young boy in blue pants and a white shirt stands at a toy kitchen set, reaching toward its sink, while a woman with blonde hair leans over beside him, observing.",
+            "start": 17.64,
+            "end": 29.52,
+            "filename": "scene_0005.jpg",
+            "t_mid": 23.58,
+            "scene_id": 5,
+            "score": 0.5044587850570679
+          },
+          {
+            "end": 52.68,
+            "caption": "A young child in a blue and white shirt is pouring liquid from a glass pitcher into a bowl, while an adult in striped pajamas stands beside them.",
+            "start": 50.08,
+            "t_mid": 51.379999999999995,
+            "filename": "scene_0013.jpg",
+            "scene_id": 13,
+            "score": 0.44775813817977905
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the final 10 seconds of the video."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-bb1d76b5209a1c12",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "why does the lady in strip touch the cheek of the boy near the end",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 5,
+        "scene_count": 3,
+        "text_evidence_count": 0,
+        "time_span_sec": 49.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-90086d9cf79339b3",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "why does the lady in strip touch the cheeck of the boy near the end\n\nCandidates:\nA) make boy laugh\nB) want to kiss boy\nC) signal him something inside drinking machine\nD) wipe tears for boy\nE) wipd off the food\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) wipe tears for boy.\n\n[FRAME:t=51.0] shows the boy with his head bowed and eyes closed, appearing distressed or upset. [FRAME:t=60.0] shows the lady in striped pajamas leaning in close to the boy’s face, with her hand positioned near his cheek and eye area — consistent with an attempt to wipe away tears or comfort him. The boy’s posture and the lady’s proximity and gesture strongly suggest an emotional moment requiring comfort, not laughter, a kiss, a signal, or food removal.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "wipe tears for boy"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 10,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) wipe tears for boy.\n\n[FRAME:t=51.0] shows the boy with his head bowed and eyes closed, appearing distressed or upset. [FRAME:t=60.0] shows the lady in striped pajamas leaning in close to the boy’s face, with her hand positioned near his cheek and eye area — consistent with an attempt to wipe away tears or comfort him. The boy’s posture and the lady’s proximity and gesture strongly suggest an emotional moment requiring comfort, not laughter, a kiss, a signal, or food removal.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "wipe tears for boy"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 11.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 27.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0027.0.jpg"
+      },
+      {
+        "timestamp": 45.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0045.0.jpg"
+      },
+      {
+        "timestamp": 51.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0051.0.jpg"
+      },
+      {
+        "timestamp": 60.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0060.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 20.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0020.0.jpg"
+      },
+      {
+        "timestamp": 24.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0024.0.jpg"
+      },
+      {
+        "timestamp": 28.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0028.0.jpg"
+      },
+      {
+        "timestamp": 32.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0032.0.jpg"
+      },
+      {
+        "timestamp": 36.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0036.0.jpg"
+      },
+      {
+        "timestamp": 40.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0040.0.jpg"
+      },
+      {
+        "timestamp": 44.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0044.0.jpg"
+      },
+      {
+        "timestamp": 48.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0048.0.jpg"
+      },
+      {
+        "timestamp": 51.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0051.0.jpg"
+      },
+      {
+        "timestamp": 55.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0055.0.jpg"
+      },
+      {
+        "timestamp": 59.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0059.0.jpg"
+      },
+      {
+        "timestamp": 63.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0063.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "filename": "scene_0003.jpg",
+        "caption": "A woman with blonde hair stands indoors, facing away from the camera, while a young boy in a blue and white shirt is positioned in the foreground, looking toward her.",
+        "scene_id": 3,
+        "start": 9.6,
+        "t_mid": 10.44,
+        "end": 11.28,
+        "score": 0.485329806804657
+      },
+      {
+        "caption": "A young boy in blue pants and a white shirt stands at a toy kitchen set, reaching toward its sink, while a woman with blonde hair leans over beside him, observing.",
+        "start": 17.64,
+        "end": 29.52,
+        "filename": "scene_0005.jpg",
+        "t_mid": 23.58,
+        "scene_id": 5,
+        "score": 0.5044587850570679
+      },
+      {
+        "end": 52.68,
+        "caption": "A young child in a blue and white shirt is pouring liquid from a glass pitcher into a bowl, while an adult in striped pajamas stands beside them.",
+        "start": 50.08,
+        "t_mid": 51.379999999999995,
+        "filename": "scene_0013.jpg",
+        "scene_id": 13,
+        "score": 0.44775813817977905
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 5,
+      "planner_notes": "Focus on the final 10 seconds of the video."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": true,
+      "confidence": 0.78,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 5,
+      "scene_count": 3,
+      "text_evidence_count": 0,
+      "time_span_sec": 49.0,
+      "missing_evidence": [],
+      "recommended_next_action": "answer_with_evidence"
+    },
+    "draft_answer": "The correct answer is D) wipe tears for boy.\n\n[FRAME:t=51.0] shows the boy with his head bowed and eyes closed, appearing distressed or upset. [FRAME:t=60.0] shows the lady in striped pajamas leaning in close to the boy’s face, with her hand positioned near his cheek and eye area — consistent with an attempt to wipe away tears or comfort him. The boy’s posture and the lady’s proximity and gesture strongly suggest an emotional moment requiring comfort, not laughter, a kiss, a signal, or food removal.",
+    "observer_notes": [],
+    "grounding_report": {
+      "grounded": true,
+      "valid_markers": 2,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [],
+      "selected_candidate": {
+        "label": "D",
+        "text": "wipe tears for boy"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": null,
+      "recommended_next_action": "final_answer"
+    },
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "76350cbf38bc56f7bec5a89952790ce4229c0dda"
+}

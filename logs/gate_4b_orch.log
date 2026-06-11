@@ -1,0 +1,14 @@
+=== variance gate: model=4b n=47 cases (EVIDENCE_IN∩CLEAN) ===
+[4b/next/orch_reflect_blind seed0] free=0.745 method=0.723 net=-0.021 CI[-0.149,+0.106] gain=4 lost=5
+[4b/next/orch_reflect_blind seed1] free=0.723 method=0.574 net=-0.149 CI[-0.298,+0.000] gain=3 lost=10
+[4b/next/orch_reflect_blind seed2] free=0.723 method=0.681 net=-0.043 CI[-0.149,+0.064] gain=3 lost=5
+[4b/next/orch_reflect_blind seed3] free=0.745 method=0.617 net=-0.128 CI[-0.255,+0.000] gain=2 lost=8
+[4b/next/orch_reflect_blind seed4] free=0.723 method=0.660 net=-0.064 CI[-0.170,+0.043] gain=2 lost=5
+[4b/next/orch_reflect_blind seed5] free=0.723 method=0.660 net=-0.064 CI[-0.191,+0.064] gain=3 lost=6
+[4b/next/orch_reflect_blind seed6] free=0.745 method=0.574 net=-0.170 CI[-0.319,-0.021] gain=3 lost=11
+[4b/next/orch_reflect_blind seed7] free=0.745 method=0.638 net=-0.106 CI[-0.234,+0.021] gain=3 lost=8
+[4b/next/orch_reflect_blind seed8] free=0.745 method=0.681 net=-0.064 CI[-0.213,+0.064] gain=4 lost=7
+[4b/next/orch_reflect_blind seed9] free=0.745 method=0.702 net=-0.043 CI[-0.191,+0.106] gain=6 lost=8
+
+=== SUMMARY (NExT CLEAN∩EVIDENCE_IN) ===
+  orch_reflect_blind     net_mean=-0.085 ± seedstd 0.050 (k=10)  verdict=within-variance  per_seed=['-0.02', '-0.15', '-0.04', '-0.13', '-0.06', '-0.06', '-0.17', '-0.11', '-0.06', '-0.04']

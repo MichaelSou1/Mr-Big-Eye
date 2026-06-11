@@ -1,0 +1,938 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-4443526735-3",
+    "video_id": "e8a25a32eed93730",
+    "question": "how does the baby move\n\nCandidates:\nA) in a swing\nB) carry by man\nC) in lady s arms\nD) in pram\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "in a swing",
+    "required_keywords": [
+      "swing"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      9.95
+    ],
+    "gold_scenes": [
+      {
+        "start": 0.5,
+        "end": 19.4
+      }
+    ],
+    "question_type": "ch"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T12:53:09",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-4B-Instruct@http://127.0.0.1:30000/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "how does the baby move\n\nCandidates:\nA) in a swing\nB) carry by man\nC) in lady s arms\nD) in pram\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the baby's movement mode from visual evidence. Classify as visual_detail with retrieval_profile focused.  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "How does the baby move?",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-b855b6b812470358",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 0.0, \"source\": \"retrieval\"}, {\"timestamp\": 4.0, \"source\": \"retrieval\"}, {\"timestamp\": 5.0, \"source\": \"retrieval\"}, {\"timestamp\": 12.0, \"source\": \"retrieval\"}, {\"timestamp\": 13.0, \"source\": \"retrieval\"}, {\"timestamp\": 14.0, \"source\": \"retrieval\"}, {\"timestamp\": 15.0, \"source\": \"retrieval\"}, {\"timestamp\": 16.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"end\": 10.0, \"t_mid\": 5.0, \"start\": 0.0, \"caption\": \"A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.\", \"filename\": \"scene_0000.jpg\", \"scene_id\": 0, \"score\": 0.6103999018669128}, {\"t_mid\": 14.843166666666669, \"start\": 10.0, \"caption\": \"A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.\", \"scene_id\": 1, \"end\": 19.686333333333337, \"filename\": \"scene_0001.jpg\", \"score\": 0.6242868900299072}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 8, \"planner_notes\": \"\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b855b6b812470358",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 5.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "t_mid": 5.0,
+            "start": 0.0,
+            "caption": "A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.",
+            "filename": "scene_0000.jpg",
+            "scene_id": 0,
+            "score": 0.6103999018669128
+          },
+          {
+            "t_mid": 14.843166666666669,
+            "start": 10.0,
+            "caption": "A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.",
+            "scene_id": 1,
+            "end": 19.686333333333337,
+            "filename": "scene_0001.jpg",
+            "score": 0.6242868900299072
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "OBSERVE: The baby is seen sitting in a bouncing seat (jumperoo) with colorful toys and rings, moving up and down rhythmically. The movement is not crawling, being carried, or in a pram. The baby is not swinging freely but is secured in a bouncing seat.\n\nPLAN: Confirm the baby’s movement is in a bouncing seat, not a swing or pram. Use segment_focus on the key moment around t=14.84.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "How does the baby move?",
+            "center_t": 14.843166666666669,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-ad9b4127bbdb4591",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 10.84, \"end\": 18.84, \"center_t\": 14.84, \"frame_count\": 8}, \"observation\": \"The baby is seated in a bouncer chair and is moving by bouncing up and down. The baby's legs are bent and feet are slightly off the ground, indicating the bouncing motion. The baby is also moving its head and arms, and appears to be holding a toy. The baby's movements are consistent with the bouncing motion of the bouncer chair.\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-ad9b4127bbdb4591",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.84,
+          "end": 18.84,
+          "center_t": 14.84,
+          "frame_count": 8
+        },
+        "observation": "The baby is seated in a bouncer chair and is moving by bouncing up and down. The baby's legs are bent and feet are slightly off the ground, indicating the bouncing motion. The baby is also moving its head and arms, and appears to be holding a toy. The baby's movements are consistent with the bouncing motion of the bouncer chair.",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess if evidence is sufficient to answer. The baby is clearly bouncing in a seat, not crawling, carried, or in a pram. The correct answer is A) in a swing — but the baby is in a bouncing seat, not a swing. Re-evaluate options.\n\nPLAN: Check if any frame shows a swing. Use retrieve_video_evidence with focused search on \"swing\".\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "Is the baby in a swing?",
+            "question_type": "existence",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-9f7c01918d4ce613",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 0.0, \"source\": \"retrieval\"}, {\"timestamp\": 1.0, \"source\": \"retrieval\"}, {\"timestamp\": 4.0, \"source\": \"retrieval\"}, {\"timestamp\": 5.0, \"source\": \"retrieval\"}, {\"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"timestamp\": 12.0, \"source\": \"retrieval\"}, {\"timestamp\": 13.0, \"source\": \"retrieval\"}, {\"timestamp\": 14.0, \"source\": \"retrieval\"}, {\"timestamp\": 15.0, \"source\": \"retrieval\"}, {\"timestamp\": 16.0, \"source\": \"retrieval\"}, {\"timestamp\": 17.0, \"source\": \"segment_focus\"}, {\"timestamp\": 18.0, \"source\": \"segment_focus\"}], \"scene_hits\": [{\"end\": 10.0, \"t_mid\": 5.0, \"start\": 0.0, \"caption\": \"A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.\", \"filename\": \"scene_0000.jpg\", \"scene_id\": 0, \"score\": 0.6103999018669128}, {\"t_mid\": 14.843166666666669, \"start\": 10.0, \"caption\": \"A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.\", \"scene_id\": 1, \"end\": 19.686333333333337, \"filename\": \"scene_0001.jpg\", \"score\": 0.6242868900299072}], \"retrieval_plan\": {\"question_type\": \"existence\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 8, \"planner_notes\": \"\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9f7c01918d4ce613",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 1.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 5.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "segment_focus"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "t_mid": 5.0,
+            "start": 0.0,
+            "caption": "A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.",
+            "filename": "scene_0000.jpg",
+            "scene_id": 0,
+            "score": 0.6103999018669128
+          },
+          {
+            "t_mid": 14.843166666666669,
+            "start": 10.0,
+            "caption": "A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.",
+            "scene_id": 1,
+            "end": 19.686333333333337,
+            "filename": "scene_0001.jpg",
+            "score": 0.6242868900299072
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "existence",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "OBSERVE: No scene shows a swing. The baby is in a bouncing seat, not a swing. Option A is incorrect.\n\nPLAN: Re-evaluate options. The baby is in a bouncing seat — not carried, not in a pram, not crawling. The closest match is not listed. But the bouncing seat is not a swing. The correct answer is not A.\n\nRe-check: Is the baby in a swing? No. Is it in a pram? No. Is it crawling? No. Is it carried? No. Is it in a bouncing seat? Yes.\n\nBut the options are:\nA) in a swing → no\nB) carry by man → no\nC) in lady s arms → no\nD) in pram → no\nE) crawl → no\n\nWait — the baby is in a bouncing seat, which is not listed. But the movement is bouncing — not crawling, not carried.\n\nBut the question is: \"how does the baby move?\"\n\nThe baby moves by bouncing in a seat.\n\nBut none of the options match \"bouncing seat\".\n\nHowever, option A is \"in a swing\" — but the baby is not in a swing. The seat is not a swing.\n\nBut the motion is similar — bouncing.\n\nBut the question is about location/movement mode.\n\nThe baby is not in a swing. So A is false.\n\nBut the baby is not crawling — E is false.\n\nNot carried — B false.\n\nNot in pram — D false.\n\nNot in lady’s arms — C false.\n\nBut the baby is in a bouncing seat — not listed.\n\nWait — perhaps the bouncing seat is considered a type of swing?\n\nBut the video shows it's a jumperoo — a bouncer chair.\n\nBut the options don’t include \"in a bouncing seat\".\n\nSo none of the options are correct?\n\nBut the user expects one of A–E.\n\nRe-examine: is the baby in a swing?\n\nUse segment_focus on t=14.84 to check for swing.\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "Is the baby in a swing?",
+            "center_t": 14.843166666666669,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-a2949c86033e8fb6",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 10.84, \"end\": 18.84, \"center_t\": 14.84, \"frame_count\": 8}, \"observation\": \"The baby is seated in a suspended, seat-like apparatus with a tray and hanging toys, which is characteristic of a baby jumper or bouncer. The baby's legs are positioned in a way that suggests they are bouncing or moving within the device. The device is suspended by straps or chains from above, and the baby is not in a traditional swing with a seat that swings back and forth. The baby is holding a toy and appears to be actively engaged with it.\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a2949c86033e8fb6",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.84,
+          "end": 18.84,
+          "center_t": 14.84,
+          "frame_count": 8
+        },
+        "observation": "The baby is seated in a suspended, seat-like apparatus with a tray and hanging toys, which is characteristic of a baby jumper or bouncer. The baby's legs are positioned in a way that suggests they are bouncing or moving within the device. The device is suspended by straps or chains from above, and the baby is not in a traditional swing with a seat that swings back and forth. The baby is holding a toy and appears to be actively engaged with it.",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "OBSERVE: The baby is in a bouncer chair, not a swing. The device is suspended but does not swing — it bounces. So not a swing.\n\nBut the motion is bouncing — similar to a swing? But the device is not a swing.\n\nSo A is incorrect.\n\nBut none of the options match the actual mode.\n\nWait — perhaps the baby is in a swing? No — the device is a jumperoo, not a swing.\n\nBut let’s check the original question: \"how does the baby move?\"\n\nThe baby moves by bouncing in a seat.\n\nBut the options are:\nA) in a swing — no\nB) carry by man — no\nC) in lady s arms — no\nD) in pram — no\nE) crawl — no\n\nBut the baby is not crawling — it’s bouncing.\n\nSo none are correct?\n\nBut the user expects one.\n\nWait — perhaps the baby is in a swing? Let’s check for \"swing\" in the transcript.\n\nBut the video has no narration — so no transcript.\n\nCheck for \"swing\" in OCR? No slides.\n\nBut the video shows a bouncing seat — not a swing.\n\nBut the motion is similar — up and down.\n\nBut the device is not a swing.\n\nSo A is false.\n\nBut perhaps the user meant \"swing\" as a general term for bouncing?\n\nBut that’s not accurate.\n\nAlternatively, maybe the baby is in a swing — but the video shows a jumperoo.\n\nBut let’s look at the frame: the baby is in a bouncer with a tray and hanging toys — not a swing.\n\nSo A is incorrect.\n\nBut the baby is not in a pram — D is incorrect.\n\nNot crawling — E is incorrect.\n\nNot carried — B is incorrect.\n\nNot in lady’s arms — C is incorrect.\n\nSo all options are wrong?\n\nBut that can’t be.\n\nWait — perhaps the baby is in a swing — but the video shows a jumperoo.\n\nBut the jumperoo is not a swing.\n\nBut let’s check: is there any frame where the baby is in a swing?\n\nUse retrieve_video_evidence with \"swing\" as keyword.\n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 0.0, \"source\": \"retrieval\"}, {\"timestamp\": 1.0, \"source\": \"retrieval\"}, {\"timestamp\": 4.0, \"source\": \"retrieval\"}, {\"timestamp\": 5.0, \"source\": \"retrieval\"}, {\"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"timestamp\": 12.0, \"source\": \"retrieval\"}, {\"timestamp\": 13.0, \"source\": \"retrieval\"}, {\"timestamp\": 14.0, \"source\": \"retrieval\"}, {\"timestamp\": 15.0, \"source\": \"retrieval\"}, {\"timestamp\": 16.0, \"source\": \"retrieval\"}, {\"timestamp\": 17.0, \"source\": \"segment_focus\"}, {\"timestamp\": 18.0, \"source\": \"segment_focus\"}], \"scene_hits\": [{\"end\": 10.0, \"t_mid\": 5.0, \"start\": 0.0, \"caption\": \"A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.\", \"filename\": \"scene_0000.jpg\", \"scene_id\": 0, \"score\": 0.6103999018669128}, {\"t_mid\": 14.843166666666669, \"start\": 10.0, \"caption\": \"A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.\", \"scene_id\": 1, \"end\": 19.686333333333337, \"filename\": \"scene_0001.jpg\", \"score\": 0.6242868900299072}], \"retrieval_plan\": {\"question_type\": \"existence\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 8, \"planner_notes\": \"\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bc75a5df52db1950",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 1.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 5.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "segment_focus"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "t_mid": 5.0,
+            "start": 0.0,
+            "caption": "A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.",
+            "filename": "scene_0000.jpg",
+            "scene_id": 0,
+            "score": 0.6103999018669128
+          },
+          {
+            "t_mid": 14.843166666666669,
+            "start": 10.0,
+            "caption": "A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.",
+            "scene_id": 1,
+            "end": 19.686333333333337,
+            "filename": "scene_0001.jpg",
+            "score": 0.6242868900299072
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "existence",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "How does the baby move?",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 5.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "t_mid": 5.0,
+            "start": 0.0,
+            "caption": "A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.",
+            "filename": "scene_0000.jpg",
+            "scene_id": 0,
+            "score": 0.6103999018669128
+          },
+          {
+            "t_mid": 14.843166666666669,
+            "start": 10.0,
+            "caption": "A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.",
+            "scene_id": 1,
+            "end": 19.686333333333337,
+            "filename": "scene_0001.jpg",
+            "score": 0.6242868900299072
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-b855b6b812470358",
+      "internalizability": "type2"
+    },
+    {
+      "index": 4,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "How does the baby move?",
+        "center_t": 14.843166666666669,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.84,
+          "end": 18.84,
+          "center_t": 14.84,
+          "frame_count": 8
+        },
+        "observation": "The baby is seated in a bouncer chair and is moving by bouncing up and down. The baby's legs are bent and feet are slightly off the ground, indicating the bouncing motion. The baby is also moving its head and arms, and appears to be holding a toy. The baby's movements are consistent with the bouncing motion of the bouncer chair.",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-ad9b4127bbdb4591",
+      "internalizability": "type1"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "Is the baby in a swing?",
+        "question_type": "existence",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 1.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 5.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "segment_focus"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "t_mid": 5.0,
+            "start": 0.0,
+            "caption": "A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.",
+            "filename": "scene_0000.jpg",
+            "scene_id": 0,
+            "score": 0.6103999018669128
+          },
+          {
+            "t_mid": 14.843166666666669,
+            "start": 10.0,
+            "caption": "A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.",
+            "scene_id": 1,
+            "end": 19.686333333333337,
+            "filename": "scene_0001.jpg",
+            "score": 0.6242868900299072
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "existence",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-9f7c01918d4ce613",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "Is the baby in a swing?",
+        "center_t": 14.843166666666669,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.84,
+          "end": 18.84,
+          "center_t": 14.84,
+          "frame_count": 8
+        },
+        "observation": "The baby is seated in a suspended, seat-like apparatus with a tray and hanging toys, which is characteristic of a baby jumper or bouncer. The baby's legs are positioned in a way that suggests they are bouncing or moving within the device. The device is suspended by straps or chains from above, and the baby is not in a traditional swing with a seat that swings back and forth. The baby is holding a toy and appears to be actively engaged with it.",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-a2949c86033e8fb6",
+      "internalizability": "type1"
+    },
+    {
+      "index": 10,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 1.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 5.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "segment_focus"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "t_mid": 5.0,
+            "start": 0.0,
+            "caption": "A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.",
+            "filename": "scene_0000.jpg",
+            "scene_id": 0,
+            "score": 0.6103999018669128
+          },
+          {
+            "t_mid": 14.843166666666669,
+            "start": 10.0,
+            "caption": "A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.",
+            "scene_id": 1,
+            "end": 19.686333333333337,
+            "filename": "scene_0001.jpg",
+            "score": 0.6242868900299072
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "existence",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-bc75a5df52db1950",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 0.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0000.0.jpg"
+      },
+      {
+        "timestamp": 1.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0001.0.jpg"
+      },
+      {
+        "timestamp": 4.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 17.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0017.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0018.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 1.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0001.0.jpg"
+      },
+      {
+        "timestamp": 2.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 17.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0017.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0018.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "end": 10.0,
+        "t_mid": 5.0,
+        "start": 0.0,
+        "caption": "A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.",
+        "filename": "scene_0000.jpg",
+        "scene_id": 0,
+        "score": 0.6103999018669128
+      },
+      {
+        "t_mid": 14.843166666666669,
+        "start": 10.0,
+        "caption": "A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.",
+        "scene_id": 1,
+        "end": 19.686333333333337,
+        "filename": "scene_0001.jpg",
+        "score": 0.6242868900299072
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "existence",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 8,
+      "planner_notes": ""
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {},
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "The baby is seated in a bouncer chair and is moving by bouncing up and down. The baby's legs are bent and feet are slightly off the ground, indicating the bouncing motion. The baby is also moving its head and arms, and appears to be holding a toy. The baby's movements are consistent with the bouncing motion of the bouncer chair.",
+        "timestamps": [
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0,
+          17.0,
+          18.0
+        ],
+        "window": {
+          "start": 10.84,
+          "end": 18.84,
+          "center_t": 14.84
+        }
+      },
+      {
+        "tool": "segment_focus",
+        "observation": "The baby is seated in a suspended, seat-like apparatus with a tray and hanging toys, which is characteristic of a baby jumper or bouncer. The baby's legs are positioned in a way that suggests they are bouncing or moving within the device. The device is suspended by straps or chains from above, and the baby is not in a traditional swing with a seat that swings back and forth. The baby is holding a toy and appears to be actively engaged with it.",
+        "timestamps": [
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0,
+          17.0,
+          18.0
+        ],
+        "window": {
+          "start": 10.84,
+          "end": 18.84,
+          "center_t": 14.84
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "14a7116828b549e958215e6642dcd6f44f8ecde9"
+}

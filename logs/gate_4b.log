@@ -1,0 +1,35 @@
+=== variance gate: model=4b n=47 cases (EVIDENCE_IN∩CLEAN) ===
+  [free_form seed0] 20/47
+  [free_form seed0] 40/47
+[4b/next/free_form seed0] free=0.745 method=0.745 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0
+  [self_reflect seed0] 20/47
+  [self_reflect seed0] 40/47
+[4b/next/self_reflect seed0] free=0.745 method=0.681 net=-0.064 CI[-0.149,+0.000] gain=0 lost=3
+  [self_reflect seed1] 20/47
+  [self_reflect seed1] 40/47
+[4b/next/self_reflect seed1] free=0.745 method=0.723 net=-0.021 CI[-0.064,+0.000] gain=0 lost=1
+  [self_reflect seed2] 20/47
+  [self_reflect seed2] 40/47
+[4b/next/self_reflect seed2] free=0.745 method=0.702 net=-0.043 CI[-0.106,+0.000] gain=0 lost=2
+  [self_reflect seed3] 20/47
+  [self_reflect seed3] 40/47
+[4b/next/self_reflect seed3] free=0.745 method=0.702 net=-0.043 CI[-0.106,+0.000] gain=0 lost=2
+  [self_reflect seed4] 20/47
+  [self_reflect seed4] 40/47
+[4b/next/self_reflect seed4] free=0.745 method=0.723 net=-0.021 CI[-0.064,+0.000] gain=0 lost=1
+  [self_reflect seed5] 20/47
+  [self_reflect seed5] 40/47
+[4b/next/self_reflect seed5] free=0.745 method=0.702 net=-0.043 CI[-0.106,+0.000] gain=0 lost=2
+  [self_reflect seed6] 20/47
+  [self_reflect seed6] 40/47
+[4b/next/self_reflect seed6] free=0.745 method=0.702 net=-0.043 CI[-0.106,+0.000] gain=0 lost=2
+  [self_reflect seed7] 20/47
+  [self_reflect seed7] 40/47
+[4b/next/self_reflect seed7] free=0.745 method=0.681 net=-0.064 CI[-0.149,+0.000] gain=0 lost=3
+  [self_reflect seed8] 20/47
+  [self_reflect seed8] 40/47
+[4b/next/self_reflect seed8] free=0.745 method=0.681 net=-0.064 CI[-0.149,+0.000] gain=0 lost=3
+  [self_reflect seed9] 20/47
+  [self_reflect seed9] 40/47
+[4b/next/self_reflect seed9] free=0.745 method=0.702 net=-0.043 CI[-0.106,+0.000] gain=0 lost=2
+  [orch_reflect_blind seed0] 20/47

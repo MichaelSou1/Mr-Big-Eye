@@ -1,0 +1,62 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "2a4ba7469fb8f2f3",
+  "case_id": "nextgqa-4244817395-3",
+  "question": "why does the lady in strip touch the cheeck of the boy near the end\n\nCandidates:\nA) make boy laugh\nB) want to kiss boy\nC) signal him something inside drinking machine\nD) wipe tears for boy\nE) wipd off the food\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    4.0,
+    8.0,
+    12.0,
+    16.0,
+    20.0,
+    24.0,
+    28.0,
+    32.0,
+    36.0,
+    40.0,
+    44.0,
+    48.0,
+    51.0,
+    55.0,
+    59.0,
+    63.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0004.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0008.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0012.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0016.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0020.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0024.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0028.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0032.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0036.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0040.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0044.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0048.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0051.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0055.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0059.0.jpg",
+    "/home/gpus/mbe_data/cache/2a4ba7469fb8f2f3/frames_dense/t0063.0.jpg"
+  ],
+  "cot": "['The boy is reaching into a toy kitchen appliance that resembles a drinking machine or coffee maker, as seen in [FRAME:t=44.0].', 'In [FRAME:t=51.0], the lady in striped pajamas leans over the boy’s shoulder, positioning her hand near his face while he continues to interact with the machine.', 'The lady’s hand is not touching the boy’s cheek in a way that suggests wiping tears or affection; instead, it is placed near his face in a gesture that appears to guide or signal him.', 'The boy’s focus remains on the machine, and the lady’s hand is aligned with his actions, indicating a deliberate instructional or signaling intent.', 'The context of the toy kitchen and the boy’s ongoing interaction with the machine supports that the lady is signaling him to perform an action related to the machine.', 'This behavior is inconsistent with options A, B, D, or E, which involve emotional, playful, romantic, or food-related actions not supported by the visual evidence.']",
+  "answer": "C",
+  "gold_timestamps": [
+    50.3
+  ],
+  "gold_scenes": [
+    {
+      "start": 47.2,
+      "end": 53.4
+    }
+  ],
+  "source_traj_hash": "19eba876d88f284b9edf199657b730275f52218b",
+  "validation_report": {
+    "ok": true,
+    "errors": [],
+    "frame_markers": [
+      44.0,
+      51.0
+    ]
+  }
+}

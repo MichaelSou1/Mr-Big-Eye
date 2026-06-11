@@ -1,0 +1,5353 @@
+{
+  "summary": {
+    "total": 50,
+    "passed": 7,
+    "pass_rate": 0.14,
+    "out_of_scope": 0,
+    "evidence_uncovered": 0,
+    "no_grounding_gt": 0,
+    "bad_process": 43
+  },
+  "passed_trajectories": [
+    "data/distill/pilot/trajectories/nextgqa-2984974097-8.json",
+    "data/distill/pilot/trajectories/nextgqa-3376544720-9.json",
+    "data/distill/pilot/trajectories/nextgqa-4244817395-3.json",
+    "data/distill/pilot/trajectories/nextgqa-4650556666-2.json",
+    "data/distill/pilot/trajectories/nextgqa-5840177726-0.json",
+    "data/distill/pilot/trajectories/nextgqa-5945172741-7.json",
+    "data/distill/pilot/trajectories/nextgqa-6097994550-4.json"
+  ],
+  "results": [
+    {
+      "case_id": "nextgqa-10309542255-4",
+      "video_id": "28854a0cc158b493",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-10309542255-4",
+        "video_id": "28854a0cc158b493",
+        "question": "how did the animals respond when being pushed by each other during the fight\n\nCandidates:\nA) push back\nB) snarl\nC) shout\nD) run away\nE) bite\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "push back"
+        },
+        "recommended_option": {
+          "label": "A",
+          "text": "push back"
+        },
+        "reference_answer": "push back",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.14285714285714285,
+          "timestamp_distance": 17.385714285714286,
+          "scene_hit_accuracy": 0.0,
+          "gold_count": 7,
+          "retrieved_count": 9,
+          "matched_gold": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "push": true,
+            "back": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            41.0,
+            42.0,
+            43.0,
+            44.0,
+            45.0,
+            46.0,
+            47.0,
+            48.0,
+            49.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": false,
+          "actions": [
+            "segment_focus",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) push back  \n[FRAME:t=41.0]  \n[FRAME:t=42.0]  \n[FRAME:t=43.0]  \n[FRAME:t=44.0]  \n[FRAME:t=45.0]  \n[FRAME:t=46.0]  \n[FRAME:t=47.0]  \n[FRAME:t=48.0]  \n[FRAME:t=49.0]  \n\nIn all frames from 41.0s to 49.0s, both animal_A and animal_B are engaged in mutual pushing using their heads and antlers, maintaining close physical contact and resisting each other’s force — consistent with “push back.” No evidence of snarling, shouting, running away, or biting is visible. The behavior is continuous and reciprocal, indicating mutual resistance rather than escape or aggression via biting.",
+        "retrieved_timestamps": [
+          41.0,
+          42.0,
+          43.0,
+          44.0,
+          45.0,
+          46.0,
+          47.0,
+          48.0,
+          49.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-10309542255-4.json"
+    },
+    {
+      "case_id": "nextgqa-10727696143-5",
+      "video_id": "50dd89ee94e107da",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "grounding_report_failed",
+        "missing_expected_keyword"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-10727696143-5",
+        "video_id": "50dd89ee94e107da",
+        "question": "what did the boy do after running to the door\n\nCandidates:\nA) walk towards the toy\nB) talk to person outside door\nC) dance\nD) run to kitchen\nE) pet cat\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_expected_keyword"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "walk towards the toy"
+        },
+        "recommended_option": {
+          "label": "B",
+          "text": "talk to person outside door"
+        },
+        "reference_answer": "talk to person outside door",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.3500000000000014,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 15,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "talk": false,
+            "person": false,
+            "outside": false,
+            "door": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            35.0,
+            36.0,
+            37.0,
+            39.0,
+            40.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "retrieve_video_evidence",
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) walk towards the toy.\n\nEvidence:\n- At [FRAME:t=35.0], the boy is seen running toward the door.\n- At [FRAME:t=36.0], he is standing near the door, having stopped running.\n- At [FRAME:t=37.0], he turns and walks toward the left side of the frame, which is the direction of the couch and toy area (implied by the wooden box and couch layout).\n- At [FRAME:t=39.0], he is seen walking toward the couch.\n- At [FRAME:t=40.0], he is sitting on the couch, which is the final location shown after his movement from the door.\n- The boy is wearing the same dark shirt and camouflage pants throughout, consistent with the subject registration.\n\nWhile the frames do not explicitly show a toy, the boy’s movement from the door to the couch (where he sits) is clearly shown, and the couch is the only furniture shown in the frames that could be associated with a toy. The other options (B, C, D, E) are not supported by any visual evidence in the provided frames. The boy’s movement is consistent with walking toward the couch, which is the only location shown after he stops running at the door.",
+        "retrieved_timestamps": [
+          11.0,
+          35.0,
+          36.0,
+          37.0,
+          38.0,
+          39.0,
+          40.0,
+          41.0,
+          42.0,
+          43.0,
+          44.0,
+          45.0,
+          49.0,
+          50.0,
+          52.0
+        ],
+        "agent_actions": [
+          "retrieve_video_evidence",
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "retrieve_video_evidence",
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-10727696143-5.json"
+    },
+    {
+      "case_id": "nextgqa-11276567104-3",
+      "video_id": "533b9ea7733afa32",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-11276567104-3",
+        "video_id": "533b9ea7733afa32",
+        "question": "what does the priest do after letting go of the woman s head\n\nCandidates:\nA) clap again\nB) hold hands out around the baby\nC) pat his head\nD) pat her shoulders and talk\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "pat her shoulders and talk"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "pat her shoulders and talk"
+        },
+        "reference_answer": "pat her shoulders and talk",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 1.8500000000000014,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "pat": true,
+            "her": true,
+            "shoulders": true,
+            "talk": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            12.0,
+            18.0,
+            30.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) pat her shoulders and talk.\n\nEvidence:\n- At [FRAME:t=12.0], the priest is seen gently placing his hand on the woman’s head, which is the action of “letting go of her head” as per the question’s context.\n- At [FRAME:t=18.0], the priest’s hand is still on her head, but his posture and gaze suggest he is speaking to her — consistent with “talk”.\n- At [FRAME:t=30.0], the priest’s hand is now on her shoulder, and he is looking at her while speaking — matching “pat her shoulders and talk”.\n\nThis sequence shows a clear transition from touching her head to patting her shoulders while speaking, making D the most consistent with the visual evidence.",
+        "retrieved_timestamps": [
+          0.0,
+          2.0,
+          12.0,
+          18.0,
+          30.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-11276567104-3.json"
+    },
+    {
+      "case_id": "nextgqa-14012319794-4",
+      "video_id": "95ff926d1ce446ad",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-14012319794-4",
+        "video_id": "95ff926d1ce446ad",
+        "question": "why did the girl pull the tent down towards her in the middle of the video\n\nCandidates:\nA) take the book\nB) try to take flag on top\nC) carry the baby\nD) pick up something on the floor\nE) talking about it\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "B",
+          "text": "try to take flag on top"
+        },
+        "recommended_option": {
+          "label": "B",
+          "text": "try to take flag on top"
+        },
+        "reference_answer": "try to take flag on top",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 10.799999999999997,
+          "scene_hit_accuracy": 0.0,
+          "gold_count": 1,
+          "retrieved_count": 9,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "try": true,
+            "take": true,
+            "flag": true,
+            "top": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            45.0,
+            45.0,
+            49.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": false,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is B) try to take flag on top [FRAME:t=45.0]  \nIn the frames from [FRAME:t=45.0] to [FRAME:t=49.0], the girl is seen pulling the tent fabric toward her while holding a toy sword, which suggests she is engaging in imaginative play, possibly pretending to “take” or “defend” something on top of the tent — consistent with the behavior of a child playing a game or role-play scenario. No other option is visually supported by the frames.",
+        "retrieved_timestamps": [
+          41.0,
+          42.0,
+          43.0,
+          44.0,
+          45.0,
+          46.0,
+          47.0,
+          48.0,
+          49.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 4,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-14012319794-4.json"
+    },
+    {
+      "case_id": "nextgqa-2547885226-4",
+      "video_id": "1d71830ae2680c35",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "missing_expected_keyword"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-2547885226-4",
+        "video_id": "1d71830ae2680c35",
+        "question": "what does the kid do before right before standing up\n\nCandidates:\nA) hug lady\nB) looking left and right\nC) looks at the camera\nD) play with toy\nE) nod his head\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_expected_keyword"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "play with toy"
+        },
+        "recommended_option": {
+          "label": "C",
+          "text": "looks at the camera"
+        },
+        "reference_answer": "looks at the camera",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.3000000000000007,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "looks": false,
+            "camera": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            6.0,
+            7.0,
+            9.0,
+            12.0,
+            13.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) play with toy\n\nEvidence:\n- At [FRAME:t=6.0], the kid is kneeling on the sand, holding a red toy dinosaur.\n- At [FRAME:t=7.0], he continues to interact with the toy, manipulating it with both hands.\n- At [FRAME:t=9.0], he is still focused on the toy, adjusting its position.\n- At [FRAME:t=12.0], he begins to stand up, but before that, he is still engaged with the toy.\n- At [FRAME:t=13.0], he is fully standing, having completed the motion.\n\nThe action immediately preceding standing up is clearly playing with the toy, as he is holding and manipulating it until the final moment before rising.",
+        "retrieved_timestamps": [
+          6.0,
+          7.0,
+          9.0,
+          12.0,
+          13.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-2547885226-4.json"
+    },
+    {
+      "case_id": "nextgqa-2614918961-2",
+      "video_id": "e92cc2ba75add6ae",
+      "passed": false,
+      "drop_reasons": [
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-2614918961-2",
+        "video_id": "e92cc2ba75add6ae",
+        "question": "why does the baby bring the two toys on his hand nearer to each other some times\n\nCandidates:\nA) try to balance the toy\nB) push the swing\nC) played with them previously\nD) try pull baby to sit up\nE) playing with the toys\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "E",
+          "text": "playing with the toys"
+        },
+        "recommended_option": {
+          "label": "E",
+          "text": "playing with the toys"
+        },
+        "reference_answer": "playing with the toys",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 17.45,
+          "scene_hit_accuracy": 0.0,
+          "gold_count": 2,
+          "retrieved_count": 3,
+          "matched_gold": [
+            false,
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "playing": true,
+            "toys": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            41.0,
+            42.0,
+            43.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is E) playing with the toys.\n\n[FRAME:t=41.0] The baby is seen holding a red toy in one hand and a yellow toy in the other, with both toys positioned close together near the baby’s chest. [FRAME:t=42.0] The baby’s head is turned slightly toward the toys, and the toys remain held close, suggesting active manipulation. [FRAME:t=43.0] The baby continues to hold both toys near each other, with the red toy still in one hand and the yellow toy in the other, indicating sustained engagement with both objects.\n\nThis behavior is consistent with exploratory play, where infants bring objects together to examine, compare, or manipulate them — a hallmark of early play behavior. No other option is supported by the visual evidence.",
+        "retrieved_timestamps": [
+          41.0,
+          42.0,
+          43.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 3,
+      "tool_names": [
+        "segment_focus",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-2614918961-2.json"
+    },
+    {
+      "case_id": "nextgqa-2669452260-4",
+      "video_id": "530ab97eba2103d3",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-2669452260-4",
+        "video_id": "530ab97eba2103d3",
+        "question": "what does the man do after drinking\n\nCandidates:\nA) touch his fingers\nB) cap the bottle\nC) close the bottle\nD) put down the can\nE) put on gloves\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "put down the can"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "put down the can"
+        },
+        "reference_answer": "put down the can",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.05000000000000071,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 10,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "put": true,
+            "down": true,
+            "can": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            5.0,
+            6.0,
+            7.0,
+            10.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) put down the can.\n\nEvidence:\n- At [FRAME:t=5.0], the man is still holding the can with the straw in his mouth, indicating he is in the process of drinking.\n- At [FRAME:t=6.0], the man has finished drinking and is no longer using the straw; the can is still in his hand but he is no longer actively drinking.\n- At [FRAME:t=7.0], the man is looking forward, and the can is no longer visible in his hand — implying he has placed it down.\n- At [FRAME:t=10.0], the can is no longer in the frame, confirming it has been set down.\n\nNo other options are supported by the visual evidence. While the man may have touched his fingers or closed the can, the frames do not show these actions. The most consistent and directly supported action is that he put down the can.",
+        "retrieved_timestamps": [
+          2.0,
+          4.0,
+          5.0,
+          6.0,
+          7.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-2669452260-4.json"
+    },
+    {
+      "case_id": "nextgqa-2782658657-0",
+      "video_id": "d22af6d9ca0224df",
+      "passed": false,
+      "drop_reasons": [
+        "missing_citation_kind",
+        "missing_expected_keyword",
+        "wrong_fact_option"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-2782658657-0",
+        "video_id": "d22af6d9ca0224df",
+        "question": "why does the girl in white look down at the feet at the beginning of the video\n\nCandidates:\nA) ready to run\nB) clean her mouth\nC) pull rope with strength\nD) arrange their standing\nE) pedalling\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_citation_kind",
+          "missing_expected_keyword",
+          "wrong_fact_option"
+        ],
+        "selected_option": null,
+        "recommended_option": {
+          "label": "A",
+          "text": "ready to run"
+        },
+        "reference_answer": "ready to run",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.6000000000000001,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 6,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "ready": false,
+            "run": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "PLAN: Assess if the retrieved visual evidence is sufficient to answer the question.  \n\n\n",
+        "retrieved_timestamps": [
+          0.0,
+          1.0,
+          2.0,
+          8.0,
+          17.0,
+          22.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency"
+        ]
+      },
+      "tool_count": 4,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-2782658657-0.json"
+    },
+    {
+      "case_id": "nextgqa-2868183184-7",
+      "video_id": "89c7395f90fe817f",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "missing_citation_kind",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-2868183184-7",
+        "video_id": "89c7395f90fe817f",
+        "question": "what does the girl do after the woman opens the cap\n\nCandidates:\nA) take the music script\nB) jumps up\nC) hands over the remote\nD) walks away\nE) look closer\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_citation_kind",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "E",
+          "text": "look closer"
+        },
+        "recommended_option": {
+          "label": "E",
+          "text": "look closer"
+        },
+        "reference_answer": "look closer",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 17.15,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 8,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "look": true,
+            "closer": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "PLAN: The video evidence shows the woman in white (the girl) looking down at the pot after the cap is opened. No other actions such as jumping, handing over a remote, walking away, or taking a script are visible. The correct answer is E) look closer. (visual_detail, focused, detail)\n\n\n",
+        "retrieved_timestamps": [
+          1.0,
+          2.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          17.0,
+          20.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency"
+        ]
+      },
+      "tool_count": 4,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-2868183184-7.json"
+    },
+    {
+      "case_id": "nextgqa-2984974097-8",
+      "video_id": "ce82cb8da378cfe4",
+      "passed": true,
+      "drop_reasons": [],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-2984974097-8",
+        "video_id": "ce82cb8da378cfe4",
+        "question": "how does the girl express her excitement while cycling\n\nCandidates:\nA) smile brightly\nB) jump\nC) cycling outfit\nD) run around\nE) claps\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": true,
+        "failure_tags": [],
+        "selected_option": {
+          "label": "A",
+          "text": "smile brightly"
+        },
+        "recommended_option": {
+          "label": "A",
+          "text": "smile brightly"
+        },
+        "reference_answer": "smile brightly",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.5,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 13,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "smile": true,
+            "brightly": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            12.0,
+            13.0,
+            14.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "retrieve_video_evidence",
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) smile brightly\n\nEvidence: At [FRAME:t=12.0], the girl is smiling broadly while cycling. This is further supported by [FRAME:t=13.0] and [FRAME:t=14.0], where her smile remains visible and expressive. No frames show her jumping, running, clapping, or wearing a cycling outfit as an expression of excitement. The outfit is static and not tied to excitement behavior.",
+        "retrieved_timestamps": [
+          6.0,
+          7.0,
+          8.0,
+          9.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          16.0,
+          17.0,
+          18.0,
+          29.0
+        ],
+        "agent_actions": [
+          "retrieve_video_evidence",
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 7,
+      "tool_names": [
+        "retrieve_video_evidence",
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-2984974097-8.json"
+    },
+    {
+      "case_id": "nextgqa-3026084730-11",
+      "video_id": "ce7e7ad582aa6278",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "missing_citation_kind",
+        "missing_expected_keyword",
+        "retrieval_issue",
+        "wrong_fact_option"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-3026084730-11",
+        "video_id": "ce7e7ad582aa6278",
+        "question": "what did the three men do after the middle man finished speaking\n\nCandidates:\nA) starts playing guitar\nB) talks to the lady\nC) drink\nD) walks away\nE) lower the camera on his shirt\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_citation_kind",
+          "missing_expected_keyword",
+          "retrieval_issue",
+          "wrong_fact_option"
+        ],
+        "selected_option": null,
+        "recommended_option": {
+          "label": "D",
+          "text": "walks away"
+        },
+        "reference_answer": "walks away",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 32.599999999999994,
+          "scene_hit_accuracy": 0.0,
+          "gold_count": 1,
+          "retrieved_count": 7,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "walks": false,
+            "away": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "PLAN: Assess if the retrieved video evidence is sufficient to answer the question. (general, sufficient_check)\n\n\n\n",
+        "retrieved_timestamps": [
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          21.0,
+          38.0,
+          39.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency"
+        ]
+      },
+      "tool_count": 4,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-3026084730-11.json"
+    },
+    {
+      "case_id": "nextgqa-3078294001-3",
+      "video_id": "ad4bf3aa13a0b247",
+      "passed": false,
+      "drop_reasons": [
+        "missing_citation_kind",
+        "missing_expected_keyword",
+        "wrong_fact_option"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-3078294001-3",
+        "video_id": "ad4bf3aa13a0b247",
+        "question": "why does the man in white move away from the man in black in the middle\n\nCandidates:\nA) take his shoes\nB) starts walking while talking\nC) get a drink\nD) answer phone call\nE) help the chef\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_citation_kind",
+          "missing_expected_keyword",
+          "wrong_fact_option"
+        ],
+        "selected_option": null,
+        "recommended_option": {
+          "label": "B",
+          "text": "starts walking while talking"
+        },
+        "reference_answer": "starts walking while talking",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 1.2999999999999998,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 7,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "starts": false,
+            "walking": false,
+            "while": false,
+            "talking": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "PLAN: Assess if the retrieved video evidence is sufficient to answer the question.  \n\n\n",
+        "retrieved_timestamps": [
+          0.0,
+          2.0,
+          3.0,
+          6.0,
+          9.0,
+          10.0,
+          11.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-3078294001-3.json"
+    },
+    {
+      "case_id": "nextgqa-3376544720-9",
+      "video_id": "a62fd13f690cb40b",
+      "passed": true,
+      "drop_reasons": [],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-3376544720-9",
+        "video_id": "a62fd13f690cb40b",
+        "question": "how does the bull move\n\nCandidates:\nA) galloping\nB) turning in circle\nC) jump up\nD) spin and  up and down\nE) run in circle\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": true,
+        "failure_tags": [],
+        "selected_option": {
+          "label": "D",
+          "text": "spin and up and down"
+        },
+        "recommended_option": null,
+        "reference_answer": "spin and  up and down",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.0,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 19,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "spin": true,
+            "down": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            67.0,
+            68.0,
+            69.0,
+            70.0,
+            71.0,
+            73.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) spin and  up and down.\n\nEvidence:  \n- [FRAME:t=67.0] The mechanical bull begins to rotate and lift its body, showing initial spinning motion.  \n- [FRAME:t=68.0] The bull is visibly spinning while the rider maintains balance, with the bull’s body rising and falling.  \n- [FRAME:t=69.0] The bull continues to spin and lift its head and body upward, confirming vertical motion.  \n- [FRAME:t=70.0] The bull is at its peak upward motion, clearly spinning and rising.  \n- [FRAME:t=71.0] The bull begins to descend while still spinning, confirming the up-and-down motion.  \n- [FRAME:t=73.0] The bull is spinning again with a vertical motion, consistent with option D.  \n\nThe subject registration table confirms: “mechanical_bull (机械公牛, 首次见于 67.0s, 最近 67.0s): 在旋转, 在上下起伏” — which directly matches “spin and up and down”.",
+        "retrieved_timestamps": [
+          4.0,
+          6.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          46.0,
+          48.0,
+          67.0,
+          68.0,
+          69.0,
+          70.0,
+          71.0,
+          72.0,
+          73.0,
+          74.0,
+          89.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 6,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-3376544720-9.json"
+    },
+    {
+      "case_id": "nextgqa-3429509208-1",
+      "video_id": "637d042e2d83be3d",
+      "passed": false,
+      "drop_reasons": [
+        "grounding_report_failed",
+        "missing_citation_kind"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-3429509208-1",
+        "video_id": "637d042e2d83be3d",
+        "question": "why is the boy touching the vacuum cleaner\n\nCandidates:\nA) push it\nB) wash their hands\nC) show interest\nD) press the keys\nE) drinking\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_citation_kind"
+        ],
+        "selected_option": {
+          "label": "C",
+          "text": "show interest"
+        },
+        "recommended_option": {
+          "label": "A",
+          "text": "push it"
+        },
+        "reference_answer": "push it",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.39999999999999947,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 12,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "push": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "retrieve_video_evidence",
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is C) show interest.\n\nEvidence:\n- [FRAME:t=0.0s] The boy is seen standing next to the vacuum cleaner with his hands on it, looking at it intently.\n- [FRAME:t=1.0s] The boy continues to hold the vacuum cleaner, maintaining his focus on it.\n- [FRAME:t=2.0s] The boy is still holding the vacuum cleaner, with his gaze directed toward it.\n- [FRAME:t=3.0s] The boy is holding the vacuum cleaner with both hands, looking at it with curiosity.\n- [FRAME:t=4.0s] The boy is still holding the vacuum cleaner, with his attention focused on it.\n- [FRAME:t=5.0s] The boy is holding the vacuum cleaner, looking at it with interest.\n- [FRAME:t=6.0s] The boy is holding the vacuum cleaner, looking at it with curiosity.\n- [FRAME:t=7.0s] The boy is holding the vacuum cleaner, looking at it with interest.\n- [FRAME:t=10.0s] The boy is holding the vacuum cleaner, looking at it with curiosity.\n- [FRAME:t=12.0s] The boy is holding the vacuum cleaner, looking at it with interest.\n- [FRAME:t=14.0s] The boy is holding the vacuum cleaner, looking at it with curiosity.\n- [FRAME:t=15.0s] The boy is looking at the camera, with a curious expression on his face.\n\nThe boy's actions throughout the frames indicate that he is showing interest in the vacuum cleaner, as he is holding it and looking at it with curiosity. There is no evidence to suggest that he is pushing it, washing his hands, pressing keys, or drinking.",
+        "retrieved_timestamps": [
+          0.0,
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          5.0,
+          6.0,
+          7.0,
+          10.0,
+          12.0,
+          14.0,
+          15.0
+        ],
+        "agent_actions": [
+          "retrieve_video_evidence",
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "retrieve_video_evidence",
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-3429509208-1.json"
+    },
+    {
+      "case_id": "nextgqa-3441428429-9",
+      "video_id": "6dd74a2bd3261c2f",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "grounding_report_failed",
+        "missing_citation_kind"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-3441428429-9",
+        "video_id": "6dd74a2bd3261c2f",
+        "question": "what does the male skater do after he pushes the female skater away at the beginning\n\nCandidates:\nA) look over fence of porch\nB) turns the baby over\nC) wipe stuff off her dress\nD) take his skateboard\nE) get up\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_citation_kind"
+        ],
+        "selected_option": {
+          "label": "E",
+          "text": "get up"
+        },
+        "recommended_option": {
+          "label": "E",
+          "text": "get up"
+        },
+        "reference_answer": "get up",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.8499999999999996,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 7,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "get": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is E) get up.\n\nEvidence:\n- [FRAME:t=3.0s] shows the male skater in a dynamic, upright posture after the push, indicating he has risen from a low position.\n- [FRAME:t=7.0s] shows him standing with arms outstretched, confirming he is no longer on the ground.\n- [FRAME:t=42.0s] shows him standing beside the female skater, fully upright and in a stable position, consistent with having gotten up.\n- [FRAME:t=70.0s] shows him in mid-motion, still standing, further confirming he is active and upright after the push.\n\nNo other options are visually supported by the frames. The male skater’s posture and movement clearly indicate he gets up after pushing the female skater away.",
+        "retrieved_timestamps": [
+          2.0,
+          3.0,
+          7.0,
+          27.0,
+          42.0,
+          70.0,
+          85.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-3441428429-9.json"
+    },
+    {
+      "case_id": "nextgqa-3524939594-2",
+      "video_id": "aa471a9e16d0df2e",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-3524939594-2",
+        "video_id": "aa471a9e16d0df2e",
+        "question": "how do the two men feel when they were moved backwards very quickly\n\nCandidates:\nA) sleepy\nB) adorable\nC) calmer and happier\nD) thrilled\nE) curious and happy\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "thrilled"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "thrilled"
+        },
+        "reference_answer": "thrilled",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.09999999999999964,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 13,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "thrilled": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            13.0,
+            13.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "retrieve_video_evidence",
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) thrilled.\n\nEvidence:\n- At [FRAME:t=13.0], person_A (红衣男子) is shown in a position of rapid backward movement, holding a backpack, and exhibiting an excited facial expression consistent with thrill or excitement.\n- The motion blur in [FRAME:t=4.0s] and [FRAME:t=5.0s] indicates rapid movement, supporting the \"moved backwards very quickly\" condition.\n- The combination of rapid backward motion and an excited facial expression at [FRAME:t=13.0] aligns with the emotional state of being \"thrilled\".",
+        "retrieved_timestamps": [
+          4.0,
+          5.0,
+          6.0,
+          7.0,
+          8.0,
+          9.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          16.0,
+          17.0,
+          18.0
+        ],
+        "agent_actions": [
+          "retrieve_video_evidence",
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "retrieve_video_evidence",
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-3524939594-2.json"
+    },
+    {
+      "case_id": "nextgqa-3741143820-8",
+      "video_id": "a0cab09bb5366f60",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-3741143820-8",
+        "video_id": "a0cab09bb5366f60",
+        "question": "how did the guy in the audience respond after the two guy performers finished talking at the end of the video\n\nCandidates:\nA) put hand on forehead\nB) continue eating then scooped for baby\nC) put it on a black table\nD) talk to man in checkered\nE) hug\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "put hand on forehead"
+        },
+        "recommended_option": {
+          "label": "A",
+          "text": "put hand on forehead"
+        },
+        "reference_answer": "put hand on forehead",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.9000000000000004,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 1,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "put": true,
+            "hand": true,
+            "forehead": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            11.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) put hand on forehead [FRAME:t=11.0]\n\nEvidence: In the frame at [t=11.0s], the audience member in the foreground (with brown hair, seen from behind) has his right hand placed on his forehead, indicating a reaction such as surprise, contemplation, or emotional response. This gesture is consistent with the context of the performers finishing their talk and the audience’s reaction. No other options are visually supported in this frame or any subsequent frames provided.",
+        "retrieved_timestamps": [
+          11.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 7,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-3741143820-8.json"
+    },
+    {
+      "case_id": "nextgqa-3943634344-10",
+      "video_id": "b87d05df78818192",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-3943634344-10",
+        "video_id": "b87d05df78818192",
+        "question": "what did the lady do after clapping at the end of the video\n\nCandidates:\nA) eat\nB) walk away from the table\nC) look around\nD) holds the book\nE) makes faces\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "holds the book"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "holds the book"
+        },
+        "reference_answer": "holds the book",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 3.8999999999999986,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "holds": true,
+            "book": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            16.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) holds the book.\n\nEvidence: In the final visible frame [FRAME:t=16.0], the lady is seated on the bed, holding the children’s book open with both hands, while the child points at the illustrations. She maintains this posture through the end of the video, and no other action (like walking away, eating, looking around, or making faces) is visually confirmed after any clapping. Although clapping is not explicitly shown in the provided frames, the lady’s consistent action of holding the book is the only clearly observable behavior in the final moments. Given the lack of evidence for clapping, the most consistent action is holding the book.",
+        "retrieved_timestamps": [
+          1.0,
+          6.0,
+          8.0,
+          12.0,
+          16.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-3943634344-10.json"
+    },
+    {
+      "case_id": "nextgqa-3960291106-7",
+      "video_id": "6ca5cea816a20791",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "missing_citation_kind",
+        "missing_expected_keyword",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-3960291106-7",
+        "video_id": "6ca5cea816a20791",
+        "question": "what does the woman in black do after putting her hands on her face at the end of the video\n\nCandidates:\nA) walk to boy in white\nB) point at something\nC) claps\nD) talks to him\nE) walk backwards\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_citation_kind",
+          "missing_expected_keyword",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "walk to boy in white"
+        },
+        "recommended_option": {
+          "label": "C",
+          "text": "claps"
+        },
+        "reference_answer": "claps",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 11.25,
+          "scene_hit_accuracy": 0.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "claps": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            118.5,
+            118.5
+          ],
+          "invalid_markers": [
+            118.5,
+            118.5
+          ],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "PLAN: Assess if the retrieved video evidence is sufficient to answer the question.  \nCLASSIFY: general, balanced, sufficient  \nOBSERVE: The video evidence shows the woman in black putting her hands on her face at t=118.0 seconds. After lowering her hands, she walks toward the boy in white. [FRAME:t=118.5]  \n\nPLAN: Finalize answer with evidence.  \nCLASSIFY: general, direct  \nOBSERVE: The correct answer is A) walk to boy in white. [FRAME:t=118.5]  \n\n\n\n",
+        "retrieved_timestamps": [
+          0.0,
+          11.0,
+          21.0,
+          22.0,
+          25.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency"
+        ]
+      },
+      "tool_count": 4,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-3960291106-7.json"
+    },
+    {
+      "case_id": "nextgqa-4087013668-8",
+      "video_id": "00c7f3015bf2d05a",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "missing_expected_keyword",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4087013668-8",
+        "video_id": "00c7f3015bf2d05a",
+        "question": "what did the lady in pink do after the boy looked at her at the end of the video\n\nCandidates:\nA) moves round\nB) looking at present\nC) clap hands\nD) smiles\nE) touch her knee\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_expected_keyword",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "smiles"
+        },
+        "recommended_option": {
+          "label": "C",
+          "text": "clap hands"
+        },
+        "reference_answer": "clap hands",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 1.2999999999999972,
+          "scene_hit_accuracy": 0.0,
+          "gold_count": 1,
+          "retrieved_count": 10,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "clap": false,
+            "hands": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            54.0,
+            56.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) smiles.\n\nEvidence: At [FRAME:t=54.0], the lady in pink (on the left) is visible, leaning slightly toward the boy, with a clear smile on her face. This occurs immediately after the boy looks at her — at [FRAME:t=56.0], the boy turns his head toward her, and she maintains her smiling expression. The smile is consistent and visible across these frames, matching the action immediately following his gaze.",
+        "retrieved_timestamps": [
+          16.0,
+          32.0,
+          33.0,
+          34.0,
+          35.0,
+          36.0,
+          38.0,
+          43.0,
+          54.0,
+          56.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4087013668-8.json"
+    },
+    {
+      "case_id": "nextgqa-4123915842-7",
+      "video_id": "86c59aefca9a2ff3",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4123915842-7",
+        "video_id": "86c59aefca9a2ff3",
+        "question": "what did the girl do as the lady in green was doing up her hair in the middle\n\nCandidates:\nA) push the table\nB) talk to the lady\nC) adjust their things\nD) stand up\nE) reading her paper\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue"
+        ],
+        "selected_option": {
+          "label": "C",
+          "text": "adjust their things"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "stand up"
+        },
+        "reference_answer": "stand up",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.5,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "stand": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            20.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is C) adjust their things.\n\n[FRAME:t=20.0] shows the girl in the pink kimono standing still while the lady in green (wearing a floral dress and glasses) is adjusting her hair with a red floral accessory. The girl is also being assisted by another woman in a black shirt who is adjusting the girl’s kimono sash and collar. The girl’s posture is passive and cooperative, not actively pushing a table, talking, standing up, or reading a paper. The actions of both the girl and the lady in green are coordinated — the girl is being prepared for an event, and the lady in green is styling her hair. The phrase “adjust their things” is the most accurate description of the girl’s role during this moment, as she is being helped to adjust her attire and hair.",
+        "retrieved_timestamps": [
+          2.0,
+          7.0,
+          8.0,
+          16.0,
+          20.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4123915842-7.json"
+    },
+    {
+      "case_id": "nextgqa-4244817395-3",
+      "video_id": "2a4ba7469fb8f2f3",
+      "passed": true,
+      "drop_reasons": [],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4244817395-3",
+        "video_id": "2a4ba7469fb8f2f3",
+        "question": "why does the lady in strip touch the cheeck of the boy near the end\n\nCandidates:\nA) make boy laugh\nB) want to kiss boy\nC) signal him something inside drinking machine\nD) wipe tears for boy\nE) wipd off the food\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": true,
+        "failure_tags": [],
+        "selected_option": {
+          "label": "C",
+          "text": "signal him something inside drinking machine"
+        },
+        "recommended_option": {
+          "label": "C",
+          "text": "signal him something inside drinking machine"
+        },
+        "reference_answer": "signal him something inside drinking machine",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.7000000000000028,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "signal": true,
+            "him": true,
+            "something": true,
+            "inside": true,
+            "drinking": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            45.0,
+            51.0,
+            60.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is C) signal him something inside drinking machine\n\nEvidence:\n- [FRAME:t=45.0] shows the boy reaching into a toy kitchen appliance, which appears to be a drinking machine or coffee maker.\n- [FRAME:t=51.0] shows the lady in striped pajamas leaning over the boy’s shoulder, with her hand near his face, as if guiding or signaling him to interact with the machine.\n- [FRAME:t=60.0] shows the lady’s hand still near the boy’s face as he continues to operate the machine, suggesting a guiding or instructional gesture rather than emotional or playful intent.\n\nThis sequence indicates the lady is signaling the boy to perform an action related to the machine, making C the most consistent with the visual evidence. Other options lack supporting visual cues or contradict the observed behavior.",
+        "retrieved_timestamps": [
+          11.0,
+          27.0,
+          45.0,
+          51.0,
+          60.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 7,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4244817395-3.json"
+    },
+    {
+      "case_id": "nextgqa-4336654741-7",
+      "video_id": "76caa60f3c0d4464",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4336654741-7",
+        "video_id": "76caa60f3c0d4464",
+        "question": "what does the baby do after the lady shakes her head at the end\n\nCandidates:\nA) imitate her\nB) move hands into water\nC) kick legs up\nD) push baby back\nE) lady copied baby\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "imitate her"
+        },
+        "recommended_option": {
+          "label": "A",
+          "text": "imitate her"
+        },
+        "reference_answer": "imitate her",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 5.799999999999997,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "imitate": true,
+            "her": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            75.0,
+            75.0,
+            67.0,
+            75.0,
+            75.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) imitate her [FRAME:t=75.0]\n\nAt [FRAME:t=75.0], the lady is shown shaking her head (as per the question’s context), and the baby, seated beside her, is seen mirroring the motion by also shaking their head in response. The baby’s facial expression and head movement are consistent with imitation. While the frames at [FRAME:t=67.0] and [FRAME:t=75.0] show the baby’s head turning and shaking, the motion at [FRAME:t=75.0] directly follows the lady’s action and is the most temporally aligned with the question’s endpoint. No other option is visually supported by the frames.",
+        "retrieved_timestamps": [
+          20.0,
+          32.0,
+          60.0,
+          67.0,
+          75.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 7,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4336654741-7.json"
+    },
+    {
+      "case_id": "nextgqa-4367056464-2",
+      "video_id": "f65f28a8c975681b",
+      "passed": false,
+      "drop_reasons": [
+        "grounding_report_failed",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4367056464-2",
+        "video_id": "f65f28a8c975681b",
+        "question": "why does the girl clap in front of the table\n\nCandidates:\nA) perform for the audience offstage\nB) excited\nC) enjoying with the piano music\nD) fixed dance moves\nE) face different audiences\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "B",
+          "text": "excited"
+        },
+        "recommended_option": {
+          "label": "B",
+          "text": "excited"
+        },
+        "reference_answer": "excited",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 2.0500000000000007,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 15,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "excited": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            20.0,
+            23.0,
+            24.0,
+            25.0,
+            26.0,
+            27.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "retrieve_video_evidence",
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is B) excited\n\nEvidence:\n- [FRAME:t=20.0] shows the girl clapping with a wide smile, indicating excitement.\n- [FRAME:t=23.0] and [FRAME:t=24.0] show her clapping with animated facial expressions and body language consistent with excitement.\n- [FRAME:t=25.0] and [FRAME:t=26.0] show her continuing to clap with joy, and [FRAME:t=27.0] confirms her smiling broadly while clapping.\n- The context of a family meal with a turkey (a festive occasion) supports that her clapping is an expression of excitement, not performance or choreography.",
+        "retrieved_timestamps": [
+          6.0,
+          9.0,
+          10.0,
+          14.0,
+          15.0,
+          16.0,
+          19.0,
+          20.0,
+          21.0,
+          22.0,
+          23.0,
+          24.0,
+          25.0,
+          26.0,
+          27.0
+        ],
+        "agent_actions": [
+          "retrieve_video_evidence",
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "retrieve_video_evidence",
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4367056464-2.json"
+    },
+    {
+      "case_id": "nextgqa-4378803532-8",
+      "video_id": "6d15a0dd71fe6b94",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "missing_citation_kind",
+        "missing_expected_keyword"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4378803532-8",
+        "video_id": "6d15a0dd71fe6b94",
+        "question": "what did the girl in red do after she approached the boy to look at the sparkles\n\nCandidates:\nA) give her something\nB) take photo\nC) touch the baby s chin\nD) happy\nE) walk away\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_citation_kind",
+          "missing_expected_keyword"
+        ],
+        "selected_option": {
+          "label": "B",
+          "text": "take photo"
+        },
+        "recommended_option": {
+          "label": "E",
+          "text": "walk away"
+        },
+        "reference_answer": "walk away",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.6499999999999986,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 7,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "walk": false,
+            "away": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "PLAN: The retrieved evidence confirms the girl in red is holding the sparkler after approaching the boy. No mention of taking a photo or touching the baby’s chin. Her action is consistent with holding the sparkler, which aligns with option B) take photo, as she is capturing the sparkler’s light. (visual_detail, focused, detail)\n\n\n\n",
+        "retrieved_timestamps": [
+          7.0,
+          8.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          23.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency"
+        ]
+      },
+      "tool_count": 4,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4378803532-8.json"
+    },
+    {
+      "case_id": "nextgqa-4419096437-1",
+      "video_id": "51f2c1741ef63993",
+      "passed": false,
+      "drop_reasons": [
+        "missing_citation_kind",
+        "missing_expected_keyword",
+        "no_final_answer",
+        "retrieval_issue",
+        "wrong_fact_option"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4419096437-1",
+        "video_id": "51f2c1741ef63993",
+        "question": "why is the person moving his hand\n\nCandidates:\nA) to adjust toy\nB) drawing\nC) put cat to sleep\nD) washing clothes\nE) watering plants\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_citation_kind",
+          "missing_expected_keyword",
+          "no_final_answer",
+          "retrieval_issue",
+          "wrong_fact_option"
+        ],
+        "selected_option": null,
+        "recommended_option": {
+          "label": "C",
+          "text": "put cat to sleep"
+        },
+        "reference_answer": "put cat to sleep",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.5,
+          "timestamp_distance": 1.2999999999999972,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 2,
+          "retrieved_count": 20,
+          "matched_gold": [
+            true,
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "put": false,
+            "cat": false,
+            "sleep": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "",
+        "retrieved_timestamps": [
+          5.0,
+          9.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0,
+          18.0,
+          21.0,
+          24.0,
+          26.0,
+          32.0,
+          33.0,
+          35.0,
+          44.0,
+          46.0,
+          51.0,
+          52.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency"
+        ]
+      },
+      "tool_count": 4,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4419096437-1.json"
+    },
+    {
+      "case_id": "nextgqa-4443526735-3",
+      "video_id": "e8a25a32eed93730",
+      "passed": false,
+      "drop_reasons": [
+        "missing_citation_kind"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4443526735-3",
+        "video_id": "e8a25a32eed93730",
+        "question": "how does the baby move\n\nCandidates:\nA) in a swing\nB) carry by man\nC) in lady s arms\nD) in pram\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_citation_kind"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "in a swing"
+        },
+        "recommended_option": {
+          "label": "A",
+          "text": "in a swing"
+        },
+        "reference_answer": "in a swing",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 1.0500000000000007,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 12,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "swing": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "retrieve_video_evidence",
+            "segment_focus",
+            "retrieve_video_evidence",
+            "segment_focus",
+            "retrieve_video_evidence"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "OBSERVE: The baby is in a bouncer chair, not a swing. The device is suspended but does not swing — it bounces. So not a swing.\n\nBut the motion is bouncing — similar to a swing? But the device is not a swing.\n\nSo A is incorrect.\n\nBut none of the options match the actual mode.\n\nWait — perhaps the baby is in a swing? No — the device is a jumperoo, not a swing.\n\nBut let’s check the original question: \"how does the baby move?\"\n\nThe baby moves by bouncing in a seat.\n\nBut the options are:\nA) in a swing — no\nB) carry by man — no\nC) in lady s arms — no\nD) in pram — no\nE) crawl — no\n\nBut the baby is not crawling — it’s bouncing.\n\nSo none are correct?\n\nBut the user expects one.\n\nWait — perhaps the baby is in a swing? Let’s check for \"swing\" in the transcript.\n\nBut the video has no narration — so no transcript.\n\nCheck for \"swing\" in OCR? No slides.\n\nBut the video shows a bouncing seat — not a swing.\n\nBut the motion is similar — up and down.\n\nBut the device is not a swing.\n\nSo A is false.\n\nBut perhaps the user meant \"swing\" as a general term for bouncing?\n\nBut that’s not accurate.\n\nAlternatively, maybe the baby is in a swing — but the video shows a jumperoo.\n\nBut let’s look at the frame: the baby is in a bouncer with a tray and hanging toys — not a swing.\n\nSo A is incorrect.\n\nBut the baby is not in a pram — D is incorrect.\n\nNot crawling — E is incorrect.\n\nNot carried — B is incorrect.\n\nNot in lady’s arms — C is incorrect.\n\nSo all options are wrong?\n\nBut that can’t be.\n\nWait — perhaps the baby is in a swing — but the video shows a jumperoo.\n\nBut the jumperoo is not a swing.\n\nBut let’s check: is there any frame where the baby is in a swing?\n\nUse retrieve_video_evidence with \"swing\" as keyword.\n\n",
+        "retrieved_timestamps": [
+          0.0,
+          1.0,
+          4.0,
+          5.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0,
+          17.0,
+          18.0
+        ],
+        "agent_actions": [
+          "retrieve_video_evidence",
+          "segment_focus",
+          "retrieve_video_evidence",
+          "segment_focus",
+          "retrieve_video_evidence"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "retrieve_video_evidence",
+        "segment_focus",
+        "retrieve_video_evidence",
+        "segment_focus",
+        "retrieve_video_evidence"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4443526735-3.json"
+    },
+    {
+      "case_id": "nextgqa-4650556666-2",
+      "video_id": "2f84ff86dbc9356e",
+      "passed": true,
+      "drop_reasons": [],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4650556666-2",
+        "video_id": "2f84ff86dbc9356e",
+        "question": "why is the child on the floor near the end of the video\n\nCandidates:\nA) cry\nB) to rest\nC) take a drink\nD) lose balance\nE) playing with dog\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": true,
+        "failure_tags": [],
+        "selected_option": {
+          "label": "D",
+          "text": "lose balance"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "lose balance"
+        },
+        "reference_answer": "lose balance",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.10000000000000142,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "lose": true,
+            "balance": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            19.0,
+            20.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) lose balance.\n\nEvidence:\n- At [FRAME:t=19.0], the child is seen standing near the adult, holding their hand, but appears unsteady.\n- At [FRAME:t=20.0], the child is no longer visible, suggesting they have fallen or been placed down — consistent with losing balance while being assisted.\n- The child is not seen crying, resting, drinking, or playing with a dog in any of the provided frames.\n\nNo other option is supported by visual evidence. The child’s posture and context imply a loss of balance during interaction with the adult.",
+        "retrieved_timestamps": [
+          0.0,
+          13.0,
+          15.0,
+          19.0,
+          20.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4650556666-2.json"
+    },
+    {
+      "case_id": "nextgqa-4674481985-2",
+      "video_id": "0b10d0ebf76cd907",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "grounding_report_failed",
+        "missing_citation_kind",
+        "missing_expected_keyword"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4674481985-2",
+        "video_id": "0b10d0ebf76cd907",
+        "question": "how did the man who jumped into the water respond after getting into the water\n\nCandidates:\nA) spray out horizontally\nB) swimming\nC) sit up\nD) excited\nE) swim back out\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_citation_kind",
+          "missing_expected_keyword"
+        ],
+        "selected_option": {
+          "label": "B",
+          "text": "swimming"
+        },
+        "recommended_option": {
+          "label": "E",
+          "text": "swim back out"
+        },
+        "reference_answer": "swim back out",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.10000000000000142,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 15,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "swim": true,
+            "back": false,
+            "out": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is B) swimming.\n\nEvidence:\n- [FRAME:t=12.0s] shows the man entering the water with a splash, indicating entry.\n- [FRAME:t=14.0s] shows the man emerging from the splash and actively moving through the water, with arms and legs engaged in motion consistent with swimming.\n- [FRAME:t=15.0s] to [FRAME:t=24.0s] show the man continuously moving through the water, maintaining a swimming posture with visible arm and leg movements, and remaining submerged or partially submerged — consistent with swimming, not sitting, spraying, or exiting.\n- The subject is identified as person_A (红衣男子) from the known subject table, and the behavior observed matches “swimming” across multiple frames.",
+        "retrieved_timestamps": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0,
+          17.0,
+          18.0,
+          19.0,
+          20.0,
+          21.0,
+          22.0,
+          23.0,
+          24.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4674481985-2.json"
+    },
+    {
+      "case_id": "nextgqa-4838145161-0",
+      "video_id": "09354c9c0dec47cf",
+      "passed": false,
+      "drop_reasons": [
+        "grounding_report_failed",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4838145161-0",
+        "video_id": "09354c9c0dec47cf",
+        "question": "why is there water flowing from the tap\n\nCandidates:\nA) to prevent babies from drowning\nB) pipe is open\nC) for cat to drink\nD) raining\nE) soapy\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "C",
+          "text": "for cat to drink"
+        },
+        "recommended_option": {
+          "label": "C",
+          "text": "for cat to drink"
+        },
+        "reference_answer": "for cat to drink",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 2.3000000000000007,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 8,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "cat": true,
+            "drink": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            21.0,
+            29.0,
+            61.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is C) for cat to drink.\n\nEvidence:\n- [FRAME:t=21.0] shows a black and white cat leaning over a kitchen sink with water flowing from the tap.\n- [FRAME:t=29.0] shows the cat licking water from the stream, indicating it is drinking.\n- [FRAME:t=61.0] shows the cat moving away from the sink and toward a pink bottle, suggesting it has finished drinking from the tap.\n- The consistent presence of the cat at the tap with water flowing and its behavior of drinking directly supports that the water is being used for the cat to drink.\n\nNo other option is supported by the visual evidence. Option B is plausible but not explicitly confirmed as the reason for the water flow; the cat’s behavior is the direct evidence of purpose. Options A, D, and E are not supported by any frame.",
+        "retrieved_timestamps": [
+          21.0,
+          22.0,
+          23.0,
+          29.0,
+          30.0,
+          61.0,
+          63.0,
+          64.0
+        ],
+        "agent_actions": [
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4838145161-0.json"
+    },
+    {
+      "case_id": "nextgqa-4838145161-2",
+      "video_id": "09354c9c0dec47cf",
+      "passed": false,
+      "drop_reasons": [
+        "missing_expected_keyword",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4838145161-2",
+        "video_id": "09354c9c0dec47cf",
+        "question": "why is the cat shaking its paws after moving back\n\nCandidates:\nA) to remove water from his body\nB) sleepy\nC) prevent hitting shelf\nD) swat water from face\nE) injured\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_expected_keyword",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "to remove water from his body"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "swat water from face"
+        },
+        "reference_answer": "swat water from face",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.5,
+          "timestamp_distance": 2.700000000000001,
+          "scene_hit_accuracy": 0.5,
+          "gold_count": 2,
+          "retrieved_count": 9,
+          "matched_gold": [
+            true,
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "swat": false,
+            "water": true,
+            "face": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            10.0,
+            11.0,
+            12.0,
+            13.0,
+            14.0,
+            15.0,
+            31.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) to remove water from his body.\n\nEvidence:\n- At [FRAME:t=10.0], the cat is near a running faucet, with water dripping onto the sink. Its paws are wet and it is actively moving.\n- At [FRAME:t=11.0], the cat has moved back slightly, and its body is visibly wet, with water dripping from its fur.\n- At [FRAME:t=12.0], the cat is standing upright, looking away from the water, and its paws are still wet.\n- At [FRAME:t=13.0], the cat is still in the sink area, and its paws are visibly shaking, likely to shake off excess water.\n- At [FRAME:t=14.0], the cat is again near the faucet, and its paws are shaking as it moves back toward the water source.\n- At [FRAME:t=15.0], the cat is drinking from the faucet, and its paws are still wet, indicating it is actively removing water from its body.\n- At [FRAME:t=31.0], the cat is again near the faucet, and its paws are shaking, likely to remove water from its body.\n\nThe cat’s paw-shaking behavior is consistent with the action of removing excess water from its body after moving back near the running faucet. The other options are not supported by the visual evidence.",
+        "retrieved_timestamps": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          31.0,
+          61.0,
+          62.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4838145161-2.json"
+    },
+    {
+      "case_id": "nextgqa-4942054721-4",
+      "video_id": "7de03cf13ebfd399",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4942054721-4",
+        "video_id": "7de03cf13ebfd399",
+        "question": "what were the goats doing that were zoomed in by the video doing\n\nCandidates:\nA) grazing\nB) playing fetch\nC) standing\nD) fighting\nE) feeding\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "grazing"
+        },
+        "recommended_option": {
+          "label": "E",
+          "text": "feeding"
+        },
+        "reference_answer": "feeding",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.25,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 10,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "feeding": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            2.0,
+            3.0,
+            5.0,
+            6.0,
+            11.0,
+            12.0,
+            13.0,
+            14.0,
+            15.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) grazing.\n\nEvidence:\n- [FRAME:t=2.0] shows multiple white goats with heads lowered toward the ground among shrubs and grass, consistent with grazing.\n- [FRAME:t=3.0] continues this pattern, with goats positioned with heads down in vegetation.\n- [FRAME:t=5.0] and [FRAME:t=6.0] show goats with heads bent toward the ground, actively consuming vegetation.\n- [FRAME:t=11.0] provides a clear close-up of two goats with heads lowered to brush or shrubbery, confirming grazing behavior.\n- [FRAME:t=12.0] and [FRAME:t=13.0] show goats with heads down near ground-level vegetation, consistent with grazing.\n- [FRAME:t=14.0] and [FRAME:t=15.0] maintain this posture, with one goat actively feeding while the other stands nearby.\n\nNo frames show signs of playing fetch, fighting, or feeding (as in being fed by humans). Standing is not the primary activity — they are consistently positioned with heads down interacting with vegetation.",
+        "retrieved_timestamps": [
+          2.0,
+          3.0,
+          5.0,
+          6.0,
+          8.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4942054721-4.json"
+    },
+    {
+      "case_id": "nextgqa-4968805923-4",
+      "video_id": "bd89b7b2c7f69024",
+      "passed": false,
+      "drop_reasons": [
+        "grounding_report_failed",
+        "missing_expected_keyword"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4968805923-4",
+        "video_id": "bd89b7b2c7f69024",
+        "question": "how did the man express his excitement after he managed to hit the water balloon\n\nCandidates:\nA) stabilise himself\nB) throw his cap onto the floor\nC) wave his bat\nD) jump u and down\nE) start dancing\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_expected_keyword"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "jump u and down"
+        },
+        "recommended_option": {
+          "label": "B",
+          "text": "throw his cap onto the floor"
+        },
+        "reference_answer": "throw his cap onto the floor",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.4500000000000002,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 8,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "throw": true,
+            "his": true,
+            "cap": true,
+            "onto": false,
+            "floor": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            8.0,
+            9.0,
+            8.0,
+            9.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "segment_focus",
+            "build_timeline",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) jump up and down [FRAME:t=8.0] [FRAME:t=9.0]. At [FRAME:t=8.0], the man in the center-right of the frame (wearing a dark shirt and light pants) is captured mid-air, jumping upward with his arms raised, indicating an excited reaction. At [FRAME:t=9.0], he continues to jump and bounce slightly on the grass, reinforcing the celebratory motion. No other option is visually supported by the frames — “stabilise himself” (A) is not shown, “throw his cap” (B) is absent, “wave his bat” (C) is not visible, and “start dancing” (E) is not evident. The jump is the only clear, consistent, and enthusiastic physical expression tied to the event.",
+        "retrieved_timestamps": [
+          0.0,
+          3.0,
+          5.0,
+          6.0,
+          7.0,
+          8.0,
+          9.0,
+          10.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "segment_focus",
+          "build_timeline",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "segment_focus",
+        "build_timeline",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4968805923-4.json"
+    },
+    {
+      "case_id": "nextgqa-4970148391-9",
+      "video_id": "c7a518b5796f6e21",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "grounding_report_failed",
+        "missing_citation_kind",
+        "missing_expected_keyword",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-4970148391-9",
+        "video_id": "c7a518b5796f6e21",
+        "question": "what does the boy do after hitting the first balloon\n\nCandidates:\nA) stop crying\nB) remove spectacles\nC) look at mirror\nD) hold railing of bed\nE) play with toys\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_citation_kind",
+          "missing_expected_keyword",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "stop crying"
+        },
+        "recommended_option": {
+          "label": "B",
+          "text": "remove spectacles"
+        },
+        "reference_answer": "remove spectacles",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 3.2,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 6,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "remove": false,
+            "spectacles": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) stop crying <FRAME:t=12.0> <FRAME:t=13.0> <FRAME:t=14.0> <FRAME:t=20.0> <FRAME:t=21.0>\n\nEvidence: At t=12.0s, the boy is seen holding the bat and looking down, suggesting he is not crying. At t=13.0s, he is in a batting stance, indicating he is preparing to hit. At t=14.0s, he swings the bat, which implies he is actively engaged in hitting the balloon. At t=20.0s, he is seen turning away from the field, and at t=21.0s, he is standing with his arms crossed, which suggests he has finished his action and is no longer crying. The boy’s posture and actions after hitting the balloon indicate he has stopped crying, as he is no longer showing signs of distress. The other options are not supported by the visual evidence.",
+        "retrieved_timestamps": [
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          20.0,
+          21.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-4970148391-9.json"
+    },
+    {
+      "case_id": "nextgqa-5056964274-5",
+      "video_id": "be2e3b43165e0587",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "missing_expected_keyword",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-5056964274-5",
+        "video_id": "be2e3b43165e0587",
+        "question": "what did the boy do after he drink from the green pack\n\nCandidates:\nA) said something\nB) eats the food\nC) the case on his left\nD) drink more\nE) standing still\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_expected_keyword",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "E",
+          "text": "standing still"
+        },
+        "recommended_option": {
+          "label": "B",
+          "text": "eats the food"
+        },
+        "reference_answer": "eats the food",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 11.45,
+          "scene_hit_accuracy": 0.0,
+          "gold_count": 1,
+          "retrieved_count": 8,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "eats": false,
+            "food": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            12.0,
+            16.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": false,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "expand_temporal_evidence",
+            "assess_evidence_sufficiency",
+            "segment_focus",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is E) standing still\n\nIn the frames from [FRAME:t=12.0] to [FRAME:t=16.0], the boy remains in the same posture while drinking from the green pack. His head is slightly tilted, his eyes are looking forward or slightly to the side, and he does not exhibit any movement such as speaking, eating, or drinking more. There is no visual evidence of him saying anything, eating food, or interacting with a case on his left. The boy’s body position and facial expression remain consistent across these frames, indicating he is standing still after drinking.",
+        "retrieved_timestamps": [
+          9.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "expand_temporal_evidence",
+          "assess_evidence_sufficiency",
+          "segment_focus",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "expand_temporal_evidence",
+        "assess_evidence_sufficiency",
+        "segment_focus",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-5056964274-5.json"
+    },
+    {
+      "case_id": "nextgqa-5138093706-1",
+      "video_id": "c83db1b6f40de09e",
+      "passed": false,
+      "drop_reasons": [
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-5138093706-1",
+        "video_id": "c83db1b6f40de09e",
+        "question": "how did the baby move up the stairs near the end of the video\n\nCandidates:\nA) lady carried her\nB) walk up\nC) ran up\nD) man hold her hands\nE) crawl up\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "E",
+          "text": "crawl up"
+        },
+        "recommended_option": {
+          "label": "E",
+          "text": "crawl up"
+        },
+        "reference_answer": "crawl up",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 8.25,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "crawl": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            11.0,
+            12.0,
+            14.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is E) crawl up.\n\nEvidence: At [FRAME:t=11.0], the baby is seen on all fours, moving forward on the carpeted floor. At [FRAME:t=12.0], the baby continues to move forward, maintaining a crawling posture. At [FRAME:t=14.0], the baby is approaching a staircase, still in a crawling position, indicating the movement is crawling up the stairs. No other option is visually supported by the frames.",
+        "retrieved_timestamps": [
+          0.0,
+          1.0,
+          11.0,
+          12.0,
+          14.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-5138093706-1.json"
+    },
+    {
+      "case_id": "nextgqa-5421648216-5",
+      "video_id": "c3bd549100b426dd",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-5421648216-5",
+        "video_id": "c3bd549100b426dd",
+        "question": "what does the brown sheep do after walking close to the black sheep at the start\n\nCandidates:\nA) flap wings\nB) let go of grey rooster\nC) look at bottle\nD) stands next to him\nE) chase the brown dog\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "stands next to him"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "stands next to him"
+        },
+        "reference_answer": "stands next to him",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 14.600000000000001,
+          "scene_hit_accuracy": 0.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "stands": true,
+            "next": true,
+            "him": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            6.0,
+            7.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": false,
+          "actions": [
+            "segment_focus",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) stands next to him.\n\n[FRAME:t=6.0] shows the brown sheep walking close to the black sheep, and by [FRAME:t=7.0], they are standing side by side, with the brown sheep positioned directly next to the black sheep. No other actions (flapping wings, letting go of a rooster, looking at a bottle, or chasing a dog) are visually supported in the frames.",
+        "retrieved_timestamps": [
+          3.0,
+          4.0,
+          5.0,
+          6.0,
+          7.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 3,
+      "tool_names": [
+        "segment_focus",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-5421648216-5.json"
+    },
+    {
+      "case_id": "nextgqa-5658916668-8",
+      "video_id": "eca5f05b17bb96c3",
+      "passed": false,
+      "drop_reasons": [
+        "missing_expected_keyword"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-5658916668-8",
+        "video_id": "eca5f05b17bb96c3",
+        "question": "why was the man lying flat on his tummy nearing the end\n\nCandidates:\nA) sleeping\nB) catch dog\nC) check out the camera\nD) fell from his board\nE) to cushion the boy s fall\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_expected_keyword"
+        ],
+        "selected_option": {
+          "label": "B",
+          "text": "catch dog"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "fell from his board"
+        },
+        "reference_answer": "fell from his board",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.9499999999999993,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 9,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "fell": false,
+            "his": true,
+            "board": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            15.0,
+            16.0,
+            17.0,
+            15.0,
+            16.0,
+            17.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "retrieve_video_evidence",
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is B) catch dog [FRAME:t=15.0] [FRAME:t=16.0] [FRAME:t=17.0]\n\nEvidence:\n- At [FRAME:t=15.0], the man is seen lying flat on his back in the snow, with a dog nearby.\n- At [FRAME:t=16.0], the man is on his stomach, and the dog is close to him, suggesting an interaction.\n- At [FRAME:t=17.0], the man is crouching, and the dog is near him, indicating a playful or intentional action to engage with the dog.\n- The context of the snowy field and the presence of the dog suggest a coordinated activity, not sleep, camera inspection, or falling from a board.\n\nThe man’s position and interaction with the dog strongly indicate he is attempting to catch the dog, making option B the most consistent with the visual evidence.",
+        "retrieved_timestamps": [
+          13.0,
+          15.0,
+          16.0,
+          17.0,
+          18.0,
+          19.0,
+          20.0,
+          21.0,
+          22.0
+        ],
+        "agent_actions": [
+          "retrieve_video_evidence",
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 7,
+      "tool_names": [
+        "retrieve_video_evidence",
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-5658916668-8.json"
+    },
+    {
+      "case_id": "nextgqa-5803861992-1",
+      "video_id": "457d8632326af483",
+      "passed": false,
+      "drop_reasons": [
+        "missing_citation_kind",
+        "missing_expected_keyword",
+        "retrieval_issue",
+        "wrong_fact_option"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-5803861992-1",
+        "video_id": "457d8632326af483",
+        "question": "how did the woman beside the baby girl entertain her\n\nCandidates:\nA) pull her legs\nB) crawl\nC) hit face gently with fan\nD) kiss the baby on forehead\nE) tickle her belly\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_citation_kind",
+          "missing_expected_keyword",
+          "retrieval_issue",
+          "wrong_fact_option"
+        ],
+        "selected_option": null,
+        "recommended_option": {
+          "label": "C",
+          "text": "hit face gently with fan"
+        },
+        "reference_answer": "hit face gently with fan",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.5,
+          "timestamp_distance": 4.925000000000003,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 2,
+          "retrieved_count": 12,
+          "matched_gold": [
+            true,
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "hit": false,
+            "face": false,
+            "gently": false,
+            "fan": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "PLAN: Assess if the retrieved video evidence is sufficient to answer the question. Classify as general with sufficient evidence.  \n\n\n",
+        "retrieved_timestamps": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          28.0,
+          33.0,
+          34.0,
+          35.0,
+          36.0,
+          39.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency"
+        ]
+      },
+      "tool_count": 4,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-5803861992-1.json"
+    },
+    {
+      "case_id": "nextgqa-5803861992-9",
+      "video_id": "457d8632326af483",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "grounding_report_failed",
+        "post_answer_retrieval"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-5803861992-9",
+        "video_id": "457d8632326af483",
+        "question": "how is the baby react when the lady hit her with the fan\n\nCandidates:\nA) no response\nB) touches his head\nC) adjust her shirt\nD) laugh\nE) shake body\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "post_answer_retrieval"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "laugh"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "laugh"
+        },
+        "reference_answer": "laugh",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.3999999999999986,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 25,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "laugh": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            44.0,
+            45.0,
+            46.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "segment_focus",
+            "answer_with_evidence",
+            "verify_grounding",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) laugh.  \nIn [FRAME:t=44.0], the baby’s mouth is open wide and eyes are bright, indicating laughter after the fan is swung near the head. In [FRAME:t=45.0] and [FRAME:t=46.0], the baby continues to smile broadly with an open mouth, consistent with laughter. The baby’s hands are raised and moving in a playful manner, reinforcing the joyful reaction. No other option is supported by the visual evidence.",
+        "retrieved_timestamps": [
+          5.0,
+          7.0,
+          8.0,
+          12.0,
+          28.0,
+          30.0,
+          31.0,
+          32.0,
+          33.0,
+          34.0,
+          35.0,
+          36.0,
+          37.0,
+          38.0,
+          39.0,
+          40.0,
+          42.0,
+          43.0,
+          44.0,
+          45.0,
+          46.0,
+          47.0,
+          48.0,
+          49.0,
+          50.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "segment_focus",
+          "answer_with_evidence",
+          "verify_grounding",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency"
+        ]
+      },
+      "tool_count": 7,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "segment_focus",
+        "answer_with_evidence",
+        "verify_grounding",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-5803861992-9.json"
+    },
+    {
+      "case_id": "nextgqa-5840177726-0",
+      "video_id": "01bb1b66328b2824",
+      "passed": true,
+      "drop_reasons": [],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-5840177726-0",
+        "video_id": "01bb1b66328b2824",
+        "question": "how did the men make their way upslope\n\nCandidates:\nA) run\nB) move left and right\nC) sitting on table\nD) run up\nE) cycle up slope\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": true,
+        "failure_tags": [],
+        "selected_option": {
+          "label": "E",
+          "text": "cycle up slope"
+        },
+        "recommended_option": {
+          "label": "E",
+          "text": "cycle up slope"
+        },
+        "reference_answer": "cycle up slope",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.10000000000000009,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 10,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "cycle": true,
+            "slope": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            7.0,
+            10.0,
+            12.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "retrieve_video_evidence",
+            "segment_focus",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is E) cycle up slope.\n\nEvidence:\n- [FRAME:t=7.0] shows person_A (brown shirt, white helmet) riding a mountain bike on a dirt trail.\n- [FRAME:t=10.0] shows person_B (red shirt) riding a mountain bike, moving up the slope.\n- [FRAME:t=12.0] confirms both riders are on bikes, ascending the incline.\n\nThe visual evidence consistently shows the men using mountain bikes to ascend the slope, matching option E.",
+        "retrieved_timestamps": [
+          1.0,
+          3.0,
+          5.0,
+          6.0,
+          7.0,
+          8.0,
+          9.0,
+          10.0,
+          11.0,
+          12.0
+        ],
+        "agent_actions": [
+          "retrieve_video_evidence",
+          "segment_focus",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 4,
+      "tool_names": [
+        "retrieve_video_evidence",
+        "segment_focus",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-5840177726-0.json"
+    },
+    {
+      "case_id": "nextgqa-5945172741-7",
+      "video_id": "4dd172f915a5cdb1",
+      "passed": true,
+      "drop_reasons": [],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-5945172741-7",
+        "video_id": "4dd172f915a5cdb1",
+        "question": "how did the man show affection to the girl when he held her\n\nCandidates:\nA) caress her hairs\nB) kiss her\nC) play with baby\nD) lady point towards it\nE) pat her back\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": true,
+        "failure_tags": [],
+        "selected_option": {
+          "label": "B",
+          "text": "kiss her"
+        },
+        "recommended_option": {
+          "label": "B",
+          "text": "kiss her"
+        },
+        "reference_answer": "kiss her",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.5,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 28,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "kiss": true,
+            "her": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            10.0,
+            12.0,
+            14.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "retrieve_video_evidence",
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is B) kiss her.\n\nEvidence:\n- At [FRAME:t=10.0], the man is seen leaning toward the girl and bringing his mouth close to her face, consistent with a kiss.\n- At [FRAME:t=12.0], the man is holding the girl close, and his facial expression and proximity suggest affectionate contact.\n- At [FRAME:t=14.0], the man is still in close proximity to the girl, and his facial expression remains affectionate.\n- The other options are not supported by the visual evidence: there is no clear caressing of hair, no baby play, no lady pointing, and no patting of the back.",
+        "retrieved_timestamps": [
+          0.0,
+          3.0,
+          6.0,
+          9.0,
+          10.0,
+          12.0,
+          13.0,
+          14.0,
+          16.0,
+          21.0,
+          23.0,
+          34.0,
+          35.0,
+          36.0,
+          37.0,
+          38.0,
+          39.0,
+          40.0,
+          41.0,
+          42.0,
+          43.0,
+          44.0,
+          46.0,
+          47.0,
+          48.0,
+          52.0,
+          58.0,
+          59.0
+        ],
+        "agent_actions": [
+          "retrieve_video_evidence",
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "retrieve_video_evidence",
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-5945172741-7.json"
+    },
+    {
+      "case_id": "nextgqa-6018514357-6",
+      "video_id": "35a9f3b80036e354",
+      "passed": false,
+      "drop_reasons": [
+        "grounding_report_failed",
+        "retrieval_issue",
+        "tool_loop_detected"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-6018514357-6",
+        "video_id": "35a9f3b80036e354",
+        "question": "why did the man hold the baby s hands\n\nCandidates:\nA) to support the baby\nB) to carry the baby\nC) to take a photo\nD) to wash the baby\nE) slide down with baby\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "to support the baby"
+        },
+        "recommended_option": {
+          "label": "A",
+          "text": "to support the baby"
+        },
+        "reference_answer": "to support the baby",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.25,
+          "scene_hit_accuracy": 0.0,
+          "gold_count": 1,
+          "retrieved_count": 6,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "support": true,
+            "baby": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            12.3
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) to support the baby.\n\nEvidence:\n- At [FRAME:t=12.3], person_A (红衣男子) is seen holding the baby's hands while standing at the top of the slide, with the baby positioned to descend. The baby is not being carried but is being supported by the man’s hands as he prepares to let the baby go down the slide.\n- The man’s posture and hand placement indicate he is providing stability and support, not carrying the baby (eliminating B), taking a photo (eliminating C), washing the baby (eliminating D), or sliding down with the baby (eliminating E).\n- The context of the playground and the baby’s position on the slide strongly suggests the man is assisting the baby’s descent, which aligns with supporting the baby’s movement.",
+        "retrieved_timestamps": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-6018514357-6.json"
+    },
+    {
+      "case_id": "nextgqa-6097994550-4",
+      "video_id": "bb13d595f11b2144",
+      "passed": true,
+      "drop_reasons": [],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-6097994550-4",
+        "video_id": "bb13d595f11b2144",
+        "question": "how does the man with spectacles move at the end of the video\n\nCandidates:\nA) walk\nB) caress his head\nC) count with fingers\nD) crawls\nE) strolls around\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": true,
+        "failure_tags": [],
+        "selected_option": {
+          "label": "D",
+          "text": "crawls"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "crawls"
+        },
+        "reference_answer": "crawls",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.25,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 5,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "crawls": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            14.0,
+            15.0,
+            16.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) crawls.\n\nEvidence:\n- At [FRAME:t=14.0], the man with spectacles is shown in a low, crawling position on the floor, gripping the ground with both hands and knees, consistent with crawling.\n- At [FRAME:t=15.0] and [FRAME:t=16.0], his body remains in a low, forward-leaning posture, with his head and shoulders close to the ground, reinforcing the crawling motion.\n- His movement is not walking, strolling, or counting — and no caressing of the head is visible.\n- The motion is continuous and consistent with crawling, especially given the context of a physical training or combat scenario.",
+        "retrieved_timestamps": [
+          1.0,
+          10.0,
+          14.0,
+          15.0,
+          16.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-6097994550-4.json"
+    },
+    {
+      "case_id": "nextgqa-6516459343-4",
+      "video_id": "e4f39a492bc1da7a",
+      "passed": false,
+      "drop_reasons": [
+        "missing_citation_kind",
+        "missing_expected_keyword",
+        "wrong_fact_option"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-6516459343-4",
+        "video_id": "e4f39a492bc1da7a",
+        "question": "why did the man in white pick up a knife after changing place with the man in green\n\nCandidates:\nA) reacting to the bread\nB) it was bloodied\nC) proceed with next part of celebration\nD) cut the vegetables\nE) cut the shoe\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_citation_kind",
+          "missing_expected_keyword",
+          "wrong_fact_option"
+        ],
+        "selected_option": null,
+        "recommended_option": {
+          "label": "E",
+          "text": "cut the shoe"
+        },
+        "reference_answer": "cut the shoe",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 1.5499999999999972,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 19,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "cut": false,
+            "shoe": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "PLAN: Assess whether the retrieved video evidence is sufficient to determine if the man in white picked up a knife. (existence, negative_check)\n\n\n\n",
+        "retrieved_timestamps": [
+          0.0,
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          12.0,
+          21.0,
+          30.0,
+          31.0,
+          32.0,
+          41.0,
+          42.0,
+          43.0,
+          44.0,
+          45.0,
+          46.0,
+          47.0,
+          48.0,
+          49.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency"
+        ]
+      },
+      "tool_count": 4,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-6516459343-4.json"
+    },
+    {
+      "case_id": "nextgqa-7001078933-1",
+      "video_id": "ad35386c510a4510",
+      "passed": false,
+      "drop_reasons": [
+        "grounding_report_failed"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-7001078933-1",
+        "video_id": "ad35386c510a4510",
+        "question": "why did the white helmet and black helmet man bend down before moving towards each other\n\nCandidates:\nA) getting into position\nB) balance themselves\nC) pick something from the grass\nD) doing squats\nE) want to sit down\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": true,
+        "failure_tags": [],
+        "selected_option": {
+          "label": "A",
+          "text": "getting into position"
+        },
+        "recommended_option": {
+          "label": "A",
+          "text": "getting into position"
+        },
+        "reference_answer": "getting into position",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 1.3000000000000007,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 9,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "getting": true,
+            "position": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            8.0,
+            12.0,
+            13.0,
+            8.0,
+            12.0,
+            13.0,
+            8.0,
+            12.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) getting into position [FRAME:t=8.0] [FRAME:t=12.0] [FRAME:t=13.0]\n\nEvidence:\n- At [FRAME:t=8.0], person_A (white helmet) bends down into a low athletic stance, which is a common preparatory posture in sports drills.\n- At [FRAME:t=12.0], person_A is in a dynamic, forward-leaning stance, actively moving toward person_B (black helmet), who is also in a similar preparatory stance, indicating they are aligning for a coordinated movement.\n- At [FRAME:t=13.0], both are in motion, with person_A initiating a forward sprint, suggesting they are executing a drill that requires synchronized positioning — consistent with “getting into position” for a play or exercise.\n- The presence of agility ladders and padded obstacles [FRAME:t=8.0] [FRAME:t=12.0] further supports that this is a training drill requiring proper stance and alignment before movement.\n\nOther options are contradicted:\n- B) balance themselves — no visual evidence of balancing or static stability.\n- C) pick something from the grass — no object is visible or picked up.\n- D) doing squats — no squatting motion is observed; stance is low but not a full squat.\n- E) want to sit down — no sitting motion or posture is visible.",
+        "retrieved_timestamps": [
+          2.0,
+          3.0,
+          5.0,
+          8.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          21.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-7001078933-1.json"
+    },
+    {
+      "case_id": "nextgqa-8177965766-0",
+      "video_id": "07fb0c0a456d94d8",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-8177965766-0",
+        "video_id": "07fb0c0a456d94d8",
+        "question": "what did the woman do to the microphone after awhile\n\nCandidates:\nA) walk away\nB) smiles\nC) she talks to the other people\nD) switch to the other hand\nE) talks\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue"
+        ],
+        "selected_option": {
+          "label": "D",
+          "text": "switch to the other hand"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "switch to the other hand"
+        },
+        "reference_answer": "switch to the other hand",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.15000000000000036,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 8,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "switch": true,
+            "other": true,
+            "hand": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            9.0,
+            10.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is D) switch to the other hand.\n\nEvidence:\n- At [FRAME:t=9.0], the woman is holding the microphone in her right hand while singing.\n- At [FRAME:t=10.0], she is seen shifting the microphone to her left hand while continuing to sing.\n- This transition is clearly visible and consistent with the action of switching to the other hand.\n\nNo other options are supported by the visual evidence. The woman does not walk away, smile, talk to others, or simply talk — she actively changes how she holds the microphone.",
+        "retrieved_timestamps": [
+          0.0,
+          5.0,
+          9.0,
+          10.0,
+          19.0,
+          23.0,
+          25.0,
+          29.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-8177965766-0.json"
+    },
+    {
+      "case_id": "nextgqa-8252088130-4",
+      "video_id": "c594ea85c9dc4e2c",
+      "passed": false,
+      "drop_reasons": [
+        "agent_loop_issue",
+        "missing_expected_keyword"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-8252088130-4",
+        "video_id": "c594ea85c9dc4e2c",
+        "question": "what did the woman do after adjusting her hand in the middle\n\nCandidates:\nA) touch her bag\nB) poke her face\nC) pick up dog\nD) walk to show camera\nE) reach for something\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "agent_loop_issue",
+          "missing_expected_keyword"
+        ],
+        "selected_option": {
+          "label": "E",
+          "text": "reach for something"
+        },
+        "recommended_option": {
+          "label": "D",
+          "text": "walk to show camera"
+        },
+        "reference_answer": "walk to show camera",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.5,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 1,
+          "retrieved_count": 8,
+          "matched_gold": [
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": false,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "walk": false,
+            "show": false,
+            "camera": false
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            14.0,
+            14.0,
+            10.0,
+            13.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": false,
+          "expected_action_ok": false,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is E) reach for something [FRAME:t=14.0]. In frame [FRAME:t=14.0], the woman is seen reaching upward with her right hand toward her head, lifting a dark-colored hat from her head. This action directly follows the adjustment of her hand in the middle of the sequence (as seen in frames [FRAME:t=10.0]–[FRAME:t=13.0], where her hand is positioned near her head or face). No other option is visually supported in the frames.",
+        "retrieved_timestamps": [
+          0.0,
+          5.0,
+          9.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 5,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-8252088130-4.json"
+    },
+    {
+      "case_id": "nextgqa-8797589693-3",
+      "video_id": "55cc11b09f36c92a",
+      "passed": false,
+      "drop_reasons": [
+        "grounding_report_failed",
+        "missing_citation_kind",
+        "retrieval_issue"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-8797589693-3",
+        "video_id": "55cc11b09f36c92a",
+        "question": "why did the man in blue turn to the lady in grey jacket before sitting down\n\nCandidates:\nA) talk to lady\nB) want to hug her\nC) to pass her something\nD) audience\nE) get a better view\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": false,
+        "failure_tags": [
+          "missing_citation_kind",
+          "retrieval_issue"
+        ],
+        "selected_option": {
+          "label": "A",
+          "text": "talk to lady"
+        },
+        "recommended_option": {
+          "label": "A",
+          "text": "talk to lady"
+        },
+        "reference_answer": "talk to lady",
+        "retrieval": {
+          "passed": false,
+          "recall_at_k": 0.0,
+          "timestamp_distance": 4.449999999999999,
+          "scene_hit_accuracy": 0.0,
+          "gold_count": 1,
+          "retrieved_count": 12,
+          "matched_gold": [
+            false
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": false,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": false,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "talk": true,
+            "lady": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is A) talk to lady\n\nEvidence:\n- [FRAME:t=11.0s] The man in blue (man_in_blue) is standing and turning his body toward the lady in grey jacket (lady_in_grey_jacket), who is seated and facing away from the camera. His posture indicates he is directing his attention toward her.\n- [FRAME:t=12.0s] He continues to face her, with his mouth slightly open as if speaking, and his hand is raised in a gesture consistent with conversation or explanation.\n- [FRAME:t=13.0s] He maintains eye contact and proximity to her, reinforcing the communicative intent.\n- [FRAME:t=14.0s] He is still oriented toward her, suggesting the interaction is ongoing and purposeful.\n\nThese frames collectively indicate a communicative interaction — consistent with talking — rather than a physical gesture (hugging, passing something) or an audience-related action (getting a better view). The option “audience” is irrelevant as the man is not addressing the group. “Want to hug her” is unsupported by any visual evidence of physical contact or embrace. “Pass her something” is not indicated by any visible object transfer or hand gesture. The least contradicted and most supported option is A) talk to lady.",
+        "retrieved_timestamps": [
+          1.0,
+          3.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          23.0,
+          28.0,
+          31.0,
+          40.0,
+          41.0,
+          46.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-8797589693-3.json"
+    },
+    {
+      "case_id": "nextgqa-9408800471-6",
+      "video_id": "436a2f672f47939a",
+      "passed": false,
+      "drop_reasons": [
+        "grounding_report_failed"
+      ],
+      "scope_ok": true,
+      "coverage_ok": true,
+      "no_grounding_gt": false,
+      "strict_eval": {
+        "case_id": "nextgqa-9408800471-6",
+        "video_id": "436a2f672f47939a",
+        "question": "why does the dog run\n\nCandidates:\nA) catch up the boy\nB) happy and excited\nC) sniff around grassland\nD) kick the thick snow\nE) follow the ball\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "passed": true,
+        "failure_tags": [],
+        "selected_option": {
+          "label": "E",
+          "text": "follow the ball"
+        },
+        "recommended_option": {
+          "label": "E",
+          "text": "follow the ball"
+        },
+        "reference_answer": "follow the ball",
+        "retrieval": {
+          "passed": true,
+          "recall_at_k": 1.0,
+          "timestamp_distance": 0.6500000000000004,
+          "scene_hit_accuracy": 1.0,
+          "gold_count": 2,
+          "retrieved_count": 25,
+          "matched_gold": [
+            true,
+            true
+          ],
+          "soft_waived": false
+        },
+        "answer": {
+          "passed": true,
+          "answered": true,
+          "hallucination_free": true,
+          "citation_correct": true,
+          "uncertainty_ok": true,
+          "required_keyword_hits": {
+            "follow": true,
+            "ball": true
+          },
+          "forbidden_keyword_hits": [],
+          "frame_markers": [
+            18.0,
+            20.0,
+            23.0,
+            28.0,
+            30.0
+          ],
+          "invalid_markers": [],
+          "citation_soft_waived": false
+        },
+        "agent_loop": {
+          "passed": true,
+          "expected_action_ok": true,
+          "expansion_ok": true,
+          "sufficiency_checked": true,
+          "actions": [
+            "segment_focus",
+            "assess_evidence_sufficiency",
+            "retrieve_video_evidence",
+            "assess_evidence_sufficiency",
+            "answer_with_evidence",
+            "verify_grounding",
+            "answer_with_evidence",
+            "verify_grounding"
+          ],
+          "soft_waived": false
+        },
+        "prediction_text": "The correct answer is E) follow the ball.\n\nEvidence:\n- At [FRAME:t=18.0], the dog is seen running toward the ball that is in mid-air, indicating pursuit.\n- At [FRAME:t=20.0], the dog is already running toward the ball, which is on the ground, confirming it is chasing it.\n- At [FRAME:t=23.0], the dog is near the ball, which is on the ground, and it is actively moving toward it.\n- At [FRAME:t=28.0], the dog is positioned directly in front of the ball, which is being held by the child, indicating the dog is following the ball’s movement.\n- At [FRAME:t=30.0], the dog is standing near the ball, which is being held by the child, reinforcing the behavior of following the ball.\n\nThe dog’s consistent movement toward the ball, even when the child is holding it, supports that the dog is following the ball, not chasing the child, sniffing, or interacting with snow.",
+        "retrieved_timestamps": [
+          0.0,
+          2.0,
+          3.0,
+          6.0,
+          8.0,
+          9.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0,
+          17.0,
+          18.0,
+          19.0,
+          20.0,
+          22.0,
+          23.0,
+          24.0,
+          26.0,
+          28.0,
+          30.0,
+          33.0,
+          34.0
+        ],
+        "agent_actions": [
+          "segment_focus",
+          "assess_evidence_sufficiency",
+          "retrieve_video_evidence",
+          "assess_evidence_sufficiency",
+          "answer_with_evidence",
+          "verify_grounding",
+          "answer_with_evidence",
+          "verify_grounding"
+        ]
+      },
+      "tool_count": 8,
+      "tool_names": [
+        "segment_focus",
+        "assess_evidence_sufficiency",
+        "retrieve_video_evidence",
+        "assess_evidence_sufficiency",
+        "answer_with_evidence",
+        "verify_grounding",
+        "answer_with_evidence",
+        "verify_grounding"
+      ],
+      "trajectory_path": "data/distill/pilot/trajectories/nextgqa-9408800471-6.json"
+    }
+  ]
+}

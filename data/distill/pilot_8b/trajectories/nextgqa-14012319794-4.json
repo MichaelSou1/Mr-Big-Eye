@@ -1,0 +1,866 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-14012319794-4",
+    "video_id": "95ff926d1ce446ad",
+    "question": "why did the girl pull the tent down towards her in the middle of the video\n\nCandidates:\nA) take the book\nB) try to take flag on top\nC) carry the baby\nD) pick up something on the floor\nE) talking about it\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "try to take flag on top",
+    "required_keywords": [
+      "try",
+      "take",
+      "flag",
+      "top"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      59.8
+    ],
+    "gold_scenes": [
+      {
+        "start": 54.0,
+        "end": 65.6
+      }
+    ],
+    "question_type": "cw"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "why did the girl pull the tent down towards her in the middle of the video\n\nCandidates:\nA) take the book\nB) try to take flag on top\nC) carry the baby\nD) pick up something on the floor\nE) talking about it\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Classify the task as visual_detail and use focused retrieval to examine the moment the girl pulls the tent down.  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "why did the girl pull the tent down towards her in the middle of the video",
+            "center_t": 45.0,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-80505b1669f5ef25",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 41.0, \"end\": 49.0, \"center_t\": 45.0, \"frame_count\": 9}, \"observation\": \"[t=43.0s] 女孩手持一把玩具剑，剑尖指向左侧的红黄相间帐篷。\\n[t=44.0s] 女孩用剑尖抵住帐篷的红色布料，身体前倾，似乎在用力推或拉。\\n[t=45.0s] 女孩继续用剑抵住帐篷，手臂伸展，帐篷布料被拉向她。\\n[t=46.0s] 女孩将剑柄握在手中，剑尖仍抵住帐篷，身体更靠近帐篷，帐篷被进一步拉向她。\\n[t=47.0s] 女孩用左手也抓住帐篷布料，与右手的剑共同作用，将帐篷拉向自己。\\n[t=48.0s] 女孩身体前倾，双手（一手持剑，一手抓布）持续拉扯帐篷，帐篷布料明显被拉近她。\\n[t=49.0s] 女孩继续用剑和手拉帐篷，帐篷布料紧贴她的身体，她正专注于这个动作。\", \"subject_deltas\": [{\"op\": \"add\", \"id\": \"girl\", \"label\": \"小女孩\", \"first_seen_t\": 41.0, \"attributes\": [\"穿着粉色外套\", \"手持玩具剑\", \"头发扎起\"], \"evidence_frames\": [41.0]}, {\"op\": \"update\", \"id\": \"girl\", \"attributes_add\": [\"用剑和手拉帐篷\", \"帐篷被拉向她\"], \"last_seen_t\": 49.0, \"evidence_frames_add\": [43.0, 44.0, 45.0, 46.0, 47.0, 48.0, 49.0]}], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-80505b1669f5ef25",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 41.0,
+          "end": 49.0,
+          "center_t": 45.0,
+          "frame_count": 9
+        },
+        "observation": "[t=43.0s] 女孩手持一把玩具剑，剑尖指向左侧的红黄相间帐篷。\n[t=44.0s] 女孩用剑尖抵住帐篷的红色布料，身体前倾，似乎在用力推或拉。\n[t=45.0s] 女孩继续用剑抵住帐篷，手臂伸展，帐篷布料被拉向她。\n[t=46.0s] 女孩将剑柄握在手中，剑尖仍抵住帐篷，身体更靠近帐篷，帐篷被进一步拉向她。\n[t=47.0s] 女孩用左手也抓住帐篷布料，与右手的剑共同作用，将帐篷拉向自己。\n[t=48.0s] 女孩身体前倾，双手（一手持剑，一手抓布）持续拉扯帐篷，帐篷布料明显被拉近她。\n[t=49.0s] 女孩继续用剑和手拉帐篷，帐篷布料紧贴她的身体，她正专注于这个动作。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "girl",
+            "label": "小女孩",
+            "first_seen_t": 41.0,
+            "attributes": [
+              "穿着粉色外套",
+              "手持玩具剑",
+              "头发扎起"
+            ],
+            "evidence_frames": [
+              41.0
+            ]
+          },
+          {
+            "op": "update",
+            "id": "girl",
+            "attributes_add": [
+              "用剑和手拉帐篷",
+              "帐篷被拉向她"
+            ],
+            "last_seen_t": 49.0,
+            "evidence_frames_add": [
+              43.0,
+              44.0,
+              45.0,
+              46.0,
+              47.0,
+              48.0,
+              49.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the visual evidence from the segment is sufficient to answer the question.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "why did the girl pull the tent down towards her in the middle of the video",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-b51930799205a926",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 9, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 8.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b51930799205a926",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 9,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 8.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve additional visual evidence around the same time window to confirm the girl's action and intent.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "why did the girl pull the tent down towards her in the middle of the video",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 12,
+            "planner_notes": "Confirm action and intent around t=45s."
+          },
+          "id": "chatcmpl-tool-a8a8dd5654cfd1c1",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 23.0, \"source\": \"retrieval\"}, {\"timestamp\": 26.0, \"source\": \"retrieval\"}, {\"timestamp\": 28.0, \"source\": \"retrieval\"}, {\"timestamp\": 29.0, \"source\": \"retrieval\"}, {\"timestamp\": 30.0, \"source\": \"retrieval\"}, {\"timestamp\": 31.0, \"source\": \"retrieval\"}, {\"timestamp\": 38.0, \"source\": \"retrieval\"}, {\"timestamp\": 41.0, \"source\": \"segment_focus\"}, {\"timestamp\": 42.0, \"source\": \"segment_focus\"}, {\"timestamp\": 43.0, \"source\": \"segment_focus\"}, {\"timestamp\": 44.0, \"source\": \"segment_focus\"}, {\"timestamp\": 45.0, \"source\": \"segment_focus\"}, {\"timestamp\": 46.0, \"source\": \"segment_focus\"}, {\"timestamp\": 47.0, \"source\": \"segment_focus\"}, {\"timestamp\": 48.0, \"source\": \"segment_focus\"}, {\"timestamp\": 49.0, \"source\": \"segment_focus\"}, {\"timestamp\": 81.0, \"source\": \"retrieval\"}, {\"timestamp\": 83.0, \"source\": \"retrieval\"}, {\"timestamp\": 110.0, \"source\": \"retrieval\"}, {\"timestamp\": 125.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"scene_id\": 1, \"t_mid\": 38.0416665, \"start\": 22.958333, \"filename\": \"scene_0001.jpg\", \"end\": 53.125, \"caption\": \"A young child in a pink shirt is interacting with the metal frame of a red and yellow play tent, holding onto it with both hands. The scene is set in a carpeted room with toys and an easel visible in the background.\", \"score\": 0.5483394861221313}, {\"end\": 54.583333, \"t_mid\": 53.854166500000005, \"filename\": \"scene_0002.jpg\", \"start\": 53.125, \"scene_id\": 2, \"caption\": \"A child's hand grips a toy sword near a red and yellow striped play tent, with a small basketball hoop and a fireplace visible in the background.\", \"score\": 0.5513297915458679}, {\"filename\": \"scene_0003.jpg\", \"t_mid\": 55.166666500000005, \"caption\": \"A child with their hair in a bun is partially visible in the foreground, facing away, near a red and yellow striped tent. In the background, a small red hoop basketball goal sits on a wooden stand beside a fireplace and scattered toys.\", \"start\": 54.583333, \"end\": 55.75, \"scene_id\": 3, \"score\": 0.5722302794456482}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 12, \"planner_notes\": \"Confirm action and intent around t=45s.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a8a8dd5654cfd1c1",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 23.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 26.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 28.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 29.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 30.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 31.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 38.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 41.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 42.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 43.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 44.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 45.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 46.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 47.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 48.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 49.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 81.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 83.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 110.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 125.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "scene_id": 1,
+            "t_mid": 38.0416665,
+            "start": 22.958333,
+            "filename": "scene_0001.jpg",
+            "end": 53.125,
+            "caption": "A young child in a pink shirt is interacting with the metal frame of a red and yellow play tent, holding onto it with both hands. The scene is set in a carpeted room with toys and an easel visible in the background.",
+            "score": 0.5483394861221313
+          },
+          {
+            "end": 54.583333,
+            "t_mid": 53.854166500000005,
+            "filename": "scene_0002.jpg",
+            "start": 53.125,
+            "scene_id": 2,
+            "caption": "A child's hand grips a toy sword near a red and yellow striped play tent, with a small basketball hoop and a fireplace visible in the background.",
+            "score": 0.5513297915458679
+          },
+          {
+            "filename": "scene_0003.jpg",
+            "t_mid": 55.166666500000005,
+            "caption": "A child with their hair in a bun is partially visible in the foreground, facing away, near a red and yellow striped tent. In the background, a small red hoop basketball goal sits on a wooden stand beside a fireplace and scattered toys.",
+            "start": 54.583333,
+            "end": 55.75,
+            "scene_id": 3,
+            "score": 0.5722302794456482
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 12,
+          "planner_notes": "Confirm action and intent around t=45s."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the retrieved visual evidence is sufficient to answer the question.  \n\n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 9, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 8.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8178508867e45e0d",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 9,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 8.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "why did the girl pull the tent down towards her in the middle of the video",
+        "center_t": 45.0,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 41.0,
+          "end": 49.0,
+          "center_t": 45.0,
+          "frame_count": 9
+        },
+        "observation": "[t=43.0s] 女孩手持一把玩具剑，剑尖指向左侧的红黄相间帐篷。\n[t=44.0s] 女孩用剑尖抵住帐篷的红色布料，身体前倾，似乎在用力推或拉。\n[t=45.0s] 女孩继续用剑抵住帐篷，手臂伸展，帐篷布料被拉向她。\n[t=46.0s] 女孩将剑柄握在手中，剑尖仍抵住帐篷，身体更靠近帐篷，帐篷被进一步拉向她。\n[t=47.0s] 女孩用左手也抓住帐篷布料，与右手的剑共同作用，将帐篷拉向自己。\n[t=48.0s] 女孩身体前倾，双手（一手持剑，一手抓布）持续拉扯帐篷，帐篷布料明显被拉近她。\n[t=49.0s] 女孩继续用剑和手拉帐篷，帐篷布料紧贴她的身体，她正专注于这个动作。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "girl",
+            "label": "小女孩",
+            "first_seen_t": 41.0,
+            "attributes": [
+              "穿着粉色外套",
+              "手持玩具剑",
+              "头发扎起"
+            ],
+            "evidence_frames": [
+              41.0
+            ]
+          },
+          {
+            "op": "update",
+            "id": "girl",
+            "attributes_add": [
+              "用剑和手拉帐篷",
+              "帐篷被拉向她"
+            ],
+            "last_seen_t": 49.0,
+            "evidence_frames_add": [
+              43.0,
+              44.0,
+              45.0,
+              46.0,
+              47.0,
+              48.0,
+              49.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-80505b1669f5ef25",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "why did the girl pull the tent down towards her in the middle of the video",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 9,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 8.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-b51930799205a926",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "why did the girl pull the tent down towards her in the middle of the video",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 12,
+        "planner_notes": "Confirm action and intent around t=45s."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 23.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 26.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 28.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 29.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 30.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 31.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 38.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 41.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 42.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 43.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 44.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 45.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 46.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 47.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 48.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 49.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 81.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 83.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 110.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 125.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "scene_id": 1,
+            "t_mid": 38.0416665,
+            "start": 22.958333,
+            "filename": "scene_0001.jpg",
+            "end": 53.125,
+            "caption": "A young child in a pink shirt is interacting with the metal frame of a red and yellow play tent, holding onto it with both hands. The scene is set in a carpeted room with toys and an easel visible in the background.",
+            "score": 0.5483394861221313
+          },
+          {
+            "end": 54.583333,
+            "t_mid": 53.854166500000005,
+            "filename": "scene_0002.jpg",
+            "start": 53.125,
+            "scene_id": 2,
+            "caption": "A child's hand grips a toy sword near a red and yellow striped play tent, with a small basketball hoop and a fireplace visible in the background.",
+            "score": 0.5513297915458679
+          },
+          {
+            "filename": "scene_0003.jpg",
+            "t_mid": 55.166666500000005,
+            "caption": "A child with their hair in a bun is partially visible in the foreground, facing away, near a red and yellow striped tent. In the background, a small red hoop basketball goal sits on a wooden stand beside a fireplace and scattered toys.",
+            "start": 54.583333,
+            "end": 55.75,
+            "scene_id": 3,
+            "score": 0.5722302794456482
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 12,
+          "planner_notes": "Confirm action and intent around t=45s."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-a8a8dd5654cfd1c1",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 9,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 8.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-8178508867e45e0d",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 23.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 28.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0028.0.jpg"
+      },
+      {
+        "timestamp": 29.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0029.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 31.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0031.0.jpg"
+      },
+      {
+        "timestamp": 38.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0038.0.jpg"
+      },
+      {
+        "timestamp": 41.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0041.0.jpg"
+      },
+      {
+        "timestamp": 42.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0042.0.jpg"
+      },
+      {
+        "timestamp": 43.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0043.0.jpg"
+      },
+      {
+        "timestamp": 44.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0044.0.jpg"
+      },
+      {
+        "timestamp": 45.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0045.0.jpg"
+      },
+      {
+        "timestamp": 46.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0046.0.jpg"
+      },
+      {
+        "timestamp": 47.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0047.0.jpg"
+      },
+      {
+        "timestamp": 48.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0048.0.jpg"
+      },
+      {
+        "timestamp": 49.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0049.0.jpg"
+      },
+      {
+        "timestamp": 81.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0081.0.jpg"
+      },
+      {
+        "timestamp": 83.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0083.0.jpg"
+      },
+      {
+        "timestamp": 110.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0110.0.jpg"
+      },
+      {
+        "timestamp": 125.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0125.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 22.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0022.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 37.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0037.0.jpg"
+      },
+      {
+        "timestamp": 44.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0044.0.jpg"
+      },
+      {
+        "timestamp": 52.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0052.0.jpg"
+      },
+      {
+        "timestamp": 59.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0059.0.jpg"
+      },
+      {
+        "timestamp": 66.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0066.0.jpg"
+      },
+      {
+        "timestamp": 74.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0074.0.jpg"
+      },
+      {
+        "timestamp": 81.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0081.0.jpg"
+      },
+      {
+        "timestamp": 89.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0089.0.jpg"
+      },
+      {
+        "timestamp": 96.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0096.0.jpg"
+      },
+      {
+        "timestamp": 103.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0103.0.jpg"
+      },
+      {
+        "timestamp": 111.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0111.0.jpg"
+      },
+      {
+        "timestamp": 118.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0118.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "scene_id": 1,
+        "t_mid": 38.0416665,
+        "start": 22.958333,
+        "filename": "scene_0001.jpg",
+        "end": 53.125,
+        "caption": "A young child in a pink shirt is interacting with the metal frame of a red and yellow play tent, holding onto it with both hands. The scene is set in a carpeted room with toys and an easel visible in the background.",
+        "score": 0.5483394861221313
+      },
+      {
+        "end": 54.583333,
+        "t_mid": 53.854166500000005,
+        "filename": "scene_0002.jpg",
+        "start": 53.125,
+        "scene_id": 2,
+        "caption": "A child's hand grips a toy sword near a red and yellow striped play tent, with a small basketball hoop and a fireplace visible in the background.",
+        "score": 0.5513297915458679
+      },
+      {
+        "filename": "scene_0003.jpg",
+        "t_mid": 55.166666500000005,
+        "caption": "A child with their hair in a bun is partially visible in the foreground, facing away, near a red and yellow striped tent. In the background, a small red hoop basketball goal sits on a wooden stand beside a fireplace and scattered toys.",
+        "start": 54.583333,
+        "end": 55.75,
+        "scene_id": 3,
+        "score": 0.5722302794456482
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 12,
+      "planner_notes": "Confirm action and intent around t=45s."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 9,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 8.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=43.0s] 女孩手持一把玩具剑，剑尖指向左侧的红黄相间帐篷。\n[t=44.0s] 女孩用剑尖抵住帐篷的红色布料，身体前倾，似乎在用力推或拉。\n[t=45.0s] 女孩继续用剑抵住帐篷，手臂伸展，帐篷布料被拉向她。\n[t=46.0s] 女孩将剑柄握在手中，剑尖仍抵住帐篷，身体更靠近帐篷，帐篷被进一步拉向她。\n[t=47.0s] 女孩用左手也抓住帐篷布料，与右手的剑共同作用，将帐篷拉向自己。\n[t=48.0s] 女孩身体前倾，双手（一手持剑，一手抓布）持续拉扯帐篷，帐篷布料明显被拉近她。\n[t=49.0s] 女孩继续用剑和手拉帐篷，帐篷布料紧贴她的身体，她正专注于这个动作。",
+        "timestamps": [
+          41.0,
+          42.0,
+          43.0,
+          44.0,
+          45.0,
+          46.0,
+          47.0,
+          48.0,
+          49.0
+        ],
+        "window": {
+          "start": 41.0,
+          "end": 49.0,
+          "center_t": 45.0
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [
+      {
+        "id": "girl",
+        "label": "小女孩",
+        "first_seen_t": 41.0,
+        "last_seen_t": 49.0,
+        "attributes": [
+          "头发扎起",
+          "帐篷被拉向她",
+          "手持玩具剑",
+          "用剑和手拉帐篷",
+          "穿着粉色外套"
+        ],
+        "evidence_frames": [
+          41.0,
+          43.0,
+          44.0,
+          45.0,
+          46.0,
+          47.0,
+          48.0,
+          49.0
+        ]
+      }
+    ],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "b07e8832a994aedf926ca2a127fc6c5a426f9c02"
+}

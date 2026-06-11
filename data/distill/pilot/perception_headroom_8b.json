@@ -1,0 +1,177 @@
+{
+  "summary": {
+    "n_free_wrong": 18,
+    "base_448_now_correct": 0,
+    "base_448_flip_rate": 0.0,
+    "uniform_hi_now_correct": 2,
+    "uniform_hi_flip_rate": 0.1111111111111111,
+    "gt_local_now_correct": 4,
+    "gt_local_flip_rate": 0.2222222222222222,
+    "gt_local_hi_now_correct": 4,
+    "gt_local_hi_flip_rate": 0.2222222222222222
+  },
+  "rows": [
+    {
+      "case_id": "nextgqa-14012319794-4",
+      "qtype": "cw",
+      "n_gt_frames": 14,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-2547885226-4",
+      "qtype": "tp",
+      "n_gt_frames": 8,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-2782658657-0",
+      "qtype": "cw",
+      "n_gt_frames": 7,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-2868183184-7",
+      "qtype": "tn",
+      "n_gt_frames": 24,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-3026084730-11",
+      "qtype": "tn",
+      "n_gt_frames": 5,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-3078294001-3",
+      "qtype": "cw",
+      "n_gt_frames": 4,
+      "base_448": false,
+      "uniform_hi": true,
+      "gt_local": true,
+      "gt_local_hi": true
+    },
+    {
+      "case_id": "nextgqa-3376544720-9",
+      "qtype": "ch",
+      "n_gt_frames": 24,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-3429509208-1",
+      "qtype": "cw",
+      "n_gt_frames": 10,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-3943634344-10",
+      "qtype": "tn",
+      "n_gt_frames": 3,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-4087013668-8",
+      "qtype": "tn",
+      "n_gt_frames": 6,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": true,
+      "gt_local_hi": true
+    },
+    {
+      "case_id": "nextgqa-4123915842-7",
+      "qtype": "tc",
+      "n_gt_frames": 6,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-4674481985-2",
+      "qtype": "tn",
+      "n_gt_frames": 13,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-4838145161-2",
+      "qtype": "cw",
+      "n_gt_frames": 22,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": true,
+      "gt_local_hi": true
+    },
+    {
+      "case_id": "nextgqa-4942054721-4",
+      "qtype": "tc",
+      "n_gt_frames": 8,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-5945172741-7",
+      "qtype": "ch",
+      "n_gt_frames": 8,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-6097994550-4",
+      "qtype": "ch",
+      "n_gt_frames": 8,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": true,
+      "gt_local_hi": true
+    },
+    {
+      "case_id": "nextgqa-6516459343-4",
+      "qtype": "cw",
+      "n_gt_frames": 6,
+      "base_448": false,
+      "uniform_hi": true,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-8252088130-4",
+      "qtype": "tn",
+      "n_gt_frames": 6,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+=== ChartQA gate: model=8b n=60 cases ===
+[8b/chartqa/free_form seed0] free=0.617 method=0.617 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0
+[8b/chartqa/self_reflect seed0] free=0.633 method=0.650 net=+0.017 CI[+0.000,+0.050] gain=1 lost=0
+[8b/chartqa/self_reflect seed1] free=0.617 method=0.633 net=+0.017 CI[+0.000,+0.050] gain=1 lost=0
+[8b/chartqa/self_reflect seed2] free=0.633 method=0.633 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0
+[8b/chartqa/self_reflect seed3] free=0.633 method=0.633 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0
+[8b/chartqa/self_reflect seed4] free=0.617 method=0.633 net=+0.017 CI[+0.000,+0.050] gain=1 lost=0
+[8b/chartqa/self_reflect seed5] free=0.600 method=0.617 net=+0.017 CI[+0.000,+0.050] gain=1 lost=0
+[8b/chartqa/self_reflect seed6] free=0.600 method=0.617 net=+0.017 CI[+0.000,+0.050] gain=1 lost=0
+[8b/chartqa/self_reflect seed7] free=0.600 method=0.617 net=+0.017 CI[+0.000,+0.050] gain=1 lost=0
+[8b/chartqa/self_reflect seed8] free=0.650 method=0.650 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0
+[8b/chartqa/self_reflect seed9] free=0.633 method=0.650 net=+0.017 CI[+0.000,+0.050] gain=1 lost=0
+[8b/chartqa/orch_reflect_blind seed0] free=0.600 method=0.617 net=+0.017 CI[-0.067,+0.100] gain=4 lost=3
+[8b/chartqa/orch_reflect_blind seed1] free=0.617 method=0.617 net=+0.000 CI[-0.083,+0.100] gain=4 lost=4
+[8b/chartqa/orch_reflect_blind seed2] free=0.617 method=0.633 net=+0.017 CI[-0.100,+0.133] gain=6 lost=5
+[8b/chartqa/orch_reflect_blind seed3] free=0.583 method=0.600 net=+0.017 CI[-0.067,+0.100] gain=4 lost=3
+[8b/chartqa/orch_reflect_blind seed4] free=0.600 method=0.517 net=-0.083 CI[-0.167,-0.017] gain=0 lost=5
+[8b/chartqa/orch_reflect_blind seed5] free=0.600 method=0.567 net=-0.033 CI[-0.117,+0.050] gain=2 lost=4
+[8b/chartqa/orch_reflect_blind seed6] free=0.617 method=0.533 net=-0.083 CI[-0.183,+0.017] gain=3 lost=8
+[8b/chartqa/orch_reflect_blind seed7] free=0.617 method=0.567 net=-0.050 CI[-0.150,+0.050] gain=3 lost=6
+[8b/chartqa/orch_reflect_blind seed8] free=0.617 method=0.600 net=-0.017 CI[-0.100,+0.067] gain=3 lost=4
+[8b/chartqa/orch_reflect_blind seed9] free=0.617 method=0.550 net=-0.067 CI[-0.167,+0.017] gain=2 lost=6
+
+=== SUMMARY (ChartQA) ===
+  self_reflect           net_mean=+0.012 ± 0.008 (k=10) verdict=within-variance
+  orch_reflect_blind     net_mean=-0.028 ± 0.041 (k=10) verdict=within-variance

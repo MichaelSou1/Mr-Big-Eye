@@ -1,0 +1,951 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-4838145161-0",
+    "video_id": "09354c9c0dec47cf",
+    "question": "why is there water flowing from the tap\n\nCandidates:\nA) to prevent babies from drowning\nB) pipe is open\nC) for cat to drink\nD) raining\nE) soapy\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "for cat to drink",
+    "required_keywords": [
+      "cat",
+      "drink"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      26.7
+    ],
+    "gold_scenes": [
+      {
+        "start": 0.0,
+        "end": 53.4
+      }
+    ],
+    "question_type": "cw"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "why is there water flowing from the tap\n\nCandidates:\nA) to prevent babies from drowning\nB) pipe is open\nC) for cat to drink\nD) raining\nE) soapy\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the visual reason for water flowing from the tap using focused video evidence. (visual_detail, focused)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "Why is water flowing from the tap?",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-85899feb8f810f26",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 21.0, \"source\": \"retrieval\"}, {\"timestamp\": 22.0, \"source\": \"retrieval\"}, {\"timestamp\": 23.0, \"source\": \"retrieval\"}, {\"timestamp\": 29.0, \"source\": \"retrieval\"}, {\"timestamp\": 30.0, \"source\": \"retrieval\"}, {\"timestamp\": 61.0, \"source\": \"retrieval\"}, {\"timestamp\": 63.0, \"source\": \"retrieval\"}, {\"timestamp\": 64.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"scene_id\": 0, \"end\": 10.0, \"filename\": \"scene_0000.jpg\", \"t_mid\": 5.0, \"start\": 0.0, \"caption\": \"A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.\", \"score\": 0.5545504093170166}, {\"filename\": \"scene_0001.jpg\", \"start\": 10.0, \"scene_id\": 1, \"caption\": \"A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.\", \"end\": 20.0, \"t_mid\": 15.0, \"score\": 0.5669229626655579}, {\"scene_id\": 2, \"caption\": \"A black and white kitten drinks from a running faucet in a kitchen sink, with a towel draped over the edge.\", \"filename\": \"scene_0002.jpg\", \"t_mid\": 25.0, \"end\": 30.0, \"start\": 20.0, \"score\": 0.5498154163360596}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 8, \"planner_notes\": \"\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-85899feb8f810f26",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 21.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 22.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 23.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 29.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 30.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 61.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 63.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 64.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "scene_id": 0,
+            "end": 10.0,
+            "filename": "scene_0000.jpg",
+            "t_mid": 5.0,
+            "start": 0.0,
+            "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+            "score": 0.5545504093170166
+          },
+          {
+            "filename": "scene_0001.jpg",
+            "start": 10.0,
+            "scene_id": 1,
+            "caption": "A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.",
+            "end": 20.0,
+            "t_mid": 15.0,
+            "score": 0.5669229626655579
+          },
+          {
+            "scene_id": 2,
+            "caption": "A black and white kitten drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+            "filename": "scene_0002.jpg",
+            "t_mid": 25.0,
+            "end": 30.0,
+            "start": 20.0,
+            "score": 0.5498154163360596
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "OBSERVE: The video shows a cat drinking from a running tap. The tap is visibly open, and water is flowing. No mention of babies, rain, or soap. The cat is actively drinking, indicating the water is flowing for its use.\n\nPLAN: Confirm the tap is open and water is flowing for the cat. (visual_detail, focused)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "Why is water flowing from the tap?",
+            "center_t": 22.0,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-8059c411563702b3",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 18.0, \"end\": 26.0, \"center_t\": 22.0, \"frame_count\": 9}, \"observation\": \"[t=18.0s] 一只黑白相间的猫站在水槽边缘，头部低垂，正对着从水龙头流出的水流。水流呈细柱状垂直落入水槽中。水槽为浅色石材质地，背景可见水龙头把手和部分台面物品。\\n\\n[t=19.0s] 猫的姿势基本未变，仍专注地低头靠近水流。水流持续下落，水槽底部的排水口清晰可见。猫的胡须在水流附近微微晃动。\\n\\n[t=20.0s] 猫继续低头，嘴部靠近水流，似乎在舔舐或观察水流。水流稳定，水槽内无明显水位变化。猫的前爪稳稳踩在水槽边缘。\\n\\n[t=21.0s] 猫的头部位置略有调整，但依然保持低头姿态，专注注视水流。水流持续下落，水槽排水口在画面下方。\\n\\n[t=22.0s] 猫的头部进一步靠近水流，嘴部几乎贴到水流边缘。水流未中断，水槽内水体平静。猫的毛发在光线下有明显反光。\\n\\n[t=23.0s] 猫的姿势保持不变，持续低头靠近水流。水流稳定，水槽边缘可见一条毛巾或布料。\\n\\n[t=24.0s] 猫的头部位置微调，但整体姿态未变，仍专注水流。水流持续下落，水槽排水口清晰可见。\\n\\n[t=25.0s] 猫的头部更贴近水流，嘴部几乎触碰到水流。水流未中断，水槽内无明显水位变化。猫的胡须在水流附近清晰可见。\\n\\n[t=26.0s] 猫的头部位置略有调整，但依然保持低头姿态，专注水流。水流持续下落，水槽排水口在画面下方。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8059c411563702b3",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 18.0,
+          "end": 26.0,
+          "center_t": 22.0,
+          "frame_count": 9
+        },
+        "observation": "[t=18.0s] 一只黑白相间的猫站在水槽边缘，头部低垂，正对着从水龙头流出的水流。水流呈细柱状垂直落入水槽中。水槽为浅色石材质地，背景可见水龙头把手和部分台面物品。\n\n[t=19.0s] 猫的姿势基本未变，仍专注地低头靠近水流。水流持续下落，水槽底部的排水口清晰可见。猫的胡须在水流附近微微晃动。\n\n[t=20.0s] 猫继续低头，嘴部靠近水流，似乎在舔舐或观察水流。水流稳定，水槽内无明显水位变化。猫的前爪稳稳踩在水槽边缘。\n\n[t=21.0s] 猫的头部位置略有调整，但依然保持低头姿态，专注注视水流。水流持续下落，水槽排水口在画面下方。\n\n[t=22.0s] 猫的头部进一步靠近水流，嘴部几乎贴到水流边缘。水流未中断，水槽内水体平静。猫的毛发在光线下有明显反光。\n\n[t=23.0s] 猫的姿势保持不变，持续低头靠近水流。水流稳定，水槽边缘可见一条毛巾或布料。\n\n[t=24.0s] 猫的头部位置微调，但整体姿态未变，仍专注水流。水流持续下落，水槽排水口清晰可见。\n\n[t=25.0s] 猫的头部更贴近水流，嘴部几乎触碰到水流。水流未中断，水槽内无明显水位变化。猫的胡须在水流附近清晰可见。\n\n[t=26.0s] 猫的头部位置略有调整，但依然保持低头姿态，专注水流。水流持续下落，水槽排水口在画面下方。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: The evidence confirms the tap is open and water is flowing for the cat to drink. (visual_detail, focused)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "why is there water flowing from the tap",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-939d4f4661181432",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": true, \"confidence\": 0.78, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 14, \"scene_count\": 3, \"text_evidence_count\": 0, \"time_span_sec\": 46.0, \"missing_evidence\": [], \"recommended_next_action\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-939d4f4661181432",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 14,
+        "scene_count": 3,
+        "text_evidence_count": 0,
+        "time_span_sec": 46.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "why is there water flowing from the tap\n\nCandidates:\nA) to prevent babies from drowning\nB) pipe is open\nC) for cat to drink\nD) raining\nE) soapy\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is C) for cat to drink\\n\\n[FRAME:t=18.0] shows a black and white cat leaning into a running tap, drinking directly from the stream of water. The cat’s posture and focused attention on the water stream confirm it is drinking. The tap is visibly open, but the primary purpose shown is the cat’s consumption. Other options are contradicted: no babies are visible (A), no rain or soap is shown (D, E), and while the pipe is open (B), this is a secondary observation — the cat’s drinking is the direct reason for the water flow in context. The least contradicted and most directly supported option is C.\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": false, \"valid_markers\": 1, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [\"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"C\", \"text\": \"for cat to drink\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"C\", \"text\": \"for cat to drink\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is C) for cat to drink\n\n[FRAME:t=18.0] shows a black and white cat leaning into a running tap, drinking directly from the stream of water. The cat’s posture and focused attention on the water stream confirm it is drinking. The tap is visibly open, but the primary purpose shown is the cat’s consumption. Other options are contradicted: no babies are visible (A), no rain or soap is shown (D, E), and while the pipe is open (B), this is a secondary observation — the cat’s drinking is the direct reason for the water flow in context. The least contradicted and most directly supported option is C.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 1,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "C",
+            "text": "for cat to drink"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "C",
+              "text": "for cat to drink"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is C) for cat to drink\\n\\n[FRAME:t=18.0] shows a black and white cat leaning into a running tap, drinking directly from the stream of water. The cat’s posture and focused attention on the water stream confirm it is drinking. The tap is visibly open, but the primary purpose shown is the cat’s consumption. Other options are contradicted: no babies are visible (A), no rain or soap is shown (D, E), and while the pipe is open (B), this is a secondary observation — the cat’s drinking is the direct reason for the water flow in context. The least contradicted and most directly supported option is C.\", \"grounding_report\": {\"grounded\": false, \"valid_markers\": 1, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [\"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"C\", \"text\": \"for cat to drink\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"C\", \"text\": \"for cat to drink\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is C) for cat to drink\n\n[FRAME:t=18.0] shows a black and white cat leaning into a running tap, drinking directly from the stream of water. The cat’s posture and focused attention on the water stream confirm it is drinking. The tap is visibly open, but the primary purpose shown is the cat’s consumption. Other options are contradicted: no babies are visible (A), no rain or soap is shown (D, E), and while the pipe is open (B), this is a secondary observation — the cat’s drinking is the direct reason for the water flow in context. The least contradicted and most directly supported option is C.",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 1,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "C",
+            "text": "for cat to drink"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "C",
+              "text": "for cat to drink"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "why is there water flowing from the tap\n\nCandidates:\nA) to prevent babies from drowning\nB) pipe is open\nC) for cat to drink\nD) raining\nE) soapy\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is C) for cat to drink\\n\\n[FRAME:t=18.0] shows a black and white cat leaning into a sink with water flowing from the tap. [FRAME:t=19.0] to [FRAME:t=30.0] show the cat actively drinking from the stream of water. The cat’s posture and behavior are consistent with drinking. No evidence of babies, rain, or soap is visible. The tap is open, but the reason for the water flowing is clearly for the cat’s consumption.\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": true, \"valid_markers\": 3, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"C\", \"text\": \"for cat to drink\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is C) for cat to drink\n\n[FRAME:t=18.0] shows a black and white cat leaning into a sink with water flowing from the tap. [FRAME:t=19.0] to [FRAME:t=30.0] show the cat actively drinking from the stream of water. The cat’s posture and behavior are consistent with drinking. No evidence of babies, rain, or soap is visible. The tap is open, but the reason for the water flowing is clearly for the cat’s consumption.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "C",
+            "text": "for cat to drink"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is C) for cat to drink\\n\\n[FRAME:t=18.0] shows a black and white cat leaning into a sink with water flowing from the tap. [FRAME:t=19.0] to [FRAME:t=30.0] show the cat actively drinking from the stream of water. The cat’s posture and behavior are consistent with drinking. No evidence of babies, rain, or soap is visible. The tap is open, but the reason for the water flowing is clearly for the cat’s consumption.\", \"grounding_report\": {\"grounded\": true, \"valid_markers\": 3, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"C\", \"text\": \"for cat to drink\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"final_answer\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is C) for cat to drink\n\n[FRAME:t=18.0] shows a black and white cat leaning into a sink with water flowing from the tap. [FRAME:t=19.0] to [FRAME:t=30.0] show the cat actively drinking from the stream of water. The cat’s posture and behavior are consistent with drinking. No evidence of babies, rain, or soap is visible. The tap is open, but the reason for the water flowing is clearly for the cat’s consumption.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "C",
+            "text": "for cat to drink"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is C) for cat to drink\n\n[FRAME:t=18.0] shows a black and white cat leaning into a sink with water flowing from the tap. [FRAME:t=19.0] to [FRAME:t=30.0] show the cat actively drinking from the stream of water. The cat’s posture and behavior are consistent with drinking. No evidence of babies, rain, or soap is visible. The tap is open, but the reason for the water flowing is clearly for the cat’s consumption.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "Why is water flowing from the tap?",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 21.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 22.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 23.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 29.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 30.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 61.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 63.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 64.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "scene_id": 0,
+            "end": 10.0,
+            "filename": "scene_0000.jpg",
+            "t_mid": 5.0,
+            "start": 0.0,
+            "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+            "score": 0.5545504093170166
+          },
+          {
+            "filename": "scene_0001.jpg",
+            "start": 10.0,
+            "scene_id": 1,
+            "caption": "A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.",
+            "end": 20.0,
+            "t_mid": 15.0,
+            "score": 0.5669229626655579
+          },
+          {
+            "scene_id": 2,
+            "caption": "A black and white kitten drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+            "filename": "scene_0002.jpg",
+            "t_mid": 25.0,
+            "end": 30.0,
+            "start": 20.0,
+            "score": 0.5498154163360596
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-85899feb8f810f26",
+      "internalizability": "type2"
+    },
+    {
+      "index": 4,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "Why is water flowing from the tap?",
+        "center_t": 22.0,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 18.0,
+          "end": 26.0,
+          "center_t": 22.0,
+          "frame_count": 9
+        },
+        "observation": "[t=18.0s] 一只黑白相间的猫站在水槽边缘，头部低垂，正对着从水龙头流出的水流。水流呈细柱状垂直落入水槽中。水槽为浅色石材质地，背景可见水龙头把手和部分台面物品。\n\n[t=19.0s] 猫的姿势基本未变，仍专注地低头靠近水流。水流持续下落，水槽底部的排水口清晰可见。猫的胡须在水流附近微微晃动。\n\n[t=20.0s] 猫继续低头，嘴部靠近水流，似乎在舔舐或观察水流。水流稳定，水槽内无明显水位变化。猫的前爪稳稳踩在水槽边缘。\n\n[t=21.0s] 猫的头部位置略有调整，但依然保持低头姿态，专注注视水流。水流持续下落，水槽排水口在画面下方。\n\n[t=22.0s] 猫的头部进一步靠近水流，嘴部几乎贴到水流边缘。水流未中断，水槽内水体平静。猫的毛发在光线下有明显反光。\n\n[t=23.0s] 猫的姿势保持不变，持续低头靠近水流。水流稳定，水槽边缘可见一条毛巾或布料。\n\n[t=24.0s] 猫的头部位置微调，但整体姿态未变，仍专注水流。水流持续下落，水槽排水口清晰可见。\n\n[t=25.0s] 猫的头部更贴近水流，嘴部几乎触碰到水流。水流未中断，水槽内无明显水位变化。猫的胡须在水流附近清晰可见。\n\n[t=26.0s] 猫的头部位置略有调整，但依然保持低头姿态，专注水流。水流持续下落，水槽排水口在画面下方。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-8059c411563702b3",
+      "internalizability": "type1"
+    },
+    {
+      "index": 6,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "why is there water flowing from the tap",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 14,
+        "scene_count": 3,
+        "text_evidence_count": 0,
+        "time_span_sec": 46.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-939d4f4661181432",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "why is there water flowing from the tap\n\nCandidates:\nA) to prevent babies from drowning\nB) pipe is open\nC) for cat to drink\nD) raining\nE) soapy\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is C) for cat to drink\n\n[FRAME:t=18.0] shows a black and white cat leaning into a running tap, drinking directly from the stream of water. The cat’s posture and focused attention on the water stream confirm it is drinking. The tap is visibly open, but the primary purpose shown is the cat’s consumption. Other options are contradicted: no babies are visible (A), no rain or soap is shown (D, E), and while the pipe is open (B), this is a secondary observation — the cat’s drinking is the direct reason for the water flow in context. The least contradicted and most directly supported option is C.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 1,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "C",
+            "text": "for cat to drink"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "C",
+              "text": "for cat to drink"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 10,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is C) for cat to drink\n\n[FRAME:t=18.0] shows a black and white cat leaning into a running tap, drinking directly from the stream of water. The cat’s posture and focused attention on the water stream confirm it is drinking. The tap is visibly open, but the primary purpose shown is the cat’s consumption. Other options are contradicted: no babies are visible (A), no rain or soap is shown (D, E), and while the pipe is open (B), this is a secondary observation — the cat’s drinking is the direct reason for the water flow in context. The least contradicted and most directly supported option is C.",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 1,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "C",
+            "text": "for cat to drink"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "C",
+              "text": "for cat to drink"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "answer_with_evidence"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    },
+    {
+      "index": 12,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "why is there water flowing from the tap\n\nCandidates:\nA) to prevent babies from drowning\nB) pipe is open\nC) for cat to drink\nD) raining\nE) soapy\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is C) for cat to drink\n\n[FRAME:t=18.0] shows a black and white cat leaning into a sink with water flowing from the tap. [FRAME:t=19.0] to [FRAME:t=30.0] show the cat actively drinking from the stream of water. The cat’s posture and behavior are consistent with drinking. No evidence of babies, rain, or soap is visible. The tap is open, but the reason for the water flowing is clearly for the cat’s consumption.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "C",
+            "text": "for cat to drink"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 14,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is C) for cat to drink\n\n[FRAME:t=18.0] shows a black and white cat leaning into a sink with water flowing from the tap. [FRAME:t=19.0] to [FRAME:t=30.0] show the cat actively drinking from the stream of water. The cat’s posture and behavior are consistent with drinking. No evidence of babies, rain, or soap is visible. The tap is open, but the reason for the water flowing is clearly for the cat’s consumption.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "C",
+            "text": "for cat to drink"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 18.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 19.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0019.0.jpg"
+      },
+      {
+        "timestamp": 20.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0020.0.jpg"
+      },
+      {
+        "timestamp": 21.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0021.0.jpg"
+      },
+      {
+        "timestamp": 22.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0022.0.jpg"
+      },
+      {
+        "timestamp": 23.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 24.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0024.0.jpg"
+      },
+      {
+        "timestamp": 25.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0025.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 29.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0029.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 61.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0061.0.jpg"
+      },
+      {
+        "timestamp": 63.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0063.0.jpg"
+      },
+      {
+        "timestamp": 64.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0064.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 19.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0019.0.jpg"
+      },
+      {
+        "timestamp": 23.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 34.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0034.0.jpg"
+      },
+      {
+        "timestamp": 38.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0038.0.jpg"
+      },
+      {
+        "timestamp": 41.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0041.0.jpg"
+      },
+      {
+        "timestamp": 45.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0045.0.jpg"
+      },
+      {
+        "timestamp": 49.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0049.0.jpg"
+      },
+      {
+        "timestamp": 53.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0053.0.jpg"
+      },
+      {
+        "timestamp": 57.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0057.0.jpg"
+      },
+      {
+        "timestamp": 60.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0060.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "scene_id": 0,
+        "end": 10.0,
+        "filename": "scene_0000.jpg",
+        "t_mid": 5.0,
+        "start": 0.0,
+        "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+        "score": 0.5545504093170166
+      },
+      {
+        "filename": "scene_0001.jpg",
+        "start": 10.0,
+        "scene_id": 1,
+        "caption": "A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.",
+        "end": 20.0,
+        "t_mid": 15.0,
+        "score": 0.5669229626655579
+      },
+      {
+        "scene_id": 2,
+        "caption": "A black and white kitten drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+        "filename": "scene_0002.jpg",
+        "t_mid": 25.0,
+        "end": 30.0,
+        "start": 20.0,
+        "score": 0.5498154163360596
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 8,
+      "planner_notes": ""
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": true,
+      "confidence": 0.78,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 14,
+      "scene_count": 3,
+      "text_evidence_count": 0,
+      "time_span_sec": 46.0,
+      "missing_evidence": [],
+      "recommended_next_action": "answer_with_evidence"
+    },
+    "draft_answer": "The correct answer is C) for cat to drink\n\n[FRAME:t=18.0] shows a black and white cat leaning into a sink with water flowing from the tap. [FRAME:t=19.0] to [FRAME:t=30.0] show the cat actively drinking from the stream of water. The cat’s posture and behavior are consistent with drinking. No evidence of babies, rain, or soap is visible. The tap is open, but the reason for the water flowing is clearly for the cat’s consumption.",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=18.0s] 一只黑白相间的猫站在水槽边缘，头部低垂，正对着从水龙头流出的水流。水流呈细柱状垂直落入水槽中。水槽为浅色石材质地，背景可见水龙头把手和部分台面物品。\n\n[t=19.0s] 猫的姿势基本未变，仍专注地低头靠近水流。水流持续下落，水槽底部的排水口清晰可见。猫的胡须在水流附近微微晃动。\n\n[t=20.0s] 猫继续低头，嘴部靠近水流，似乎在舔舐或观察水流。水流稳定，水槽内无明显水位变化。猫的前爪稳稳踩在水槽边缘。\n\n[t=21.0s] 猫的头部位置略有调整，但依然保持低头姿态，专注注视水流。水流持续下落，水槽排水口在画面下方。\n\n[t=22.0s] 猫的头部进一步靠近水流，嘴部几乎贴到水流边缘。水流未中断，水槽内水体平静。猫的毛发在光线下有明显反光。\n\n[t=23.0s] 猫的姿势保持不变，持续低头靠近水流。水流稳定，水槽边缘可见一条毛巾或布料。\n\n[t=24.0s] 猫的头部位置微调，但整体姿态未变，仍专注水流。水流持续下落，水槽排水口清晰可见。\n\n[t=25.0s] 猫的头部更贴近水流，嘴部几乎触碰到水流。水流未中断，水槽内无明显水位变化。猫的胡须在水流附近清晰可见。\n\n[t=26.0s] 猫的头部位置略有调整，但依然保持低头姿态，专注水流。水流持续下落，水槽排水口在画面下方。",
+        "timestamps": [
+          18.0,
+          19.0,
+          20.0,
+          21.0,
+          22.0,
+          23.0,
+          24.0,
+          25.0,
+          26.0
+        ],
+        "window": {
+          "start": 18.0,
+          "end": 26.0,
+          "center_t": 22.0
+        }
+      }
+    ],
+    "grounding_report": {
+      "grounded": true,
+      "valid_markers": 3,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [],
+      "selected_candidate": {
+        "label": "C",
+        "text": "for cat to drink"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": null,
+      "recommended_next_action": "final_answer"
+    },
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "27d1cb6be9195f43bb5d026d84b6f36583388e2c"
+}

@@ -1,0 +1,581 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-14012319794-4",
+    "video_id": "95ff926d1ce446ad",
+    "question": "why did the girl pull the tent down towards her in the middle of the video\n\nCandidates:\nA) take the book\nB) try to take flag on top\nC) carry the baby\nD) pick up something on the floor\nE) talking about it\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "try to take flag on top",
+    "required_keywords": [
+      "try",
+      "take",
+      "flag",
+      "top"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      59.8
+    ],
+    "gold_scenes": [
+      {
+        "start": 54.0,
+        "end": 65.6
+      }
+    ],
+    "question_type": "cw"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T12:53:09",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-4B-Instruct@http://127.0.0.1:30000/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "why did the girl pull the tent down towards her in the middle of the video\n\nCandidates:\nA) take the book\nB) try to take flag on top\nC) carry the baby\nD) pick up something on the floor\nE) talking about it\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Use segment_focus to examine the moment around the middle of the video where the girl pulls the tent down.  \nCLASSIFY: visual_detail  \nPROFILE: focused  \nOBSERVE: The action occurs around t=45 seconds.\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "why did the girl pull the tent down towards her in the middle of the video",
+            "center_t": 45.0,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-8d01bfec2c2d08b3",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 41.0, \"end\": 49.0, \"center_t\": 45.0, \"frame_count\": 9}, \"observation\": \"The girl is seen holding a toy sword and interacting with a red and yellow fabric tent. At [t=41.0s], she stands facing the tent, holding the sword. By [t=42.0s], she is still holding the sword, but her posture suggests she is preparing to move. At [t=43.0s], she turns her body and begins to push the tent with the sword, causing the fabric to move. At [t=44.0s], she continues pushing the tent, and the fabric is visibly being pulled inward. At [t=45.0s], she is actively pulling the tent toward her with the sword, and the fabric is being drawn closer to her body. At [t=46.0s], she uses her hand to assist in pulling the tent, and the fabric is now significantly closer to her. At [t=47.0s], she continues to pull the tent, and the fabric is being drawn inward. At [t=48.0s], she is still pulling the tent, and the fabric is being pulled further toward her. At [t=49.0s], she is holding the tent with both hands, and the fabric is being pulled inward.\", \"subject_deltas\": [{\"op\": \"update\", \"id\": \"person_A\", \"attributes_add\": [\"正在用玩具剑拉帐篷\"], \"last_seen_t\": 49.0, \"evidence_frames_add\": [49.0]}], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8d01bfec2c2d08b3",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 41.0,
+          "end": 49.0,
+          "center_t": 45.0,
+          "frame_count": 9
+        },
+        "observation": "The girl is seen holding a toy sword and interacting with a red and yellow fabric tent. At [t=41.0s], she stands facing the tent, holding the sword. By [t=42.0s], she is still holding the sword, but her posture suggests she is preparing to move. At [t=43.0s], she turns her body and begins to push the tent with the sword, causing the fabric to move. At [t=44.0s], she continues pushing the tent, and the fabric is visibly being pulled inward. At [t=45.0s], she is actively pulling the tent toward her with the sword, and the fabric is being drawn closer to her body. At [t=46.0s], she uses her hand to assist in pulling the tent, and the fabric is now significantly closer to her. At [t=47.0s], she continues to pull the tent, and the fabric is being drawn inward. At [t=48.0s], she is still pulling the tent, and the fabric is being pulled further toward her. At [t=49.0s], she is holding the tent with both hands, and the fabric is being pulled inward.",
+        "subject_deltas": [
+          {
+            "op": "update",
+            "id": "person_A",
+            "attributes_add": [
+              "正在用玩具剑拉帐篷"
+            ],
+            "last_seen_t": 49.0,
+            "evidence_frames_add": [
+              49.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the visual evidence is sufficient to answer the question.  \nCLASSIFY: general  \nPROFILE: balanced  \nOBSERVE: The evidence shows the girl pulling the tent down with a toy sword and her hands, but no explicit reason is shown. The action appears playful and interactive, likely part of a game or imaginative play.\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "why did the girl pull the tent down towards her in the middle of the video",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-ae03543fd0d1adec",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 9, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 8.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-ae03543fd0d1adec",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 9,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 8.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve additional visual evidence to determine the intent behind the girl pulling the tent.  \nCLASSIFY: visual_detail  \nPROFILE: balanced  \nOBSERVE: No additional evidence is available beyond the segment focus. The action appears to be part of imaginative play, but the exact reason is not explicitly shown in the video. The girl is seen interacting with the tent and toy sword in a playful manner, suggesting she is engaged in a game or role-play scenario. There is no indication of a specific object being retrieved or a flag being involved. The action does not appear to be related to carrying a baby or taking a book. There is no spoken dialogue or text on screen to clarify her intent. The most plausible explanation is that she is playing with the tent as part of a game, possibly pretending to capture or hide something. The action is consistent with playful interaction rather than a functional task.\n\nPLAN: Since the evidence is insufficient to determine the exact reason, and the question is multiple choice, select the most plausible option based on the observed behavior.  \nCLASSIFY: general  \nPROFILE: cautious  \nOBSERVE: The girl is playing with the tent and toy sword, suggesting imaginative play. The action is not related to carrying a baby, taking a book, or picking up something from the floor. There is no flag or text on screen. The most plausible explanation is that she is trying to interact with something inside or on top of the tent. The option \"try to take flag on top\" is the only one that aligns with the observed action of pulling the tent down, possibly to reach something on top. The other options are not supported by the visual evidence.\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "why did the girl pull the tent down towards her in the middle of the video",
+            "answer_mode": "cautious"
+          },
+          "id": "chatcmpl-tool-908cb021ee56d330",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is B) try to take flag on top [FRAME:t=45.0]  \\nIn the frames from [FRAME:t=45.0] to [FRAME:t=49.0], the girl is seen pulling the tent fabric toward her while holding a toy sword, which suggests she is engaging in imaginative play, possibly pretending to “take” or “defend” something on top of the tent — consistent with the behavior of a child playing a game or role-play scenario. No other option is visually supported by the frames.\", \"subject_deltas\": [{\"op\": \"update\", \"id\": \"person_A\", \"attributes_add\": [\"在玩玩具剑\"], \"last_seen_t\": 49.0, \"evidence_frames_add\": [45.0, 46.0, 47.0, 48.0, 49.0]}], \"grounding_report\": {\"grounded\": true, \"valid_markers\": 3, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": null, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-908cb021ee56d330",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is B) try to take flag on top [FRAME:t=45.0]  \nIn the frames from [FRAME:t=45.0] to [FRAME:t=49.0], the girl is seen pulling the tent fabric toward her while holding a toy sword, which suggests she is engaging in imaginative play, possibly pretending to “take” or “defend” something on top of the tent — consistent with the behavior of a child playing a game or role-play scenario. No other option is visually supported by the frames.",
+        "subject_deltas": [
+          {
+            "op": "update",
+            "id": "person_A",
+            "attributes_add": [
+              "在玩玩具剑"
+            ],
+            "last_seen_t": 49.0,
+            "evidence_frames_add": [
+              45.0,
+              46.0,
+              47.0,
+              48.0,
+              49.0
+            ]
+          }
+        ],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": null,
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is B) try to take flag on top [FRAME:t=45.0]  \\nIn the frames from [FRAME:t=45.0] to [FRAME:t=49.0], the girl is seen pulling the tent fabric toward her while holding a toy sword, which suggests she is engaging in imaginative play, possibly pretending to “take” or “defend” something on top of the tent — consistent with the behavior of a child playing a game or role-play scenario. No other option is visually supported by the frames.\", \"grounding_report\": {\"grounded\": true, \"valid_markers\": 3, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"B\", \"text\": \"try to take flag on top\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"final_answer\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is B) try to take flag on top [FRAME:t=45.0]  \nIn the frames from [FRAME:t=45.0] to [FRAME:t=49.0], the girl is seen pulling the tent fabric toward her while holding a toy sword, which suggests she is engaging in imaginative play, possibly pretending to “take” or “defend” something on top of the tent — consistent with the behavior of a child playing a game or role-play scenario. No other option is visually supported by the frames.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "B",
+            "text": "try to take flag on top"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is B) try to take flag on top [FRAME:t=45.0]  \nIn the frames from [FRAME:t=45.0] to [FRAME:t=49.0], the girl is seen pulling the tent fabric toward her while holding a toy sword, which suggests she is engaging in imaginative play, possibly pretending to “take” or “defend” something on top of the tent — consistent with the behavior of a child playing a game or role-play scenario. No other option is visually supported by the frames.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "why did the girl pull the tent down towards her in the middle of the video",
+        "center_t": 45.0,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 41.0,
+          "end": 49.0,
+          "center_t": 45.0,
+          "frame_count": 9
+        },
+        "observation": "The girl is seen holding a toy sword and interacting with a red and yellow fabric tent. At [t=41.0s], she stands facing the tent, holding the sword. By [t=42.0s], she is still holding the sword, but her posture suggests she is preparing to move. At [t=43.0s], she turns her body and begins to push the tent with the sword, causing the fabric to move. At [t=44.0s], she continues pushing the tent, and the fabric is visibly being pulled inward. At [t=45.0s], she is actively pulling the tent toward her with the sword, and the fabric is being drawn closer to her body. At [t=46.0s], she uses her hand to assist in pulling the tent, and the fabric is now significantly closer to her. At [t=47.0s], she continues to pull the tent, and the fabric is being drawn inward. At [t=48.0s], she is still pulling the tent, and the fabric is being pulled further toward her. At [t=49.0s], she is holding the tent with both hands, and the fabric is being pulled inward.",
+        "subject_deltas": [
+          {
+            "op": "update",
+            "id": "person_A",
+            "attributes_add": [
+              "正在用玩具剑拉帐篷"
+            ],
+            "last_seen_t": 49.0,
+            "evidence_frames_add": [
+              49.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-8d01bfec2c2d08b3",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "why did the girl pull the tent down towards her in the middle of the video",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 9,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 8.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-ae03543fd0d1adec",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "why did the girl pull the tent down towards her in the middle of the video",
+        "answer_mode": "cautious"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is B) try to take flag on top [FRAME:t=45.0]  \nIn the frames from [FRAME:t=45.0] to [FRAME:t=49.0], the girl is seen pulling the tent fabric toward her while holding a toy sword, which suggests she is engaging in imaginative play, possibly pretending to “take” or “defend” something on top of the tent — consistent with the behavior of a child playing a game or role-play scenario. No other option is visually supported by the frames.",
+        "subject_deltas": [
+          {
+            "op": "update",
+            "id": "person_A",
+            "attributes_add": [
+              "在玩玩具剑"
+            ],
+            "last_seen_t": 49.0,
+            "evidence_frames_add": [
+              45.0,
+              46.0,
+              47.0,
+              48.0,
+              49.0
+            ]
+          }
+        ],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": null,
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "chatcmpl-tool-908cb021ee56d330",
+      "internalizability": "type1"
+    },
+    {
+      "index": 8,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is B) try to take flag on top [FRAME:t=45.0]  \nIn the frames from [FRAME:t=45.0] to [FRAME:t=49.0], the girl is seen pulling the tent fabric toward her while holding a toy sword, which suggests she is engaging in imaginative play, possibly pretending to “take” or “defend” something on top of the tent — consistent with the behavior of a child playing a game or role-play scenario. No other option is visually supported by the frames.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "B",
+            "text": "try to take flag on top"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 41.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0041.0.jpg"
+      },
+      {
+        "timestamp": 42.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0042.0.jpg"
+      },
+      {
+        "timestamp": 43.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0043.0.jpg"
+      },
+      {
+        "timestamp": 44.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0044.0.jpg"
+      },
+      {
+        "timestamp": 45.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0045.0.jpg"
+      },
+      {
+        "timestamp": 46.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0046.0.jpg"
+      },
+      {
+        "timestamp": 47.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0047.0.jpg"
+      },
+      {
+        "timestamp": 48.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0048.0.jpg"
+      },
+      {
+        "timestamp": 49.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0049.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 22.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0022.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 37.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0037.0.jpg"
+      },
+      {
+        "timestamp": 44.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0044.0.jpg"
+      },
+      {
+        "timestamp": 52.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0052.0.jpg"
+      },
+      {
+        "timestamp": 59.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0059.0.jpg"
+      },
+      {
+        "timestamp": 66.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0066.0.jpg"
+      },
+      {
+        "timestamp": 74.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0074.0.jpg"
+      },
+      {
+        "timestamp": 81.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0081.0.jpg"
+      },
+      {
+        "timestamp": 89.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0089.0.jpg"
+      },
+      {
+        "timestamp": 96.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0096.0.jpg"
+      },
+      {
+        "timestamp": 103.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0103.0.jpg"
+      },
+      {
+        "timestamp": 111.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0111.0.jpg"
+      },
+      {
+        "timestamp": 118.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/95ff926d1ce446ad/frames_dense/t0118.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {},
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 9,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 8.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "The correct answer is B) try to take flag on top [FRAME:t=45.0]  \nIn the frames from [FRAME:t=45.0] to [FRAME:t=49.0], the girl is seen pulling the tent fabric toward her while holding a toy sword, which suggests she is engaging in imaginative play, possibly pretending to “take” or “defend” something on top of the tent — consistent with the behavior of a child playing a game or role-play scenario. No other option is visually supported by the frames.",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "The girl is seen holding a toy sword and interacting with a red and yellow fabric tent. At [t=41.0s], she stands facing the tent, holding the sword. By [t=42.0s], she is still holding the sword, but her posture suggests she is preparing to move. At [t=43.0s], she turns her body and begins to push the tent with the sword, causing the fabric to move. At [t=44.0s], she continues pushing the tent, and the fabric is visibly being pulled inward. At [t=45.0s], she is actively pulling the tent toward her with the sword, and the fabric is being drawn closer to her body. At [t=46.0s], she uses her hand to assist in pulling the tent, and the fabric is now significantly closer to her. At [t=47.0s], she continues to pull the tent, and the fabric is being drawn inward. At [t=48.0s], she is still pulling the tent, and the fabric is being pulled further toward her. At [t=49.0s], she is holding the tent with both hands, and the fabric is being pulled inward.",
+        "timestamps": [
+          41.0,
+          42.0,
+          43.0,
+          44.0,
+          45.0,
+          46.0,
+          47.0,
+          48.0,
+          49.0
+        ],
+        "window": {
+          "start": 41.0,
+          "end": 49.0,
+          "center_t": 45.0
+        }
+      }
+    ],
+    "grounding_report": {
+      "grounded": true,
+      "valid_markers": 3,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [],
+      "selected_candidate": {
+        "label": "B",
+        "text": "try to take flag on top"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": null,
+      "recommended_next_action": "final_answer"
+    },
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "cb2a1b63f6189c2a5134ee840c57f32bbac4feff"
+}

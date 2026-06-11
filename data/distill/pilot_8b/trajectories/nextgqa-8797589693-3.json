@@ -1,0 +1,1292 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-8797589693-3",
+    "video_id": "55cc11b09f36c92a",
+    "question": "why did the man in blue turn to the lady in grey jacket before sitting down\n\nCandidates:\nA) talk to lady\nB) want to hug her\nC) to pass her something\nD) audience\nE) get a better view\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "talk to lady",
+    "required_keywords": [
+      "talk",
+      "lady"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      18.55
+    ],
+    "gold_scenes": [
+      {
+        "start": 16.5,
+        "end": 20.6
+      }
+    ],
+    "question_type": "cw"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "why did the man in blue turn to the lady in grey jacket before sitting down\n\nCandidates:\nA) talk to lady\nB) want to hug her\nC) to pass her something\nD) audience\nE) get a better view\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Use segment_focus to examine the moment just before the man in blue turns toward the lady in grey jacket, to analyze visual context and intent. (visual_detail, detail, focused)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "why did the man in blue turn to the lady in grey jacket before sitting down",
+            "center_t": 12.5,
+            "half_window_sec": 2.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-b46666b9b0342753",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 10.5, \"end\": 14.5, \"center_t\": 12.5, \"frame_count\": 4}, \"observation\": \"[t=11.0s] 画面中，一名穿蓝色衬衫的男子站在房间右侧，背对镜头，面向前方的白板和另外两名站立的男子。他身旁坐着一位穿灰色夹克的女士，但此时他并未面向她。\\n\\n[t=12.0s] 蓝衣男子身体转向左侧，面向穿灰色夹克的女士，同时他右手抬起，似乎在做手势或与她交流。此时，穿灰色夹克的女士正面向他。\\n\\n[t=13.0s] 蓝衣男子继续面向灰色夹克女士，身体略微前倾，似乎在与她交谈或互动。灰色夹克女士也保持面向他的姿势。\\n\\n[t=14.0s] 蓝衣男子仍面向灰色夹克女士，身体姿态与前一帧相似，两人似乎仍在互动。灰色夹克女士也保持面向他的姿势。\", \"subject_deltas\": [{\"op\": \"add\", \"id\": \"man_in_blue\", \"label\": \"穿蓝色衬衫的男子\", \"first_seen_t\": 11.0, \"attributes\": [\"站立\", \"面向前方\"], \"evidence_frames\": [11.0]}, {\"op\": \"add\", \"id\": \"lady_in_grey_jacket\", \"label\": \"穿灰色夹克的女士\", \"first_seen_t\": 11.0, \"attributes\": [\"坐着\", \"面向前方\"], \"evidence_frames\": [11.0]}, {\"op\": \"update\", \"id\": \"man_in_blue\", \"attributes_add\": [\"转向女士\", \"右手抬起做手势\"], \"last_seen_t\": 14.0, \"evidence_frames_add\": [12.0, 13.0, 14.0]}, {\"op\": \"update\", \"id\": \"lady_in_grey_jacket\", \"attributes_add\": [\"面向蓝衣男子\"], \"last_seen_t\": 14.0, \"evidence_frames_add\": [12.0, 13.0, 14.0]}], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b46666b9b0342753",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5,
+          "frame_count": 4
+        },
+        "observation": "[t=11.0s] 画面中，一名穿蓝色衬衫的男子站在房间右侧，背对镜头，面向前方的白板和另外两名站立的男子。他身旁坐着一位穿灰色夹克的女士，但此时他并未面向她。\n\n[t=12.0s] 蓝衣男子身体转向左侧，面向穿灰色夹克的女士，同时他右手抬起，似乎在做手势或与她交流。此时，穿灰色夹克的女士正面向他。\n\n[t=13.0s] 蓝衣男子继续面向灰色夹克女士，身体略微前倾，似乎在与她交谈或互动。灰色夹克女士也保持面向他的姿势。\n\n[t=14.0s] 蓝衣男子仍面向灰色夹克女士，身体姿态与前一帧相似，两人似乎仍在互动。灰色夹克女士也保持面向他的姿势。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "man_in_blue",
+            "label": "穿蓝色衬衫的男子",
+            "first_seen_t": 11.0,
+            "attributes": [
+              "站立",
+              "面向前方"
+            ],
+            "evidence_frames": [
+              11.0
+            ]
+          },
+          {
+            "op": "add",
+            "id": "lady_in_grey_jacket",
+            "label": "穿灰色夹克的女士",
+            "first_seen_t": 11.0,
+            "attributes": [
+              "坐着",
+              "面向前方"
+            ],
+            "evidence_frames": [
+              11.0
+            ]
+          },
+          {
+            "op": "update",
+            "id": "man_in_blue",
+            "attributes_add": [
+              "转向女士",
+              "右手抬起做手势"
+            ],
+            "last_seen_t": 14.0,
+            "evidence_frames_add": [
+              12.0,
+              13.0,
+              14.0
+            ]
+          },
+          {
+            "op": "update",
+            "id": "lady_in_grey_jacket",
+            "attributes_add": [
+              "面向蓝衣男子"
+            ],
+            "last_seen_t": 14.0,
+            "evidence_frames_add": [
+              12.0,
+              13.0,
+              14.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the visual evidence from the segment_focus is sufficient to answer the question. (general, general, sufficient_check)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "why did the man in blue turn to the lady in grey jacket before sitting down",
+            "question_type": "visual_detail",
+            "retrieval_profile": "detail"
+          },
+          "id": "chatcmpl-tool-98ce3e1162dd1776",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"frame_count\": 4, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 3.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-98ce3e1162dd1776",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve additional visual evidence from the full video to confirm the context of the interaction. (visual_detail, balanced, expand_context)\n\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "why did the man in blue turn to the lady in grey jacket before sitting down",
+            "question_type": "visual_detail",
+            "retrieval_profile": "balanced",
+            "top_k_frames": 6
+          },
+          "id": "chatcmpl-tool-8feabf37cd87136c",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 1.0, \"source\": \"retrieval\"}, {\"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"timestamp\": 12.0, \"source\": \"segment_focus\"}, {\"timestamp\": 13.0, \"source\": \"segment_focus\"}, {\"timestamp\": 14.0, \"source\": \"segment_focus\"}, {\"timestamp\": 28.0, \"source\": \"retrieval\"}, {\"timestamp\": 31.0, \"source\": \"retrieval\"}, {\"timestamp\": 40.0, \"source\": \"retrieval\"}, {\"timestamp\": 41.0, \"source\": \"retrieval\"}, {\"timestamp\": 46.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"caption\": \"A person in a dark jacket stands at the front of a classroom, gesturing while speaking to students seated at desks. Another person in a blue jacket is bent over a desk in the foreground, partially obscuring the view.\", \"end\": 3.703704, \"scene_id\": 2, \"start\": 1.901902, \"t_mid\": 2.802803, \"filename\": \"scene_0002.jpg\", \"score\": 0.5058701634407043}, {\"start\": 3.703704, \"t_mid\": 4.6379715, \"caption\": \"A man in a dark shirt gestures with his hands while speaking to a woman with blonde hair who is smiling and holding a pen, seated at a table in a classroom setting with other students and desks visible.\", \"filename\": \"scene_0003.jpg\", \"scene_id\": 3, \"end\": 5.572239, \"score\": 0.47633564472198486}, {\"start\": 28.495162, \"t_mid\": 30.263597, \"scene_id\": 6, \"filename\": \"scene_0006.jpg\", \"end\": 32.032032, \"caption\": \"A person in dark clothing is moving quickly, causing motion blur, near a table with a large plastic container on it.\", \"score\": 0.461215615272522}, {\"filename\": \"scene_0007.jpg\", \"scene_id\": 7, \"caption\": \"Students are seated at desks in a classroom, with one person standing near the back, while jackets and papers are visible on the furniture.\", \"start\": 32.032032, \"t_mid\": 40.8241575, \"end\": 49.616283, \"score\": 0.44533324241638184}, {\"start\": 78.978979, \"end\": 80.547214, \"filename\": \"scene_0009.jpg\", \"scene_id\": 9, \"caption\": \"A blurry indoor scene shows the edge of a white desk in the foreground, with a dark jacket draped over a chair and another chair with blue legs in the background.\", \"t_mid\": 79.76309649999999, \"score\": 0.4750431776046753}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"balanced\", \"top_n_scenes\": 5, \"top_k_frames\": 6, \"planner_notes\": \"\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8feabf37cd87136c",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 1.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 28.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 31.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 40.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 41.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 46.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "caption": "A person in a dark jacket stands at the front of a classroom, gesturing while speaking to students seated at desks. Another person in a blue jacket is bent over a desk in the foreground, partially obscuring the view.",
+            "end": 3.703704,
+            "scene_id": 2,
+            "start": 1.901902,
+            "t_mid": 2.802803,
+            "filename": "scene_0002.jpg",
+            "score": 0.5058701634407043
+          },
+          {
+            "start": 3.703704,
+            "t_mid": 4.6379715,
+            "caption": "A man in a dark shirt gestures with his hands while speaking to a woman with blonde hair who is smiling and holding a pen, seated at a table in a classroom setting with other students and desks visible.",
+            "filename": "scene_0003.jpg",
+            "scene_id": 3,
+            "end": 5.572239,
+            "score": 0.47633564472198486
+          },
+          {
+            "start": 28.495162,
+            "t_mid": 30.263597,
+            "scene_id": 6,
+            "filename": "scene_0006.jpg",
+            "end": 32.032032,
+            "caption": "A person in dark clothing is moving quickly, causing motion blur, near a table with a large plastic container on it.",
+            "score": 0.461215615272522
+          },
+          {
+            "filename": "scene_0007.jpg",
+            "scene_id": 7,
+            "caption": "Students are seated at desks in a classroom, with one person standing near the back, while jackets and papers are visible on the furniture.",
+            "start": 32.032032,
+            "t_mid": 40.8241575,
+            "end": 49.616283,
+            "score": 0.44533324241638184
+          },
+          {
+            "start": 78.978979,
+            "end": 80.547214,
+            "filename": "scene_0009.jpg",
+            "scene_id": 9,
+            "caption": "A blurry indoor scene shows the edge of a white desk in the foreground, with a dark jacket draped over a chair and another chair with blue legs in the background.",
+            "t_mid": 79.76309649999999,
+            "score": 0.4750431776046753
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "balanced",
+          "top_n_scenes": 5,
+          "top_k_frames": 6,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the retrieved video evidence is sufficient to answer the question. (general, general, sufficient_check)\n\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "why did the man in blue turn to the lady in grey jacket before sitting down",
+            "question_type": "visual_detail",
+            "retrieval_profile": "balanced"
+          },
+          "id": "chatcmpl-tool-83137b97f116ac66",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": true, \"confidence\": 0.78, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"balanced\", \"frame_count\": 10, \"scene_count\": 5, \"text_evidence_count\": 0, \"time_span_sec\": 45.0, \"missing_evidence\": [], \"recommended_next_action\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-83137b97f116ac66",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "balanced",
+        "frame_count": 10,
+        "scene_count": 5,
+        "text_evidence_count": 0,
+        "time_span_sec": 45.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "why did the man in blue turn to the lady in grey jacket before sitting down\n\nCandidates:\nA) talk to lady\nB) want to hug her\nC) to pass her something\nD) audience\nE) get a better view\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is A) talk to lady.\\n\\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while standing. His posture and orientation suggest he is engaging with her, and his hand is raised in a gesture consistent with speaking or communicating. The lady is facing him, indicating she is receptive to his attention. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or adjusting view (E). The most plausible and least contradicted option is A.\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": false, \"valid_markers\": 0, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [\"[FRAME:t=12\", \"0s] shows the man in blue turning toward the lady in grey jacket while standing\"], \"warnings\": [\"Some visual claim lines are not tied to frame or slide markers.\", \"Visual answer has no frame citations.\", \"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"A\", \"text\": \"talk to lady\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"A\", \"text\": \"talk to lady\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is A) talk to lady.\n\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while standing. His posture and orientation suggest he is engaging with her, and his hand is raised in a gesture consistent with speaking or communicating. The lady is facing him, indicating she is receptive to his attention. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or adjusting view (E). The most plausible and least contradicted option is A.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 0,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "[FRAME:t=12",
+            "0s] shows the man in blue turning toward the lady in grey jacket while standing"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "Visual answer has no frame citations.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "A",
+            "text": "talk to lady"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "A",
+              "text": "talk to lady"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is A) talk to lady.\\n\\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while standing. His posture and orientation suggest he is engaging with her, and his hand is raised in a gesture consistent with speaking or communicating. The lady is facing him, indicating she is receptive to his attention. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or adjusting view (E). The most plausible and least contradicted option is A.\", \"grounding_report\": {\"grounded\": false, \"valid_markers\": 0, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [\"[FRAME:t=12\", \"0s] shows the man in blue turning toward the lady in grey jacket while standing\"], \"warnings\": [\"Some visual claim lines are not tied to frame or slide markers.\", \"Visual answer has no frame citations.\", \"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"A\", \"text\": \"talk to lady\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"A\", \"text\": \"talk to lady\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is A) talk to lady.\n\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while standing. His posture and orientation suggest he is engaging with her, and his hand is raised in a gesture consistent with speaking or communicating. The lady is facing him, indicating she is receptive to his attention. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or adjusting view (E). The most plausible and least contradicted option is A.",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 0,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "[FRAME:t=12",
+            "0s] shows the man in blue turning toward the lady in grey jacket while standing"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "Visual answer has no frame citations.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "A",
+            "text": "talk to lady"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "A",
+              "text": "talk to lady"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "why did the man in blue turn to the lady in grey jacket before sitting down\n\nCandidates:\nA) talk to lady\nB) want to hug her\nC) to pass her something\nD) audience\nE) get a better view\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is A) talk to lady\\n\\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction. His posture and orientation suggest he is addressing her directly. The lady is seated and facing him, consistent with a conversational exchange. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or seeking a better view (E). The most plausible and directly supported option is A.\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": false, \"valid_markers\": 0, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [\"[FRAME:t=12\", \"0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction\"], \"warnings\": [\"Some visual claim lines are not tied to frame or slide markers.\", \"Visual answer has no frame citations.\", \"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"A\", \"text\": \"talk to lady\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"A\", \"text\": \"talk to lady\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is A) talk to lady\n\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction. His posture and orientation suggest he is addressing her directly. The lady is seated and facing him, consistent with a conversational exchange. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or seeking a better view (E). The most plausible and directly supported option is A.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 0,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "[FRAME:t=12",
+            "0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "Visual answer has no frame citations.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "A",
+            "text": "talk to lady"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "A",
+              "text": "talk to lady"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is A) talk to lady\\n\\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction. His posture and orientation suggest he is addressing her directly. The lady is seated and facing him, consistent with a conversational exchange. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or seeking a better view (E). The most plausible and directly supported option is A.\", \"grounding_report\": {\"grounded\": false, \"valid_markers\": 0, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [\"[FRAME:t=12\", \"0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction\"], \"warnings\": [\"Some visual claim lines are not tied to frame or slide markers.\", \"Visual answer has no frame citations.\", \"MCQ explanation contradicts the selected option.\"], \"selected_candidate\": {\"label\": \"A\", \"text\": \"talk to lady\"}, \"recommended_candidate\": null, \"option_contradiction\": {\"selected\": {\"label\": \"A\", \"text\": \"talk to lady\"}, \"reason\": \"multiple_candidate_labels\"}, \"recommended_next_action\": \"answer_with_evidence\"}, \"next\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is A) talk to lady\n\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction. His posture and orientation suggest he is addressing her directly. The lady is seated and facing him, consistent with a conversational exchange. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or seeking a better view (E). The most plausible and directly supported option is A.",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 0,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "[FRAME:t=12",
+            "0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "Visual answer has no frame citations.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "A",
+            "text": "talk to lady"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "A",
+              "text": "talk to lady"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is A) talk to lady.\n\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while standing. His posture and orientation suggest he is engaging with her, and his hand is raised in a gesture consistent with speaking or communicating. The lady is facing him, indicating she is receptive to his attention. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or adjusting view (E). The most plausible and least contradicted option is A.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "why did the man in blue turn to the lady in grey jacket before sitting down",
+        "center_t": 12.5,
+        "half_window_sec": 2.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5,
+          "frame_count": 4
+        },
+        "observation": "[t=11.0s] 画面中，一名穿蓝色衬衫的男子站在房间右侧，背对镜头，面向前方的白板和另外两名站立的男子。他身旁坐着一位穿灰色夹克的女士，但此时他并未面向她。\n\n[t=12.0s] 蓝衣男子身体转向左侧，面向穿灰色夹克的女士，同时他右手抬起，似乎在做手势或与她交流。此时，穿灰色夹克的女士正面向他。\n\n[t=13.0s] 蓝衣男子继续面向灰色夹克女士，身体略微前倾，似乎在与她交谈或互动。灰色夹克女士也保持面向他的姿势。\n\n[t=14.0s] 蓝衣男子仍面向灰色夹克女士，身体姿态与前一帧相似，两人似乎仍在互动。灰色夹克女士也保持面向他的姿势。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "man_in_blue",
+            "label": "穿蓝色衬衫的男子",
+            "first_seen_t": 11.0,
+            "attributes": [
+              "站立",
+              "面向前方"
+            ],
+            "evidence_frames": [
+              11.0
+            ]
+          },
+          {
+            "op": "add",
+            "id": "lady_in_grey_jacket",
+            "label": "穿灰色夹克的女士",
+            "first_seen_t": 11.0,
+            "attributes": [
+              "坐着",
+              "面向前方"
+            ],
+            "evidence_frames": [
+              11.0
+            ]
+          },
+          {
+            "op": "update",
+            "id": "man_in_blue",
+            "attributes_add": [
+              "转向女士",
+              "右手抬起做手势"
+            ],
+            "last_seen_t": 14.0,
+            "evidence_frames_add": [
+              12.0,
+              13.0,
+              14.0
+            ]
+          },
+          {
+            "op": "update",
+            "id": "lady_in_grey_jacket",
+            "attributes_add": [
+              "面向蓝衣男子"
+            ],
+            "last_seen_t": 14.0,
+            "evidence_frames_add": [
+              12.0,
+              13.0,
+              14.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-b46666b9b0342753",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "why did the man in blue turn to the lady in grey jacket before sitting down",
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-98ce3e1162dd1776",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "why did the man in blue turn to the lady in grey jacket before sitting down",
+        "question_type": "visual_detail",
+        "retrieval_profile": "balanced",
+        "top_k_frames": 6
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 1.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 28.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 31.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 40.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 41.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 46.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "caption": "A person in a dark jacket stands at the front of a classroom, gesturing while speaking to students seated at desks. Another person in a blue jacket is bent over a desk in the foreground, partially obscuring the view.",
+            "end": 3.703704,
+            "scene_id": 2,
+            "start": 1.901902,
+            "t_mid": 2.802803,
+            "filename": "scene_0002.jpg",
+            "score": 0.5058701634407043
+          },
+          {
+            "start": 3.703704,
+            "t_mid": 4.6379715,
+            "caption": "A man in a dark shirt gestures with his hands while speaking to a woman with blonde hair who is smiling and holding a pen, seated at a table in a classroom setting with other students and desks visible.",
+            "filename": "scene_0003.jpg",
+            "scene_id": 3,
+            "end": 5.572239,
+            "score": 0.47633564472198486
+          },
+          {
+            "start": 28.495162,
+            "t_mid": 30.263597,
+            "scene_id": 6,
+            "filename": "scene_0006.jpg",
+            "end": 32.032032,
+            "caption": "A person in dark clothing is moving quickly, causing motion blur, near a table with a large plastic container on it.",
+            "score": 0.461215615272522
+          },
+          {
+            "filename": "scene_0007.jpg",
+            "scene_id": 7,
+            "caption": "Students are seated at desks in a classroom, with one person standing near the back, while jackets and papers are visible on the furniture.",
+            "start": 32.032032,
+            "t_mid": 40.8241575,
+            "end": 49.616283,
+            "score": 0.44533324241638184
+          },
+          {
+            "start": 78.978979,
+            "end": 80.547214,
+            "filename": "scene_0009.jpg",
+            "scene_id": 9,
+            "caption": "A blurry indoor scene shows the edge of a white desk in the foreground, with a dark jacket draped over a chair and another chair with blue legs in the background.",
+            "t_mid": 79.76309649999999,
+            "score": 0.4750431776046753
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "balanced",
+          "top_n_scenes": 5,
+          "top_k_frames": 6,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-8feabf37cd87136c",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "why did the man in blue turn to the lady in grey jacket before sitting down",
+        "question_type": "visual_detail",
+        "retrieval_profile": "balanced"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "balanced",
+        "frame_count": 10,
+        "scene_count": 5,
+        "text_evidence_count": 0,
+        "time_span_sec": 45.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-83137b97f116ac66",
+      "internalizability": "type2"
+    },
+    {
+      "index": 10,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "why did the man in blue turn to the lady in grey jacket before sitting down\n\nCandidates:\nA) talk to lady\nB) want to hug her\nC) to pass her something\nD) audience\nE) get a better view\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is A) talk to lady.\n\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while standing. His posture and orientation suggest he is engaging with her, and his hand is raised in a gesture consistent with speaking or communicating. The lady is facing him, indicating she is receptive to his attention. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or adjusting view (E). The most plausible and least contradicted option is A.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 0,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "[FRAME:t=12",
+            "0s] shows the man in blue turning toward the lady in grey jacket while standing"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "Visual answer has no frame citations.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "A",
+            "text": "talk to lady"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "A",
+              "text": "talk to lady"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 12,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is A) talk to lady.\n\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while standing. His posture and orientation suggest he is engaging with her, and his hand is raised in a gesture consistent with speaking or communicating. The lady is facing him, indicating she is receptive to his attention. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or adjusting view (E). The most plausible and least contradicted option is A.",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 0,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "[FRAME:t=12",
+            "0s] shows the man in blue turning toward the lady in grey jacket while standing"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "Visual answer has no frame citations.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "A",
+            "text": "talk to lady"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "A",
+              "text": "talk to lady"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "answer_with_evidence"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    },
+    {
+      "index": 14,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "why did the man in blue turn to the lady in grey jacket before sitting down\n\nCandidates:\nA) talk to lady\nB) want to hug her\nC) to pass her something\nD) audience\nE) get a better view\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is A) talk to lady\n\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction. His posture and orientation suggest he is addressing her directly. The lady is seated and facing him, consistent with a conversational exchange. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or seeking a better view (E). The most plausible and directly supported option is A.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 0,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "[FRAME:t=12",
+            "0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "Visual answer has no frame citations.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "A",
+            "text": "talk to lady"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "A",
+              "text": "talk to lady"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 16,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is A) talk to lady\n\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction. His posture and orientation suggest he is addressing her directly. The lady is seated and facing him, consistent with a conversational exchange. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or seeking a better view (E). The most plausible and directly supported option is A.",
+        "grounding_report": {
+          "grounded": false,
+          "valid_markers": 0,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [
+            "[FRAME:t=12",
+            "0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction"
+          ],
+          "warnings": [
+            "Some visual claim lines are not tied to frame or slide markers.",
+            "Visual answer has no frame citations.",
+            "MCQ explanation contradicts the selected option."
+          ],
+          "selected_candidate": {
+            "label": "A",
+            "text": "talk to lady"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": {
+            "selected": {
+              "label": "A",
+              "text": "talk to lady"
+            },
+            "reason": "multiple_candidate_labels"
+          },
+          "recommended_next_action": "answer_with_evidence"
+        },
+        "next": "answer_with_evidence"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 1.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0001.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 28.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0028.0.jpg"
+      },
+      {
+        "timestamp": 31.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0031.0.jpg"
+      },
+      {
+        "timestamp": 40.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0040.0.jpg"
+      },
+      {
+        "timestamp": 41.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0041.0.jpg"
+      },
+      {
+        "timestamp": 46.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0046.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 21.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0021.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 32.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0032.0.jpg"
+      },
+      {
+        "timestamp": 37.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0037.0.jpg"
+      },
+      {
+        "timestamp": 42.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0042.0.jpg"
+      },
+      {
+        "timestamp": 48.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0048.0.jpg"
+      },
+      {
+        "timestamp": 53.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0053.0.jpg"
+      },
+      {
+        "timestamp": 58.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0058.0.jpg"
+      },
+      {
+        "timestamp": 64.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0064.0.jpg"
+      },
+      {
+        "timestamp": 69.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0069.0.jpg"
+      },
+      {
+        "timestamp": 74.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0074.0.jpg"
+      },
+      {
+        "timestamp": 79.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0079.0.jpg"
+      },
+      {
+        "timestamp": 85.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/55cc11b09f36c92a/frames_dense/t0085.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "caption": "A person in a dark jacket stands at the front of a classroom, gesturing while speaking to students seated at desks. Another person in a blue jacket is bent over a desk in the foreground, partially obscuring the view.",
+        "end": 3.703704,
+        "scene_id": 2,
+        "start": 1.901902,
+        "t_mid": 2.802803,
+        "filename": "scene_0002.jpg",
+        "score": 0.5058701634407043
+      },
+      {
+        "start": 3.703704,
+        "t_mid": 4.6379715,
+        "caption": "A man in a dark shirt gestures with his hands while speaking to a woman with blonde hair who is smiling and holding a pen, seated at a table in a classroom setting with other students and desks visible.",
+        "filename": "scene_0003.jpg",
+        "scene_id": 3,
+        "end": 5.572239,
+        "score": 0.47633564472198486
+      },
+      {
+        "start": 28.495162,
+        "t_mid": 30.263597,
+        "scene_id": 6,
+        "filename": "scene_0006.jpg",
+        "end": 32.032032,
+        "caption": "A person in dark clothing is moving quickly, causing motion blur, near a table with a large plastic container on it.",
+        "score": 0.461215615272522
+      },
+      {
+        "filename": "scene_0007.jpg",
+        "scene_id": 7,
+        "caption": "Students are seated at desks in a classroom, with one person standing near the back, while jackets and papers are visible on the furniture.",
+        "start": 32.032032,
+        "t_mid": 40.8241575,
+        "end": 49.616283,
+        "score": 0.44533324241638184
+      },
+      {
+        "start": 78.978979,
+        "end": 80.547214,
+        "filename": "scene_0009.jpg",
+        "scene_id": 9,
+        "caption": "A blurry indoor scene shows the edge of a white desk in the foreground, with a dark jacket draped over a chair and another chair with blue legs in the background.",
+        "t_mid": 79.76309649999999,
+        "score": 0.4750431776046753
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "balanced",
+      "top_n_scenes": 5,
+      "top_k_frames": 6,
+      "planner_notes": ""
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": true,
+      "confidence": 0.78,
+      "question_type": "visual_detail",
+      "retrieval_profile": "balanced",
+      "frame_count": 10,
+      "scene_count": 5,
+      "text_evidence_count": 0,
+      "time_span_sec": 45.0,
+      "missing_evidence": [],
+      "recommended_next_action": "answer_with_evidence"
+    },
+    "draft_answer": "The correct answer is A) talk to lady\n\n[FRAME:t=12.0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction. His posture and orientation suggest he is addressing her directly. The lady is seated and facing him, consistent with a conversational exchange. No visual evidence supports hugging (B), passing something (C), audience interaction (D), or seeking a better view (E). The most plausible and directly supported option is A.",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=11.0s] 画面中，一名穿蓝色衬衫的男子站在房间右侧，背对镜头，面向前方的白板和另外两名站立的男子。他身旁坐着一位穿灰色夹克的女士，但此时他并未面向她。\n\n[t=12.0s] 蓝衣男子身体转向左侧，面向穿灰色夹克的女士，同时他右手抬起，似乎在做手势或与她交流。此时，穿灰色夹克的女士正面向他。\n\n[t=13.0s] 蓝衣男子继续面向灰色夹克女士，身体略微前倾，似乎在与她交谈或互动。灰色夹克女士也保持面向他的姿势。\n\n[t=14.0s] 蓝衣男子仍面向灰色夹克女士，身体姿态与前一帧相似，两人似乎仍在互动。灰色夹克女士也保持面向他的姿势。",
+        "timestamps": [
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ],
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5
+        }
+      }
+    ],
+    "grounding_report": {
+      "grounded": false,
+      "valid_markers": 0,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [
+        "[FRAME:t=12",
+        "0s] shows the man in blue turning toward the lady in grey jacket while gesturing with his right hand, indicating an interaction"
+      ],
+      "warnings": [
+        "Some visual claim lines are not tied to frame or slide markers.",
+        "Visual answer has no frame citations.",
+        "MCQ explanation contradicts the selected option."
+      ],
+      "selected_candidate": {
+        "label": "A",
+        "text": "talk to lady"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": {
+        "selected": {
+          "label": "A",
+          "text": "talk to lady"
+        },
+        "reason": "multiple_candidate_labels"
+      },
+      "recommended_next_action": "answer_with_evidence"
+    },
+    "subject_registry": [
+      {
+        "id": "man_in_blue",
+        "label": "穿蓝色衬衫的男子",
+        "first_seen_t": 11.0,
+        "last_seen_t": 14.0,
+        "attributes": [
+          "右手抬起做手势",
+          "站立",
+          "转向女士",
+          "面向前方"
+        ],
+        "evidence_frames": [
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ]
+      },
+      {
+        "id": "lady_in_grey_jacket",
+        "label": "穿灰色夹克的女士",
+        "first_seen_t": 11.0,
+        "last_seen_t": 14.0,
+        "attributes": [
+          "坐着",
+          "面向前方",
+          "面向蓝衣男子"
+        ],
+        "evidence_frames": [
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ]
+      }
+    ],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "fa8a5a348b6238506d0ddaf6e2dff2327517b487"
+}

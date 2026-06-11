@@ -1,0 +1,56 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "01bb1b66328b2824",
+  "case_id": "nextgqa-5840177726-0",
+  "question": "how did the men make their way upslope\n\nCandidates:\nA) run\nB) move left and right\nC) sitting on table\nD) run up\nE) cycle up slope\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0,
+    11.0,
+    12.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0001.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0002.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0003.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0004.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0005.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0006.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0007.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0008.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0009.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0010.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0011.0.jpg",
+    "/home/gpus/mbe_data/cache/01bb1b66328b2824/frames_dense/t0012.0.jpg"
+  ],
+  "cot": "['At [FRAME:t=7.0], a man in a brown shirt and white helmet is seen riding a mountain bike on a dirt trail through a forested area, leaning into a turn.', 'At [FRAME:t=8.0], the same rider continues along a narrow, sloped trail with the front wheel of the bike lifted, indicating movement uphill.', 'At [FRAME:t=10.0], another rider in a red shirt is visible further up the trail, also on a mountain bike, confirming upward movement.', 'At [FRAME:t=12.0], both riders are still on their bikes, ascending the incline, with the trail clearly sloping upward through dense trees.', 'The consistent presence of mountain bikes and upward trajectory across multiple frames confirms the men are cycling up the slope.']",
+  "answer": "E) cycle up slope",
+  "gold_timestamps": [
+    1.1
+  ],
+  "gold_scenes": [
+    {
+      "start": 0.1,
+      "end": 2.1
+    }
+  ],
+  "source_traj_hash": "82ebe5097fcb1ced9088d62bdd6dad3d5c7c546a",
+  "validation_report": {
+    "ok": true,
+    "errors": [],
+    "frame_markers": [
+      7.0,
+      8.0,
+      10.0,
+      12.0
+    ]
+  }
+}

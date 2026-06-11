@@ -1,0 +1,703 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-3943634344-10",
+    "video_id": "b87d05df78818192",
+    "question": "what did the lady do after clapping at the end of the video\n\nCandidates:\nA) eat\nB) walk away from the table\nC) look around\nD) holds the book\nE) makes faces\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "holds the book",
+    "required_keywords": [
+      "holds",
+      "book"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      19.9
+    ],
+    "gold_scenes": [
+      {
+        "start": 18.8,
+        "end": 21.0
+      }
+    ],
+    "question_type": "tn"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T12:53:09",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-4B-Instruct@http://127.0.0.1:30000/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "what did the lady do after clapping at the end of the video\n\nCandidates:\nA) eat\nB) walk away from the table\nC) look around\nD) holds the book\nE) makes faces\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the action immediately after clapping at the end of the video. Use segment_focus to examine the final few seconds closely. (task: visual_detail, profile: focused)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "What did the lady do after clapping at the end of the video?",
+            "center_t": 120.0,
+            "half_window_sec": 3.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-be478ef245797cf2",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 20.99, \"end\": 20.99, \"center_t\": 20.99, \"frame_count\": 0}, \"observation\": \"I could not load dense frames for the requested window.\", \"subject_deltas\": [], \"required_next_action\": \"retrieve_video_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-be478ef245797cf2",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 20.99,
+          "end": 20.99,
+          "center_t": 20.99,
+          "frame_count": 0
+        },
+        "observation": "I could not load dense frames for the requested window.",
+        "subject_deltas": [],
+        "required_next_action": "retrieve_video_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve visual evidence from the final moments of the video to determine the lady's action after clapping. (task: visual_detail, profile: focused)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "What did the lady do after clapping at the end of the video?",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 5,
+            "planner_notes": "Focus on the last few seconds after clapping."
+          },
+          "id": "chatcmpl-tool-b62869a685cae206",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 1.0, \"source\": \"retrieval\"}, {\"timestamp\": 6.0, \"source\": \"retrieval\"}, {\"timestamp\": 8.0, \"source\": \"retrieval\"}, {\"timestamp\": 12.0, \"source\": \"retrieval\"}, {\"timestamp\": 16.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"caption\": \"A woman and a toddler sit on a bed, with the woman pointing to colorful illustrations in an open book held by the child.\", \"filename\": \"scene_0000.jpg\", \"end\": 10.0, \"scene_id\": 0, \"start\": 0.0, \"t_mid\": 5.0, \"score\": 0.4104512929916382}, {\"start\": 10.0, \"scene_id\": 1, \"caption\": \"A woman and a young child sit on a bed, with the woman pointing to colorful illustrations in an open book held by both of them.\", \"t_mid\": 15.0, \"end\": 20.0, \"filename\": \"scene_0001.jpg\", \"score\": 0.409549355506897}, {\"scene_id\": 2, \"caption\": \"A woman sits on a bed holding a children's book, smiling as a baby in pink pajamas stands nearby.\", \"t_mid\": 20.493816666666667, \"filename\": \"scene_0002.jpg\", \"start\": 20.0, \"end\": 20.987633333333335, \"score\": 0.4154309034347534}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 5, \"planner_notes\": \"Focus on the last few seconds after clapping.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b62869a685cae206",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 1.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 6.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 8.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "caption": "A woman and a toddler sit on a bed, with the woman pointing to colorful illustrations in an open book held by the child.",
+            "filename": "scene_0000.jpg",
+            "end": 10.0,
+            "scene_id": 0,
+            "start": 0.0,
+            "t_mid": 5.0,
+            "score": 0.4104512929916382
+          },
+          {
+            "start": 10.0,
+            "scene_id": 1,
+            "caption": "A woman and a young child sit on a bed, with the woman pointing to colorful illustrations in an open book held by both of them.",
+            "t_mid": 15.0,
+            "end": 20.0,
+            "filename": "scene_0001.jpg",
+            "score": 0.409549355506897
+          },
+          {
+            "scene_id": 2,
+            "caption": "A woman sits on a bed holding a children's book, smiling as a baby in pink pajamas stands nearby.",
+            "t_mid": 20.493816666666667,
+            "filename": "scene_0002.jpg",
+            "start": 20.0,
+            "end": 20.987633333333335,
+            "score": 0.4154309034347534
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the last few seconds after clapping."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "OBSERVE: The final scene (scene_id=2) shows the woman sitting on a bed holding a children's book, smiling, with a baby in pink pajamas nearby. The timestamp is around t=20.0–20.99 seconds. Clapping is not visible in this scene, but it likely occurred earlier. The video ends with the woman still holding the book and smiling.\n\nPLAN: Assess whether the evidence is sufficient to determine the action after clapping. (task: general, profile: assess_sufficiency)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "What did the lady do after clapping at the end of the video?",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-b5637774ccc3afca",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": true, \"confidence\": 0.78, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 5, \"scene_count\": 3, \"text_evidence_count\": 0, \"time_span_sec\": 15.0, \"missing_evidence\": [], \"recommended_next_action\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b5637774ccc3afca",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 5,
+        "scene_count": 3,
+        "text_evidence_count": 0,
+        "time_span_sec": 15.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "what did the lady do after clapping at the end of the video\n\nCandidates:\nA) eat\nB) walk away from the table\nC) look around\nD) holds the book\nE) makes faces\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is D) holds the book.\\n\\nEvidence: In the final visible frame [FRAME:t=16.0], the lady is seated on the bed, holding the children’s book open with both hands, while the child points at the illustrations. She maintains this posture through the end of the video, and no other action (like walking away, eating, looking around, or making faces) is visually confirmed after any clapping. Although clapping is not explicitly shown in the provided frames, the lady’s consistent action of holding the book is the only clearly observable behavior in the final moments. Given the lack of evidence for clapping, the most consistent action is holding the book.\", \"subject_deltas\": [{\"op\": \"update\", \"id\": \"person_A\", \"attributes_add\": [\"持有书本\"], \"last_seen_t\": 16.0, \"evidence_frames_add\": [16.0]}], \"grounding_report\": {\"grounded\": true, \"valid_markers\": 1, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"D\", \"text\": \"holds the book\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) holds the book.\n\nEvidence: In the final visible frame [FRAME:t=16.0], the lady is seated on the bed, holding the children’s book open with both hands, while the child points at the illustrations. She maintains this posture through the end of the video, and no other action (like walking away, eating, looking around, or making faces) is visually confirmed after any clapping. Although clapping is not explicitly shown in the provided frames, the lady’s consistent action of holding the book is the only clearly observable behavior in the final moments. Given the lack of evidence for clapping, the most consistent action is holding the book.",
+        "subject_deltas": [
+          {
+            "op": "update",
+            "id": "person_A",
+            "attributes_add": [
+              "持有书本"
+            ],
+            "last_seen_t": 16.0,
+            "evidence_frames_add": [
+              16.0
+            ]
+          }
+        ],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 1,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "holds the book"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is D) holds the book.\\n\\nEvidence: In the final visible frame [FRAME:t=16.0], the lady is seated on the bed, holding the children’s book open with both hands, while the child points at the illustrations. She maintains this posture through the end of the video, and no other action (like walking away, eating, looking around, or making faces) is visually confirmed after any clapping. Although clapping is not explicitly shown in the provided frames, the lady’s consistent action of holding the book is the only clearly observable behavior in the final moments. Given the lack of evidence for clapping, the most consistent action is holding the book.\", \"grounding_report\": {\"grounded\": true, \"valid_markers\": 1, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"D\", \"text\": \"holds the book\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"final_answer\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) holds the book.\n\nEvidence: In the final visible frame [FRAME:t=16.0], the lady is seated on the bed, holding the children’s book open with both hands, while the child points at the illustrations. She maintains this posture through the end of the video, and no other action (like walking away, eating, looking around, or making faces) is visually confirmed after any clapping. Although clapping is not explicitly shown in the provided frames, the lady’s consistent action of holding the book is the only clearly observable behavior in the final moments. Given the lack of evidence for clapping, the most consistent action is holding the book.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 1,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "holds the book"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is D) holds the book.\n\nEvidence: In the final visible frame [FRAME:t=16.0], the lady is seated on the bed, holding the children’s book open with both hands, while the child points at the illustrations. She maintains this posture through the end of the video, and no other action (like walking away, eating, looking around, or making faces) is visually confirmed after any clapping. Although clapping is not explicitly shown in the provided frames, the lady’s consistent action of holding the book is the only clearly observable behavior in the final moments. Given the lack of evidence for clapping, the most consistent action is holding the book.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "What did the lady do after clapping at the end of the video?",
+        "center_t": 120.0,
+        "half_window_sec": 3.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 20.99,
+          "end": 20.99,
+          "center_t": 20.99,
+          "frame_count": 0
+        },
+        "observation": "I could not load dense frames for the requested window.",
+        "subject_deltas": [],
+        "required_next_action": "retrieve_video_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-be478ef245797cf2",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "What did the lady do after clapping at the end of the video?",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 5,
+        "planner_notes": "Focus on the last few seconds after clapping."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 1.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 6.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 8.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "caption": "A woman and a toddler sit on a bed, with the woman pointing to colorful illustrations in an open book held by the child.",
+            "filename": "scene_0000.jpg",
+            "end": 10.0,
+            "scene_id": 0,
+            "start": 0.0,
+            "t_mid": 5.0,
+            "score": 0.4104512929916382
+          },
+          {
+            "start": 10.0,
+            "scene_id": 1,
+            "caption": "A woman and a young child sit on a bed, with the woman pointing to colorful illustrations in an open book held by both of them.",
+            "t_mid": 15.0,
+            "end": 20.0,
+            "filename": "scene_0001.jpg",
+            "score": 0.409549355506897
+          },
+          {
+            "scene_id": 2,
+            "caption": "A woman sits on a bed holding a children's book, smiling as a baby in pink pajamas stands nearby.",
+            "t_mid": 20.493816666666667,
+            "filename": "scene_0002.jpg",
+            "start": 20.0,
+            "end": 20.987633333333335,
+            "score": 0.4154309034347534
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the last few seconds after clapping."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-b62869a685cae206",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "What did the lady do after clapping at the end of the video?",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 5,
+        "scene_count": 3,
+        "text_evidence_count": 0,
+        "time_span_sec": 15.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-b5637774ccc3afca",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "what did the lady do after clapping at the end of the video\n\nCandidates:\nA) eat\nB) walk away from the table\nC) look around\nD) holds the book\nE) makes faces\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) holds the book.\n\nEvidence: In the final visible frame [FRAME:t=16.0], the lady is seated on the bed, holding the children’s book open with both hands, while the child points at the illustrations. She maintains this posture through the end of the video, and no other action (like walking away, eating, looking around, or making faces) is visually confirmed after any clapping. Although clapping is not explicitly shown in the provided frames, the lady’s consistent action of holding the book is the only clearly observable behavior in the final moments. Given the lack of evidence for clapping, the most consistent action is holding the book.",
+        "subject_deltas": [
+          {
+            "op": "update",
+            "id": "person_A",
+            "attributes_add": [
+              "持有书本"
+            ],
+            "last_seen_t": 16.0,
+            "evidence_frames_add": [
+              16.0
+            ]
+          }
+        ],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 1,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "holds the book"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 10,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) holds the book.\n\nEvidence: In the final visible frame [FRAME:t=16.0], the lady is seated on the bed, holding the children’s book open with both hands, while the child points at the illustrations. She maintains this posture through the end of the video, and no other action (like walking away, eating, looking around, or making faces) is visually confirmed after any clapping. Although clapping is not explicitly shown in the provided frames, the lady’s consistent action of holding the book is the only clearly observable behavior in the final moments. Given the lack of evidence for clapping, the most consistent action is holding the book.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 1,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "holds the book"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 1.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0001.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0016.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 1.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0001.0.jpg"
+      },
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 17.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0017.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 20.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/b87d05df78818192/frames_dense/t0020.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "caption": "A woman and a toddler sit on a bed, with the woman pointing to colorful illustrations in an open book held by the child.",
+        "filename": "scene_0000.jpg",
+        "end": 10.0,
+        "scene_id": 0,
+        "start": 0.0,
+        "t_mid": 5.0,
+        "score": 0.4104512929916382
+      },
+      {
+        "start": 10.0,
+        "scene_id": 1,
+        "caption": "A woman and a young child sit on a bed, with the woman pointing to colorful illustrations in an open book held by both of them.",
+        "t_mid": 15.0,
+        "end": 20.0,
+        "filename": "scene_0001.jpg",
+        "score": 0.409549355506897
+      },
+      {
+        "scene_id": 2,
+        "caption": "A woman sits on a bed holding a children's book, smiling as a baby in pink pajamas stands nearby.",
+        "t_mid": 20.493816666666667,
+        "filename": "scene_0002.jpg",
+        "start": 20.0,
+        "end": 20.987633333333335,
+        "score": 0.4154309034347534
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 5,
+      "planner_notes": "Focus on the last few seconds after clapping."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": true,
+      "confidence": 0.78,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 5,
+      "scene_count": 3,
+      "text_evidence_count": 0,
+      "time_span_sec": 15.0,
+      "missing_evidence": [],
+      "recommended_next_action": "answer_with_evidence"
+    },
+    "draft_answer": "The correct answer is D) holds the book.\n\nEvidence: In the final visible frame [FRAME:t=16.0], the lady is seated on the bed, holding the children’s book open with both hands, while the child points at the illustrations. She maintains this posture through the end of the video, and no other action (like walking away, eating, looking around, or making faces) is visually confirmed after any clapping. Although clapping is not explicitly shown in the provided frames, the lady’s consistent action of holding the book is the only clearly observable behavior in the final moments. Given the lack of evidence for clapping, the most consistent action is holding the book.",
+    "observer_notes": [],
+    "grounding_report": {
+      "grounded": true,
+      "valid_markers": 1,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [],
+      "selected_candidate": {
+        "label": "D",
+        "text": "holds the book"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": null,
+      "recommended_next_action": "final_answer"
+    },
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "ad9250c137b8f6c8116cedd11595de09016fde52"
+}

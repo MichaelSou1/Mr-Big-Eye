@@ -1,0 +1,698 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-2984974097-8",
+    "video_id": "ce82cb8da378cfe4",
+    "question": "how does the girl express her excitement while cycling\n\nCandidates:\nA) smile brightly\nB) jump\nC) cycling outfit\nD) run around\nE) claps\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "smile brightly",
+    "required_keywords": [
+      "smile",
+      "brightly"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      13.5
+    ],
+    "gold_scenes": [
+      {
+        "start": 10.7,
+        "end": 16.3
+      }
+    ],
+    "question_type": "ch"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "how does the girl express her excitement while cycling\n\nCandidates:\nA) smile brightly\nB) jump\nC) cycling outfit\nD) run around\nE) claps\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify visual cues of excitement during cycling; classify as visual_detail with focused retrieval.  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "how does the girl express her excitement while cycling",
+            "center_t": 12.5,
+            "half_window_sec": 3.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-afac2e3f267da577",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 9.5, \"end\": 15.5, \"center_t\": 12.5, \"frame_count\": 6}, \"observation\": \"[t=12.0s] 女孩骑在蓝色自行车上，面带大笑，嘴巴张开，眼睛眯起，表情非常开心。\\n[t=13.0s] 女孩继续骑行，笑容灿烂，头部略微前倾，仍保持大笑的表情。\\n[t=14.0s] 女孩笑容持续，面部表情充满喜悦，身体随着骑行轻微晃动。\\n[t=15.0s] 女孩依然在骑行中大笑，表情兴奋，眼睛明亮，嘴巴张开。\", \"subject_deltas\": [{\"op\": \"add\", \"id\": \"girl\", \"label\": \"骑自行车的女孩\", \"first_seen_t\": 10.0, \"attributes\": [\"穿着粉色连衣裙\", \"骑蓝色带辅助轮的自行车\", \"面带大笑\", \"表情兴奋\"], \"evidence_frames\": [12.0, 13.0, 14.0, 15.0]}], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-afac2e3f267da577",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5,
+          "frame_count": 6
+        },
+        "observation": "[t=12.0s] 女孩骑在蓝色自行车上，面带大笑，嘴巴张开，眼睛眯起，表情非常开心。\n[t=13.0s] 女孩继续骑行，笑容灿烂，头部略微前倾，仍保持大笑的表情。\n[t=14.0s] 女孩笑容持续，面部表情充满喜悦，身体随着骑行轻微晃动。\n[t=15.0s] 女孩依然在骑行中大笑，表情兴奋，眼睛明亮，嘴巴张开。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "girl",
+            "label": "骑自行车的女孩",
+            "first_seen_t": 10.0,
+            "attributes": [
+              "穿着粉色连衣裙",
+              "骑蓝色带辅助轮的自行车",
+              "面带大笑",
+              "表情兴奋"
+            ],
+            "evidence_frames": [
+              12.0,
+              13.0,
+              14.0,
+              15.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess if visual evidence from segment_focus is sufficient to answer the question.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "how does the girl express her excitement while cycling",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-aebe0b8cb4ba6b04",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 6, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 5.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-aebe0b8cb4ba6b04",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve additional visual evidence around the same time window to confirm excitement expressions.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "how does the girl express her excitement while cycling",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 6,
+            "planner_notes": "Confirm facial expression and body language of excitement during cycling."
+          },
+          "id": "chatcmpl-tool-ab699b82f18cd248",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 9.0, \"source\": \"retrieval\"}, {\"timestamp\": 10.0, \"source\": \"segment_focus\"}, {\"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"timestamp\": 12.0, \"source\": \"segment_focus\"}, {\"timestamp\": 13.0, \"source\": \"segment_focus\"}, {\"timestamp\": 14.0, \"source\": \"segment_focus\"}, {\"timestamp\": 15.0, \"source\": \"segment_focus\"}, {\"timestamp\": 18.0, \"source\": \"retrieval\"}, {\"timestamp\": 28.0, \"source\": \"retrieval\"}, {\"timestamp\": 29.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"start\": 0.0, \"filename\": \"scene_0000.jpg\", \"t_mid\": 5.0, \"scene_id\": 0, \"caption\": \"A young child in a pink dress rides a blue bicycle along a white line on a paved street, with parked cars and trees lining the road.\", \"end\": 10.0, \"score\": 0.5687814950942993}, {\"start\": 10.0, \"end\": 20.0, \"scene_id\": 1, \"t_mid\": 15.0, \"caption\": \"A young child in a pink dress smiles while sitting on a blue tricycle parked next to a silver car on a street with parked vehicles and trees in the background.\", \"filename\": \"scene_0001.jpg\", \"score\": 0.5535792112350464}, {\"filename\": \"scene_0002.jpg\", \"scene_id\": 2, \"end\": 29.99696663296259, \"start\": 20.0, \"caption\": \"A young child in a pink outfit rides a blue bicycle with training wheels on a paved parking lot, positioned near a black car.\", \"t_mid\": 24.998483316481295, \"score\": 0.5403438806533813}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 6, \"planner_notes\": \"Confirm facial expression and body language of excitement during cycling.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-ab699b82f18cd248",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 9.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 28.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 29.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "start": 0.0,
+            "filename": "scene_0000.jpg",
+            "t_mid": 5.0,
+            "scene_id": 0,
+            "caption": "A young child in a pink dress rides a blue bicycle along a white line on a paved street, with parked cars and trees lining the road.",
+            "end": 10.0,
+            "score": 0.5687814950942993
+          },
+          {
+            "start": 10.0,
+            "end": 20.0,
+            "scene_id": 1,
+            "t_mid": 15.0,
+            "caption": "A young child in a pink dress smiles while sitting on a blue tricycle parked next to a silver car on a street with parked vehicles and trees in the background.",
+            "filename": "scene_0001.jpg",
+            "score": 0.5535792112350464
+          },
+          {
+            "filename": "scene_0002.jpg",
+            "scene_id": 2,
+            "end": 29.99696663296259,
+            "start": 20.0,
+            "caption": "A young child in a pink outfit rides a blue bicycle with training wheels on a paved parking lot, positioned near a black car.",
+            "t_mid": 24.998483316481295,
+            "score": 0.5403438806533813
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 6,
+          "planner_notes": "Confirm facial expression and body language of excitement during cycling."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess if the retrieved video evidence is sufficient to answer the question.  \n\n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 6, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 5.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-81e8e82edeb60502",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "how does the girl express her excitement while cycling",
+        "center_t": 12.5,
+        "half_window_sec": 3.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5,
+          "frame_count": 6
+        },
+        "observation": "[t=12.0s] 女孩骑在蓝色自行车上，面带大笑，嘴巴张开，眼睛眯起，表情非常开心。\n[t=13.0s] 女孩继续骑行，笑容灿烂，头部略微前倾，仍保持大笑的表情。\n[t=14.0s] 女孩笑容持续，面部表情充满喜悦，身体随着骑行轻微晃动。\n[t=15.0s] 女孩依然在骑行中大笑，表情兴奋，眼睛明亮，嘴巴张开。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "girl",
+            "label": "骑自行车的女孩",
+            "first_seen_t": 10.0,
+            "attributes": [
+              "穿着粉色连衣裙",
+              "骑蓝色带辅助轮的自行车",
+              "面带大笑",
+              "表情兴奋"
+            ],
+            "evidence_frames": [
+              12.0,
+              13.0,
+              14.0,
+              15.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-afac2e3f267da577",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "how does the girl express her excitement while cycling",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-aebe0b8cb4ba6b04",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "how does the girl express her excitement while cycling",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 6,
+        "planner_notes": "Confirm facial expression and body language of excitement during cycling."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 9.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 28.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 29.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "start": 0.0,
+            "filename": "scene_0000.jpg",
+            "t_mid": 5.0,
+            "scene_id": 0,
+            "caption": "A young child in a pink dress rides a blue bicycle along a white line on a paved street, with parked cars and trees lining the road.",
+            "end": 10.0,
+            "score": 0.5687814950942993
+          },
+          {
+            "start": 10.0,
+            "end": 20.0,
+            "scene_id": 1,
+            "t_mid": 15.0,
+            "caption": "A young child in a pink dress smiles while sitting on a blue tricycle parked next to a silver car on a street with parked vehicles and trees in the background.",
+            "filename": "scene_0001.jpg",
+            "score": 0.5535792112350464
+          },
+          {
+            "filename": "scene_0002.jpg",
+            "scene_id": 2,
+            "end": 29.99696663296259,
+            "start": 20.0,
+            "caption": "A young child in a pink outfit rides a blue bicycle with training wheels on a paved parking lot, positioned near a black car.",
+            "t_mid": 24.998483316481295,
+            "score": 0.5403438806533813
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 6,
+          "planner_notes": "Confirm facial expression and body language of excitement during cycling."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-ab699b82f18cd248",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-81e8e82edeb60502",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 9.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 28.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0028.0.jpg"
+      },
+      {
+        "timestamp": 29.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0029.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 2.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 19.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0019.0.jpg"
+      },
+      {
+        "timestamp": 21.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0021.0.jpg"
+      },
+      {
+        "timestamp": 23.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 25.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0025.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 28.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/ce82cb8da378cfe4/frames_dense/t0028.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "start": 0.0,
+        "filename": "scene_0000.jpg",
+        "t_mid": 5.0,
+        "scene_id": 0,
+        "caption": "A young child in a pink dress rides a blue bicycle along a white line on a paved street, with parked cars and trees lining the road.",
+        "end": 10.0,
+        "score": 0.5687814950942993
+      },
+      {
+        "start": 10.0,
+        "end": 20.0,
+        "scene_id": 1,
+        "t_mid": 15.0,
+        "caption": "A young child in a pink dress smiles while sitting on a blue tricycle parked next to a silver car on a street with parked vehicles and trees in the background.",
+        "filename": "scene_0001.jpg",
+        "score": 0.5535792112350464
+      },
+      {
+        "filename": "scene_0002.jpg",
+        "scene_id": 2,
+        "end": 29.99696663296259,
+        "start": 20.0,
+        "caption": "A young child in a pink outfit rides a blue bicycle with training wheels on a paved parking lot, positioned near a black car.",
+        "t_mid": 24.998483316481295,
+        "score": 0.5403438806533813
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 6,
+      "planner_notes": "Confirm facial expression and body language of excitement during cycling."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 6,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 5.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=12.0s] 女孩骑在蓝色自行车上，面带大笑，嘴巴张开，眼睛眯起，表情非常开心。\n[t=13.0s] 女孩继续骑行，笑容灿烂，头部略微前倾，仍保持大笑的表情。\n[t=14.0s] 女孩笑容持续，面部表情充满喜悦，身体随着骑行轻微晃动。\n[t=15.0s] 女孩依然在骑行中大笑，表情兴奋，眼睛明亮，嘴巴张开。",
+        "timestamps": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0
+        ],
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [
+      {
+        "id": "girl",
+        "label": "骑自行车的女孩",
+        "first_seen_t": 10.0,
+        "last_seen_t": 10.0,
+        "attributes": [
+          "穿着粉色连衣裙",
+          "骑蓝色带辅助轮的自行车",
+          "面带大笑",
+          "表情兴奋"
+        ],
+        "evidence_frames": [
+          12.0,
+          13.0,
+          14.0,
+          15.0
+        ]
+      }
+    ],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "fb7f321a34328957dfe265a5ee3940a42a653ee2"
+}

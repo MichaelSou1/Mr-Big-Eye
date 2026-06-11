@@ -1,0 +1,595 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-2547885226-4",
+    "video_id": "1d71830ae2680c35",
+    "question": "what does the kid do before right before standing up\n\nCandidates:\nA) hug lady\nB) looking left and right\nC) looks at the camera\nD) play with toy\nE) nod his head\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "looks at the camera",
+    "required_keywords": [
+      "looks",
+      "camera"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      8.7
+    ],
+    "gold_scenes": [
+      {
+        "start": 6.0,
+        "end": 11.4
+      }
+    ],
+    "question_type": "tp"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "what does the kid do before right before standing up\n\nCandidates:\nA) hug lady\nB) looking left and right\nC) looks at the camera\nD) play with toy\nE) nod his head\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Use segment_focus to examine the moment just before the kid stands up, focusing on visual actions. Classify as visual_detail with retrieval_profile=detail.  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "what does the kid do before right before standing up",
+            "center_t": 12.5,
+            "half_window_sec": 2.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-be7f2abc911b5d38",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 10.5, \"end\": 13.55, \"center_t\": 12.02, \"frame_count\": 3}, \"observation\": \"[t=11.0s] 儿童跪在地上，双手撑在沙地上，身体前倾，面前有一个红色的恐龙玩具。\\n[t=12.0s] 儿童身体已从跪姿开始直立，双脚站立在地面上，上半身略微前倾，双手自然下垂。\\n[t=13.0s] 儿童身体已基本直立，左腿抬起并向前伸出，双臂向两侧张开以保持平衡，头部低垂注视着前方地面。\", \"subject_deltas\": [{\"op\": \"add\", \"id\": \"child\", \"label\": \"小孩\", \"first_seen_t\": 11.0, \"attributes\": [\"跪在地上\", \"穿着黑色T恤和蓝色短裤\", \"穿着凉鞋\"], \"evidence_frames\": [11.0, 12.0, 13.0]}], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-be7f2abc911b5d38",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 13.55,
+          "center_t": 12.02,
+          "frame_count": 3
+        },
+        "observation": "[t=11.0s] 儿童跪在地上，双手撑在沙地上，身体前倾，面前有一个红色的恐龙玩具。\n[t=12.0s] 儿童身体已从跪姿开始直立，双脚站立在地面上，上半身略微前倾，双手自然下垂。\n[t=13.0s] 儿童身体已基本直立，左腿抬起并向前伸出，双臂向两侧张开以保持平衡，头部低垂注视着前方地面。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "child",
+            "label": "小孩",
+            "first_seen_t": 11.0,
+            "attributes": [
+              "跪在地上",
+              "穿着黑色T恤和蓝色短裤",
+              "穿着凉鞋"
+            ],
+            "evidence_frames": [
+              11.0,
+              12.0,
+              13.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the evidence from segment_focus is sufficient to answer the question. Classify as general with retrieval_profile=detail.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "what does the kid do before right before standing up",
+            "question_type": "visual_detail",
+            "retrieval_profile": "detail"
+          },
+          "id": "chatcmpl-tool-b8e3b9afc7f2c2ff",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"frame_count\": 3, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 2.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b8e3b9afc7f2c2ff",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 3,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 2.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve additional visual evidence just before the standing motion begins, focusing on the exact moment the child starts to rise. Use retrieval_profile=detail to ensure precision.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "what does the kid do just before standing up",
+            "question_type": "visual_detail",
+            "retrieval_profile": "detail",
+            "top_k_frames": 5,
+            "planner_notes": "Focus on the frame immediately before the child transitions from kneeling to standing."
+          },
+          "id": "chatcmpl-tool-bef870c1a599736b",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 6.0, \"source\": \"retrieval\"}, {\"timestamp\": 7.0, \"source\": \"retrieval\"}, {\"timestamp\": 9.0, \"source\": \"retrieval\"}, {\"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"timestamp\": 12.0, \"source\": \"segment_focus\"}, {\"timestamp\": 13.0, \"source\": \"segment_focus\"}], \"scene_hits\": [{\"start\": 0.0, \"end\": 10.0, \"filename\": \"scene_0000.jpg\", \"t_mid\": 5.0, \"scene_id\": 0, \"caption\": \"A young boy kneels on sandy ground, holding a red and yellow toy dinosaur with its mouth open.\", \"score\": 0.5658440589904785}, {\"filename\": \"scene_0001.jpg\", \"start\": 10.0, \"t_mid\": 11.773433333333331, \"caption\": \"A child in a black shirt and blue shorts stands on sandy ground, bending slightly with hands near the sand, while a red and yellow toy lies on the ground nearby.\", \"scene_id\": 1, \"end\": 13.546866666666666, \"score\": 0.6293796300888062}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"top_n_scenes\": 5, \"top_k_frames\": 5, \"planner_notes\": \"Focus on the frame immediately before the child transitions from kneeling to standing.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bef870c1a599736b",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 6.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 7.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 9.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          }
+        ],
+        "scene_hits": [
+          {
+            "start": 0.0,
+            "end": 10.0,
+            "filename": "scene_0000.jpg",
+            "t_mid": 5.0,
+            "scene_id": 0,
+            "caption": "A young boy kneels on sandy ground, holding a red and yellow toy dinosaur with its mouth open.",
+            "score": 0.5658440589904785
+          },
+          {
+            "filename": "scene_0001.jpg",
+            "start": 10.0,
+            "t_mid": 11.773433333333331,
+            "caption": "A child in a black shirt and blue shorts stands on sandy ground, bending slightly with hands near the sand, while a red and yellow toy lies on the ground nearby.",
+            "scene_id": 1,
+            "end": 13.546866666666666,
+            "score": 0.6293796300888062
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "detail",
+          "top_n_scenes": 5,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the frame immediately before the child transitions from kneeling to standing."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the current evidence set is sufficient to answer the question. Classify as visual_detail with retrieval_profile=detail.  \n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"frame_count\": 3, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 2.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-ae8c6f2c4b2c096f",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 3,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 2.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "what does the kid do before right before standing up",
+        "center_t": 12.5,
+        "half_window_sec": 2.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 13.55,
+          "center_t": 12.02,
+          "frame_count": 3
+        },
+        "observation": "[t=11.0s] 儿童跪在地上，双手撑在沙地上，身体前倾，面前有一个红色的恐龙玩具。\n[t=12.0s] 儿童身体已从跪姿开始直立，双脚站立在地面上，上半身略微前倾，双手自然下垂。\n[t=13.0s] 儿童身体已基本直立，左腿抬起并向前伸出，双臂向两侧张开以保持平衡，头部低垂注视着前方地面。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "child",
+            "label": "小孩",
+            "first_seen_t": 11.0,
+            "attributes": [
+              "跪在地上",
+              "穿着黑色T恤和蓝色短裤",
+              "穿着凉鞋"
+            ],
+            "evidence_frames": [
+              11.0,
+              12.0,
+              13.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-be7f2abc911b5d38",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "what does the kid do before right before standing up",
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 3,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 2.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-b8e3b9afc7f2c2ff",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "what does the kid do just before standing up",
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "top_k_frames": 5,
+        "planner_notes": "Focus on the frame immediately before the child transitions from kneeling to standing."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 6.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 7.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 9.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          }
+        ],
+        "scene_hits": [
+          {
+            "start": 0.0,
+            "end": 10.0,
+            "filename": "scene_0000.jpg",
+            "t_mid": 5.0,
+            "scene_id": 0,
+            "caption": "A young boy kneels on sandy ground, holding a red and yellow toy dinosaur with its mouth open.",
+            "score": 0.5658440589904785
+          },
+          {
+            "filename": "scene_0001.jpg",
+            "start": 10.0,
+            "t_mid": 11.773433333333331,
+            "caption": "A child in a black shirt and blue shorts stands on sandy ground, bending slightly with hands near the sand, while a red and yellow toy lies on the ground nearby.",
+            "scene_id": 1,
+            "end": 13.546866666666666,
+            "score": 0.6293796300888062
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "detail",
+          "top_n_scenes": 5,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the frame immediately before the child transitions from kneeling to standing."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-bef870c1a599736b",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 3,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 2.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-ae8c6f2c4b2c096f",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 6.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0013.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 1.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0001.0.jpg"
+      },
+      {
+        "timestamp": 2.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/1d71830ae2680c35/frames_dense/t0013.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "start": 0.0,
+        "end": 10.0,
+        "filename": "scene_0000.jpg",
+        "t_mid": 5.0,
+        "scene_id": 0,
+        "caption": "A young boy kneels on sandy ground, holding a red and yellow toy dinosaur with its mouth open.",
+        "score": 0.5658440589904785
+      },
+      {
+        "filename": "scene_0001.jpg",
+        "start": 10.0,
+        "t_mid": 11.773433333333331,
+        "caption": "A child in a black shirt and blue shorts stands on sandy ground, bending slightly with hands near the sand, while a red and yellow toy lies on the ground nearby.",
+        "scene_id": 1,
+        "end": 13.546866666666666,
+        "score": 0.6293796300888062
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "detail",
+      "top_n_scenes": 5,
+      "top_k_frames": 5,
+      "planner_notes": "Focus on the frame immediately before the child transitions from kneeling to standing."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "detail",
+      "frame_count": 3,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 2.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=11.0s] 儿童跪在地上，双手撑在沙地上，身体前倾，面前有一个红色的恐龙玩具。\n[t=12.0s] 儿童身体已从跪姿开始直立，双脚站立在地面上，上半身略微前倾，双手自然下垂。\n[t=13.0s] 儿童身体已基本直立，左腿抬起并向前伸出，双臂向两侧张开以保持平衡，头部低垂注视着前方地面。",
+        "timestamps": [
+          11.0,
+          12.0,
+          13.0
+        ],
+        "window": {
+          "start": 10.5,
+          "end": 13.55,
+          "center_t": 12.02
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [
+      {
+        "id": "child",
+        "label": "小孩",
+        "first_seen_t": 11.0,
+        "last_seen_t": 11.0,
+        "attributes": [
+          "跪在地上",
+          "穿着黑色T恤和蓝色短裤",
+          "穿着凉鞋"
+        ],
+        "evidence_frames": [
+          11.0,
+          12.0,
+          13.0
+        ]
+      }
+    ],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "378533039d124a297e845af7309a966691101963"
+}

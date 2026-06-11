@@ -1,0 +1,470 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-5421648216-5",
+    "video_id": "c3bd549100b426dd",
+    "question": "what does the brown sheep do after walking close to the black sheep at the start\n\nCandidates:\nA) flap wings\nB) let go of grey rooster\nC) look at bottle\nD) stands next to him\nE) chase the brown dog\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "stands next to him",
+    "required_keywords": [
+      "stands",
+      "next",
+      "him"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      21.6
+    ],
+    "gold_scenes": [
+      {
+        "start": 0.2,
+        "end": 43.0
+      }
+    ],
+    "question_type": "tn"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T12:53:09",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-4B-Instruct@http://127.0.0.1:30000/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "what does the brown sheep do after walking close to the black sheep at the start\n\nCandidates:\nA) flap wings\nB) let go of grey rooster\nC) look at bottle\nD) stands next to him\nE) chase the brown dog\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the action of the brown sheep immediately after approaching the black sheep at the start. Use segment_focus for precise visual detail around the moment of interaction. (classification: visual_detail, retrieval_profile: focused)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "what does the brown sheep do after walking close to the black sheep at the start",
+            "center_t": 5.0,
+            "half_window_sec": 2.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-a2c7b8e2e863bd27",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 3.0, \"end\": 7.0, \"center_t\": 5.0, \"frame_count\": 5}, \"observation\": \"The brown sheep, initially positioned near the black sheep at [t=3.0s], moves closer to it in the subsequent frames. At [t=4.0s], the brown sheep is seen stepping forward, partially obscured by the fence, while the black sheep remains stationary. By [t=5.0s], the brown sheep is directly beside the black sheep, with both animals standing close together. At [t=6.0s], the brown sheep continues to stand near the black sheep, with no significant movement observed. The interaction appears to be stationary, with the brown sheep maintaining proximity to the black sheep without moving away.\", \"subject_deltas\": [{\"op\": \"update\", \"id\": \"brown_sheep\", \"attributes_add\": [\"站立在黑色绵羊旁边\"], \"last_seen_t\": 6.0, \"evidence_frames_add\": [6.0]}], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a2c7b8e2e863bd27",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 3.0,
+          "end": 7.0,
+          "center_t": 5.0,
+          "frame_count": 5
+        },
+        "observation": "The brown sheep, initially positioned near the black sheep at [t=3.0s], moves closer to it in the subsequent frames. At [t=4.0s], the brown sheep is seen stepping forward, partially obscured by the fence, while the black sheep remains stationary. By [t=5.0s], the brown sheep is directly beside the black sheep, with both animals standing close together. At [t=6.0s], the brown sheep continues to stand near the black sheep, with no significant movement observed. The interaction appears to be stationary, with the brown sheep maintaining proximity to the black sheep without moving away.",
+        "subject_deltas": [
+          {
+            "op": "update",
+            "id": "brown_sheep",
+            "attributes_add": [
+              "站立在黑色绵羊旁边"
+            ],
+            "last_seen_t": 6.0,
+            "evidence_frames_add": [
+              6.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Confirm that the brown sheep stands next to the black sheep after approaching, based on visual evidence from the segment. (classification: visual_detail, retrieval_profile: focused)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "what does the brown sheep do after walking close to the black sheep at the start",
+            "answer_mode": "direct"
+          },
+          "id": "chatcmpl-tool-87f72288f0b447af",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is D) stands next to him.\\n\\n[FRAME:t=6.0] shows the brown sheep walking close to the black sheep, and by [FRAME:t=7.0], they are standing side by side, with the brown sheep positioned directly next to the black sheep. No other actions (flapping wings, letting go of a rooster, looking at a bottle, or chasing a dog) are visually supported in the frames.\", \"subject_deltas\": [{\"op\": \"update\", \"id\": \"brown_sheep\", \"attributes_add\": [\"stands next to black sheep\"], \"last_seen_t\": 7.0, \"evidence_frames_add\": [7.0]}], \"grounding_report\": {\"grounded\": true, \"valid_markers\": 2, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": null, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-87f72288f0b447af",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) stands next to him.\n\n[FRAME:t=6.0] shows the brown sheep walking close to the black sheep, and by [FRAME:t=7.0], they are standing side by side, with the brown sheep positioned directly next to the black sheep. No other actions (flapping wings, letting go of a rooster, looking at a bottle, or chasing a dog) are visually supported in the frames.",
+        "subject_deltas": [
+          {
+            "op": "update",
+            "id": "brown_sheep",
+            "attributes_add": [
+              "stands next to black sheep"
+            ],
+            "last_seen_t": 7.0,
+            "evidence_frames_add": [
+              7.0
+            ]
+          }
+        ],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": null,
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is D) stands next to him.\\n\\n[FRAME:t=6.0] shows the brown sheep walking close to the black sheep, and by [FRAME:t=7.0], they are standing side by side, with the brown sheep positioned directly next to the black sheep. No other actions (flapping wings, letting go of a rooster, looking at a bottle, or chasing a dog) are visually supported in the frames.\", \"grounding_report\": {\"grounded\": true, \"valid_markers\": 2, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"D\", \"text\": \"stands next to him\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"final_answer\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) stands next to him.\n\n[FRAME:t=6.0] shows the brown sheep walking close to the black sheep, and by [FRAME:t=7.0], they are standing side by side, with the brown sheep positioned directly next to the black sheep. No other actions (flapping wings, letting go of a rooster, looking at a bottle, or chasing a dog) are visually supported in the frames.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "stands next to him"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is D) stands next to him.\n\n[FRAME:t=6.0] shows the brown sheep walking close to the black sheep, and by [FRAME:t=7.0], they are standing side by side, with the brown sheep positioned directly next to the black sheep. No other actions (flapping wings, letting go of a rooster, looking at a bottle, or chasing a dog) are visually supported in the frames.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "what does the brown sheep do after walking close to the black sheep at the start",
+        "center_t": 5.0,
+        "half_window_sec": 2.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 3.0,
+          "end": 7.0,
+          "center_t": 5.0,
+          "frame_count": 5
+        },
+        "observation": "The brown sheep, initially positioned near the black sheep at [t=3.0s], moves closer to it in the subsequent frames. At [t=4.0s], the brown sheep is seen stepping forward, partially obscured by the fence, while the black sheep remains stationary. By [t=5.0s], the brown sheep is directly beside the black sheep, with both animals standing close together. At [t=6.0s], the brown sheep continues to stand near the black sheep, with no significant movement observed. The interaction appears to be stationary, with the brown sheep maintaining proximity to the black sheep without moving away.",
+        "subject_deltas": [
+          {
+            "op": "update",
+            "id": "brown_sheep",
+            "attributes_add": [
+              "站立在黑色绵羊旁边"
+            ],
+            "last_seen_t": 6.0,
+            "evidence_frames_add": [
+              6.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-a2c7b8e2e863bd27",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "what does the brown sheep do after walking close to the black sheep at the start",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) stands next to him.\n\n[FRAME:t=6.0] shows the brown sheep walking close to the black sheep, and by [FRAME:t=7.0], they are standing side by side, with the brown sheep positioned directly next to the black sheep. No other actions (flapping wings, letting go of a rooster, looking at a bottle, or chasing a dog) are visually supported in the frames.",
+        "subject_deltas": [
+          {
+            "op": "update",
+            "id": "brown_sheep",
+            "attributes_add": [
+              "stands next to black sheep"
+            ],
+            "last_seen_t": 7.0,
+            "evidence_frames_add": [
+              7.0
+            ]
+          }
+        ],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": null,
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "chatcmpl-tool-87f72288f0b447af",
+      "internalizability": "type1"
+    },
+    {
+      "index": 6,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) stands next to him.\n\n[FRAME:t=6.0] shows the brown sheep walking close to the black sheep, and by [FRAME:t=7.0], they are standing side by side, with the brown sheep positioned directly next to the black sheep. No other actions (flapping wings, letting go of a rooster, looking at a bottle, or chasing a dog) are visually supported in the frames.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 2,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "stands next to him"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 3.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 4.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0007.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 20.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0020.0.jpg"
+      },
+      {
+        "timestamp": 23.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 25.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0025.0.jpg"
+      },
+      {
+        "timestamp": 28.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0028.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 33.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0033.0.jpg"
+      },
+      {
+        "timestamp": 35.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0035.0.jpg"
+      },
+      {
+        "timestamp": 38.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0038.0.jpg"
+      },
+      {
+        "timestamp": 41.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0041.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {},
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {},
+    "draft_answer": "The correct answer is D) stands next to him.\n\n[FRAME:t=6.0] shows the brown sheep walking close to the black sheep, and by [FRAME:t=7.0], they are standing side by side, with the brown sheep positioned directly next to the black sheep. No other actions (flapping wings, letting go of a rooster, looking at a bottle, or chasing a dog) are visually supported in the frames.",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "The brown sheep, initially positioned near the black sheep at [t=3.0s], moves closer to it in the subsequent frames. At [t=4.0s], the brown sheep is seen stepping forward, partially obscured by the fence, while the black sheep remains stationary. By [t=5.0s], the brown sheep is directly beside the black sheep, with both animals standing close together. At [t=6.0s], the brown sheep continues to stand near the black sheep, with no significant movement observed. The interaction appears to be stationary, with the brown sheep maintaining proximity to the black sheep without moving away.",
+        "timestamps": [
+          3.0,
+          4.0,
+          5.0,
+          6.0,
+          7.0
+        ],
+        "window": {
+          "start": 3.0,
+          "end": 7.0,
+          "center_t": 5.0
+        }
+      }
+    ],
+    "grounding_report": {
+      "grounded": true,
+      "valid_markers": 2,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [],
+      "selected_candidate": {
+        "label": "D",
+        "text": "stands next to him"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": null,
+      "recommended_next_action": "final_answer"
+    },
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "272b179a7ee73cdf93e5c52d354247bb7edeab81"
+}

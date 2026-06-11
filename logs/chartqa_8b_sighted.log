@@ -1,0 +1,9 @@
+=== ChartQA gate: model=8b n=60 cases ===
+[8b/chartqa/orch_reflect_sighted seed0] free=0.617 method=0.633 net=+0.017 CI[-0.050,+0.083] gain=3 lost=2
+[8b/chartqa/orch_reflect_sighted seed1] free=0.600 method=0.700 net=+0.100 CI[+0.017,+0.200] gain=7 lost=1
+[8b/chartqa/orch_reflect_sighted seed2] free=0.617 method=0.683 net=+0.067 CI[+0.000,+0.150] gain=5 lost=1
+[8b/chartqa/orch_reflect_sighted seed3] free=0.617 method=0.667 net=+0.050 CI[-0.033,+0.133] gain=5 lost=2
+[8b/chartqa/orch_reflect_sighted seed4] free=0.617 method=0.733 net=+0.117 CI[+0.033,+0.217] gain=8 lost=1
+
+=== SUMMARY (ChartQA) ===
+  orch_reflect_sighted   net_mean=+0.070 ± 0.040 (k=5) verdict=within-variance

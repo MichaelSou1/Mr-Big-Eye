@@ -1,0 +1,60 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "bb13d595f11b2144",
+  "case_id": "nextgqa-6097994550-4",
+  "question": "how does the man with spectacles move at the end of the video\n\nCandidates:\nA) walk\nB) caress his head\nC) count with fingers\nD) crawls\nE) strolls around\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0,
+    11.0,
+    12.0,
+    13.0,
+    14.0,
+    16.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0001.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0002.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0003.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0004.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0005.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0006.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0007.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0008.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0009.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0010.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0011.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0012.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0013.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0014.0.jpg",
+    "/home/gpus/mbe_data/cache/bb13d595f11b2144/frames_dense/t0016.0.jpg"
+  ],
+  "cot": "['At [FRAME:t=10.0], the man with spectacles is on his stomach, with his hands and knees in contact with the ground, moving forward in a low, controlled motion.', 'His body is close to the ground, and his limbs are positioned symmetrically, indicating a crawling motion rather than walking or strolling.', 'In [FRAME:t=14.0], the posture is consistent: he remains on all fours, with no evidence of upright movement or hand gestures for counting or head touching.', 'The motion is continuous and low to the ground, confirming crawling as the only accurate description of his movement at the end of the video.']",
+  "answer": "D) crawls",
+  "gold_timestamps": [
+    14.25
+  ],
+  "gold_scenes": [
+    {
+      "start": 10.9,
+      "end": 17.6
+    }
+  ],
+  "source_traj_hash": "4adabb26c2c38f1615cd8e8755be25d28b69b186",
+  "validation_report": {
+    "ok": true,
+    "errors": [],
+    "frame_markers": [
+      10.0,
+      14.0
+    ]
+  }
+}

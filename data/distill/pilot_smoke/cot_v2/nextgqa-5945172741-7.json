@@ -1,0 +1,62 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "4dd172f915a5cdb1",
+  "case_id": "nextgqa-5945172741-7",
+  "question": "how did the man show affection to the girl when he held her\n\nCandidates:\nA) caress her hairs\nB) kiss her\nC) play with baby\nD) lady point towards it\nE) pat her back\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    4.0,
+    7.0,
+    11.0,
+    15.0,
+    19.0,
+    23.0,
+    26.0,
+    30.0,
+    34.0,
+    38.0,
+    41.0,
+    45.0,
+    49.0,
+    53.0,
+    56.0,
+    60.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0004.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0007.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0011.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0015.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0019.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0023.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0026.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0030.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0034.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0038.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0041.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0045.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0049.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0053.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0056.0.jpg",
+    "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0060.0.jpg"
+  ],
+  "cot": "['At [FRAME:t=11.0], the man is seen holding the girl close on a bed. His face is positioned near hers, and his mouth is open, suggesting a close physical interaction.', 'At [FRAME:t=15.0], the man remains in close proximity to the girl, with his face near her cheek. His expression is affectionate, and his lips are near her face, consistent with a kiss.', 'No visible hair-touching is observed, ruling out A) caress her hairs.', 'No baby is present, and no play behavior is seen, ruling out C) play with baby.', 'No lady is present, and no pointing gesture is visible, ruling out D) lady point towards it.', 'No hand motion on the back is observed in the frames, ruling out E) pat her back.', 'The facial proximity and affectionate expression strongly support B) kiss her as the most consistent action with the visual evidence.']",
+  "answer": "B",
+  "gold_timestamps": [
+    11.5
+  ],
+  "gold_scenes": [
+    {
+      "start": 8.7,
+      "end": 14.3
+    }
+  ],
+  "source_traj_hash": "1b8e7c4f9e250409bd1a55248b9f0aa6aa462ab9",
+  "validation_report": {
+    "ok": true,
+    "errors": [],
+    "frame_markers": [
+      11.0,
+      15.0
+    ]
+  }
+}

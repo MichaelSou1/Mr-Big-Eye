@@ -1,0 +1,705 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-5138093706-1",
+    "video_id": "c83db1b6f40de09e",
+    "question": "how did the baby move up the stairs near the end of the video\n\nCandidates:\nA) lady carried her\nB) walk up\nC) ran up\nD) man hold her hands\nE) crawl up\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "crawl up",
+    "required_keywords": [
+      "crawl"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      22.25
+    ],
+    "gold_scenes": [
+      {
+        "start": 14.7,
+        "end": 29.8
+      }
+    ],
+    "question_type": "ch"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "how did the baby move up the stairs near the end of the video\n\nCandidates:\nA) lady carried her\nB) walk up\nC) ran up\nD) man hold her hands\nE) crawl up\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Use segment_focus to examine the final moments of the video for precise visual details of the baby's movement. Classify as visual_detail with retrieval_profile = detail.  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "how did the baby move up the stairs near the end of the video",
+            "center_t": 120.0,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-bcb629c292023e62",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 31.06, \"end\": 31.06, \"center_t\": 31.06, \"frame_count\": 0}, \"observation\": \"I could not load dense frames for the requested window.\", \"subject_deltas\": [], \"required_next_action\": \"retrieve_video_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bcb629c292023e62",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 31.06,
+          "end": 31.06,
+          "center_t": 31.06,
+          "frame_count": 0
+        },
+        "observation": "I could not load dense frames for the requested window.",
+        "subject_deltas": [],
+        "required_next_action": "retrieve_video_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve visual evidence around the final moments of the video to observe the baby’s movement on the stairs. Use retrieval_profile = detail for precision.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "how did the baby move up the stairs near the end of the video",
+            "question_type": "visual_detail",
+            "retrieval_profile": "detail",
+            "top_k_frames": 5,
+            "planner_notes": "Focus on the final few seconds of the video where the baby is on the stairs."
+          },
+          "id": "chatcmpl-tool-aed86314536c8192",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 0.0, \"source\": \"retrieval\"}, {\"timestamp\": 1.0, \"source\": \"retrieval\"}, {\"timestamp\": 4.0, \"source\": \"retrieval\"}, {\"timestamp\": 7.0, \"source\": \"retrieval\"}, {\"timestamp\": 11.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"start\": 0.0, \"end\": 10.0, \"caption\": \"A child in a striped outfit is walking away from the camera across a patterned carpet.\", \"filename\": \"scene_0000.jpg\", \"t_mid\": 5.0, \"scene_id\": 0, \"score\": 0.5599289536476135}, {\"filename\": \"scene_0001.jpg\", \"start\": 10.0, \"t_mid\": 15.0, \"scene_id\": 1, \"caption\": \"A toddler in striped pajamas is crawling on a patterned carpet toward a dark, textured wall or door.\", \"end\": 20.0, \"score\": 0.569215714931488}, {\"scene_id\": 2, \"end\": 30.0, \"start\": 20.0, \"t_mid\": 25.0, \"caption\": \"A toddler in a striped outfit is crawling up a dark staircase, reaching toward a vertical surface with one hand.\", \"filename\": \"scene_0002.jpg\", \"score\": 0.6503891944885254}, {\"caption\": \"A woman kneels on a tiled floor, guiding a small child in striped pajamas as they descend a staircase. Another person’s hand is visible near the top step.\", \"start\": 30.0, \"scene_id\": 3, \"end\": 31.06436666666667, \"filename\": \"scene_0003.jpg\", \"t_mid\": 30.532183333333336, \"score\": 0.5933917164802551}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"top_n_scenes\": 5, \"top_k_frames\": 5, \"planner_notes\": \"Focus on the final few seconds of the video where the baby is on the stairs.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-aed86314536c8192",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 1.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 7.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "start": 0.0,
+            "end": 10.0,
+            "caption": "A child in a striped outfit is walking away from the camera across a patterned carpet.",
+            "filename": "scene_0000.jpg",
+            "t_mid": 5.0,
+            "scene_id": 0,
+            "score": 0.5599289536476135
+          },
+          {
+            "filename": "scene_0001.jpg",
+            "start": 10.0,
+            "t_mid": 15.0,
+            "scene_id": 1,
+            "caption": "A toddler in striped pajamas is crawling on a patterned carpet toward a dark, textured wall or door.",
+            "end": 20.0,
+            "score": 0.569215714931488
+          },
+          {
+            "scene_id": 2,
+            "end": 30.0,
+            "start": 20.0,
+            "t_mid": 25.0,
+            "caption": "A toddler in a striped outfit is crawling up a dark staircase, reaching toward a vertical surface with one hand.",
+            "filename": "scene_0002.jpg",
+            "score": 0.6503891944885254
+          },
+          {
+            "caption": "A woman kneels on a tiled floor, guiding a small child in striped pajamas as they descend a staircase. Another person’s hand is visible near the top step.",
+            "start": 30.0,
+            "scene_id": 3,
+            "end": 31.06436666666667,
+            "filename": "scene_0003.jpg",
+            "t_mid": 30.532183333333336,
+            "score": 0.5933917164802551
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "detail",
+          "top_n_scenes": 5,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the final few seconds of the video where the baby is on the stairs."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the retrieved video evidence is sufficient to determine how the baby moved up the stairs. Classify as general with retrieval_profile = detail.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "how did the baby move up the stairs near the end of the video",
+            "question_type": "visual_detail",
+            "retrieval_profile": "detail"
+          },
+          "id": "chatcmpl-tool-acaa3baa7475a89a",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": true, \"confidence\": 0.78, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"frame_count\": 5, \"scene_count\": 4, \"text_evidence_count\": 0, \"time_span_sec\": 11.0, \"missing_evidence\": [], \"recommended_next_action\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-acaa3baa7475a89a",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 5,
+        "scene_count": 4,
+        "text_evidence_count": 0,
+        "time_span_sec": 11.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "how did the baby move up the stairs near the end of the video\n\nCandidates:\nA) lady carried her\nB) walk up\nC) ran up\nD) man hold her hands\nE) crawl up\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is E) crawl up\\n\\nEvidence: The baby is seen moving across the carpeted floor in a crawling posture from [t=0.0s] to [t=11.0s]. The baby’s body is low to the ground, arms and legs are extended in a crawling motion, and there is no visual evidence of being carried, walking, running, or being held by hands. The movement is consistent with crawling.\\n\\n[FRAME:t=0.0] [FRAME:t=1.0] [FRAME:t=4.0] [FRAME:t=7.0] [FRAME:t=11.0]\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": true, \"valid_markers\": 5, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"E\", \"text\": \"crawl up\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is E) crawl up\n\nEvidence: The baby is seen moving across the carpeted floor in a crawling posture from [t=0.0s] to [t=11.0s]. The baby’s body is low to the ground, arms and legs are extended in a crawling motion, and there is no visual evidence of being carried, walking, running, or being held by hands. The movement is consistent with crawling.\n\n[FRAME:t=0.0] [FRAME:t=1.0] [FRAME:t=4.0] [FRAME:t=7.0] [FRAME:t=11.0]",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 5,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "E",
+            "text": "crawl up"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is E) crawl up\\n\\nEvidence: The baby is seen moving across the carpeted floor in a crawling posture from [t=0.0s] to [t=11.0s]. The baby’s body is low to the ground, arms and legs are extended in a crawling motion, and there is no visual evidence of being carried, walking, running, or being held by hands. The movement is consistent with crawling.\\n\\n[FRAME:t=0.0] [FRAME:t=1.0] [FRAME:t=4.0] [FRAME:t=7.0] [FRAME:t=11.0]\", \"grounding_report\": {\"grounded\": true, \"valid_markers\": 5, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"E\", \"text\": \"crawl up\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"final_answer\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is E) crawl up\n\nEvidence: The baby is seen moving across the carpeted floor in a crawling posture from [t=0.0s] to [t=11.0s]. The baby’s body is low to the ground, arms and legs are extended in a crawling motion, and there is no visual evidence of being carried, walking, running, or being held by hands. The movement is consistent with crawling.\n\n[FRAME:t=0.0] [FRAME:t=1.0] [FRAME:t=4.0] [FRAME:t=7.0] [FRAME:t=11.0]",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 5,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "E",
+            "text": "crawl up"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is E) crawl up\n\nEvidence: The baby is seen moving across the carpeted floor in a crawling posture from [t=0.0s] to [t=11.0s]. The baby’s body is low to the ground, arms and legs are extended in a crawling motion, and there is no visual evidence of being carried, walking, running, or being held by hands. The movement is consistent with crawling.\n\n[FRAME:t=0.0] [FRAME:t=1.0] [FRAME:t=4.0] [FRAME:t=7.0] [FRAME:t=11.0]",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "how did the baby move up the stairs near the end of the video",
+        "center_t": 120.0,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 31.06,
+          "end": 31.06,
+          "center_t": 31.06,
+          "frame_count": 0
+        },
+        "observation": "I could not load dense frames for the requested window.",
+        "subject_deltas": [],
+        "required_next_action": "retrieve_video_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-bcb629c292023e62",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "how did the baby move up the stairs near the end of the video",
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "top_k_frames": 5,
+        "planner_notes": "Focus on the final few seconds of the video where the baby is on the stairs."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 1.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 7.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "start": 0.0,
+            "end": 10.0,
+            "caption": "A child in a striped outfit is walking away from the camera across a patterned carpet.",
+            "filename": "scene_0000.jpg",
+            "t_mid": 5.0,
+            "scene_id": 0,
+            "score": 0.5599289536476135
+          },
+          {
+            "filename": "scene_0001.jpg",
+            "start": 10.0,
+            "t_mid": 15.0,
+            "scene_id": 1,
+            "caption": "A toddler in striped pajamas is crawling on a patterned carpet toward a dark, textured wall or door.",
+            "end": 20.0,
+            "score": 0.569215714931488
+          },
+          {
+            "scene_id": 2,
+            "end": 30.0,
+            "start": 20.0,
+            "t_mid": 25.0,
+            "caption": "A toddler in a striped outfit is crawling up a dark staircase, reaching toward a vertical surface with one hand.",
+            "filename": "scene_0002.jpg",
+            "score": 0.6503891944885254
+          },
+          {
+            "caption": "A woman kneels on a tiled floor, guiding a small child in striped pajamas as they descend a staircase. Another person’s hand is visible near the top step.",
+            "start": 30.0,
+            "scene_id": 3,
+            "end": 31.06436666666667,
+            "filename": "scene_0003.jpg",
+            "t_mid": 30.532183333333336,
+            "score": 0.5933917164802551
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "detail",
+          "top_n_scenes": 5,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the final few seconds of the video where the baby is on the stairs."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-aed86314536c8192",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "how did the baby move up the stairs near the end of the video",
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 5,
+        "scene_count": 4,
+        "text_evidence_count": 0,
+        "time_span_sec": 11.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-acaa3baa7475a89a",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "how did the baby move up the stairs near the end of the video\n\nCandidates:\nA) lady carried her\nB) walk up\nC) ran up\nD) man hold her hands\nE) crawl up\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is E) crawl up\n\nEvidence: The baby is seen moving across the carpeted floor in a crawling posture from [t=0.0s] to [t=11.0s]. The baby’s body is low to the ground, arms and legs are extended in a crawling motion, and there is no visual evidence of being carried, walking, running, or being held by hands. The movement is consistent with crawling.\n\n[FRAME:t=0.0] [FRAME:t=1.0] [FRAME:t=4.0] [FRAME:t=7.0] [FRAME:t=11.0]",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 5,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "E",
+            "text": "crawl up"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 10,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is E) crawl up\n\nEvidence: The baby is seen moving across the carpeted floor in a crawling posture from [t=0.0s] to [t=11.0s]. The baby’s body is low to the ground, arms and legs are extended in a crawling motion, and there is no visual evidence of being carried, walking, running, or being held by hands. The movement is consistent with crawling.\n\n[FRAME:t=0.0] [FRAME:t=1.0] [FRAME:t=4.0] [FRAME:t=7.0] [FRAME:t=11.0]",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 5,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "E",
+            "text": "crawl up"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 0.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0000.0.jpg"
+      },
+      {
+        "timestamp": 1.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0001.0.jpg"
+      },
+      {
+        "timestamp": 4.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0011.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 2.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 20.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0020.0.jpg"
+      },
+      {
+        "timestamp": 22.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0022.0.jpg"
+      },
+      {
+        "timestamp": 24.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0024.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 27.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0027.0.jpg"
+      },
+      {
+        "timestamp": 29.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c83db1b6f40de09e/frames_dense/t0029.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "start": 0.0,
+        "end": 10.0,
+        "caption": "A child in a striped outfit is walking away from the camera across a patterned carpet.",
+        "filename": "scene_0000.jpg",
+        "t_mid": 5.0,
+        "scene_id": 0,
+        "score": 0.5599289536476135
+      },
+      {
+        "filename": "scene_0001.jpg",
+        "start": 10.0,
+        "t_mid": 15.0,
+        "scene_id": 1,
+        "caption": "A toddler in striped pajamas is crawling on a patterned carpet toward a dark, textured wall or door.",
+        "end": 20.0,
+        "score": 0.569215714931488
+      },
+      {
+        "scene_id": 2,
+        "end": 30.0,
+        "start": 20.0,
+        "t_mid": 25.0,
+        "caption": "A toddler in a striped outfit is crawling up a dark staircase, reaching toward a vertical surface with one hand.",
+        "filename": "scene_0002.jpg",
+        "score": 0.6503891944885254
+      },
+      {
+        "caption": "A woman kneels on a tiled floor, guiding a small child in striped pajamas as they descend a staircase. Another person’s hand is visible near the top step.",
+        "start": 30.0,
+        "scene_id": 3,
+        "end": 31.06436666666667,
+        "filename": "scene_0003.jpg",
+        "t_mid": 30.532183333333336,
+        "score": 0.5933917164802551
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "detail",
+      "top_n_scenes": 5,
+      "top_k_frames": 5,
+      "planner_notes": "Focus on the final few seconds of the video where the baby is on the stairs."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": true,
+      "confidence": 0.78,
+      "question_type": "visual_detail",
+      "retrieval_profile": "detail",
+      "frame_count": 5,
+      "scene_count": 4,
+      "text_evidence_count": 0,
+      "time_span_sec": 11.0,
+      "missing_evidence": [],
+      "recommended_next_action": "answer_with_evidence"
+    },
+    "draft_answer": "The correct answer is E) crawl up\n\nEvidence: The baby is seen moving across the carpeted floor in a crawling posture from [t=0.0s] to [t=11.0s]. The baby’s body is low to the ground, arms and legs are extended in a crawling motion, and there is no visual evidence of being carried, walking, running, or being held by hands. The movement is consistent with crawling.\n\n[FRAME:t=0.0] [FRAME:t=1.0] [FRAME:t=4.0] [FRAME:t=7.0] [FRAME:t=11.0]",
+    "observer_notes": [],
+    "grounding_report": {
+      "grounded": true,
+      "valid_markers": 5,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [],
+      "selected_candidate": {
+        "label": "E",
+        "text": "crawl up"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": null,
+      "recommended_next_action": "final_answer"
+    },
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "5fc5c0e31249615c797755b18846b7e14d97a3a4"
+}

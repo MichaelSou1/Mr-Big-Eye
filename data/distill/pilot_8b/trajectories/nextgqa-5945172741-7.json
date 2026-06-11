@@ -1,0 +1,782 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-5945172741-7",
+    "video_id": "4dd172f915a5cdb1",
+    "question": "how did the man show affection to the girl when he held her\n\nCandidates:\nA) caress her hairs\nB) kiss her\nC) play with baby\nD) lady point towards it\nE) pat her back\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "kiss her",
+    "required_keywords": [
+      "kiss",
+      "her"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      11.5
+    ],
+    "gold_scenes": [
+      {
+        "start": 8.7,
+        "end": 14.3
+      }
+    ],
+    "question_type": "ch"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "how did the man show affection to the girl when he held her\n\nCandidates:\nA) caress her hairs\nB) kiss her\nC) play with baby\nD) lady point towards it\nE) pat her back\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the specific visual action showing affection when the man holds the girl. Use segment_focus for detailed frame analysis around the key moment. (visual_detail, focused, negative_check)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "how did the man show affection to the girl when he held her",
+            "center_t": 12.5,
+            "half_window_sec": 3.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-98d84783ff0f5b4c",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 9.5, \"end\": 15.5, \"center_t\": 12.5, \"frame_count\": 6}, \"observation\": \"[t=13.0s] 画面中，男子将头靠近女孩，女孩的头也贴近男子的肩膀和脸颊，两人身体紧密相贴。\\n[t=14.0s] 男子继续将头贴近女孩，女孩的头也靠在男子的肩膀上，两人保持亲密接触。\\n[t=15.0s] 男子和女孩继续保持紧密相贴的姿势，男子的头靠近女孩的头部，女孩的头靠在男子的肩膀上。\", \"subject_deltas\": [{\"op\": \"add\", \"id\": \"man\", \"label\": \"男子\", \"first_seen_t\": 10.0, \"attributes\": [\"躺在沙发上\", \"抱着女孩\"], \"evidence_frames\": [10.0]}, {\"op\": \"add\", \"id\": \"girl\", \"label\": \"女孩\", \"first_seen_t\": 10.0, \"attributes\": [\"被男子抱着\", \"手持橙色球\"], \"evidence_frames\": [10.0]}, {\"op\": \"update\", \"id\": \"man\", \"attributes_add\": [\"亲吻女孩额头\"], \"last_seen_t\": 15.0, \"evidence_frames_add\": [13.0, 14.0, 15.0]}, {\"op\": \"update\", \"id\": \"girl\", \"attributes_add\": [\"头部贴近男子肩膀\"], \"last_seen_t\": 15.0, \"evidence_frames_add\": [13.0, 14.0, 15.0]}], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-98d84783ff0f5b4c",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5,
+          "frame_count": 6
+        },
+        "observation": "[t=13.0s] 画面中，男子将头靠近女孩，女孩的头也贴近男子的肩膀和脸颊，两人身体紧密相贴。\n[t=14.0s] 男子继续将头贴近女孩，女孩的头也靠在男子的肩膀上，两人保持亲密接触。\n[t=15.0s] 男子和女孩继续保持紧密相贴的姿势，男子的头靠近女孩的头部，女孩的头靠在男子的肩膀上。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "man",
+            "label": "男子",
+            "first_seen_t": 10.0,
+            "attributes": [
+              "躺在沙发上",
+              "抱着女孩"
+            ],
+            "evidence_frames": [
+              10.0
+            ]
+          },
+          {
+            "op": "add",
+            "id": "girl",
+            "label": "女孩",
+            "first_seen_t": 10.0,
+            "attributes": [
+              "被男子抱着",
+              "手持橙色球"
+            ],
+            "evidence_frames": [
+              10.0
+            ]
+          },
+          {
+            "op": "update",
+            "id": "man",
+            "attributes_add": [
+              "亲吻女孩额头"
+            ],
+            "last_seen_t": 15.0,
+            "evidence_frames_add": [
+              13.0,
+              14.0,
+              15.0
+            ]
+          },
+          {
+            "op": "update",
+            "id": "girl",
+            "attributes_add": [
+              "头部贴近男子肩膀"
+            ],
+            "last_seen_t": 15.0,
+            "evidence_frames_add": [
+              13.0,
+              14.0,
+              15.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Confirm that the man kissed the girl's forehead as the affectionate gesture. Use assess_evidence_sufficiency to check if evidence is sufficient. (visual_detail, focused, negative_check)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "how did the man show affection to the girl when he held her",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-ae54a4fb3984ea4f",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 6, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 5.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-ae54a4fb3984ea4f",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve additional visual evidence to confirm the affection gesture. Use retrieve_video_evidence with focused profile to verify the action. (visual_detail, focused, negative_check)\n\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "how did the man show affection to the girl when he held her",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 5,
+            "planner_notes": "Confirm if the man kissed the girl's forehead."
+          },
+          "id": "chatcmpl-tool-bb34c5b37cb6e92e",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 0.0, \"source\": \"retrieval\"}, {\"timestamp\": 10.0, \"source\": \"segment_focus\"}, {\"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"timestamp\": 12.0, \"source\": \"segment_focus\"}, {\"timestamp\": 13.0, \"source\": \"segment_focus\"}, {\"timestamp\": 14.0, \"source\": \"segment_focus\"}, {\"timestamp\": 15.0, \"source\": \"segment_focus\"}, {\"timestamp\": 21.0, \"source\": \"retrieval\"}, {\"timestamp\": 48.0, \"source\": \"retrieval\"}, {\"timestamp\": 54.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"t_mid\": 15.0, \"filename\": \"scene_0000.jpg\", \"end\": 30.0, \"start\": 0.0, \"caption\": \"A man lies on a bed holding a small child, while a woman sits on the couch reading a book. An orange plush toy rests nearby on the bed.\", \"scene_id\": 0, \"score\": 0.5132070779800415}, {\"start\": 30.0, \"caption\": \"A man and a woman lie on a bed with two children; one child crawls on the bed while the other lies on their back, and the man gestures with his hands.\", \"filename\": \"scene_0001.jpg\", \"end\": 30.84, \"scene_id\": 1, \"t_mid\": 30.42, \"score\": 0.5052229166030884}, {\"end\": 38.28, \"t_mid\": 37.68, \"filename\": \"scene_0003.jpg\", \"start\": 37.08, \"caption\": \"A man and a young girl are on a bed, with the man leaning forward and the girl crawling toward him, while a young girl sits in the background.\", \"scene_id\": 3, \"score\": 0.5651498436927795}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 5, \"planner_notes\": \"Confirm if the man kissed the girl's forehead.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bb34c5b37cb6e92e",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 21.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 48.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 54.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "t_mid": 15.0,
+            "filename": "scene_0000.jpg",
+            "end": 30.0,
+            "start": 0.0,
+            "caption": "A man lies on a bed holding a small child, while a woman sits on the couch reading a book. An orange plush toy rests nearby on the bed.",
+            "scene_id": 0,
+            "score": 0.5132070779800415
+          },
+          {
+            "start": 30.0,
+            "caption": "A man and a woman lie on a bed with two children; one child crawls on the bed while the other lies on their back, and the man gestures with his hands.",
+            "filename": "scene_0001.jpg",
+            "end": 30.84,
+            "scene_id": 1,
+            "t_mid": 30.42,
+            "score": 0.5052229166030884
+          },
+          {
+            "end": 38.28,
+            "t_mid": 37.68,
+            "filename": "scene_0003.jpg",
+            "start": 37.08,
+            "caption": "A man and a young girl are on a bed, with the man leaning forward and the girl crawling toward him, while a young girl sits in the background.",
+            "scene_id": 3,
+            "score": 0.5651498436927795
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Confirm if the man kissed the girl's forehead."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Confirm that the man kissed the girl's forehead based on the retrieved frames. Use assess_evidence_sufficiency to check if evidence is sufficient. (visual_detail, focused, negative_check)\n\n\n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 6, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 5.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-ba4a88ef74129435",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "how did the man show affection to the girl when he held her",
+        "center_t": 12.5,
+        "half_window_sec": 3.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5,
+          "frame_count": 6
+        },
+        "observation": "[t=13.0s] 画面中，男子将头靠近女孩，女孩的头也贴近男子的肩膀和脸颊，两人身体紧密相贴。\n[t=14.0s] 男子继续将头贴近女孩，女孩的头也靠在男子的肩膀上，两人保持亲密接触。\n[t=15.0s] 男子和女孩继续保持紧密相贴的姿势，男子的头靠近女孩的头部，女孩的头靠在男子的肩膀上。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "man",
+            "label": "男子",
+            "first_seen_t": 10.0,
+            "attributes": [
+              "躺在沙发上",
+              "抱着女孩"
+            ],
+            "evidence_frames": [
+              10.0
+            ]
+          },
+          {
+            "op": "add",
+            "id": "girl",
+            "label": "女孩",
+            "first_seen_t": 10.0,
+            "attributes": [
+              "被男子抱着",
+              "手持橙色球"
+            ],
+            "evidence_frames": [
+              10.0
+            ]
+          },
+          {
+            "op": "update",
+            "id": "man",
+            "attributes_add": [
+              "亲吻女孩额头"
+            ],
+            "last_seen_t": 15.0,
+            "evidence_frames_add": [
+              13.0,
+              14.0,
+              15.0
+            ]
+          },
+          {
+            "op": "update",
+            "id": "girl",
+            "attributes_add": [
+              "头部贴近男子肩膀"
+            ],
+            "last_seen_t": 15.0,
+            "evidence_frames_add": [
+              13.0,
+              14.0,
+              15.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-98d84783ff0f5b4c",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "how did the man show affection to the girl when he held her",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-ae54a4fb3984ea4f",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "how did the man show affection to the girl when he held her",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 5,
+        "planner_notes": "Confirm if the man kissed the girl's forehead."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 21.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 48.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 54.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "t_mid": 15.0,
+            "filename": "scene_0000.jpg",
+            "end": 30.0,
+            "start": 0.0,
+            "caption": "A man lies on a bed holding a small child, while a woman sits on the couch reading a book. An orange plush toy rests nearby on the bed.",
+            "scene_id": 0,
+            "score": 0.5132070779800415
+          },
+          {
+            "start": 30.0,
+            "caption": "A man and a woman lie on a bed with two children; one child crawls on the bed while the other lies on their back, and the man gestures with his hands.",
+            "filename": "scene_0001.jpg",
+            "end": 30.84,
+            "scene_id": 1,
+            "t_mid": 30.42,
+            "score": 0.5052229166030884
+          },
+          {
+            "end": 38.28,
+            "t_mid": 37.68,
+            "filename": "scene_0003.jpg",
+            "start": 37.08,
+            "caption": "A man and a young girl are on a bed, with the man leaning forward and the girl crawling toward him, while a young girl sits in the background.",
+            "scene_id": 3,
+            "score": 0.5651498436927795
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Confirm if the man kissed the girl's forehead."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-bb34c5b37cb6e92e",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-ba4a88ef74129435",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 0.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0000.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 21.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0021.0.jpg"
+      },
+      {
+        "timestamp": 48.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0048.0.jpg"
+      },
+      {
+        "timestamp": 54.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0054.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 19.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0019.0.jpg"
+      },
+      {
+        "timestamp": 23.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 34.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0034.0.jpg"
+      },
+      {
+        "timestamp": 38.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0038.0.jpg"
+      },
+      {
+        "timestamp": 41.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0041.0.jpg"
+      },
+      {
+        "timestamp": 45.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0045.0.jpg"
+      },
+      {
+        "timestamp": 49.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0049.0.jpg"
+      },
+      {
+        "timestamp": 53.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0053.0.jpg"
+      },
+      {
+        "timestamp": 56.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0056.0.jpg"
+      },
+      {
+        "timestamp": 60.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/4dd172f915a5cdb1/frames_dense/t0060.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "t_mid": 15.0,
+        "filename": "scene_0000.jpg",
+        "end": 30.0,
+        "start": 0.0,
+        "caption": "A man lies on a bed holding a small child, while a woman sits on the couch reading a book. An orange plush toy rests nearby on the bed.",
+        "scene_id": 0,
+        "score": 0.5132070779800415
+      },
+      {
+        "start": 30.0,
+        "caption": "A man and a woman lie on a bed with two children; one child crawls on the bed while the other lies on their back, and the man gestures with his hands.",
+        "filename": "scene_0001.jpg",
+        "end": 30.84,
+        "scene_id": 1,
+        "t_mid": 30.42,
+        "score": 0.5052229166030884
+      },
+      {
+        "end": 38.28,
+        "t_mid": 37.68,
+        "filename": "scene_0003.jpg",
+        "start": 37.08,
+        "caption": "A man and a young girl are on a bed, with the man leaning forward and the girl crawling toward him, while a young girl sits in the background.",
+        "scene_id": 3,
+        "score": 0.5651498436927795
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 5,
+      "planner_notes": "Confirm if the man kissed the girl's forehead."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 6,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 5.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=13.0s] 画面中，男子将头靠近女孩，女孩的头也贴近男子的肩膀和脸颊，两人身体紧密相贴。\n[t=14.0s] 男子继续将头贴近女孩，女孩的头也靠在男子的肩膀上，两人保持亲密接触。\n[t=15.0s] 男子和女孩继续保持紧密相贴的姿势，男子的头靠近女孩的头部，女孩的头靠在男子的肩膀上。",
+        "timestamps": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0
+        ],
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [
+      {
+        "id": "man",
+        "label": "男子",
+        "first_seen_t": 10.0,
+        "last_seen_t": 15.0,
+        "attributes": [
+          "亲吻女孩额头",
+          "抱着女孩",
+          "躺在沙发上"
+        ],
+        "evidence_frames": [
+          10.0,
+          13.0,
+          14.0,
+          15.0
+        ]
+      },
+      {
+        "id": "girl",
+        "label": "女孩",
+        "first_seen_t": 10.0,
+        "last_seen_t": 15.0,
+        "attributes": [
+          "头部贴近男子肩膀",
+          "手持橙色球",
+          "被男子抱着"
+        ],
+        "evidence_frames": [
+          10.0,
+          13.0,
+          14.0,
+          15.0
+        ]
+      }
+    ],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "b477196667c791220c5c32260ac4fc6b5e214415"
+}

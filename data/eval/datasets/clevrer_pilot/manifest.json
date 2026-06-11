@@ -1,0 +1,422 @@
+[
+  {
+    "case_id": "clevrer-6230-15",
+    "vidor_path": "video_06230.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_06000-07000/video_06230.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-9772-11",
+    "vidor_path": "video_09772.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_09000-10000/video_09772.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-5869-11",
+    "vidor_path": "video_05869.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_05000-06000/video_05869.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-2659-11",
+    "vidor_path": "video_02659.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_02000-03000/video_02659.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-612-12",
+    "vidor_path": "video_00612.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_00000-01000/video_00612.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-8636-14",
+    "vidor_path": "video_08636.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_08000-09000/video_08636.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-5856-12",
+    "vidor_path": "video_05856.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_05000-06000/video_05856.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-6776-14",
+    "vidor_path": "video_06776.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_06000-07000/video_06776.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-1802-11",
+    "vidor_path": "video_01802.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01802.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-3758-12",
+    "vidor_path": "video_03758.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_03000-04000/video_03758.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-3018-11",
+    "vidor_path": "video_03018.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_03000-04000/video_03018.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-4481-13",
+    "vidor_path": "video_04481.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_04000-05000/video_04481.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-5822-15",
+    "vidor_path": "video_05822.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_05000-06000/video_05822.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-8878-14",
+    "vidor_path": "video_08878.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_08000-09000/video_08878.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-9485-14",
+    "vidor_path": "video_09485.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_09000-10000/video_09485.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-2735-14",
+    "vidor_path": "video_02735.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_02000-03000/video_02735.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-8388-14",
+    "vidor_path": "video_08388.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_08000-09000/video_08388.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-3516-14",
+    "vidor_path": "video_03516.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_03000-04000/video_03516.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-4192-14",
+    "vidor_path": "video_04192.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_04000-05000/video_04192.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-7947-13",
+    "vidor_path": "video_07947.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_07000-08000/video_07947.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-1205-14",
+    "vidor_path": "video_01205.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01205.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-4411-15",
+    "vidor_path": "video_04411.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_04000-05000/video_04411.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-1445-13",
+    "vidor_path": "video_01445.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01445.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-3981-15",
+    "vidor_path": "video_03981.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_03000-04000/video_03981.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-4015-13",
+    "vidor_path": "video_04015.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_04000-05000/video_04015.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-6649-14",
+    "vidor_path": "video_06649.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_06000-07000/video_06649.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-726-12",
+    "vidor_path": "video_00726.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_00000-01000/video_00726.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-1648-13",
+    "vidor_path": "video_01648.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01648.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-5786-14",
+    "vidor_path": "video_05786.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_05000-06000/video_05786.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-1456-11",
+    "vidor_path": "video_01456.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01456.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-1945-12",
+    "vidor_path": "video_01945.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01945.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-5581-12",
+    "vidor_path": "video_05581.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_05000-06000/video_05581.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-8240-12",
+    "vidor_path": "video_08240.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_08000-09000/video_08240.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-3866-12",
+    "vidor_path": "video_03866.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_03000-04000/video_03866.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-560-14",
+    "vidor_path": "video_00560.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_00000-01000/video_00560.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-1876-15",
+    "vidor_path": "video_01876.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01876.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-3813-13",
+    "vidor_path": "video_03813.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_03000-04000/video_03813.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-5393-14",
+    "vidor_path": "video_05393.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_05000-06000/video_05393.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-6461-13",
+    "vidor_path": "video_06461.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_06000-07000/video_06461.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-7976-12",
+    "vidor_path": "video_07976.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_07000-08000/video_07976.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-2516-11",
+    "vidor_path": "video_02516.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_02000-03000/video_02516.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-9488-13",
+    "vidor_path": "video_09488.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_09000-10000/video_09488.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-6592-13",
+    "vidor_path": "video_06592.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_06000-07000/video_06592.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-9829-14",
+    "vidor_path": "video_09829.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_09000-10000/video_09829.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-3977-14",
+    "vidor_path": "video_03977.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_03000-04000/video_03977.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-4540-13",
+    "vidor_path": "video_04540.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_04000-05000/video_04540.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-942-11",
+    "vidor_path": "video_00942.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_00000-01000/video_00942.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-583-15",
+    "vidor_path": "video_00583.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_00000-01000/video_00583.mp4",
+    "qtype": "counterfactual"
+  },
+  {
+    "case_id": "clevrer-6521-13",
+    "vidor_path": "video_06521.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_06000-07000/video_06521.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-7366-11",
+    "vidor_path": "video_07366.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_07000-08000/video_07366.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-3754-11",
+    "vidor_path": "video_03754.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_03000-04000/video_03754.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-2358-12",
+    "vidor_path": "video_02358.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_02000-03000/video_02358.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-6037-12",
+    "vidor_path": "video_06037.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_06000-07000/video_06037.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-6468-12",
+    "vidor_path": "video_06468.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_06000-07000/video_06468.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-1635-11",
+    "vidor_path": "video_01635.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01635.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-1504-12",
+    "vidor_path": "video_01504.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01504.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-2886-12",
+    "vidor_path": "video_02886.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_02000-03000/video_02886.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-2736-11",
+    "vidor_path": "video_02736.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_02000-03000/video_02736.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-9669-11",
+    "vidor_path": "video_09669.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_09000-10000/video_09669.mp4",
+    "qtype": "explanatory"
+  },
+  {
+    "case_id": "clevrer-7151-13",
+    "vidor_path": "video_07151.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_07000-08000/video_07151.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-7610-12",
+    "vidor_path": "video_07610.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_07000-08000/video_07610.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-8792-13",
+    "vidor_path": "video_08792.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_08000-09000/video_08792.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-3218-13",
+    "vidor_path": "video_03218.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_03000-04000/video_03218.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-1439-12",
+    "vidor_path": "video_01439.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01439.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-8559-13",
+    "vidor_path": "video_08559.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_08000-09000/video_08559.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-1674-13",
+    "vidor_path": "video_01674.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01674.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-2193-13",
+    "vidor_path": "video_02193.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_02000-03000/video_02193.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-2685-12",
+    "vidor_path": "video_02685.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_02000-03000/video_02685.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-8615-13",
+    "vidor_path": "video_08615.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_08000-09000/video_08615.mp4",
+    "qtype": "predictive"
+  },
+  {
+    "case_id": "clevrer-1974-12",
+    "vidor_path": "video_01974.mp4",
+    "clevrer_url": "https://data.csail.mit.edu/clevrer/videos/train/video_01000-02000/video_01974.mp4",
+    "qtype": "predictive"
+  }
+]

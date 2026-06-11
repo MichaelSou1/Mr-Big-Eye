@@ -1,0 +1,467 @@
+{
+  "master": [
+    {
+      "dataset": "chartqa",
+      "model_id": "32b",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.8,
+      "net": -0.044444444444444446,
+      "ci": [
+        -0.13333333333333333,
+        0.03333333333333333
+      ],
+      "seed_std": 0.02721655269759087,
+      "k": 6,
+      "gain": 0,
+      "lost": 3,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "32b",
+      "method": "self_reflect",
+      "free_acc": 0.8,
+      "net": 0.016666666666666666,
+      "ci": [
+        -0.03333333333333333,
+        0.08333333333333333
+      ],
+      "seed_std": 0.010540925533894598,
+      "k": 6,
+      "gain": 1,
+      "lost": 0,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "4b",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.6666666666666666,
+      "net": -0.12166666666666666,
+      "ci": [
+        -0.26666666666666666,
+        0.0
+      ],
+      "seed_std": 0.05214533346781029,
+      "k": 10,
+      "gain": 1,
+      "lost": 9,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "4b",
+      "method": "self_reflect",
+      "free_acc": 0.6666666666666666,
+      "net": 0.023333333333333334,
+      "ci": [
+        -0.03333333333333333,
+        0.08333333333333333
+      ],
+      "seed_std": 0.016101529717988262,
+      "k": 10,
+      "gain": 2,
+      "lost": 0,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "8b",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.6166666666666667,
+      "net": -0.028333333333333332,
+      "ci": [
+        -0.15,
+        0.08333333333333333
+      ],
+      "seed_std": 0.04086261232985176,
+      "k": 10,
+      "gain": 3,
+      "lost": 4,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "8b",
+      "method": "orch_reflect_sighted",
+      "free_acc": 0.6166666666666667,
+      "net": 0.06999999999999999,
+      "ci": [
+        -0.03333333333333333,
+        0.18333333333333332
+      ],
+      "seed_std": 0.039791121287711076,
+      "k": 5,
+      "gain": 5,
+      "lost": 1,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "8b",
+      "method": "self_reflect",
+      "free_acc": 0.6166666666666667,
+      "net": 0.011666666666666667,
+      "ci": [
+        0.0,
+        0.05
+      ],
+      "seed_std": 0.008050764858994131,
+      "k": 10,
+      "gain": 0,
+      "lost": 0,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "penguin2b",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.8166666666666667,
+      "net": -0.07777777777777778,
+      "ci": [
+        -0.18333333333333332,
+        0.016666666666666666
+      ],
+      "seed_std": 0.034694433324435545,
+      "k": 3,
+      "gain": 1,
+      "lost": 6,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "penguin8b",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.8,
+      "net": -0.005555555555555556,
+      "ci": [
+        -0.1,
+        0.08333333333333333
+      ],
+      "seed_std": 0.019245008972987525,
+      "k": 3,
+      "gain": 3,
+      "lost": 3,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "next",
+      "model_id": "32b",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.7021276595744681,
+      "net": 0.039007092198581554,
+      "ci": [
+        -0.0851063829787234,
+        0.14893617021276595
+      ],
+      "seed_std": 0.03131830094442498,
+      "k": 6,
+      "gain": 3,
+      "lost": 1,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "next",
+      "model_id": "32b",
+      "method": "self_reflect",
+      "free_acc": 0.7021276595744681,
+      "net": 0.0,
+      "ci": [
+        -0.10638297872340426,
+        0.10638297872340426
+      ],
+      "seed_std": 0.02330734287256026,
+      "k": 6,
+      "gain": 3,
+      "lost": 3,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "next",
+      "model_id": "4b",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.7446808510638298,
+      "net": -0.0851063829787234,
+      "ci": [
+        -0.2553191489361702,
+        0.06382978723404255
+      ],
+      "seed_std": 0.0501494171054289,
+      "k": 10,
+      "gain": 3,
+      "lost": 7,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "next",
+      "model_id": "4b",
+      "method": "self_reflect",
+      "free_acc": 0.7446808510638298,
+      "net": -0.04468085106382978,
+      "ci": [
+        -0.1276595744680851,
+        0.0
+      ],
+      "seed_std": 0.015699250795162163,
+      "k": 10,
+      "gain": 0,
+      "lost": 2,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "next",
+      "model_id": "8b",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.6595744680851063,
+      "net": 0.00851063829787234,
+      "ci": [
+        -0.1702127659574468,
+        0.19148936170212766
+      ],
+      "seed_std": 0.06515565434244455,
+      "k": 10,
+      "gain": 5,
+      "lost": 5,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "next",
+      "model_id": "8b",
+      "method": "orch_reflect_sighted",
+      "free_acc": 0.6595744680851063,
+      "net": 0.05957446808510638,
+      "ci": [
+        -0.0851063829787234,
+        0.19148936170212766
+      ],
+      "seed_std": 0.05507310257678631,
+      "k": 5,
+      "gain": 4,
+      "lost": 2,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "next",
+      "model_id": "8b",
+      "method": "self_reflect",
+      "free_acc": 0.6595744680851063,
+      "net": 0.05957446808510637,
+      "ci": [
+        0.0,
+        0.1276595744680851
+      ],
+      "seed_std": 0.008971000454378378,
+      "k": 10,
+      "gain": 2,
+      "lost": 0,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "next",
+      "model_id": "internvl",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.7021276595744681,
+      "net": -0.1631205673758865,
+      "ci": [
+        -0.3191489361702128,
+        -0.02127659574468085
+      ],
+      "seed_std": 0.06500107368731688,
+      "k": 3,
+      "gain": 1,
+      "lost": 9,
+      "verdict": "effect"
+    },
+    {
+      "dataset": "next",
+      "model_id": "penguin2b",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.5319148936170213,
+      "net": 0.04964539007092198,
+      "ci": [
+        -0.1276595744680851,
+        0.23404255319148937
+      ],
+      "seed_std": 0.03250053684365844,
+      "k": 3,
+      "gain": 9,
+      "lost": 7,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "next",
+      "model_id": "penguin8b",
+      "method": "orch_reflect_blind",
+      "free_acc": 0.425531914893617,
+      "net": 0.1276595744680851,
+      "ci": [
+        -0.06382978723404255,
+        0.3191489361702128
+      ],
+      "seed_std": 0.0425531914893617,
+      "k": 3,
+      "gain": 12,
+      "lost": 6,
+      "verdict": "within-variance"
+    }
+  ],
+  "retraction": [
+    {
+      "dataset": "chartqa",
+      "model_id": "32b",
+      "method": "self_reflect",
+      "best_single_seed_net": 0.03333333333333333,
+      "pooled_net": 0.016666666666666666,
+      "pooled_ci": [
+        -0.03333333333333333,
+        0.08333333333333333
+      ]
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "4b",
+      "method": "self_reflect",
+      "best_single_seed_net": 0.03333333333333333,
+      "pooled_net": 0.023333333333333334,
+      "pooled_ci": [
+        -0.03333333333333333,
+        0.08333333333333333
+      ]
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "8b",
+      "method": "orch_reflect_blind",
+      "best_single_seed_net": 0.016666666666666666,
+      "pooled_net": -0.028333333333333332,
+      "pooled_ci": [
+        -0.15,
+        0.08333333333333333
+      ]
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "8b",
+      "method": "orch_reflect_sighted",
+      "best_single_seed_net": 0.11666666666666667,
+      "pooled_net": 0.06999999999999999,
+      "pooled_ci": [
+        -0.03333333333333333,
+        0.18333333333333332
+      ]
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "8b",
+      "method": "self_reflect",
+      "best_single_seed_net": 0.016666666666666666,
+      "pooled_net": 0.011666666666666667,
+      "pooled_ci": [
+        0.0,
+        0.05
+      ]
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "penguin8b",
+      "method": "orch_reflect_blind",
+      "best_single_seed_net": 0.016666666666666666,
+      "pooled_net": -0.005555555555555556,
+      "pooled_ci": [
+        -0.1,
+        0.08333333333333333
+      ]
+    },
+    {
+      "dataset": "next",
+      "model_id": "32b",
+      "method": "orch_reflect_blind",
+      "best_single_seed_net": 0.06382978723404255,
+      "pooled_net": 0.039007092198581554,
+      "pooled_ci": [
+        -0.0851063829787234,
+        0.14893617021276595
+      ]
+    },
+    {
+      "dataset": "next",
+      "model_id": "32b",
+      "method": "self_reflect",
+      "best_single_seed_net": 0.0425531914893617,
+      "pooled_net": 0.0,
+      "pooled_ci": [
+        -0.10638297872340426,
+        0.10638297872340426
+      ]
+    },
+    {
+      "dataset": "next",
+      "model_id": "8b",
+      "method": "orch_reflect_blind",
+      "best_single_seed_net": 0.10638297872340426,
+      "pooled_net": 0.00851063829787234,
+      "pooled_ci": [
+        -0.1702127659574468,
+        0.19148936170212766
+      ]
+    },
+    {
+      "dataset": "next",
+      "model_id": "8b",
+      "method": "orch_reflect_sighted",
+      "best_single_seed_net": 0.1276595744680851,
+      "pooled_net": 0.05957446808510638,
+      "pooled_ci": [
+        -0.0851063829787234,
+        0.19148936170212766
+      ]
+    },
+    {
+      "dataset": "next",
+      "model_id": "8b",
+      "method": "self_reflect",
+      "best_single_seed_net": 0.06382978723404255,
+      "pooled_net": 0.05957446808510637,
+      "pooled_ci": [
+        0.0,
+        0.1276595744680851
+      ]
+    },
+    {
+      "dataset": "next",
+      "model_id": "penguin2b",
+      "method": "orch_reflect_blind",
+      "best_single_seed_net": 0.0851063829787234,
+      "pooled_net": 0.04964539007092198,
+      "pooled_ci": [
+        -0.1276595744680851,
+        0.23404255319148937
+      ]
+    },
+    {
+      "dataset": "next",
+      "model_id": "penguin8b",
+      "method": "orch_reflect_blind",
+      "best_single_seed_net": 0.1702127659574468,
+      "pooled_net": 0.1276595744680851,
+      "pooled_ci": [
+        -0.06382978723404255,
+        0.3191489361702128
+      ]
+    }
+  ],
+  "free_acc": {
+    "next/8b": 0.6595744680851063,
+    "next/4b": 0.7446808510638298,
+    "chartqa/8b": 0.6166666666666667,
+    "chartqa/4b": 0.6666666666666666,
+    "chartqa/32b": 0.8,
+    "next/internvl": 0.7021276595744681,
+    "next/32b": 0.7021276595744681,
+    "chartqa/8b_sft": 0.7333333333333333,
+    "next/penguin2b": 0.5319148936170213,
+    "chartqa/penguin8b": 0.8,
+    "chartqa/penguin2b": 0.8166666666666667,
+    "next/penguin8b": 0.425531914893617
+  }
+}

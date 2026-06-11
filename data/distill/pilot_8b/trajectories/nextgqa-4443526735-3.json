@@ -1,0 +1,721 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-4443526735-3",
+    "video_id": "e8a25a32eed93730",
+    "question": "how does the baby move\n\nCandidates:\nA) in a swing\nB) carry by man\nC) in lady s arms\nD) in pram\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "in a swing",
+    "required_keywords": [
+      "swing"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      9.95
+    ],
+    "gold_scenes": [
+      {
+        "start": 0.5,
+        "end": 19.4
+      }
+    ],
+    "question_type": "ch"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "how does the baby move\n\nCandidates:\nA) in a swing\nB) carry by man\nC) in lady s arms\nD) in pram\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Classify task as visual_detail, use focused retrieval to identify baby's movement.  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "How does the baby move?",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-a8de1b9d59b5ff6b",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 0.0, \"source\": \"retrieval\"}, {\"timestamp\": 4.0, \"source\": \"retrieval\"}, {\"timestamp\": 5.0, \"source\": \"retrieval\"}, {\"timestamp\": 12.0, \"source\": \"retrieval\"}, {\"timestamp\": 13.0, \"source\": \"retrieval\"}, {\"timestamp\": 14.0, \"source\": \"retrieval\"}, {\"timestamp\": 15.0, \"source\": \"retrieval\"}, {\"timestamp\": 16.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"scene_id\": 0, \"end\": 10.0, \"t_mid\": 5.0, \"caption\": \"A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.\", \"filename\": \"scene_0000.jpg\", \"start\": 0.0, \"score\": 0.6103999018669128}, {\"start\": 10.0, \"caption\": \"A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.\", \"filename\": \"scene_0001.jpg\", \"scene_id\": 1, \"t_mid\": 14.843166666666669, \"end\": 19.686333333333337, \"score\": 0.6242868900299072}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 8, \"planner_notes\": \"\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a8de1b9d59b5ff6b",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 5.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "scene_id": 0,
+            "end": 10.0,
+            "t_mid": 5.0,
+            "caption": "A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.",
+            "filename": "scene_0000.jpg",
+            "start": 0.0,
+            "score": 0.6103999018669128
+          },
+          {
+            "start": 10.0,
+            "caption": "A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.",
+            "filename": "scene_0001.jpg",
+            "scene_id": 1,
+            "t_mid": 14.843166666666669,
+            "end": 19.686333333333337,
+            "score": 0.6242868900299072
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "OBSERVE: The baby is seen in a bouncing seat (jumperoo) with colorful toys hanging above. The baby is actively moving, bouncing and reaching for toys. This matches option D) in pram, but the seat is not a pram. The baby is not crawling, swinging, carried by a man, or in a lady’s arms.\n\nPLAN: Use segment_focus to examine the baby’s movement in detail around the center of the scene.\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "How does the baby move?",
+            "center_t": 14.843166666666669,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-b5b7a1bcadb26a45",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 10.84, \"end\": 18.84, \"center_t\": 14.84, \"frame_count\": 8}, \"observation\": \"[t=11.0s] 婴儿坐在学步车中，双脚着地，身体轻微晃动，双手握着一个黄色玩具放在嘴边。\\n[t=12.0s] 婴儿身体前倾，头部略微低下，仍在玩弄手中的黄色玩具，双脚保持在木地板上。\\n[t=13.0s] 婴儿头部抬起，目光向前，双手继续握着玩具，身体有轻微前后晃动。\\n[t=14.0s] 婴儿头部转向右侧，目光跟随玩具移动，身体晃动幅度稍大，双脚仍着地。\\n[t=15.0s] 婴儿身体明显前倾，双脚离地，学步车随之向前移动，玩具仍被握在手中。\\n[t=16.0s] 婴儿身体继续前倾，学步车向前移动，头部转向左侧，玩具被举到嘴边。\\n[t=17.0s] 婴儿身体大幅前倾，学步车向前移动，头部转向右侧，玩具被放下。\\n[t=18.0s] 婴儿身体继续前倾，学步车向前移动，头部转向左侧，玩具被放下。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b5b7a1bcadb26a45",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.84,
+          "end": 18.84,
+          "center_t": 14.84,
+          "frame_count": 8
+        },
+        "observation": "[t=11.0s] 婴儿坐在学步车中，双脚着地，身体轻微晃动，双手握着一个黄色玩具放在嘴边。\n[t=12.0s] 婴儿身体前倾，头部略微低下，仍在玩弄手中的黄色玩具，双脚保持在木地板上。\n[t=13.0s] 婴儿头部抬起，目光向前，双手继续握着玩具，身体有轻微前后晃动。\n[t=14.0s] 婴儿头部转向右侧，目光跟随玩具移动，身体晃动幅度稍大，双脚仍着地。\n[t=15.0s] 婴儿身体明显前倾，双脚离地，学步车随之向前移动，玩具仍被握在手中。\n[t=16.0s] 婴儿身体继续前倾，学步车向前移动，头部转向左侧，玩具被举到嘴边。\n[t=17.0s] 婴儿身体大幅前倾，学步车向前移动，头部转向右侧，玩具被放下。\n[t=18.0s] 婴儿身体继续前倾，学步车向前移动，头部转向左侧，玩具被放下。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess if evidence is sufficient to answer the question.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "how does the baby move",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-ab8a0a48ea46cf55",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": true, \"confidence\": 0.78, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 11, \"scene_count\": 2, \"text_evidence_count\": 0, \"time_span_sec\": 18.0, \"missing_evidence\": [], \"recommended_next_action\": \"answer_with_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-ab8a0a48ea46cf55",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 11,
+        "scene_count": 2,
+        "text_evidence_count": 0,
+        "time_span_sec": 18.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "how does the baby move\n\nCandidates:\nA) in a swing\nB) carry by man\nC) in lady s arms\nD) in pram\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+            "answer_mode": "direct"
+          },
+          "id": "force_answer_with_evidence",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is D) in pram\\n\\nEvidence: The baby is seated in a bouncer-style baby seat with hanging toys, which is a type of pram or jumperoo. The baby is bouncing and moving within the seat, consistent with being in a pram. This is visible across multiple frames, including [FRAME:t=0.0], [FRAME:t=4.0], [FRAME:t=5.0], [FRAME:t=11.0], [FRAME:t=12.0], [FRAME:t=13.0], [FRAME:t=14.0], [FRAME:t=15.0], [FRAME:t=16.0], [FRAME:t=17.0], and [FRAME:t=18.0]. The baby is not being carried, not crawling, not in a swing (which would have a different structure), and not in a lady’s arms.\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": true, \"valid_markers\": 11, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"D\", \"text\": \"in pram\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "force_answer_with_evidence",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) in pram\n\nEvidence: The baby is seated in a bouncer-style baby seat with hanging toys, which is a type of pram or jumperoo. The baby is bouncing and moving within the seat, consistent with being in a pram. This is visible across multiple frames, including [FRAME:t=0.0], [FRAME:t=4.0], [FRAME:t=5.0], [FRAME:t=11.0], [FRAME:t=12.0], [FRAME:t=13.0], [FRAME:t=14.0], [FRAME:t=15.0], [FRAME:t=16.0], [FRAME:t=17.0], and [FRAME:t=18.0]. The baby is not being carried, not crawling, not in a swing (which would have a different structure), and not in a lady’s arms.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 11,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "in pram"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is D) in pram\\n\\nEvidence: The baby is seated in a bouncer-style baby seat with hanging toys, which is a type of pram or jumperoo. The baby is bouncing and moving within the seat, consistent with being in a pram. This is visible across multiple frames, including [FRAME:t=0.0], [FRAME:t=4.0], [FRAME:t=5.0], [FRAME:t=11.0], [FRAME:t=12.0], [FRAME:t=13.0], [FRAME:t=14.0], [FRAME:t=15.0], [FRAME:t=16.0], [FRAME:t=17.0], and [FRAME:t=18.0]. The baby is not being carried, not crawling, not in a swing (which would have a different structure), and not in a lady’s arms.\", \"grounding_report\": {\"grounded\": true, \"valid_markers\": 11, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"D\", \"text\": \"in pram\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"final_answer\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) in pram\n\nEvidence: The baby is seated in a bouncer-style baby seat with hanging toys, which is a type of pram or jumperoo. The baby is bouncing and moving within the seat, consistent with being in a pram. This is visible across multiple frames, including [FRAME:t=0.0], [FRAME:t=4.0], [FRAME:t=5.0], [FRAME:t=11.0], [FRAME:t=12.0], [FRAME:t=13.0], [FRAME:t=14.0], [FRAME:t=15.0], [FRAME:t=16.0], [FRAME:t=17.0], and [FRAME:t=18.0]. The baby is not being carried, not crawling, not in a swing (which would have a different structure), and not in a lady’s arms.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 11,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "in pram"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is D) in pram\n\nEvidence: The baby is seated in a bouncer-style baby seat with hanging toys, which is a type of pram or jumperoo. The baby is bouncing and moving within the seat, consistent with being in a pram. This is visible across multiple frames, including [FRAME:t=0.0], [FRAME:t=4.0], [FRAME:t=5.0], [FRAME:t=11.0], [FRAME:t=12.0], [FRAME:t=13.0], [FRAME:t=14.0], [FRAME:t=15.0], [FRAME:t=16.0], [FRAME:t=17.0], and [FRAME:t=18.0]. The baby is not being carried, not crawling, not in a swing (which would have a different structure), and not in a lady’s arms.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "How does the baby move?",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 5.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "scene_id": 0,
+            "end": 10.0,
+            "t_mid": 5.0,
+            "caption": "A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.",
+            "filename": "scene_0000.jpg",
+            "start": 0.0,
+            "score": 0.6103999018669128
+          },
+          {
+            "start": 10.0,
+            "caption": "A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.",
+            "filename": "scene_0001.jpg",
+            "scene_id": 1,
+            "t_mid": 14.843166666666669,
+            "end": 19.686333333333337,
+            "score": 0.6242868900299072
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 8,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-a8de1b9d59b5ff6b",
+      "internalizability": "type2"
+    },
+    {
+      "index": 4,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "How does the baby move?",
+        "center_t": 14.843166666666669,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.84,
+          "end": 18.84,
+          "center_t": 14.84,
+          "frame_count": 8
+        },
+        "observation": "[t=11.0s] 婴儿坐在学步车中，双脚着地，身体轻微晃动，双手握着一个黄色玩具放在嘴边。\n[t=12.0s] 婴儿身体前倾，头部略微低下，仍在玩弄手中的黄色玩具，双脚保持在木地板上。\n[t=13.0s] 婴儿头部抬起，目光向前，双手继续握着玩具，身体有轻微前后晃动。\n[t=14.0s] 婴儿头部转向右侧，目光跟随玩具移动，身体晃动幅度稍大，双脚仍着地。\n[t=15.0s] 婴儿身体明显前倾，双脚离地，学步车随之向前移动，玩具仍被握在手中。\n[t=16.0s] 婴儿身体继续前倾，学步车向前移动，头部转向左侧，玩具被举到嘴边。\n[t=17.0s] 婴儿身体大幅前倾，学步车向前移动，头部转向右侧，玩具被放下。\n[t=18.0s] 婴儿身体继续前倾，学步车向前移动，头部转向左侧，玩具被放下。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-b5b7a1bcadb26a45",
+      "internalizability": "type1"
+    },
+    {
+      "index": 6,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "how does the baby move",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": true,
+        "confidence": 0.78,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 11,
+        "scene_count": 2,
+        "text_evidence_count": 0,
+        "time_span_sec": 18.0,
+        "missing_evidence": [],
+        "recommended_next_action": "answer_with_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-ab8a0a48ea46cf55",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "how does the baby move\n\nCandidates:\nA) in a swing\nB) carry by man\nC) in lady s arms\nD) in pram\nE) crawl\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is D) in pram\n\nEvidence: The baby is seated in a bouncer-style baby seat with hanging toys, which is a type of pram or jumperoo. The baby is bouncing and moving within the seat, consistent with being in a pram. This is visible across multiple frames, including [FRAME:t=0.0], [FRAME:t=4.0], [FRAME:t=5.0], [FRAME:t=11.0], [FRAME:t=12.0], [FRAME:t=13.0], [FRAME:t=14.0], [FRAME:t=15.0], [FRAME:t=16.0], [FRAME:t=17.0], and [FRAME:t=18.0]. The baby is not being carried, not crawling, not in a swing (which would have a different structure), and not in a lady’s arms.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 11,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "in pram"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "force_answer_with_evidence",
+      "internalizability": "type1"
+    },
+    {
+      "index": 10,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is D) in pram\n\nEvidence: The baby is seated in a bouncer-style baby seat with hanging toys, which is a type of pram or jumperoo. The baby is bouncing and moving within the seat, consistent with being in a pram. This is visible across multiple frames, including [FRAME:t=0.0], [FRAME:t=4.0], [FRAME:t=5.0], [FRAME:t=11.0], [FRAME:t=12.0], [FRAME:t=13.0], [FRAME:t=14.0], [FRAME:t=15.0], [FRAME:t=16.0], [FRAME:t=17.0], and [FRAME:t=18.0]. The baby is not being carried, not crawling, not in a swing (which would have a different structure), and not in a lady’s arms.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 11,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "D",
+            "text": "in pram"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 0.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0000.0.jpg"
+      },
+      {
+        "timestamp": 4.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 17.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0017.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0018.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 1.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0001.0.jpg"
+      },
+      {
+        "timestamp": 2.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 17.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0017.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/e8a25a32eed93730/frames_dense/t0018.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "scene_id": 0,
+        "end": 10.0,
+        "t_mid": 5.0,
+        "caption": "A baby sits in a blue and white jumperoo, reaching for colorful hanging toys, on a wooden floor with a bright light source nearby.",
+        "filename": "scene_0000.jpg",
+        "start": 0.0,
+        "score": 0.6103999018669128
+      },
+      {
+        "start": 10.0,
+        "caption": "A baby sits in a bouncing seat on a wooden floor, holding a yellow toy and looking toward the camera. The seat has colorful rings and toys hanging from above.",
+        "filename": "scene_0001.jpg",
+        "scene_id": 1,
+        "t_mid": 14.843166666666669,
+        "end": 19.686333333333337,
+        "score": 0.6242868900299072
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 8,
+      "planner_notes": ""
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": true,
+      "confidence": 0.78,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 11,
+      "scene_count": 2,
+      "text_evidence_count": 0,
+      "time_span_sec": 18.0,
+      "missing_evidence": [],
+      "recommended_next_action": "answer_with_evidence"
+    },
+    "draft_answer": "The correct answer is D) in pram\n\nEvidence: The baby is seated in a bouncer-style baby seat with hanging toys, which is a type of pram or jumperoo. The baby is bouncing and moving within the seat, consistent with being in a pram. This is visible across multiple frames, including [FRAME:t=0.0], [FRAME:t=4.0], [FRAME:t=5.0], [FRAME:t=11.0], [FRAME:t=12.0], [FRAME:t=13.0], [FRAME:t=14.0], [FRAME:t=15.0], [FRAME:t=16.0], [FRAME:t=17.0], and [FRAME:t=18.0]. The baby is not being carried, not crawling, not in a swing (which would have a different structure), and not in a lady’s arms.",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=11.0s] 婴儿坐在学步车中，双脚着地，身体轻微晃动，双手握着一个黄色玩具放在嘴边。\n[t=12.0s] 婴儿身体前倾，头部略微低下，仍在玩弄手中的黄色玩具，双脚保持在木地板上。\n[t=13.0s] 婴儿头部抬起，目光向前，双手继续握着玩具，身体有轻微前后晃动。\n[t=14.0s] 婴儿头部转向右侧，目光跟随玩具移动，身体晃动幅度稍大，双脚仍着地。\n[t=15.0s] 婴儿身体明显前倾，双脚离地，学步车随之向前移动，玩具仍被握在手中。\n[t=16.0s] 婴儿身体继续前倾，学步车向前移动，头部转向左侧，玩具被举到嘴边。\n[t=17.0s] 婴儿身体大幅前倾，学步车向前移动，头部转向右侧，玩具被放下。\n[t=18.0s] 婴儿身体继续前倾，学步车向前移动，头部转向左侧，玩具被放下。",
+        "timestamps": [
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0,
+          17.0,
+          18.0
+        ],
+        "window": {
+          "start": 10.84,
+          "end": 18.84,
+          "center_t": 14.84
+        }
+      }
+    ],
+    "grounding_report": {
+      "grounded": true,
+      "valid_markers": 11,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [],
+      "selected_candidate": {
+        "label": "D",
+        "text": "in pram"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": null,
+      "recommended_next_action": "final_answer"
+    },
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "2f01d4c5b025e80e653f79b3b2063d22a0a42173"
+}

@@ -1,0 +1,70 @@
+{
+  "summary": {
+    "total": 4,
+    "passed": 1,
+    "retention_rate": 0.25,
+    "signal_gain_rate": 0.25,
+    "base_free_correct": 1,
+    "base_free_accuracy": 0.25
+  },
+  "kept_cot": [
+    "data/distill/pilot_8b/cot/nextgqa-6097994550-4.json"
+  ],
+  "results": [
+    {
+      "case_id": "nextgqa-4443526735-3",
+      "passed": false,
+      "drop_reasons": [
+        "forbidden_token:fts"
+      ],
+      "cot_path": "data/distill/pilot_8b/cot/nextgqa-4443526735-3.json"
+    },
+    {
+      "case_id": "nextgqa-4838145161-0",
+      "video_id": "09354c9c0dec47cf",
+      "passed": false,
+      "drop_reasons": [
+        "base_already_correct_no_signal"
+      ],
+      "conditioned_answer": "The correct answer is C) for cat to drink.\n\n[FRAME:t=4.0s] shows a black and white cat drinking from the running tap water in a sink. [FRAME:t=7.0s] confirms the cat is actively drinking. [FRAME:t=15.0s], [FRAME:t=19.0s], [FRAME:t=23.0s], [FRAME:t=26.0s], [FRAME:t=30.0s], [FRAME:t=34.0s], [FRAME:t=38.0s], [FRAME:t=41.0s], [FRAME:t=45.0s], and [FRAME:t=49.0s] all show the cat positioned at the tap, drinking or observing the water flow. The cat’s behavior is consistent with drinking from a running tap, making option C the most plausible and directly supported by the visual evidence. Other options are implausible: A) is nonsensical, D) shows no rain, and E) shows no soap. Option B) is technically true (the pipe is open), but it is not the *reason* the water is flowing — the cat’s presence and drinking behavior are the context. The question asks *why* the water is flowing, and the cat’s action is the most relevant cause in this context.\n\nThe correct answer is C) for cat to drink.",
+      "consistency_answer": "The correct answer is C) for cat to drink.\n\n[FRAME:t=4.0s] shows a black and white cat drinking from the running tap water in the sink. [FRAME:t=7.0s] confirms the cat is actively drinking. [FRAME:t=15.0s], [FRAME:t=19.0s], [FRAME:t=23.0s], [FRAME:t=26.0s], [FRAME:t=30.0s], [FRAME:t=34.0s], [FRAME:t=38.0s], [FRAME:t=41.0s], [FRAME:t=45.0s], and [FRAME:t=49.0s] all show the cat positioned at the tap, drinking or observing the stream. The cat’s behavior is consistent with drinking from the tap, making option C the most plausible and directly supported by the visual evidence. Other options (A, B, D, E) are not supported by the frames.",
+      "free_answer": "The correct answer is C) for cat to drink.\n\n[FRAME:t=4.0s] shows a black and white cat drinking from the running tap water in a sink. [FRAME:t=7.0s] and [FRAME:t=26.0s] further confirm the cat is actively drinking from the stream. The cat’s behavior and positioning directly indicate it is drinking, making option C the most consistent with the visual evidence. Other options are implausible: A) is nonsensical, D) shows no rain, and E) shows no soap. Option B) is technically true (the pipe is open), but it doesn’t explain *why* the water is flowing — the cat’s presence and action provide the functional reason.",
+      "conditioned_correct": true,
+      "consistency_correct": true,
+      "free_correct": true,
+      "signal_gain": false,
+      "cot_path": "data/distill/pilot_8b/cot/nextgqa-4838145161-0.json"
+    },
+    {
+      "case_id": "nextgqa-5658916668-8",
+      "video_id": "eca5f05b17bb96c3",
+      "passed": false,
+      "drop_reasons": [
+        "conditioned_answer_wrong",
+        "consistency_answer_wrong"
+      ],
+      "conditioned_answer": "The correct answer is D) fell from his board.\n\nAt [t=14.0s], the man is seen lying flat on his back in the snow, having apparently fallen from his snowboard. He then begins to push himself up at [t=16.0s] and is kneeling by [t=17.0s]. The context of the scene — snowboarding down a slope — and his position on the ground strongly suggest he fell from his board, not that he was sleeping, catching a dog, checking the camera, or cushioning a fall (as no other person is seen falling nearby).\n\n[FRAME:t=14.0s]",
+      "consistency_answer": "The correct answer is D) fell from his board.\n\n[FRAME:t=14.0s] shows the man lying flat on his back after a fall, indicating he lost control of his board. [FRAME:t=16.0s] and [FRAME:t=17.0s] show him beginning to push himself up from the snow, consistent with recovering from a fall. There is no visual evidence of him sleeping, catching a dog, checking the camera, or cushioning a boy’s fall. The most plausible explanation is that he fell from his board.",
+      "free_answer": "The correct answer is D) fell from his board.\n\n[FRAME:t=14.0s] shows the man lying flat on his tummy in the snow after what appears to be a fall. He is not in a sleeping position, not catching a dog, not checking out a camera, and there is no boy nearby to cushion a fall. The context of the frames suggests he was snowboarding or sledding and lost balance or control, leading to a fall. The prior frames show him preparing to descend the slope on a board, and the subsequent frames show him getting up, consistent with a fall rather than intentional action.\n\n[FRAME:t=14.0s]",
+      "conditioned_correct": false,
+      "consistency_correct": false,
+      "free_correct": false,
+      "signal_gain": false,
+      "cot_path": "data/distill/pilot_8b/cot/nextgqa-5658916668-8.json"
+    },
+    {
+      "case_id": "nextgqa-6097994550-4",
+      "video_id": "bb13d595f11b2144",
+      "passed": true,
+      "drop_reasons": [],
+      "conditioned_answer": "The correct answer is D) crawls\n\n[FRAME:t=10.0] shows the man with spectacles on his stomach, moving forward with his hands and knees on the ground. [FRAME:t=11.0] and [FRAME:t=12.0] confirm he is in a crawling posture, moving forward on all fours. [FRAME:t=13.0] and [FRAME:t=14.0] show him continuing this low, controlled motion, consistent with crawling. None of the other options are supported: he is not upright to walk or stroll, not counting with fingers, and not caressing his head.",
+      "consistency_answer": "The correct answer is D) crawls\n\n[FRAME:t=10.0] shows the man with spectacles on his stomach, moving forward with his hands and knees on the ground. [FRAME:t=11.0] and [FRAME:t=12.0] confirm he is in a crawling position, propelling himself forward. [FRAME:t=13.0] and [FRAME:t=14.0] show him continuing this low, controlled motion, consistent with crawling. None of the other options are visually supported in the final frames.",
+      "free_answer": "The correct answer is B) caress his head.\n\n[FRAME:t=12.0s] shows the man with spectacles lying prone on the mat, and his hands are near his head. [FRAME:t=13.0s] and [FRAME:t=14.0s] show him in a close-up, with his hands still positioned near his head, suggesting he is caressing or adjusting his head/hair. The other options are not supported: he is not walking (A), not counting (C), and not crawling (D) — he is lying down and moving his head slightly. \"Strolls around\" (E) is clearly inconsistent with his position on the floor.\n\nThe most consistent action with the visual evidence is caressing his head.",
+      "conditioned_correct": true,
+      "consistency_correct": true,
+      "free_correct": false,
+      "signal_gain": true,
+      "cot_path": "data/distill/pilot_8b/cot/nextgqa-6097994550-4.json"
+    }
+  ]
+}

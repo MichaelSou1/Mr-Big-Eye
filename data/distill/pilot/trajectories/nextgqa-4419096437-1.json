@@ -1,0 +1,891 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-4419096437-1",
+    "video_id": "51f2c1741ef63993",
+    "question": "why is the person moving his hand\n\nCandidates:\nA) to adjust toy\nB) drawing\nC) put cat to sleep\nD) washing clothes\nE) watering plants\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "put cat to sleep",
+    "required_keywords": [
+      "put",
+      "cat",
+      "sleep"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      26.5,
+      41.900000000000006
+    ],
+    "gold_scenes": [
+      {
+        "start": 21.0,
+        "end": 32.0
+      },
+      {
+        "start": 39.1,
+        "end": 44.7
+      }
+    ],
+    "question_type": "cw"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T12:53:09",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-4B-Instruct@http://127.0.0.1:30000/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "why is the person moving his hand\n\nCandidates:\nA) to adjust toy\nB) drawing\nC) put cat to sleep\nD) washing clothes\nE) watering plants\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "why is the person moving his hand",
+            "center_t": 12.5,
+            "half_window_sec": 4.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-b7d47c0df2058cf3",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 8.5, \"end\": 16.5, \"center_t\": 12.5, \"frame_count\": 8}, \"observation\": \"The hand is moving in a gentle, stroking motion across the kitten's belly, which is lying on its back. The hand's movement is consistent and rhythmic, appearing to pet or caress the kitten. The kitten remains asleep with its eyes closed and body relaxed, suggesting it is comfortable with the touch. The hand's motion is not erratic or purposeful in a way that suggests urgency or distress, but rather a calm, soothing gesture.\", \"subject_deltas\": [{\"op\": \"add\", \"id\": \"person_A\", \"label\": \"手\", \"first_seen_t\": 9.0, \"attributes\": [\"正在抚摸猫\"], \"evidence_frames\": [9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0]}], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b7d47c0df2058cf3",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 8.5,
+          "end": 16.5,
+          "center_t": 12.5,
+          "frame_count": 8
+        },
+        "observation": "The hand is moving in a gentle, stroking motion across the kitten's belly, which is lying on its back. The hand's movement is consistent and rhythmic, appearing to pet or caress the kitten. The kitten remains asleep with its eyes closed and body relaxed, suggesting it is comfortable with the touch. The hand's motion is not erratic or purposeful in a way that suggests urgency or distress, but rather a calm, soothing gesture.",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "person_A",
+            "label": "手",
+            "first_seen_t": 9.0,
+            "attributes": [
+              "正在抚摸猫"
+            ],
+            "evidence_frames": [
+              9.0,
+              10.0,
+              11.0,
+              12.0,
+              13.0,
+              14.0,
+              15.0,
+              16.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "why is the person moving his hand",
+            "question_type": "visual_detail",
+            "retrieval_profile": "detail"
+          },
+          "id": "chatcmpl-tool-8ca72bcb3701717e",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"frame_count\": 8, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 7.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8ca72bcb3701717e",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 8,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 7.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "why is the person moving his hand",
+            "question_type": "visual_detail",
+            "retrieval_profile": "detail",
+            "top_k_frames": 12
+          },
+          "id": "chatcmpl-tool-adb9fb1fc6151855",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 5.0, \"source\": \"retrieval\"}, {\"timestamp\": 9.0, \"source\": \"segment_focus\"}, {\"timestamp\": 10.0, \"source\": \"segment_focus\"}, {\"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"timestamp\": 12.0, \"source\": \"segment_focus\"}, {\"timestamp\": 13.0, \"source\": \"segment_focus\"}, {\"timestamp\": 14.0, \"source\": \"segment_focus\"}, {\"timestamp\": 15.0, \"source\": \"segment_focus\"}, {\"timestamp\": 16.0, \"source\": \"segment_focus\"}, {\"timestamp\": 18.0, \"source\": \"retrieval\"}, {\"timestamp\": 21.0, \"source\": \"retrieval\"}, {\"timestamp\": 24.0, \"source\": \"retrieval\"}, {\"timestamp\": 26.0, \"source\": \"retrieval\"}, {\"timestamp\": 32.0, \"source\": \"retrieval\"}, {\"timestamp\": 33.0, \"source\": \"retrieval\"}, {\"timestamp\": 35.0, \"source\": \"retrieval\"}, {\"timestamp\": 44.0, \"source\": \"retrieval\"}, {\"timestamp\": 46.0, \"source\": \"retrieval\"}, {\"timestamp\": 51.0, \"source\": \"retrieval\"}, {\"timestamp\": 52.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"t_mid\": 15.0, \"filename\": \"scene_0001.jpg\", \"caption\": \"A human hand gently strokes a sleeping tabby cat wearing a red collar, which is lying on a dark, soft surface.\", \"start\": 10.0, \"end\": 20.0, \"scene_id\": 1, \"score\": 0.5592024326324463}, {\"start\": 20.0, \"t_mid\": 25.0, \"filename\": \"scene_0002.jpg\", \"end\": 30.0, \"caption\": \"A hand gently touches the nose of a small tabby kitten lying on its back on a dark surface, with a red object visible to the right.\", \"scene_id\": 2, \"score\": 0.5467804670333862}, {\"t_mid\": 35.0, \"scene_id\": 3, \"end\": 40.0, \"start\": 30.0, \"filename\": \"scene_0003.jpg\", \"caption\": \"A tabby cat with a red collar lies on its back, sleeping soundly on a dark surface with its paws up in the air.\", \"score\": 0.39025384187698364}, {\"t_mid\": 45.0, \"scene_id\": 4, \"caption\": \"A tabby cat with a red collar lies on its back on a dark surface, paws up in a relaxed, sleeping position.\", \"end\": 50.0, \"filename\": \"scene_0004.jpg\", \"start\": 40.0, \"score\": 0.41317135095596313}, {\"scene_id\": 5, \"t_mid\": 51.4264, \"caption\": \"A tabby kitten with a red collar sleeps on its back on a dark surface, paws up and eyes closed.\", \"filename\": \"scene_0005.jpg\", \"start\": 50.0, \"end\": 52.8528, \"score\": 0.38670194149017334}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"top_n_scenes\": 5, \"top_k_frames\": 12, \"planner_notes\": \"\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-adb9fb1fc6151855",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 5.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 9.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 21.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 24.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 26.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 32.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 33.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 35.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 44.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 46.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 51.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 52.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "t_mid": 15.0,
+            "filename": "scene_0001.jpg",
+            "caption": "A human hand gently strokes a sleeping tabby cat wearing a red collar, which is lying on a dark, soft surface.",
+            "start": 10.0,
+            "end": 20.0,
+            "scene_id": 1,
+            "score": 0.5592024326324463
+          },
+          {
+            "start": 20.0,
+            "t_mid": 25.0,
+            "filename": "scene_0002.jpg",
+            "end": 30.0,
+            "caption": "A hand gently touches the nose of a small tabby kitten lying on its back on a dark surface, with a red object visible to the right.",
+            "scene_id": 2,
+            "score": 0.5467804670333862
+          },
+          {
+            "t_mid": 35.0,
+            "scene_id": 3,
+            "end": 40.0,
+            "start": 30.0,
+            "filename": "scene_0003.jpg",
+            "caption": "A tabby cat with a red collar lies on its back, sleeping soundly on a dark surface with its paws up in the air.",
+            "score": 0.39025384187698364
+          },
+          {
+            "t_mid": 45.0,
+            "scene_id": 4,
+            "caption": "A tabby cat with a red collar lies on its back on a dark surface, paws up in a relaxed, sleeping position.",
+            "end": 50.0,
+            "filename": "scene_0004.jpg",
+            "start": 40.0,
+            "score": 0.41317135095596313
+          },
+          {
+            "scene_id": 5,
+            "t_mid": 51.4264,
+            "caption": "A tabby kitten with a red collar sleeps on its back on a dark surface, paws up and eyes closed.",
+            "filename": "scene_0005.jpg",
+            "start": 50.0,
+            "end": 52.8528,
+            "score": 0.38670194149017334
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "detail",
+          "top_n_scenes": 5,
+          "top_k_frames": 12,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"frame_count\": 8, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 7.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b5e1a9b4b0a0cff8",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 8,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 7.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "why is the person moving his hand",
+        "center_t": 12.5,
+        "half_window_sec": 4.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 8.5,
+          "end": 16.5,
+          "center_t": 12.5,
+          "frame_count": 8
+        },
+        "observation": "The hand is moving in a gentle, stroking motion across the kitten's belly, which is lying on its back. The hand's movement is consistent and rhythmic, appearing to pet or caress the kitten. The kitten remains asleep with its eyes closed and body relaxed, suggesting it is comfortable with the touch. The hand's motion is not erratic or purposeful in a way that suggests urgency or distress, but rather a calm, soothing gesture.",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "person_A",
+            "label": "手",
+            "first_seen_t": 9.0,
+            "attributes": [
+              "正在抚摸猫"
+            ],
+            "evidence_frames": [
+              9.0,
+              10.0,
+              11.0,
+              12.0,
+              13.0,
+              14.0,
+              15.0,
+              16.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-b7d47c0df2058cf3",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "why is the person moving his hand",
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 8,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 7.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-8ca72bcb3701717e",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "why is the person moving his hand",
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "top_k_frames": 12
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 5.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 9.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 21.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 24.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 26.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 32.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 33.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 35.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 44.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 46.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 51.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 52.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "t_mid": 15.0,
+            "filename": "scene_0001.jpg",
+            "caption": "A human hand gently strokes a sleeping tabby cat wearing a red collar, which is lying on a dark, soft surface.",
+            "start": 10.0,
+            "end": 20.0,
+            "scene_id": 1,
+            "score": 0.5592024326324463
+          },
+          {
+            "start": 20.0,
+            "t_mid": 25.0,
+            "filename": "scene_0002.jpg",
+            "end": 30.0,
+            "caption": "A hand gently touches the nose of a small tabby kitten lying on its back on a dark surface, with a red object visible to the right.",
+            "scene_id": 2,
+            "score": 0.5467804670333862
+          },
+          {
+            "t_mid": 35.0,
+            "scene_id": 3,
+            "end": 40.0,
+            "start": 30.0,
+            "filename": "scene_0003.jpg",
+            "caption": "A tabby cat with a red collar lies on its back, sleeping soundly on a dark surface with its paws up in the air.",
+            "score": 0.39025384187698364
+          },
+          {
+            "t_mid": 45.0,
+            "scene_id": 4,
+            "caption": "A tabby cat with a red collar lies on its back on a dark surface, paws up in a relaxed, sleeping position.",
+            "end": 50.0,
+            "filename": "scene_0004.jpg",
+            "start": 40.0,
+            "score": 0.41317135095596313
+          },
+          {
+            "scene_id": 5,
+            "t_mid": 51.4264,
+            "caption": "A tabby kitten with a red collar sleeps on its back on a dark surface, paws up and eyes closed.",
+            "filename": "scene_0005.jpg",
+            "start": 50.0,
+            "end": 52.8528,
+            "score": 0.38670194149017334
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "detail",
+          "top_n_scenes": 5,
+          "top_k_frames": 12,
+          "planner_notes": ""
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-adb9fb1fc6151855",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 8,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 7.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-b5e1a9b4b0a0cff8",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 5.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 21.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0021.0.jpg"
+      },
+      {
+        "timestamp": 24.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0024.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 32.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0032.0.jpg"
+      },
+      {
+        "timestamp": 33.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0033.0.jpg"
+      },
+      {
+        "timestamp": 35.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0035.0.jpg"
+      },
+      {
+        "timestamp": 44.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0044.0.jpg"
+      },
+      {
+        "timestamp": 46.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0046.0.jpg"
+      },
+      {
+        "timestamp": 51.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0051.0.jpg"
+      },
+      {
+        "timestamp": 52.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0052.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 19.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0019.0.jpg"
+      },
+      {
+        "timestamp": 22.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0022.0.jpg"
+      },
+      {
+        "timestamp": 25.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0025.0.jpg"
+      },
+      {
+        "timestamp": 28.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0028.0.jpg"
+      },
+      {
+        "timestamp": 31.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0031.0.jpg"
+      },
+      {
+        "timestamp": 34.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0034.0.jpg"
+      },
+      {
+        "timestamp": 37.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0037.0.jpg"
+      },
+      {
+        "timestamp": 40.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0040.0.jpg"
+      },
+      {
+        "timestamp": 44.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0044.0.jpg"
+      },
+      {
+        "timestamp": 47.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0047.0.jpg"
+      },
+      {
+        "timestamp": 50.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/51f2c1741ef63993/frames_dense/t0050.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "t_mid": 15.0,
+        "filename": "scene_0001.jpg",
+        "caption": "A human hand gently strokes a sleeping tabby cat wearing a red collar, which is lying on a dark, soft surface.",
+        "start": 10.0,
+        "end": 20.0,
+        "scene_id": 1,
+        "score": 0.5592024326324463
+      },
+      {
+        "start": 20.0,
+        "t_mid": 25.0,
+        "filename": "scene_0002.jpg",
+        "end": 30.0,
+        "caption": "A hand gently touches the nose of a small tabby kitten lying on its back on a dark surface, with a red object visible to the right.",
+        "scene_id": 2,
+        "score": 0.5467804670333862
+      },
+      {
+        "t_mid": 35.0,
+        "scene_id": 3,
+        "end": 40.0,
+        "start": 30.0,
+        "filename": "scene_0003.jpg",
+        "caption": "A tabby cat with a red collar lies on its back, sleeping soundly on a dark surface with its paws up in the air.",
+        "score": 0.39025384187698364
+      },
+      {
+        "t_mid": 45.0,
+        "scene_id": 4,
+        "caption": "A tabby cat with a red collar lies on its back on a dark surface, paws up in a relaxed, sleeping position.",
+        "end": 50.0,
+        "filename": "scene_0004.jpg",
+        "start": 40.0,
+        "score": 0.41317135095596313
+      },
+      {
+        "scene_id": 5,
+        "t_mid": 51.4264,
+        "caption": "A tabby kitten with a red collar sleeps on its back on a dark surface, paws up and eyes closed.",
+        "filename": "scene_0005.jpg",
+        "start": 50.0,
+        "end": 52.8528,
+        "score": 0.38670194149017334
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "detail",
+      "top_n_scenes": 5,
+      "top_k_frames": 12,
+      "planner_notes": ""
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "detail",
+      "frame_count": 8,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 7.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "The hand is moving in a gentle, stroking motion across the kitten's belly, which is lying on its back. The hand's movement is consistent and rhythmic, appearing to pet or caress the kitten. The kitten remains asleep with its eyes closed and body relaxed, suggesting it is comfortable with the touch. The hand's motion is not erratic or purposeful in a way that suggests urgency or distress, but rather a calm, soothing gesture.",
+        "timestamps": [
+          9.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0
+        ],
+        "window": {
+          "start": 8.5,
+          "end": 16.5,
+          "center_t": 12.5
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [
+      {
+        "id": "person_A",
+        "label": "手",
+        "first_seen_t": 9.0,
+        "last_seen_t": 9.0,
+        "attributes": [
+          "正在抚摸猫"
+        ],
+        "evidence_frames": [
+          9.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0
+        ]
+      }
+    ],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "d44dbc6ae32453fc21481c154f2504db100ca66f"
+}

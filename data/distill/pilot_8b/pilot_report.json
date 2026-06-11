@@ -1,0 +1,28 @@
+{
+  "n_requested": 50,
+  "n_selected": 50,
+  "strict": {
+    "total": 50,
+    "passed": 4,
+    "pass_rate": 0.08,
+    "out_of_scope": 1,
+    "evidence_uncovered": 0,
+    "no_grounding_gt": 0,
+    "bad_process": 45
+  },
+  "rewrite": {
+    "total": 4,
+    "passed": 3,
+    "pass_rate": 0.75
+  },
+  "consistency": {
+    "total": 4,
+    "passed": 1,
+    "retention_rate": 0.25,
+    "signal_gain_rate": 0.25,
+    "base_free_correct": 1,
+    "base_free_accuracy": 0.25
+  },
+  "decision": "STOP_SHRINK_TASK_SUBSET",
+  "gate_text": "retention <30% => STOP/Shrink; 30-50% => caution; >=50% => proceed to scale"
+}

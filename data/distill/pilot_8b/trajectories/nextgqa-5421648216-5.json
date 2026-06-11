@@ -1,0 +1,628 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-5421648216-5",
+    "video_id": "c3bd549100b426dd",
+    "question": "what does the brown sheep do after walking close to the black sheep at the start\n\nCandidates:\nA) flap wings\nB) let go of grey rooster\nC) look at bottle\nD) stands next to him\nE) chase the brown dog\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "stands next to him",
+    "required_keywords": [
+      "stands",
+      "next",
+      "him"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      21.6
+    ],
+    "gold_scenes": [
+      {
+        "start": 0.2,
+        "end": 43.0
+      }
+    ],
+    "question_type": "tn"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "what does the brown sheep do after walking close to the black sheep at the start\n\nCandidates:\nA) flap wings\nB) let go of grey rooster\nC) look at bottle\nD) stands next to him\nE) chase the brown dog\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the action of the brown sheep immediately after approaching the black sheep at the start. Use segment_focus for precise visual detail around the moment of interaction. (visual_detail, focused, detail)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "what does the brown sheep do after walking close to the black sheep at the start",
+            "center_t": 5.0,
+            "half_window_sec": 2.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-829e5740e999bc33",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 3.0, \"end\": 7.0, \"center_t\": 5.0, \"frame_count\": 5}, \"observation\": \"[t=3.0s] 画面中，一只棕色绵羊位于画面左侧，紧挨着一只黑色绵羊，两者都站在围栏内。棕色绵羊的头部朝向右侧，身体略微前倾，似乎正在与黑色绵羊互动或靠近它。\\n\\n[t=4.0s] 棕色绵羊继续靠近黑色绵羊，两者几乎并排站立，棕色绵羊的头部仍朝向右侧，身体姿态与前一帧相似，表明它在持续靠近或与黑色绵羊保持接触。\\n\\n[t=5.0s] 棕色绵羊和黑色绵羊的位置基本未变，仍紧挨在一起，棕色绵羊的头部依然朝向右侧，表明它在与黑色绵羊保持近距离互动。\\n\\n[t=6.0s] 棕色绵羊和黑色绵羊的位置略有变化，棕色绵羊稍微向右移动，但仍与黑色绵羊保持近距离接触，头部朝向右侧，表明它在继续靠近或与黑色绵羊互动。\\n\\n[t=7.0s] 棕色绵羊和黑色绵羊的位置进一步变化，棕色绵羊稍微向右移动，但仍与黑色绵羊保持近距离接触，头部朝向右侧，表明它在继续靠近或与黑色绵羊互动。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-829e5740e999bc33",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 3.0,
+          "end": 7.0,
+          "center_t": 5.0,
+          "frame_count": 5
+        },
+        "observation": "[t=3.0s] 画面中，一只棕色绵羊位于画面左侧，紧挨着一只黑色绵羊，两者都站在围栏内。棕色绵羊的头部朝向右侧，身体略微前倾，似乎正在与黑色绵羊互动或靠近它。\n\n[t=4.0s] 棕色绵羊继续靠近黑色绵羊，两者几乎并排站立，棕色绵羊的头部仍朝向右侧，身体姿态与前一帧相似，表明它在持续靠近或与黑色绵羊保持接触。\n\n[t=5.0s] 棕色绵羊和黑色绵羊的位置基本未变，仍紧挨在一起，棕色绵羊的头部依然朝向右侧，表明它在与黑色绵羊保持近距离互动。\n\n[t=6.0s] 棕色绵羊和黑色绵羊的位置略有变化，棕色绵羊稍微向右移动，但仍与黑色绵羊保持近距离接触，头部朝向右侧，表明它在继续靠近或与黑色绵羊互动。\n\n[t=7.0s] 棕色绵羊和黑色绵羊的位置进一步变化，棕色绵羊稍微向右移动，但仍与黑色绵羊保持近距离接触，头部朝向右侧，表明它在继续靠近或与黑色绵羊互动。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Confirm that the brown sheep stands next to the black sheep after approaching it, based on visual evidence from frames at t=3.0s to t=7.0s. (visual_detail, focused, detail)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "what does the brown sheep do after walking close to the black sheep at the start",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-a4b1104b4ec8d23b",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 5, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 4.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a4b1104b4ec8d23b",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 5,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 4.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Reconfirm the visual action of the brown sheep after approaching the black sheep by retrieving additional video evidence around the interaction moment. (visual_detail, focused, detail)\n\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "what does the brown sheep do after walking close to the black sheep at the start",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 5,
+            "planner_notes": "Focus on the moment immediately after the brown sheep approaches the black sheep."
+          },
+          "id": "chatcmpl-tool-99ca4b0da7b68be8",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 3.0, \"source\": \"segment_focus\"}, {\"timestamp\": 4.0, \"source\": \"segment_focus\"}, {\"timestamp\": 5.0, \"source\": \"segment_focus\"}, {\"timestamp\": 6.0, \"source\": \"segment_focus\"}, {\"timestamp\": 7.0, \"source\": \"segment_focus\"}, {\"timestamp\": 11.0, \"source\": \"retrieval\"}, {\"timestamp\": 25.0, \"source\": \"retrieval\"}, {\"timestamp\": 26.0, \"source\": \"retrieval\"}, {\"timestamp\": 31.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"scene_id\": 0, \"t_mid\": 5.0, \"start\": 0.0, \"filename\": \"scene_0000.jpg\", \"end\": 10.0, \"caption\": \"Several sheep stand behind a green fence on a grassy slope, with one black sheep and a brown sheep near a concrete wall, and another white sheep further right.\", \"score\": 0.5610367655754089}, {\"start\": 20.0, \"t_mid\": 25.0, \"caption\": \"A black sheep with a thick, brownish fleece stands behind a green wire fence, facing right, against a weathered concrete wall with patches of moss and grass at its base.\", \"end\": 30.0, \"scene_id\": 2, \"filename\": \"scene_0002.jpg\", \"score\": 0.5923542380332947}, {\"filename\": \"scene_0004.jpg\", \"start\": 40.0, \"caption\": \"Two sheep stand behind a green fence on a grassy slope, with a weathered concrete wall in the background.\", \"scene_id\": 4, \"end\": 43.043, \"t_mid\": 41.5215, \"score\": 0.5396839380264282}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 5, \"planner_notes\": \"Focus on the moment immediately after the brown sheep approaches the black sheep.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-99ca4b0da7b68be8",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 3.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 5.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 6.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 7.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 25.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 26.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 31.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "scene_id": 0,
+            "t_mid": 5.0,
+            "start": 0.0,
+            "filename": "scene_0000.jpg",
+            "end": 10.0,
+            "caption": "Several sheep stand behind a green fence on a grassy slope, with one black sheep and a brown sheep near a concrete wall, and another white sheep further right.",
+            "score": 0.5610367655754089
+          },
+          {
+            "start": 20.0,
+            "t_mid": 25.0,
+            "caption": "A black sheep with a thick, brownish fleece stands behind a green wire fence, facing right, against a weathered concrete wall with patches of moss and grass at its base.",
+            "end": 30.0,
+            "scene_id": 2,
+            "filename": "scene_0002.jpg",
+            "score": 0.5923542380332947
+          },
+          {
+            "filename": "scene_0004.jpg",
+            "start": 40.0,
+            "caption": "Two sheep stand behind a green fence on a grassy slope, with a weathered concrete wall in the background.",
+            "scene_id": 4,
+            "end": 43.043,
+            "t_mid": 41.5215,
+            "score": 0.5396839380264282
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the moment immediately after the brown sheep approaches the black sheep."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Confirm that the brown sheep stands next to the black sheep after approaching it, based on visual evidence from frames at t=3.0s to t=7.0s and scene context. (visual_detail, focused, detail)\n\n\n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 5, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 4.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-af8bc149187c11c2",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 5,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 4.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "what does the brown sheep do after walking close to the black sheep at the start",
+        "center_t": 5.0,
+        "half_window_sec": 2.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 3.0,
+          "end": 7.0,
+          "center_t": 5.0,
+          "frame_count": 5
+        },
+        "observation": "[t=3.0s] 画面中，一只棕色绵羊位于画面左侧，紧挨着一只黑色绵羊，两者都站在围栏内。棕色绵羊的头部朝向右侧，身体略微前倾，似乎正在与黑色绵羊互动或靠近它。\n\n[t=4.0s] 棕色绵羊继续靠近黑色绵羊，两者几乎并排站立，棕色绵羊的头部仍朝向右侧，身体姿态与前一帧相似，表明它在持续靠近或与黑色绵羊保持接触。\n\n[t=5.0s] 棕色绵羊和黑色绵羊的位置基本未变，仍紧挨在一起，棕色绵羊的头部依然朝向右侧，表明它在与黑色绵羊保持近距离互动。\n\n[t=6.0s] 棕色绵羊和黑色绵羊的位置略有变化，棕色绵羊稍微向右移动，但仍与黑色绵羊保持近距离接触，头部朝向右侧，表明它在继续靠近或与黑色绵羊互动。\n\n[t=7.0s] 棕色绵羊和黑色绵羊的位置进一步变化，棕色绵羊稍微向右移动，但仍与黑色绵羊保持近距离接触，头部朝向右侧，表明它在继续靠近或与黑色绵羊互动。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-829e5740e999bc33",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "what does the brown sheep do after walking close to the black sheep at the start",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 5,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 4.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-a4b1104b4ec8d23b",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "what does the brown sheep do after walking close to the black sheep at the start",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 5,
+        "planner_notes": "Focus on the moment immediately after the brown sheep approaches the black sheep."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 3.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 4.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 5.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 6.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 7.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 25.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 26.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 31.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "scene_id": 0,
+            "t_mid": 5.0,
+            "start": 0.0,
+            "filename": "scene_0000.jpg",
+            "end": 10.0,
+            "caption": "Several sheep stand behind a green fence on a grassy slope, with one black sheep and a brown sheep near a concrete wall, and another white sheep further right.",
+            "score": 0.5610367655754089
+          },
+          {
+            "start": 20.0,
+            "t_mid": 25.0,
+            "caption": "A black sheep with a thick, brownish fleece stands behind a green wire fence, facing right, against a weathered concrete wall with patches of moss and grass at its base.",
+            "end": 30.0,
+            "scene_id": 2,
+            "filename": "scene_0002.jpg",
+            "score": 0.5923542380332947
+          },
+          {
+            "filename": "scene_0004.jpg",
+            "start": 40.0,
+            "caption": "Two sheep stand behind a green fence on a grassy slope, with a weathered concrete wall in the background.",
+            "scene_id": 4,
+            "end": 43.043,
+            "t_mid": 41.5215,
+            "score": 0.5396839380264282
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the moment immediately after the brown sheep approaches the black sheep."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-99ca4b0da7b68be8",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 5,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 4.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-af8bc149187c11c2",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 3.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 4.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 25.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0025.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 31.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0031.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 20.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0020.0.jpg"
+      },
+      {
+        "timestamp": 23.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 25.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0025.0.jpg"
+      },
+      {
+        "timestamp": 28.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0028.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 33.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0033.0.jpg"
+      },
+      {
+        "timestamp": 35.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0035.0.jpg"
+      },
+      {
+        "timestamp": 38.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0038.0.jpg"
+      },
+      {
+        "timestamp": 41.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/c3bd549100b426dd/frames_dense/t0041.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "scene_id": 0,
+        "t_mid": 5.0,
+        "start": 0.0,
+        "filename": "scene_0000.jpg",
+        "end": 10.0,
+        "caption": "Several sheep stand behind a green fence on a grassy slope, with one black sheep and a brown sheep near a concrete wall, and another white sheep further right.",
+        "score": 0.5610367655754089
+      },
+      {
+        "start": 20.0,
+        "t_mid": 25.0,
+        "caption": "A black sheep with a thick, brownish fleece stands behind a green wire fence, facing right, against a weathered concrete wall with patches of moss and grass at its base.",
+        "end": 30.0,
+        "scene_id": 2,
+        "filename": "scene_0002.jpg",
+        "score": 0.5923542380332947
+      },
+      {
+        "filename": "scene_0004.jpg",
+        "start": 40.0,
+        "caption": "Two sheep stand behind a green fence on a grassy slope, with a weathered concrete wall in the background.",
+        "scene_id": 4,
+        "end": 43.043,
+        "t_mid": 41.5215,
+        "score": 0.5396839380264282
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 5,
+      "planner_notes": "Focus on the moment immediately after the brown sheep approaches the black sheep."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 5,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 4.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=3.0s] 画面中，一只棕色绵羊位于画面左侧，紧挨着一只黑色绵羊，两者都站在围栏内。棕色绵羊的头部朝向右侧，身体略微前倾，似乎正在与黑色绵羊互动或靠近它。\n\n[t=4.0s] 棕色绵羊继续靠近黑色绵羊，两者几乎并排站立，棕色绵羊的头部仍朝向右侧，身体姿态与前一帧相似，表明它在持续靠近或与黑色绵羊保持接触。\n\n[t=5.0s] 棕色绵羊和黑色绵羊的位置基本未变，仍紧挨在一起，棕色绵羊的头部依然朝向右侧，表明它在与黑色绵羊保持近距离互动。\n\n[t=6.0s] 棕色绵羊和黑色绵羊的位置略有变化，棕色绵羊稍微向右移动，但仍与黑色绵羊保持近距离接触，头部朝向右侧，表明它在继续靠近或与黑色绵羊互动。\n\n[t=7.0s] 棕色绵羊和黑色绵羊的位置进一步变化，棕色绵羊稍微向右移动，但仍与黑色绵羊保持近距离接触，头部朝向右侧，表明它在继续靠近或与黑色绵羊互动。",
+        "timestamps": [
+          3.0,
+          4.0,
+          5.0,
+          6.0,
+          7.0
+        ],
+        "window": {
+          "start": 3.0,
+          "end": 7.0,
+          "center_t": 5.0
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "77631d650b7f35d3cc7541fb0e11a3e98b40348b"
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "eca5f05b17bb96c3",
+  "case_id": "nextgqa-5658916668-8",
+  "question": "why was the man lying flat on his tummy nearing the end\n\nCandidates:\nA) sleeping\nB) catch dog\nC) check out the camera\nD) fell from his board\nE) to cushion the boy s fall\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    1.0,
+    3.0,
+    4.0,
+    5.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0,
+    12.0,
+    13.0,
+    14.0,
+    16.0,
+    17.0,
+    18.0,
+    19.0,
+    21.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0001.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0003.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0004.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0005.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0007.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0008.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0009.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0010.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0012.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0013.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0014.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0016.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0017.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0018.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0019.0.jpg",
+    "/home/gpus/mbe_data/cache/eca5f05b17bb96c3/frames_dense/t0021.0.jpg"
+  ],
+  "cot": "At [FRAME:t=13.0], the man is seen lying on his back in the snow, limbs spread, indicating a fall. The snow-covered environment and his prone posture suggest he has just landed after falling. At [FRAME:t=14.0], he remains motionless in the same position, confirming he is not moving voluntarily. The presence of a board nearby, visible in earlier frames such as [FRAME:t=13.0], supports the context of a snowboarding or similar activity. His flat, supine position is inconsistent with sleeping, checking a camera, catching a dog, or cushioning a boy’s fall. The evidence strongly indicates he fell from his board.",
+  "answer": "D",
+  "gold_timestamps": [
+    13.95
+  ],
+  "gold_scenes": [
+    {
+      "start": 12.1,
+      "end": 15.8
+    }
+  ],
+  "source_traj_hash": "acac030f311db6013ed728a068f92b1da1f9106c",
+  "validation_report": {
+    "ok": true,
+    "errors": [],
+    "frame_markers": [
+      13.0,
+      14.0,
+      13.0
+    ]
+  }
+}

@@ -1,0 +1,597 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-3441428429-9",
+    "video_id": "6dd74a2bd3261c2f",
+    "question": "what does the male skater do after he pushes the female skater away at the beginning\n\nCandidates:\nA) look over fence of porch\nB) turns the baby over\nC) wipe stuff off her dress\nD) take his skateboard\nE) get up\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "get up",
+    "required_keywords": [
+      "get"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      6.15
+    ],
+    "gold_scenes": [
+      {
+        "start": 5.0,
+        "end": 7.3
+      }
+    ],
+    "question_type": "tn"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "what does the male skater do after he pushes the female skater away at the beginning\n\nCandidates:\nA) look over fence of porch\nB) turns the baby over\nC) wipe stuff off her dress\nD) take his skateboard\nE) get up\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the immediate action of the male skater after pushing the female skater at the beginning of the video. Use segment_focus for precise visual detail around the key moment. (visual_detail, focused, negative_check)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "what does the male skater do after he pushes the female skater away at the beginning",
+            "center_t": 2.5,
+            "half_window_sec": 1.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-853c966ed644f58f",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 1.5, \"end\": 3.5, \"center_t\": 2.5, \"frame_count\": 2}, \"observation\": \"[t=2.0s] 男滑冰者单膝跪地，身体前倾，右手扶住女滑冰者的背部，左手向侧方伸展。女滑冰者身体前倾，左腿向后伸展，右腿弯曲，两人身体紧密接触，处于一个动态的托举或旋转准备姿势。\\n\\n[t=3.0s] 男滑冰者已从跪姿站起，身体向后倾斜，双臂环绕女滑冰者，女滑冰者被托举在空中，双腿向后伸展，身体呈水平姿态。两人在冰面上形成一个旋转或托举动作。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-853c966ed644f58f",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 1.5,
+          "end": 3.5,
+          "center_t": 2.5,
+          "frame_count": 2
+        },
+        "observation": "[t=2.0s] 男滑冰者单膝跪地，身体前倾，右手扶住女滑冰者的背部，左手向侧方伸展。女滑冰者身体前倾，左腿向后伸展，右腿弯曲，两人身体紧密接触，处于一个动态的托举或旋转准备姿势。\n\n[t=3.0s] 男滑冰者已从跪姿站起，身体向后倾斜，双臂环绕女滑冰者，女滑冰者被托举在空中，双腿向后伸展，身体呈水平姿态。两人在冰面上形成一个旋转或托举动作。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Confirm that the male skater stands up and begins a rotational or lifting motion immediately after pushing the female skater. The visual evidence shows he transitions from a kneeling position to standing and lifting her. (visual_detail, focused, negative_check)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "what does the male skater do after he pushes the female skater away at the beginning",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-9d78c49c151f1f0d",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 2, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 1.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9d78c49c151f1f0d",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 2,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 1.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve additional visual evidence around the moment immediately after the push to confirm the male skater’s next action. Focus on the first 5 seconds of the video. (visual_detail, focused, negative_check)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "what does the male skater do after he pushes the female skater away at the beginning",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 5,
+            "planner_notes": "Focus on the first 5 seconds after the push to capture immediate action."
+          },
+          "id": "chatcmpl-tool-a529220ff74d20a0",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 2.0, \"source\": \"segment_focus\"}, {\"timestamp\": 3.0, \"source\": \"segment_focus\"}, {\"timestamp\": 7.0, \"source\": \"retrieval\"}, {\"timestamp\": 27.0, \"source\": \"retrieval\"}, {\"timestamp\": 65.0, \"source\": \"retrieval\"}, {\"timestamp\": 70.0, \"source\": \"retrieval\"}, {\"timestamp\": 85.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"filename\": \"scene_0000.jpg\", \"start\": 0.0, \"scene_id\": 0, \"caption\": \"A man and a woman in formal attire are skating on an ice rink, with the woman kneeling and the man leaning forward, their bodies close as they perform a dance move under stage lighting.\", \"t_mid\": 5.0, \"end\": 10.0, \"score\": 0.5671632289886475}, {\"end\": 70.0, \"start\": 60.0, \"scene_id\": 6, \"caption\": \"A male and female figure skater glide across an ice rink illuminated with purple lighting, their shadows cast long on the surface.\", \"filename\": \"scene_0006.jpg\", \"t_mid\": 65.0, \"score\": 0.5797930359840393}, {\"start\": 70.0, \"end\": 80.0, \"filename\": \"scene_0007.jpg\", \"caption\": \"A man and a woman in ice skates glide across a brightly lit ice rink, their shadows stretched across the surface, with spotlights positioned at either side.\", \"scene_id\": 7, \"t_mid\": 75.0, \"score\": 0.601638674736023}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 5, \"planner_notes\": \"Focus on the first 5 seconds after the push to capture immediate action.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a529220ff74d20a0",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 2.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 3.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 7.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 27.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 65.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 70.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 85.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "filename": "scene_0000.jpg",
+            "start": 0.0,
+            "scene_id": 0,
+            "caption": "A man and a woman in formal attire are skating on an ice rink, with the woman kneeling and the man leaning forward, their bodies close as they perform a dance move under stage lighting.",
+            "t_mid": 5.0,
+            "end": 10.0,
+            "score": 0.5671632289886475
+          },
+          {
+            "end": 70.0,
+            "start": 60.0,
+            "scene_id": 6,
+            "caption": "A male and female figure skater glide across an ice rink illuminated with purple lighting, their shadows cast long on the surface.",
+            "filename": "scene_0006.jpg",
+            "t_mid": 65.0,
+            "score": 0.5797930359840393
+          },
+          {
+            "start": 70.0,
+            "end": 80.0,
+            "filename": "scene_0007.jpg",
+            "caption": "A man and a woman in ice skates glide across a brightly lit ice rink, their shadows stretched across the surface, with spotlights positioned at either side.",
+            "scene_id": 7,
+            "t_mid": 75.0,
+            "score": 0.601638674736023
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the first 5 seconds after the push to capture immediate action."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: The retrieved evidence shows the male skater transitioning from a kneeling position to standing and lifting the female skater into a rotational or lifting move. The action immediately after the push is standing up and initiating a lift. (visual_detail, focused, negative_check)\n\n\n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 2, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 1.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-ac110bafac1e852e",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 2,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 1.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "what does the male skater do after he pushes the female skater away at the beginning",
+        "center_t": 2.5,
+        "half_window_sec": 1.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 1.5,
+          "end": 3.5,
+          "center_t": 2.5,
+          "frame_count": 2
+        },
+        "observation": "[t=2.0s] 男滑冰者单膝跪地，身体前倾，右手扶住女滑冰者的背部，左手向侧方伸展。女滑冰者身体前倾，左腿向后伸展，右腿弯曲，两人身体紧密接触，处于一个动态的托举或旋转准备姿势。\n\n[t=3.0s] 男滑冰者已从跪姿站起，身体向后倾斜，双臂环绕女滑冰者，女滑冰者被托举在空中，双腿向后伸展，身体呈水平姿态。两人在冰面上形成一个旋转或托举动作。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-853c966ed644f58f",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "what does the male skater do after he pushes the female skater away at the beginning",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 2,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 1.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-9d78c49c151f1f0d",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "what does the male skater do after he pushes the female skater away at the beginning",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 5,
+        "planner_notes": "Focus on the first 5 seconds after the push to capture immediate action."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 2.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 3.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 7.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 27.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 65.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 70.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 85.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "filename": "scene_0000.jpg",
+            "start": 0.0,
+            "scene_id": 0,
+            "caption": "A man and a woman in formal attire are skating on an ice rink, with the woman kneeling and the man leaning forward, their bodies close as they perform a dance move under stage lighting.",
+            "t_mid": 5.0,
+            "end": 10.0,
+            "score": 0.5671632289886475
+          },
+          {
+            "end": 70.0,
+            "start": 60.0,
+            "scene_id": 6,
+            "caption": "A male and female figure skater glide across an ice rink illuminated with purple lighting, their shadows cast long on the surface.",
+            "filename": "scene_0006.jpg",
+            "t_mid": 65.0,
+            "score": 0.5797930359840393
+          },
+          {
+            "start": 70.0,
+            "end": 80.0,
+            "filename": "scene_0007.jpg",
+            "caption": "A man and a woman in ice skates glide across a brightly lit ice rink, their shadows stretched across the surface, with spotlights positioned at either side.",
+            "scene_id": 7,
+            "t_mid": 75.0,
+            "score": 0.601638674736023
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 5,
+          "planner_notes": "Focus on the first 5 seconds after the push to capture immediate action."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-a529220ff74d20a0",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 2,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 1.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-ac110bafac1e852e",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 2.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 3.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 27.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0027.0.jpg"
+      },
+      {
+        "timestamp": 65.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0065.0.jpg"
+      },
+      {
+        "timestamp": 70.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0070.0.jpg"
+      },
+      {
+        "timestamp": 85.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0085.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 21.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0021.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 32.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0032.0.jpg"
+      },
+      {
+        "timestamp": 37.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0037.0.jpg"
+      },
+      {
+        "timestamp": 42.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0042.0.jpg"
+      },
+      {
+        "timestamp": 48.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0048.0.jpg"
+      },
+      {
+        "timestamp": 53.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0053.0.jpg"
+      },
+      {
+        "timestamp": 58.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0058.0.jpg"
+      },
+      {
+        "timestamp": 64.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0064.0.jpg"
+      },
+      {
+        "timestamp": 69.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0069.0.jpg"
+      },
+      {
+        "timestamp": 74.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0074.0.jpg"
+      },
+      {
+        "timestamp": 79.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0079.0.jpg"
+      },
+      {
+        "timestamp": 85.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/6dd74a2bd3261c2f/frames_dense/t0085.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "filename": "scene_0000.jpg",
+        "start": 0.0,
+        "scene_id": 0,
+        "caption": "A man and a woman in formal attire are skating on an ice rink, with the woman kneeling and the man leaning forward, their bodies close as they perform a dance move under stage lighting.",
+        "t_mid": 5.0,
+        "end": 10.0,
+        "score": 0.5671632289886475
+      },
+      {
+        "end": 70.0,
+        "start": 60.0,
+        "scene_id": 6,
+        "caption": "A male and female figure skater glide across an ice rink illuminated with purple lighting, their shadows cast long on the surface.",
+        "filename": "scene_0006.jpg",
+        "t_mid": 65.0,
+        "score": 0.5797930359840393
+      },
+      {
+        "start": 70.0,
+        "end": 80.0,
+        "filename": "scene_0007.jpg",
+        "caption": "A man and a woman in ice skates glide across a brightly lit ice rink, their shadows stretched across the surface, with spotlights positioned at either side.",
+        "scene_id": 7,
+        "t_mid": 75.0,
+        "score": 0.601638674736023
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 5,
+      "planner_notes": "Focus on the first 5 seconds after the push to capture immediate action."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 2,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 1.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=2.0s] 男滑冰者单膝跪地，身体前倾，右手扶住女滑冰者的背部，左手向侧方伸展。女滑冰者身体前倾，左腿向后伸展，右腿弯曲，两人身体紧密接触，处于一个动态的托举或旋转准备姿势。\n\n[t=3.0s] 男滑冰者已从跪姿站起，身体向后倾斜，双臂环绕女滑冰者，女滑冰者被托举在空中，双腿向后伸展，身体呈水平姿态。两人在冰面上形成一个旋转或托举动作。",
+        "timestamps": [
+          2.0,
+          3.0
+        ],
+        "window": {
+          "start": 1.5,
+          "end": 3.5,
+          "center_t": 2.5
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "4e7580283a8b2987e306b881ab5481affdd1efab"
+}

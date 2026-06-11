@@ -1,0 +1,125 @@
+{
+  "summary": {
+    "total": 7,
+    "passed": 0,
+    "retention_rate": 0.0,
+    "signal_gain_rate": 0.0,
+    "base_free_correct": 7,
+    "base_free_accuracy": 1.0
+  },
+  "kept_cot": [],
+  "results": [
+    {
+      "case_id": "nextgqa-2984974097-8",
+      "video_id": "ce82cb8da378cfe4",
+      "passed": false,
+      "drop_reasons": [
+        "base_already_correct_no_signal"
+      ],
+      "conditioned_answer": "The correct answer is A) smile brightly <FRAME:t=12.0> <FRAME:t=14.0> <FRAME:t=16.0> <FRAME:t=18.0> <FRAME:t=19.0> <FRAME:t=21.0> <FRAME:t=23.0> <FRAME:t=25.0> <FRAME:t=26.0> <FRAME:t=28.0>",
+      "consistency_answer": "The correct answer is A) smile brightly <FRAME:t=12.0> <FRAME:t=14.0> <FRAME:t=16.0> <FRAME:t=18.0> <FRAME:t=19.0>. In multiple frames, the girl is seen smiling broadly while cycling, which is a clear expression of excitement. Other options like jumping, clapping, or running around are not observed in the provided frames. The cycling outfit (C) is not an expression of excitement, and running around (D) is not shown.",
+      "free_answer": "The correct answer is A) smile brightly <FRAME:t=12.0> <FRAME:t=14.0> <FRAME:t=16.0> <FRAME:t=18.0> <FRAME:t=19.0>\n\nIn frames [FRAME:t=12.0] through [FRAME:t=19.0], the girl is clearly seen smiling broadly and joyfully while cycling. Her facial expression is the most direct and visible indicator of excitement. While she does not jump (B), clap (E), or run (D), and her outfit (C) is not an expression of excitement, her smiling is consistently visible and matches the context of her cycling activity. The other options are either not performed or not expressions of emotion.",
+      "conditioned_correct": true,
+      "consistency_correct": true,
+      "free_correct": true,
+      "signal_gain": false,
+      "cot_path": "data/distill/pilot/cot/nextgqa-2984974097-8.json"
+    },
+    {
+      "case_id": "nextgqa-3376544720-9",
+      "video_id": "a62fd13f690cb40b",
+      "passed": false,
+      "drop_reasons": [
+        "base_already_correct_no_signal"
+      ],
+      "conditioned_answer": "The correct answer is D) spin and up and down. \n\nThe visual evidence from [FRAME:t=69.0] shows the mechanical bull in a low, crouched position that begins to lift its front end while rotating — indicating a spin. At [FRAME:t=69.0], the bull is spinning clockwise and rising, with the rider leaning back, confirming upward motion. At [FRAME:t=69.0], the bull reaches a peak in its spin with the body tilted upward, and at [FRAME:t=69.0], it is fully upright and spinning, confirming continued upward motion. At [FRAME:t=69.0], the bull starts descending while continuing to spin, indicating downward movement. The sequence from [FRAME:t=69.0] to [FRAME:t=74.0] completes the cycle of spinning and vertical motion, confirming the bull moves by spinning and going up and down. This matches option D.",
+      "consistency_answer": "The correct answer is D) spin and up and down.\n\nThe visual evidence from [FRAME:t=69.0] to [FRAME:t=74.0] shows the mechanical bull performing a continuous spinning motion while simultaneously rising and falling vertically. At [FRAME:t=69.0], the bull is spinning clockwise and rising, with the rider leaning back. At [FRAME:t=69.0], the bull reaches a peak in its spin, body tilted upward. At [FRAME:t=69.0], the bull is fully upright and spinning. At [FRAME:t=69.0], the bull starts descending while continuing to spin. At [FRAME:t=74.0], the bull is again crouched, completing the cycle. This sequence confirms the bull is spinning and moving up and down simultaneously, matching option D. The other options are not supported: it is not galloping (A), not turning in a circle (B), not jumping up (C), and not running in a circle (E).",
+      "free_answer": "The correct answer is D) spin and up and down.\n\n[FRAME:t=16.0s] shows the bull beginning to spin on its axis, with its body twisting and the rider leaning back. [FRAME:t=21.0s] captures the bull in mid-spin, with its head and body tilted upward as it rotates. [FRAME:t=26.0s] and [FRAME:t=32.0s] show the bull continuing its rotational motion while the rider struggles to maintain balance. [FRAME:t=64.0s] and [FRAME:t=69.0s] clearly depict the bull spinning rapidly while also bouncing up and down, with the rider’s body reacting to the vertical motion. This combination of spinning and vertical movement matches option D. The other options are either inaccurate or not supported by the visual evidence.",
+      "conditioned_correct": true,
+      "consistency_correct": true,
+      "free_correct": true,
+      "signal_gain": false,
+      "cot_path": "data/distill/pilot/cot/nextgqa-3376544720-9.json"
+    },
+    {
+      "case_id": "nextgqa-4244817395-3",
+      "video_id": "2a4ba7469fb8f2f3",
+      "passed": false,
+      "drop_reasons": [
+        "base_already_correct_no_signal"
+      ],
+      "conditioned_answer": "The correct answer is C) signal him something inside drinking machine [FRAME:t=51.0]. In [FRAME:t=51.0], the lady in striped pajamas leans over the boy’s shoulder, positioning her hand near his face while he continues to interact with the machine. Her hand is not touching the boy’s cheek in a way that suggests wiping tears or affection; instead, it is placed near his face in a gesture that appears to guide or signal him. The boy’s focus remains on the machine, and the lady’s hand is aligned with his actions, indicating a deliberate instructional or signaling intent. The context of the toy kitchen and the boy’s ongoing interaction with the machine supports that the lady is signaling him to perform an action related to the machine. This behavior is inconsistent with options A, B, D, or E, which involve emotional, playful, romantic, or food-related actions not supported by the visual evidence.",
+      "consistency_answer": "The correct answer is C) signal him something inside drinking machine [FRAME:t=51.0]. \n\nIn [FRAME:t=51.0], the lady in striped pajamas (wearing pink and white striped clothing) leans over the boy’s shoulder with her hand positioned near his face, directly above the toy drinking machine. The boy is actively engaged with the machine, pouring liquid from a toy kettle onto a toy cup. The lady’s gesture is not affectionate, playful, or wiping-related — it is a clear, deliberate placement of her hand near his face while he is focused on the machine, indicating she is guiding or signaling him to perform an action related to the appliance. This aligns with the context of the toy kitchen and the boy’s ongoing interaction with the machine, making C the most consistent and supported option.",
+      "free_answer": "The correct answer is C) signal him something inside drinking machine [FRAME:t=51.0s] [FRAME:t=55.0s]\n\nAt t=51.0s, the lady in the striped shirt leans in close to the boy’s shoulder and touches his cheek while he is operating the toy kitchen. This gesture coincides with him interacting with the toy microwave and kettle, suggesting she is signaling him to do something with the machine. At t=55.0s, she is seen leaning over him again as he presses a button on the toy oven, reinforcing that her touch is part of guiding or signaling his play. The other options are not supported by the visual evidence: there is no indication of laughter, kissing, or wiping tears. The boy is not visibly crying or having food on his face. The gesture is contextually tied to the toy kitchen interaction, making C the most plausible interpretation.",
+      "conditioned_correct": true,
+      "consistency_correct": true,
+      "free_correct": true,
+      "signal_gain": false,
+      "cot_path": "data/distill/pilot/cot/nextgqa-4244817395-3.json"
+    },
+    {
+      "case_id": "nextgqa-4650556666-2",
+      "video_id": "2f84ff86dbc9356e",
+      "passed": false,
+      "drop_reasons": [
+        "base_already_correct_no_signal"
+      ],
+      "conditioned_answer": "The correct answer is D) lose balance [FRAME:t=19.0] and [FRAME:t=20.0] show the child standing unsteadily while being held by an adult, followed by the child disappearing from the frame and then appearing on the floor at [FRAME:t=21.0], which indicates a fall consistent with losing balance. The other options are not supported by any visual evidence in the frames.",
+      "consistency_answer": "The correct answer is D) lose balance.\n\n[FRAME:t=19.0] shows the child standing unsteadily while holding the adult’s hand, with a wobbly posture indicating difficulty maintaining balance. [FRAME:t=20.0] shows the child no longer visible in the frame, consistent with a fall. [FRAME:t=21.0] clearly shows the child on the floor, having fallen while being held by the adult, which directly supports the interpretation that the child lost balance and fell. The other options are not supported by any visual evidence in the frames.",
+      "free_answer": "The correct answer is D) lose balance.\n\n[FRAME:t=21.0s] shows the child falling backward onto the floor while still holding the adult’s hand, indicating a loss of balance. The child is not crying (A), not resting (B), not taking a drink (C), and not playing with a dog (E) — the dog is not visible in any frame. The fall is a direct result of the child’s instability while being held and encouraged to stand.",
+      "conditioned_correct": true,
+      "consistency_correct": true,
+      "free_correct": true,
+      "signal_gain": false,
+      "cot_path": "data/distill/pilot/cot/nextgqa-4650556666-2.json"
+    },
+    {
+      "case_id": "nextgqa-5840177726-0",
+      "video_id": "01bb1b66328b2824",
+      "passed": false,
+      "drop_reasons": [
+        "base_already_correct_no_signal"
+      ],
+      "conditioned_answer": "The correct answer is E) cycle up slope.\n\nEvidence from the frames:\n- At [FRAME:t=7.0], a man in a brown shirt and white helmet is seen riding a mountain bike on a dirt trail through a forested area, leaning into a turn.\n- At [FRAME:t=8.0], the same rider continues along a narrow, sloped trail with the front wheel of the bike lifted, indicating movement uphill.\n- At [FRAME:t=10.0], another rider in a red shirt is visible further up the trail, also on a mountain bike, confirming upward movement.\n- At [FRAME:t=12.0], both riders are still on their bikes, ascending the incline, with the trail clearly sloping upward through dense trees.\n- The consistent presence of mountain bikes and upward trajectory across multiple frames confirms the men are cycling up the slope.",
+      "consistency_answer": "The correct answer is E) cycle up slope.\n\n[FRAME:t=7.0] shows a man in a brown shirt and white helmet riding a mountain bike on a dirt trail through a forested area, leaning into a turn. [FRAME:t=8.0] shows the same rider continuing along a narrow, sloped trail with the front wheel of the bike lifted, indicating movement uphill. [FRAME:t=10.0] shows another rider in a red shirt further up the trail, also on a mountain bike, confirming upward movement. [FRAME:t=12.0] shows both riders still on their bikes, ascending the incline, with the trail clearly sloping upward through dense trees. The consistent presence of mountain bikes and upward trajectory across multiple frames confirms the men are cycling up the slope.",
+      "free_answer": "The correct answer is E) cycle up slope.\n\n[FRAME:t=1.0s] shows a man on a mountain bike approaching a slope. [FRAME:t=2.0s] and [FRAME:t=3.0s] show him actively pedaling and leaning into the incline, consistent with cycling uphill. [FRAME:t=4.0s] and [FRAME:t=8.0s] show him continuing up the slope on the same bike, with his body posture indicating cycling motion. [FRAME:t=6.0s] and [FRAME:t=7.0s] show another cyclist in a similar posture, confirming the group is cycling up the slope. The terrain is a dirt trail through a forest, and the riders are using bicycles, not running, sitting, or moving left/right. Therefore, cycling up the slope is the only consistent and supported method shown.",
+      "conditioned_correct": true,
+      "consistency_correct": true,
+      "free_correct": true,
+      "signal_gain": false,
+      "cot_path": "data/distill/pilot/cot/nextgqa-5840177726-0.json"
+    },
+    {
+      "case_id": "nextgqa-5945172741-7",
+      "video_id": "4dd172f915a5cdb1",
+      "passed": false,
+      "drop_reasons": [
+        "base_already_correct_no_signal"
+      ],
+      "conditioned_answer": "The correct answer is B) kiss her.  \nAt [FRAME:t=11.0], the man is seen leaning toward the girl, his face close to hers, with his mouth near her cheek. His expression is affectionate, and his body posture suggests intimate contact. At [FRAME:t=15.0], the man maintains close proximity to the girl, his head tilted slightly toward her, and his lips are in close alignment with her face, indicating a kiss. At [FRAME:t=19.0], the man continues to hold the girl in a close embrace, his face still near hers, and his eyes are closed, reinforcing the gesture of a kiss. The visual evidence across these frames shows sustained physical closeness, facial alignment, and affectionate expression, consistent with kissing rather than other actions like patting, caressing, or playing. No frames show the man touching the girl’s hair, patting her back, or engaging in play with a baby. The lady is not visible in the relevant frames.",
+      "consistency_answer": "The correct answer is B) kiss her. [FRAME:t=15.0] shows the man leaning close to the girl with his head tilted and lips near her face, consistent with a kiss. [FRAME:t=19.0] reinforces this with continued close embrace and facial alignment. The visual evidence across these frames confirms the action is kissing, not caressing, patting, or playing with a baby. The lady is not visible in the relevant frames, and no frames show hair touching or back patting.",
+      "free_answer": "The correct answer is B) kiss her <FRAME:t=15.0> <FRAME:t=19.0>. \n\nIn frame [FRAME:t=15.0], the man is seen leaning down and kissing the girl on her forehead while she is nestled against him. In frame [FRAME:t=19.0], he continues to hold her close and kiss her head, reinforcing the affectionate gesture. The other options are not supported by the visual evidence: there is no visible caressing of hair, no patting of the back, no baby play, and no lady pointing. The girl is the focus of the affection, not a lady.",
+      "conditioned_correct": true,
+      "consistency_correct": true,
+      "free_correct": true,
+      "signal_gain": false,
+      "cot_path": "data/distill/pilot/cot/nextgqa-5945172741-7.json"
+    },
+    {
+      "case_id": "nextgqa-6097994550-4",
+      "video_id": "bb13d595f11b2144",
+      "passed": false,
+      "drop_reasons": [
+        "base_already_correct_no_signal"
+      ],
+      "conditioned_answer": "The correct answer is D) crawls [FRAME:t=10.0s] [FRAME:t=11.0s] [FRAME:t=12.0s] [FRAME:t=13.0s] [FRAME:t=14.0s] [FRAME:t=16.0s].\n\nAt [FRAME:t=10.0s], the man with spectacles begins to move his legs and body in a low, forward motion. By [FRAME:t=11.0s], he is on his hands and knees, actively propelling himself forward. At [FRAME:t=12.0s], he is in a crawling position, moving across the mat. The close-up at [FRAME:t=13.0s] and [FRAME:t=14.0s] confirms his body is low to the ground, and [FRAME:t=16.0s] shows his face as he continues this crawling motion. This movement is consistent with crawling, not walking, caressing his head, counting, or strolling.",
+      "consistency_answer": "The correct answer is D) crawls [FRAME:t=10.0s] [FRAME:t=11.0s] [FRAME:t=12.0s] [FRAME:t=13.0s] [FRAME:t=14.0s] [FRAME:t=16.0s].\n\nAt [FRAME:t=10.0s], the man with spectacles begins to push himself up from the mat, transitioning into a crawling position. By [FRAME:t=11.0s], he is fully on his hands and knees, moving forward. This crawling motion continues through [FRAME:t=12.0s] to [FRAME:t=16.0s], where he is clearly in a crawling posture, looking toward the camera. The other options are inconsistent with the visual evidence: he does not walk (A), caress his head (B), count with fingers (C), or stroll around (E) — the motion is distinctly crawling.",
+      "free_answer": "The correct answer is D) crawls [FRAME:t=10.0s] [FRAME:t=11.0s] [FRAME:t=12.0s] [FRAME:t=13.0s] [FRAME:t=14.0s] [FRAME:t=15.0s] [FRAME:t=16.0s]\n\nAt [FRAME:t=10.0s], the man with spectacles begins to push himself up from the mat, transitioning from lying down to a crawling position. By [FRAME:t=11.0s], he is clearly on all fours, moving forward on his hands and knees. This crawling motion continues through [FRAME:t=12.0s] to [FRAME:t=16.0s], where he is seen moving closer to the camera while maintaining the crawling posture. The other options are not supported: he does not walk (A), caress his head (B), count with fingers (C), or stroll around (E) — the motion is distinctly crawling.",
+      "conditioned_correct": true,
+      "consistency_correct": true,
+      "free_correct": true,
+      "signal_gain": false,
+      "cot_path": "data/distill/pilot/cot/nextgqa-6097994550-4.json"
+    }
+  ]
+}

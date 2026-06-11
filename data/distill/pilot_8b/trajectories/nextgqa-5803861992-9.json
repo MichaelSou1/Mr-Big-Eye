@@ -1,0 +1,706 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-5803861992-9",
+    "video_id": "457d8632326af483",
+    "question": "how is the baby react when the lady hit her with the fan\n\nCandidates:\nA) no response\nB) touches his head\nC) adjust her shirt\nD) laugh\nE) shake body\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "laugh",
+    "required_keywords": [
+      "laugh"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      36.4
+    ],
+    "gold_scenes": [
+      {
+        "start": 1.8,
+        "end": 71.0
+      }
+    ],
+    "question_type": "tc"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "how is the baby react when the lady hit her with the fan\n\nCandidates:\nA) no response\nB) touches his head\nC) adjust her shirt\nD) laugh\nE) shake body\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the moment when the lady hits the baby with the fan and observe the baby's immediate reaction. Use segment_focus for precise visual detail around the impact. (visual_detail, focused, negative_check)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "how is the baby react when the lady hit her with the fan",
+            "center_t": 12.5,
+            "half_window_sec": 2.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-a7855bca0aee5131",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 10.5, \"end\": 14.5, \"center_t\": 12.5, \"frame_count\": 4}, \"observation\": \"[t=11.0s] 婴儿躺在印有“Sinbo Family”字样的垫子上，面朝上，嘴巴张开，眼睛睁大，表情看起来很开心，正注视着前方的红色扇子。\\n[t=12.0s] 婴儿继续躺着，嘴巴张开，眼睛看着扇子，表情依然愉悦，似乎在笑。\\n[t=13.0s] 婴儿面带笑容，眼睛看着扇子，嘴巴张开，表情非常开心。\\n[t=14.0s] 婴儿继续躺着，面带笑容，眼睛看着扇子，嘴巴张开，表情非常开心。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a7855bca0aee5131",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5,
+          "frame_count": 4
+        },
+        "observation": "[t=11.0s] 婴儿躺在印有“Sinbo Family”字样的垫子上，面朝上，嘴巴张开，眼睛睁大，表情看起来很开心，正注视着前方的红色扇子。\n[t=12.0s] 婴儿继续躺着，嘴巴张开，眼睛看着扇子，表情依然愉悦，似乎在笑。\n[t=13.0s] 婴儿面带笑容，眼睛看着扇子，嘴巴张开，表情非常开心。\n[t=14.0s] 婴儿继续躺着，面带笑容，眼睛看着扇子，嘴巴张开，表情非常开心。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: The baby shows no sign of distress or reaction to the fan strike. The baby remains smiling and looking at the fan, indicating a positive emotional response. The evidence supports that the baby does not react with pain or discomfort. (visual_detail, focused, negative_check)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "how is the baby react when the lady hit her with the fan",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-95632594c7ba0107",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 4, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 3.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-95632594c7ba0107",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Confirm the absence of any reaction from the baby during the fan strike by checking the full timeline around the impact. Use build_timeline to locate the exact moment of impact and verify the baby’s behavior. (temporal_order, balanced, negative_check)\n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "build_timeline",
+          "args": {
+            "question": "how is the baby react when the lady hit her with the fan",
+            "expand": true,
+            "window_sec": 3.0,
+            "max_frames": 12
+          },
+          "id": "chatcmpl-tool-8a8454883baff446",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"build_timeline\", \"question\": \"how is the baby react when the lady hit her with the fan\", \"added_frames\": [{\"timestamp\": 8.0, \"source\": \"timeline_expand\"}, {\"timestamp\": 9.0, \"source\": \"timeline_expand\"}, {\"timestamp\": 10.0, \"source\": \"timeline_expand\"}, {\"timestamp\": 11.0, \"source\": \"timeline_expand\"}, {\"timestamp\": 12.0, \"source\": \"timeline_expand\"}, {\"timestamp\": 13.0, \"source\": \"timeline_expand\"}, {\"timestamp\": 14.0, \"source\": \"timeline_expand\"}, {\"timestamp\": 15.0, \"source\": \"timeline_expand\"}, {\"timestamp\": 16.0, \"source\": \"timeline_expand\"}, {\"timestamp\": 17.0, \"source\": \"timeline_expand\"}], \"timeline\": [{\"type\": \"frame\", \"timestamp\": 8.0, \"source\": \"timeline_expand\"}, {\"type\": \"frame\", \"timestamp\": 9.0, \"source\": \"timeline_expand\"}, {\"type\": \"frame\", \"timestamp\": 10.0, \"source\": \"timeline_expand\"}, {\"type\": \"frame\", \"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"type\": \"frame\", \"timestamp\": 12.0, \"source\": \"segment_focus\"}, {\"type\": \"frame\", \"timestamp\": 13.0, \"source\": \"segment_focus\"}, {\"type\": \"frame\", \"timestamp\": 14.0, \"source\": \"segment_focus\"}, {\"type\": \"frame\", \"timestamp\": 15.0, \"source\": \"timeline_expand\"}, {\"type\": \"frame\", \"timestamp\": 16.0, \"source\": \"timeline_expand\"}, {\"type\": \"frame\", \"timestamp\": 17.0, \"source\": \"timeline_expand\"}], \"candidate_timeline\": {\"items\": [], \"recommended_order\": [], \"recommended_option\": null, \"coverage_ok\": false}, \"inferred_order\": [], \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8a8454883baff446",
+      "name": "build_timeline",
+      "payload": {
+        "tool": "build_timeline",
+        "question": "how is the baby react when the lady hit her with the fan",
+        "added_frames": [
+          {
+            "timestamp": 8.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 9.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "timeline_expand"
+          }
+        ],
+        "timeline": [
+          {
+            "type": "frame",
+            "timestamp": 8.0,
+            "source": "timeline_expand"
+          },
+          {
+            "type": "frame",
+            "timestamp": 9.0,
+            "source": "timeline_expand"
+          },
+          {
+            "type": "frame",
+            "timestamp": 10.0,
+            "source": "timeline_expand"
+          },
+          {
+            "type": "frame",
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "type": "frame",
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "type": "frame",
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "type": "frame",
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "type": "frame",
+            "timestamp": 15.0,
+            "source": "timeline_expand"
+          },
+          {
+            "type": "frame",
+            "timestamp": 16.0,
+            "source": "timeline_expand"
+          },
+          {
+            "type": "frame",
+            "timestamp": 17.0,
+            "source": "timeline_expand"
+          }
+        ],
+        "candidate_timeline": {
+          "items": [],
+          "recommended_order": [],
+          "recommended_option": null,
+          "coverage_ok": false
+        },
+        "inferred_order": [],
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: The baby’s behavior remains unchanged throughout the incident. The baby is seen smiling and looking at the fan before, during, and after the strike. There is no evidence of pain, fear, or physical reaction. The baby does not touch its head, adjust its shirt, or shake its body. The only consistent behavior is smiling and looking at the fan. Therefore, the correct answer is that the baby shows no response to the hit. (visual_detail, focused, negative_check)\n\n\n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 4, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 3.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-924722e33975e8b0",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "how is the baby react when the lady hit her with the fan",
+        "center_t": 12.5,
+        "half_window_sec": 2.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5,
+          "frame_count": 4
+        },
+        "observation": "[t=11.0s] 婴儿躺在印有“Sinbo Family”字样的垫子上，面朝上，嘴巴张开，眼睛睁大，表情看起来很开心，正注视着前方的红色扇子。\n[t=12.0s] 婴儿继续躺着，嘴巴张开，眼睛看着扇子，表情依然愉悦，似乎在笑。\n[t=13.0s] 婴儿面带笑容，眼睛看着扇子，嘴巴张开，表情非常开心。\n[t=14.0s] 婴儿继续躺着，面带笑容，眼睛看着扇子，嘴巴张开，表情非常开心。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-a7855bca0aee5131",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "how is the baby react when the lady hit her with the fan",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-95632594c7ba0107",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "build_timeline",
+      "tool_args": {
+        "question": "how is the baby react when the lady hit her with the fan",
+        "expand": true,
+        "window_sec": 3.0,
+        "max_frames": 12
+      },
+      "tool_result": {
+        "tool": "build_timeline",
+        "question": "how is the baby react when the lady hit her with the fan",
+        "added_frames": [
+          {
+            "timestamp": 8.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 9.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "timeline_expand"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "timeline_expand"
+          }
+        ],
+        "timeline": [
+          {
+            "type": "frame",
+            "timestamp": 8.0,
+            "source": "timeline_expand"
+          },
+          {
+            "type": "frame",
+            "timestamp": 9.0,
+            "source": "timeline_expand"
+          },
+          {
+            "type": "frame",
+            "timestamp": 10.0,
+            "source": "timeline_expand"
+          },
+          {
+            "type": "frame",
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "type": "frame",
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "type": "frame",
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "type": "frame",
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "type": "frame",
+            "timestamp": 15.0,
+            "source": "timeline_expand"
+          },
+          {
+            "type": "frame",
+            "timestamp": 16.0,
+            "source": "timeline_expand"
+          },
+          {
+            "type": "frame",
+            "timestamp": 17.0,
+            "source": "timeline_expand"
+          }
+        ],
+        "candidate_timeline": {
+          "items": [],
+          "recommended_order": [],
+          "recommended_option": null,
+          "coverage_ok": false
+        },
+        "inferred_order": [],
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-8a8454883baff446",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-924722e33975e8b0",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 8.0,
+        "source": "timeline_expand",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "timeline_expand",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "timeline_expand",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "timeline_expand",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "timeline_expand",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 17.0,
+        "source": "timeline_expand",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0017.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 17.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0017.0.jpg"
+      },
+      {
+        "timestamp": 21.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0021.0.jpg"
+      },
+      {
+        "timestamp": 25.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0025.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 34.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0034.0.jpg"
+      },
+      {
+        "timestamp": 38.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0038.0.jpg"
+      },
+      {
+        "timestamp": 42.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0042.0.jpg"
+      },
+      {
+        "timestamp": 46.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0046.0.jpg"
+      },
+      {
+        "timestamp": 50.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0050.0.jpg"
+      },
+      {
+        "timestamp": 55.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0055.0.jpg"
+      },
+      {
+        "timestamp": 59.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0059.0.jpg"
+      },
+      {
+        "timestamp": 63.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0063.0.jpg"
+      },
+      {
+        "timestamp": 67.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/457d8632326af483/frames_dense/t0067.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {},
+    "timeline": [
+      {
+        "type": "frame",
+        "timestamp": 8.0,
+        "source": "timeline_expand"
+      },
+      {
+        "type": "frame",
+        "timestamp": 9.0,
+        "source": "timeline_expand"
+      },
+      {
+        "type": "frame",
+        "timestamp": 10.0,
+        "source": "timeline_expand"
+      },
+      {
+        "type": "frame",
+        "timestamp": 11.0,
+        "source": "segment_focus"
+      },
+      {
+        "type": "frame",
+        "timestamp": 12.0,
+        "source": "segment_focus"
+      },
+      {
+        "type": "frame",
+        "timestamp": 13.0,
+        "source": "segment_focus"
+      },
+      {
+        "type": "frame",
+        "timestamp": 14.0,
+        "source": "segment_focus"
+      },
+      {
+        "type": "frame",
+        "timestamp": 15.0,
+        "source": "timeline_expand"
+      },
+      {
+        "type": "frame",
+        "timestamp": 16.0,
+        "source": "timeline_expand"
+      },
+      {
+        "type": "frame",
+        "timestamp": 17.0,
+        "source": "timeline_expand"
+      }
+    ],
+    "candidate_timeline": {
+      "items": [],
+      "recommended_order": [],
+      "recommended_option": null,
+      "coverage_ok": false
+    },
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 4,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 3.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=11.0s] 婴儿躺在印有“Sinbo Family”字样的垫子上，面朝上，嘴巴张开，眼睛睁大，表情看起来很开心，正注视着前方的红色扇子。\n[t=12.0s] 婴儿继续躺着，嘴巴张开，眼睛看着扇子，表情依然愉悦，似乎在笑。\n[t=13.0s] 婴儿面带笑容，眼睛看着扇子，嘴巴张开，表情非常开心。\n[t=14.0s] 婴儿继续躺着，面带笑容，眼睛看着扇子，嘴巴张开，表情非常开心。",
+        "timestamps": [
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ],
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "48b33765476fb743c7d0985042cf579ff3e110be"
+}

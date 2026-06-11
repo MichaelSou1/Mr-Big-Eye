@@ -1,0 +1,159 @@
+{
+  "summary": {
+    "n_free_wrong": 16,
+    "base_448_now_correct": 2,
+    "base_448_flip_rate": 0.125,
+    "uniform_hi_now_correct": 4,
+    "uniform_hi_flip_rate": 0.25,
+    "gt_local_now_correct": 5,
+    "gt_local_flip_rate": 0.3125,
+    "gt_local_hi_now_correct": 5,
+    "gt_local_hi_flip_rate": 0.3125
+  },
+  "rows": [
+    {
+      "case_id": "nextgqa-2547885226-4",
+      "qtype": "tp",
+      "n_gt_frames": 8,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-2782658657-0",
+      "qtype": "cw",
+      "n_gt_frames": 7,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-2868183184-7",
+      "qtype": "tn",
+      "n_gt_frames": 24,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": true,
+      "gt_local_hi": true
+    },
+    {
+      "case_id": "nextgqa-3078294001-3",
+      "qtype": "cw",
+      "n_gt_frames": 4,
+      "base_448": false,
+      "uniform_hi": true,
+      "gt_local": true,
+      "gt_local_hi": true
+    },
+    {
+      "case_id": "nextgqa-3376544720-9",
+      "qtype": "ch",
+      "n_gt_frames": 24,
+      "base_448": true,
+      "uniform_hi": true,
+      "gt_local": true,
+      "gt_local_hi": true
+    },
+    {
+      "case_id": "nextgqa-3943634344-10",
+      "qtype": "tn",
+      "n_gt_frames": 3,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-4087013668-8",
+      "qtype": "tn",
+      "n_gt_frames": 6,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": true,
+      "gt_local_hi": true
+    },
+    {
+      "case_id": "nextgqa-4123915842-7",
+      "qtype": "tc",
+      "n_gt_frames": 6,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-4419096437-1",
+      "qtype": "cw",
+      "n_gt_frames": 24,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-4674481985-2",
+      "qtype": "tn",
+      "n_gt_frames": 13,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-4838145161-0",
+      "qtype": "cw",
+      "n_gt_frames": 24,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-4942054721-4",
+      "qtype": "tc",
+      "n_gt_frames": 8,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-4968805923-4",
+      "qtype": "ch",
+      "n_gt_frames": 4,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-4970148391-9",
+      "qtype": "tn",
+      "n_gt_frames": 3,
+      "base_448": false,
+      "uniform_hi": true,
+      "gt_local": false,
+      "gt_local_hi": false
+    },
+    {
+      "case_id": "nextgqa-5658916668-8",
+      "qtype": "cw",
+      "n_gt_frames": 5,
+      "base_448": true,
+      "uniform_hi": true,
+      "gt_local": true,
+      "gt_local_hi": true
+    },
+    {
+      "case_id": "nextgqa-8252088130-4",
+      "qtype": "tn",
+      "n_gt_frames": 6,
+      "base_448": false,
+      "uniform_hi": false,
+      "gt_local": false,
+      "gt_local_hi": false
+    }
+  ]
+}

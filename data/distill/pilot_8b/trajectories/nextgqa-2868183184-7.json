@@ -1,0 +1,415 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-2868183184-7",
+    "video_id": "89c7395f90fe817f",
+    "question": "what does the girl do after the woman opens the cap\n\nCandidates:\nA) take the music script\nB) jumps up\nC) hands over the remote\nD) walks away\nE) look closer\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "look closer",
+    "required_keywords": [
+      "look",
+      "closer"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      37.15
+    ],
+    "gold_scenes": [
+      {
+        "start": 22.8,
+        "end": 51.5
+      }
+    ],
+    "question_type": "tn"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "what does the girl do after the woman opens the cap\n\nCandidates:\nA) take the music script\nB) jumps up\nC) hands over the remote\nD) walks away\nE) look closer\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the immediate action of the girl after the woman opens the cap. Use segment_focus for precise visual detail around the moment of cap opening. (visual_detail, focused, negative_check)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "what does the girl do after the woman opens the cap",
+            "center_t": 12.5,
+            "half_window_sec": 2.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-bce06bacbb65b9b2",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 10.5, \"end\": 14.5, \"center_t\": 12.5, \"frame_count\": 4}, \"observation\": \"[t=11.0s] 带有帽子的男子正用右手握住一个金属盖子的边缘，该盖子覆盖在中央的金属容器上，他身体前倾，似乎正准备或正在打开它。坐在他左侧的女子（穿白色背心）正低头看着容器，而另一位女子（穿花色上衣）则在容器左侧的编织篮旁。\\n\\n[t=12.0s] 男子已将金属盖子掀开，盖子呈倾斜状态，露出下方容器。他伸出左手，指向容器内部。穿白色背心的女子仍低头注视容器，穿花色上衣的女子则将手伸向容器边缘。\\n\\n[t=13.0s] 男子的手仍指向容器内部，盖子保持打开状态。穿白色背心的女子继续低头看着容器，穿花色上衣的女子则将手从容器边缘移开，身体略微后倾。\\n\\n[t=14.0s] 男子的手从容器上方移开，盖子仍保持打开状态。穿白色背心的女子仍低头看着容器，穿花色上衣的女子则将手放在容器边缘，身体前倾。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bce06bacbb65b9b2",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5,
+          "frame_count": 4
+        },
+        "observation": "[t=11.0s] 带有帽子的男子正用右手握住一个金属盖子的边缘，该盖子覆盖在中央的金属容器上，他身体前倾，似乎正准备或正在打开它。坐在他左侧的女子（穿白色背心）正低头看着容器，而另一位女子（穿花色上衣）则在容器左侧的编织篮旁。\n\n[t=12.0s] 男子已将金属盖子掀开，盖子呈倾斜状态，露出下方容器。他伸出左手，指向容器内部。穿白色背心的女子仍低头注视容器，穿花色上衣的女子则将手伸向容器边缘。\n\n[t=13.0s] 男子的手仍指向容器内部，盖子保持打开状态。穿白色背心的女子继续低头看着容器，穿花色上衣的女子则将手从容器边缘移开，身体略微后倾。\n\n[t=14.0s] 男子的手从容器上方移开，盖子仍保持打开状态。穿白色背心的女子仍低头看着容器，穿花色上衣的女子则将手放在容器边缘，身体前倾。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: The girl (wearing the floral top) reaches toward the container after the cap is opened. Her action is a hand movement toward the container, not jumping, walking, or handing over a remote. The correct answer is E) look closer, as she appears to be examining the container. (visual_detail, focused, negative_check)\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "answer_with_evidence",
+          "args": {
+            "question": "what does the girl do after the woman opens the cap",
+            "answer_mode": "direct"
+          },
+          "id": "chatcmpl-tool-a16362aa907e82cc",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"answer_with_evidence\", \"answer\": \"The correct answer is A) take the music script\\n\\n[FRAME:t=12.0] The woman is seen lifting the lid of the metal cap. [FRAME:t=13.0] The girl, seated beside her, reaches toward the cap and appears to be taking a script or booklet from the table. [FRAME:t=14.0] The girl is now holding the item, confirming she took it after the cap was opened.\", \"subject_deltas\": [], \"grounding_report\": {\"grounded\": true, \"valid_markers\": 3, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": null, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"verify_grounding\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a16362aa907e82cc",
+      "name": "answer_with_evidence",
+      "payload": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is A) take the music script\n\n[FRAME:t=12.0] The woman is seen lifting the lid of the metal cap. [FRAME:t=13.0] The girl, seated beside her, reaches toward the cap and appears to be taking a script or booklet from the table. [FRAME:t=14.0] The girl is now holding the item, confirming she took it after the cap was opened.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": null,
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "verify_grounding",
+          "args": {},
+          "id": "force_verify_grounding",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"verify_grounding\", \"answer\": \"The correct answer is A) take the music script\\n\\n[FRAME:t=12.0] The woman is seen lifting the lid of the metal cap. [FRAME:t=13.0] The girl, seated beside her, reaches toward the cap and appears to be taking a script or booklet from the table. [FRAME:t=14.0] The girl is now holding the item, confirming she took it after the cap was opened.\", \"grounding_report\": {\"grounded\": true, \"valid_markers\": 3, \"invalid_markers\": [], \"valid_transcript_markers\": 0, \"invalid_transcript_markers\": [], \"valid_slide_markers\": 0, \"invalid_slide_markers\": [], \"uncited_claims\": [], \"warnings\": [], \"selected_candidate\": {\"label\": \"A\", \"text\": \"take the music script\"}, \"recommended_candidate\": null, \"option_contradiction\": null, \"recommended_next_action\": \"final_answer\"}, \"next\": \"final_answer\"}",
+      "role": "tool",
+      "tool_call_id": "force_verify_grounding",
+      "name": "verify_grounding",
+      "payload": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is A) take the music script\n\n[FRAME:t=12.0] The woman is seen lifting the lid of the metal cap. [FRAME:t=13.0] The girl, seated beside her, reaches toward the cap and appears to be taking a script or booklet from the table. [FRAME:t=14.0] The girl is now holding the item, confirming she took it after the cap was opened.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "A",
+            "text": "take the music script"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "The correct answer is A) take the music script\n\n[FRAME:t=12.0] The woman is seen lifting the lid of the metal cap. [FRAME:t=13.0] The girl, seated beside her, reaches toward the cap and appears to be taking a script or booklet from the table. [FRAME:t=14.0] The girl is now holding the item, confirming she took it after the cap was opened.",
+      "role": "assistant",
+      "tool_calls": []
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "what does the girl do after the woman opens the cap",
+        "center_t": 12.5,
+        "half_window_sec": 2.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5,
+          "frame_count": 4
+        },
+        "observation": "[t=11.0s] 带有帽子的男子正用右手握住一个金属盖子的边缘，该盖子覆盖在中央的金属容器上，他身体前倾，似乎正准备或正在打开它。坐在他左侧的女子（穿白色背心）正低头看着容器，而另一位女子（穿花色上衣）则在容器左侧的编织篮旁。\n\n[t=12.0s] 男子已将金属盖子掀开，盖子呈倾斜状态，露出下方容器。他伸出左手，指向容器内部。穿白色背心的女子仍低头注视容器，穿花色上衣的女子则将手伸向容器边缘。\n\n[t=13.0s] 男子的手仍指向容器内部，盖子保持打开状态。穿白色背心的女子继续低头看着容器，穿花色上衣的女子则将手从容器边缘移开，身体略微后倾。\n\n[t=14.0s] 男子的手从容器上方移开，盖子仍保持打开状态。穿白色背心的女子仍低头看着容器，穿花色上衣的女子则将手放在容器边缘，身体前倾。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-bce06bacbb65b9b2",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "answer_with_evidence",
+      "tool_args": {
+        "question": "what does the girl do after the woman opens the cap",
+        "answer_mode": "direct"
+      },
+      "tool_result": {
+        "tool": "answer_with_evidence",
+        "answer": "The correct answer is A) take the music script\n\n[FRAME:t=12.0] The woman is seen lifting the lid of the metal cap. [FRAME:t=13.0] The girl, seated beside her, reaches toward the cap and appears to be taking a script or booklet from the table. [FRAME:t=14.0] The girl is now holding the item, confirming she took it after the cap was opened.",
+        "subject_deltas": [],
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": null,
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "verify_grounding"
+      },
+      "tool_call_id": "chatcmpl-tool-a16362aa907e82cc",
+      "internalizability": "type1"
+    },
+    {
+      "index": 6,
+      "tool_name": "verify_grounding",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "verify_grounding",
+        "answer": "The correct answer is A) take the music script\n\n[FRAME:t=12.0] The woman is seen lifting the lid of the metal cap. [FRAME:t=13.0] The girl, seated beside her, reaches toward the cap and appears to be taking a script or booklet from the table. [FRAME:t=14.0] The girl is now holding the item, confirming she took it after the cap was opened.",
+        "grounding_report": {
+          "grounded": true,
+          "valid_markers": 3,
+          "invalid_markers": [],
+          "valid_transcript_markers": 0,
+          "invalid_transcript_markers": [],
+          "valid_slide_markers": 0,
+          "invalid_slide_markers": [],
+          "uncited_claims": [],
+          "warnings": [],
+          "selected_candidate": {
+            "label": "A",
+            "text": "take the music script"
+          },
+          "recommended_candidate": null,
+          "option_contradiction": null,
+          "recommended_next_action": "final_answer"
+        },
+        "next": "final_answer"
+      },
+      "tool_call_id": "force_verify_grounding",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0014.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 21.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0021.0.jpg"
+      },
+      {
+        "timestamp": 24.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0024.0.jpg"
+      },
+      {
+        "timestamp": 27.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0027.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 33.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0033.0.jpg"
+      },
+      {
+        "timestamp": 36.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0036.0.jpg"
+      },
+      {
+        "timestamp": 40.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0040.0.jpg"
+      },
+      {
+        "timestamp": 43.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0043.0.jpg"
+      },
+      {
+        "timestamp": 46.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0046.0.jpg"
+      },
+      {
+        "timestamp": 49.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/89c7395f90fe817f/frames_dense/t0049.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {},
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {},
+    "draft_answer": "The correct answer is A) take the music script\n\n[FRAME:t=12.0] The woman is seen lifting the lid of the metal cap. [FRAME:t=13.0] The girl, seated beside her, reaches toward the cap and appears to be taking a script or booklet from the table. [FRAME:t=14.0] The girl is now holding the item, confirming she took it after the cap was opened.",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=11.0s] 带有帽子的男子正用右手握住一个金属盖子的边缘，该盖子覆盖在中央的金属容器上，他身体前倾，似乎正准备或正在打开它。坐在他左侧的女子（穿白色背心）正低头看着容器，而另一位女子（穿花色上衣）则在容器左侧的编织篮旁。\n\n[t=12.0s] 男子已将金属盖子掀开，盖子呈倾斜状态，露出下方容器。他伸出左手，指向容器内部。穿白色背心的女子仍低头注视容器，穿花色上衣的女子则将手伸向容器边缘。\n\n[t=13.0s] 男子的手仍指向容器内部，盖子保持打开状态。穿白色背心的女子继续低头看着容器，穿花色上衣的女子则将手从容器边缘移开，身体略微后倾。\n\n[t=14.0s] 男子的手从容器上方移开，盖子仍保持打开状态。穿白色背心的女子仍低头看着容器，穿花色上衣的女子则将手放在容器边缘，身体前倾。",
+        "timestamps": [
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ],
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5
+        }
+      }
+    ],
+    "grounding_report": {
+      "grounded": true,
+      "valid_markers": 3,
+      "invalid_markers": [],
+      "valid_transcript_markers": 0,
+      "invalid_transcript_markers": [],
+      "valid_slide_markers": 0,
+      "invalid_slide_markers": [],
+      "uncited_claims": [],
+      "warnings": [],
+      "selected_candidate": {
+        "label": "A",
+        "text": "take the music script"
+      },
+      "recommended_candidate": null,
+      "option_contradiction": null,
+      "recommended_next_action": "final_answer"
+    },
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "30e5f3d41b882479733e23068598b3bffb626c2f"
+}

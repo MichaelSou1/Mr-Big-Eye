@@ -1,0 +1,711 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-2782658657-0",
+    "video_id": "d22af6d9ca0224df",
+    "question": "why does the girl in white look down at the feet at the beginning of the video\n\nCandidates:\nA) ready to run\nB) clean her mouth\nC) pull rope with strength\nD) arrange their standing\nE) pedalling\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "ready to run",
+    "required_keywords": [
+      "ready",
+      "run"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      2.6
+    ],
+    "gold_scenes": [
+      {
+        "start": 0.0,
+        "end": 5.2
+      }
+    ],
+    "question_type": "cw"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "why does the girl in white look down at the feet at the beginning of the video\n\nCandidates:\nA) ready to run\nB) clean her mouth\nC) pull rope with strength\nD) arrange their standing\nE) pedalling\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Classify as visual_detail; use segment_focus to examine the girl's action at the start.  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "why does the girl in white look down at the feet at the beginning of the video",
+            "center_t": 0.5,
+            "half_window_sec": 2.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-bcb0f2e4c93b9aff",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 0.0, \"end\": 2.5, \"center_t\": 1.25, \"frame_count\": 3}, \"observation\": \"[t=0.0s] 女孩身穿白色连衣裙，站在石阶上，身体朝向镜头，头部明显低垂，视线朝向下方，似乎在看自己的脚或脚下的台阶。\\n[t=1.0s] 女孩仍站在石阶上，头部保持低垂姿态，视线方向未变，继续向下看。\\n[t=2.0s] 女孩已不在画面中，镜头聚焦于空的石阶，无法观察其动作或视线方向。\", \"subject_deltas\": [{\"op\": \"add\", \"id\": \"girl_in_white\", \"label\": \"穿白裙的女孩\", \"first_seen_t\": 0.0, \"attributes\": [\"站在石阶上\", \"低头看脚下\"], \"evidence_frames\": [0.0, 1.0]}], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bcb0f2e4c93b9aff",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 0.0,
+          "end": 2.5,
+          "center_t": 1.25,
+          "frame_count": 3
+        },
+        "observation": "[t=0.0s] 女孩身穿白色连衣裙，站在石阶上，身体朝向镜头，头部明显低垂，视线朝向下方，似乎在看自己的脚或脚下的台阶。\n[t=1.0s] 女孩仍站在石阶上，头部保持低垂姿态，视线方向未变，继续向下看。\n[t=2.0s] 女孩已不在画面中，镜头聚焦于空的石阶，无法观察其动作或视线方向。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "girl_in_white",
+            "label": "穿白裙的女孩",
+            "first_seen_t": 0.0,
+            "attributes": [
+              "站在石阶上",
+              "低头看脚下"
+            ],
+            "evidence_frames": [
+              0.0,
+              1.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess sufficiency and answer directly with evidence.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "why does the girl in white look down at the feet at the beginning of the video",
+            "question_type": "visual_detail",
+            "retrieval_profile": "detail"
+          },
+          "id": "chatcmpl-tool-a7cc783c09c7f4a8",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"frame_count\": 3, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 2.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a7cc783c09c7f4a8",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 3,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 2.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Retrieve additional visual evidence to confirm the girl’s action.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "why does the girl in white look down at the feet at the beginning of the video",
+            "question_type": "visual_detail",
+            "retrieval_profile": "detail",
+            "top_k_frames": 5,
+            "planner_notes": "Confirm if the girl is adjusting footwear or preparing to move."
+          },
+          "id": "chatcmpl-tool-9fc456fef9c5a85d",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 0.0, \"source\": \"segment_focus\"}, {\"timestamp\": 1.0, \"source\": \"segment_focus\"}, {\"timestamp\": 2.0, \"source\": \"segment_focus\"}, {\"timestamp\": 8.0, \"source\": \"retrieval\"}, {\"timestamp\": 13.0, \"source\": \"retrieval\"}, {\"timestamp\": 16.0, \"source\": \"retrieval\"}, {\"timestamp\": 17.0, \"source\": \"retrieval\"}, {\"timestamp\": 22.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"caption\": \"A young child in a white dress stands at the bottom of a stone staircase surrounded by greenery and trees under bright sunlight.\", \"scene_id\": 0, \"t_mid\": 0.7841165, \"end\": 1.568233, \"start\": 0.0, \"filename\": \"scene_0000.jpg\", \"score\": 0.5323415398597717}, {\"filename\": \"scene_0001.jpg\", \"end\": 2.969633, \"scene_id\": 1, \"caption\": \"A young child in a white outfit stands at the bottom of a stone staircase, facing upward toward the steps. The staircase is surrounded by greenery and sunlight filters through the trees above.\", \"start\": 1.568233, \"t_mid\": 2.268933, \"score\": 0.558925211429596}, {\"t_mid\": 15.2318835, \"filename\": \"scene_0004.jpg\", \"end\": 15.849167, \"scene_id\": 4, \"caption\": \"A blurry, low-angle view captures a paved surface with a grassy area to the right, suggesting motion or a shaky camera.\", \"start\": 14.6146, \"score\": 0.49992096424102783}, {\"t_mid\": 16.1828335, \"filename\": \"scene_0005.jpg\", \"start\": 15.849167, \"end\": 16.5165, \"scene_id\": 5, \"caption\": \"A close-up view of a rugged stone wall, composed of irregularly shaped rocks in shades of brown and gray, with patches of white and yellow lichen. A hand is partially visible at the bottom right, suggesting interaction with the wall.\", \"score\": 0.4143286943435669}, {\"caption\": \"Two young girls run down a paved path; one in a light blue dress looks toward the camera, while the other in a pink dress runs ahead with her back turned.\", \"scene_id\": 6, \"end\": 22.188833, \"start\": 16.5165, \"t_mid\": 19.3526665, \"filename\": \"scene_0006.jpg\", \"score\": 0.5009199380874634}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"top_n_scenes\": 5, \"top_k_frames\": 5, \"planner_notes\": \"Confirm if the girl is adjusting footwear or preparing to move.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9fc456fef9c5a85d",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 1.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 2.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 8.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 22.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "caption": "A young child in a white dress stands at the bottom of a stone staircase surrounded by greenery and trees under bright sunlight.",
+            "scene_id": 0,
+            "t_mid": 0.7841165,
+            "end": 1.568233,
+            "start": 0.0,
+            "filename": "scene_0000.jpg",
+            "score": 0.5323415398597717
+          },
+          {
+            "filename": "scene_0001.jpg",
+            "end": 2.969633,
+            "scene_id": 1,
+            "caption": "A young child in a white outfit stands at the bottom of a stone staircase, facing upward toward the steps. The staircase is surrounded by greenery and sunlight filters through the trees above.",
+            "start": 1.568233,
+            "t_mid": 2.268933,
+            "score": 0.558925211429596
+          },
+          {
+            "t_mid": 15.2318835,
+            "filename": "scene_0004.jpg",
+            "end": 15.849167,
+            "scene_id": 4,
+            "caption": "A blurry, low-angle view captures a paved surface with a grassy area to the right, suggesting motion or a shaky camera.",
+            "start": 14.6146,
+            "score": 0.49992096424102783
+          },
+          {
+            "t_mid": 16.1828335,
+            "filename": "scene_0005.jpg",
+            "start": 15.849167,
+            "end": 16.5165,
+            "scene_id": 5,
+            "caption": "A close-up view of a rugged stone wall, composed of irregularly shaped rocks in shades of brown and gray, with patches of white and yellow lichen. A hand is partially visible at the bottom right, suggesting interaction with the wall.",
+            "score": 0.4143286943435669
+          },
+          {
+            "caption": "Two young girls run down a paved path; one in a light blue dress looks toward the camera, while the other in a pink dress runs ahead with her back turned.",
+            "scene_id": 6,
+            "end": 22.188833,
+            "start": 16.5165,
+            "t_mid": 19.3526665,
+            "filename": "scene_0006.jpg",
+            "score": 0.5009199380874634
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "detail",
+          "top_n_scenes": 5,
+          "top_k_frames": 5,
+          "planner_notes": "Confirm if the girl is adjusting footwear or preparing to move."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess if current evidence is sufficient for answering.  \n\n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"detail\", \"frame_count\": 3, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 2.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-90507b7ea3105a94",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 3,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 2.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "why does the girl in white look down at the feet at the beginning of the video",
+        "center_t": 0.5,
+        "half_window_sec": 2.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 0.0,
+          "end": 2.5,
+          "center_t": 1.25,
+          "frame_count": 3
+        },
+        "observation": "[t=0.0s] 女孩身穿白色连衣裙，站在石阶上，身体朝向镜头，头部明显低垂，视线朝向下方，似乎在看自己的脚或脚下的台阶。\n[t=1.0s] 女孩仍站在石阶上，头部保持低垂姿态，视线方向未变，继续向下看。\n[t=2.0s] 女孩已不在画面中，镜头聚焦于空的石阶，无法观察其动作或视线方向。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "girl_in_white",
+            "label": "穿白裙的女孩",
+            "first_seen_t": 0.0,
+            "attributes": [
+              "站在石阶上",
+              "低头看脚下"
+            ],
+            "evidence_frames": [
+              0.0,
+              1.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-bcb0f2e4c93b9aff",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "why does the girl in white look down at the feet at the beginning of the video",
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 3,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 2.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-a7cc783c09c7f4a8",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "why does the girl in white look down at the feet at the beginning of the video",
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "top_k_frames": 5,
+        "planner_notes": "Confirm if the girl is adjusting footwear or preparing to move."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 0.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 1.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 2.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 8.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 22.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "caption": "A young child in a white dress stands at the bottom of a stone staircase surrounded by greenery and trees under bright sunlight.",
+            "scene_id": 0,
+            "t_mid": 0.7841165,
+            "end": 1.568233,
+            "start": 0.0,
+            "filename": "scene_0000.jpg",
+            "score": 0.5323415398597717
+          },
+          {
+            "filename": "scene_0001.jpg",
+            "end": 2.969633,
+            "scene_id": 1,
+            "caption": "A young child in a white outfit stands at the bottom of a stone staircase, facing upward toward the steps. The staircase is surrounded by greenery and sunlight filters through the trees above.",
+            "start": 1.568233,
+            "t_mid": 2.268933,
+            "score": 0.558925211429596
+          },
+          {
+            "t_mid": 15.2318835,
+            "filename": "scene_0004.jpg",
+            "end": 15.849167,
+            "scene_id": 4,
+            "caption": "A blurry, low-angle view captures a paved surface with a grassy area to the right, suggesting motion or a shaky camera.",
+            "start": 14.6146,
+            "score": 0.49992096424102783
+          },
+          {
+            "t_mid": 16.1828335,
+            "filename": "scene_0005.jpg",
+            "start": 15.849167,
+            "end": 16.5165,
+            "scene_id": 5,
+            "caption": "A close-up view of a rugged stone wall, composed of irregularly shaped rocks in shades of brown and gray, with patches of white and yellow lichen. A hand is partially visible at the bottom right, suggesting interaction with the wall.",
+            "score": 0.4143286943435669
+          },
+          {
+            "caption": "Two young girls run down a paved path; one in a light blue dress looks toward the camera, while the other in a pink dress runs ahead with her back turned.",
+            "scene_id": 6,
+            "end": 22.188833,
+            "start": 16.5165,
+            "t_mid": 19.3526665,
+            "filename": "scene_0006.jpg",
+            "score": 0.5009199380874634
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "detail",
+          "top_n_scenes": 5,
+          "top_k_frames": 5,
+          "planner_notes": "Confirm if the girl is adjusting footwear or preparing to move."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-9fc456fef9c5a85d",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "detail",
+        "frame_count": 3,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 2.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-90507b7ea3105a94",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 0.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0000.0.jpg"
+      },
+      {
+        "timestamp": 1.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0001.0.jpg"
+      },
+      {
+        "timestamp": 2.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 17.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0017.0.jpg"
+      },
+      {
+        "timestamp": 22.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0022.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 2.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 3.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0003.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 6.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0006.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 17.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0017.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 20.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0020.0.jpg"
+      },
+      {
+        "timestamp": 22.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0022.0.jpg"
+      },
+      {
+        "timestamp": 23.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 25.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/d22af6d9ca0224df/frames_dense/t0025.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "caption": "A young child in a white dress stands at the bottom of a stone staircase surrounded by greenery and trees under bright sunlight.",
+        "scene_id": 0,
+        "t_mid": 0.7841165,
+        "end": 1.568233,
+        "start": 0.0,
+        "filename": "scene_0000.jpg",
+        "score": 0.5323415398597717
+      },
+      {
+        "filename": "scene_0001.jpg",
+        "end": 2.969633,
+        "scene_id": 1,
+        "caption": "A young child in a white outfit stands at the bottom of a stone staircase, facing upward toward the steps. The staircase is surrounded by greenery and sunlight filters through the trees above.",
+        "start": 1.568233,
+        "t_mid": 2.268933,
+        "score": 0.558925211429596
+      },
+      {
+        "t_mid": 15.2318835,
+        "filename": "scene_0004.jpg",
+        "end": 15.849167,
+        "scene_id": 4,
+        "caption": "A blurry, low-angle view captures a paved surface with a grassy area to the right, suggesting motion or a shaky camera.",
+        "start": 14.6146,
+        "score": 0.49992096424102783
+      },
+      {
+        "t_mid": 16.1828335,
+        "filename": "scene_0005.jpg",
+        "start": 15.849167,
+        "end": 16.5165,
+        "scene_id": 5,
+        "caption": "A close-up view of a rugged stone wall, composed of irregularly shaped rocks in shades of brown and gray, with patches of white and yellow lichen. A hand is partially visible at the bottom right, suggesting interaction with the wall.",
+        "score": 0.4143286943435669
+      },
+      {
+        "caption": "Two young girls run down a paved path; one in a light blue dress looks toward the camera, while the other in a pink dress runs ahead with her back turned.",
+        "scene_id": 6,
+        "end": 22.188833,
+        "start": 16.5165,
+        "t_mid": 19.3526665,
+        "filename": "scene_0006.jpg",
+        "score": 0.5009199380874634
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "detail",
+      "top_n_scenes": 5,
+      "top_k_frames": 5,
+      "planner_notes": "Confirm if the girl is adjusting footwear or preparing to move."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "detail",
+      "frame_count": 3,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 2.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=0.0s] 女孩身穿白色连衣裙，站在石阶上，身体朝向镜头，头部明显低垂，视线朝向下方，似乎在看自己的脚或脚下的台阶。\n[t=1.0s] 女孩仍站在石阶上，头部保持低垂姿态，视线方向未变，继续向下看。\n[t=2.0s] 女孩已不在画面中，镜头聚焦于空的石阶，无法观察其动作或视线方向。",
+        "timestamps": [
+          0.0,
+          1.0,
+          2.0
+        ],
+        "window": {
+          "start": 0.0,
+          "end": 2.5,
+          "center_t": 1.25
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [
+      {
+        "id": "girl_in_white",
+        "label": "穿白裙的女孩",
+        "first_seen_t": 0.0,
+        "last_seen_t": 0.0,
+        "attributes": [
+          "站在石阶上",
+          "低头看脚下"
+        ],
+        "evidence_frames": [
+          0.0,
+          1.0
+        ]
+      }
+    ],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "47e4e48e864077f623e831349bccc60f9e7e168c"
+}

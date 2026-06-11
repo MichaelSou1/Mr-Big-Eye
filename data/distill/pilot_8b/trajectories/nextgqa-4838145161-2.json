@@ -1,0 +1,644 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-4838145161-2",
+    "video_id": "09354c9c0dec47cf",
+    "question": "why is the cat shaking its paws after moving back\n\nCandidates:\nA) to remove water from his body\nB) sleepy\nC) prevent hitting shelf\nD) swat water from face\nE) injured\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "swat water from face",
+    "required_keywords": [
+      "swat",
+      "water",
+      "face"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      9.2,
+      26.4
+    ],
+    "gold_scenes": [
+      {
+        "start": 8.3,
+        "end": 10.1
+      },
+      {
+        "start": 24.5,
+        "end": 28.3
+      }
+    ],
+    "question_type": "cw"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "why is the cat shaking its paws after moving back\n\nCandidates:\nA) to remove water from his body\nB) sleepy\nC) prevent hitting shelf\nD) swat water from face\nE) injured\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: 识别猫在移动后抖动爪子的视觉行为，定位关键帧并分析其动作目的。分类为 visual_detail，使用 focused 检索策略。  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "why is the cat shaking its paws after moving back",
+            "center_t": 12.5,
+            "half_window_sec": 2.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-b54b26465ab5a215",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 10.5, \"end\": 14.5, \"center_t\": 12.5, \"frame_count\": 4}, \"observation\": \"[t=11.0s] 黑白猫位于水槽左侧，身体朝向右侧，正对着正在流水的水龙头，其前爪可见但未明显动作。\\n[t=12.0s] 猫保持相同位置，头部转向水龙头方向，前爪抬起并靠近水龙头下方水流处，似乎在试探或准备接触水流。\\n[t=13.0s] 猫前爪已伸入水流中，爪子在水中晃动，水槽底部可见水花溅起。\\n[t=14.0s] 猫前爪持续在水流中晃动，爪子明显在水中来回摆动，水槽底部水花更明显。\", \"subject_deltas\": [{\"op\": \"add\", \"id\": \"cat\", \"label\": \"黑白猫\", \"first_seen_t\": 11.0, \"attributes\": [\"位于水槽中\", \"面对水龙头\"], \"evidence_frames\": [11.0, 12.0, 13.0, 14.0]}], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b54b26465ab5a215",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5,
+          "frame_count": 4
+        },
+        "observation": "[t=11.0s] 黑白猫位于水槽左侧，身体朝向右侧，正对着正在流水的水龙头，其前爪可见但未明显动作。\n[t=12.0s] 猫保持相同位置，头部转向水龙头方向，前爪抬起并靠近水龙头下方水流处，似乎在试探或准备接触水流。\n[t=13.0s] 猫前爪已伸入水流中，爪子在水中晃动，水槽底部可见水花溅起。\n[t=14.0s] 猫前爪持续在水流中晃动，爪子明显在水中来回摆动，水槽底部水花更明显。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "cat",
+            "label": "黑白猫",
+            "first_seen_t": 11.0,
+            "attributes": [
+              "位于水槽中",
+              "面对水龙头"
+            ],
+            "evidence_frames": [
+              11.0,
+              12.0,
+              13.0,
+              14.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: 评估当前证据是否足以回答问题，确认猫抖动爪子的视觉行为与水接触相关。分类为 visual_detail，使用 sufficient 检查。  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "why is the cat shaking its paws after moving back",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-a535e234f1644358",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 4, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 3.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a535e234f1644358",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: 在猫移动后抖动爪子的时段内，进一步检索视觉证据，确认动作是否与水有关。分类为 visual_detail，使用 focused 检索策略。  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "why is the cat shaking its paws after moving back",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 4,
+            "planner_notes": "Focus on paw shaking immediately after movement, especially near water source."
+          },
+          "id": "chatcmpl-tool-83b3ccc34929c842",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"timestamp\": 12.0, \"source\": \"segment_focus\"}, {\"timestamp\": 13.0, \"source\": \"segment_focus\"}, {\"timestamp\": 14.0, \"source\": \"segment_focus\"}, {\"timestamp\": 61.0, \"source\": \"retrieval\"}, {\"timestamp\": 62.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"end\": 10.0, \"t_mid\": 5.0, \"scene_id\": 0, \"filename\": \"scene_0000.jpg\", \"start\": 0.0, \"caption\": \"A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.\", \"score\": 0.5147524476051331}, {\"end\": 20.0, \"filename\": \"scene_0001.jpg\", \"t_mid\": 15.0, \"start\": 10.0, \"scene_id\": 1, \"caption\": \"A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.\", \"score\": 0.5245813131332397}, {\"caption\": \"A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge of the sink.\", \"t_mid\": 35.0, \"filename\": \"scene_0003.jpg\", \"end\": 40.0, \"start\": 30.0, \"scene_id\": 3, \"score\": 0.5134286880493164}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 4, \"planner_notes\": \"Focus on paw shaking immediately after movement, especially near water source.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-83b3ccc34929c842",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 61.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 62.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "t_mid": 5.0,
+            "scene_id": 0,
+            "filename": "scene_0000.jpg",
+            "start": 0.0,
+            "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+            "score": 0.5147524476051331
+          },
+          {
+            "end": 20.0,
+            "filename": "scene_0001.jpg",
+            "t_mid": 15.0,
+            "start": 10.0,
+            "scene_id": 1,
+            "caption": "A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.",
+            "score": 0.5245813131332397
+          },
+          {
+            "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge of the sink.",
+            "t_mid": 35.0,
+            "filename": "scene_0003.jpg",
+            "end": 40.0,
+            "start": 30.0,
+            "scene_id": 3,
+            "score": 0.5134286880493164
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 4,
+          "planner_notes": "Focus on paw shaking immediately after movement, especially near water source."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: 评估当前证据是否足以回答问题，确认猫在接触水后抖动爪子的行为与水有关。分类为 visual_detail，使用 sufficient 检查。  \n\n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 4, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 3.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-86035e9632a3b8f5",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "why is the cat shaking its paws after moving back",
+        "center_t": 12.5,
+        "half_window_sec": 2.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5,
+          "frame_count": 4
+        },
+        "observation": "[t=11.0s] 黑白猫位于水槽左侧，身体朝向右侧，正对着正在流水的水龙头，其前爪可见但未明显动作。\n[t=12.0s] 猫保持相同位置，头部转向水龙头方向，前爪抬起并靠近水龙头下方水流处，似乎在试探或准备接触水流。\n[t=13.0s] 猫前爪已伸入水流中，爪子在水中晃动，水槽底部可见水花溅起。\n[t=14.0s] 猫前爪持续在水流中晃动，爪子明显在水中来回摆动，水槽底部水花更明显。",
+        "subject_deltas": [
+          {
+            "op": "add",
+            "id": "cat",
+            "label": "黑白猫",
+            "first_seen_t": 11.0,
+            "attributes": [
+              "位于水槽中",
+              "面对水龙头"
+            ],
+            "evidence_frames": [
+              11.0,
+              12.0,
+              13.0,
+              14.0
+            ]
+          }
+        ],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-b54b26465ab5a215",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "why is the cat shaking its paws after moving back",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-a535e234f1644358",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "why is the cat shaking its paws after moving back",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 4,
+        "planner_notes": "Focus on paw shaking immediately after movement, especially near water source."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 61.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 62.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "end": 10.0,
+            "t_mid": 5.0,
+            "scene_id": 0,
+            "filename": "scene_0000.jpg",
+            "start": 0.0,
+            "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+            "score": 0.5147524476051331
+          },
+          {
+            "end": 20.0,
+            "filename": "scene_0001.jpg",
+            "t_mid": 15.0,
+            "start": 10.0,
+            "scene_id": 1,
+            "caption": "A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.",
+            "score": 0.5245813131332397
+          },
+          {
+            "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge of the sink.",
+            "t_mid": 35.0,
+            "filename": "scene_0003.jpg",
+            "end": 40.0,
+            "start": 30.0,
+            "scene_id": 3,
+            "score": 0.5134286880493164
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 4,
+          "planner_notes": "Focus on paw shaking immediately after movement, especially near water source."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-83b3ccc34929c842",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 4,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 3.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-86035e9632a3b8f5",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 61.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0061.0.jpg"
+      },
+      {
+        "timestamp": 62.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0062.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 19.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0019.0.jpg"
+      },
+      {
+        "timestamp": 23.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0023.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0030.0.jpg"
+      },
+      {
+        "timestamp": 34.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0034.0.jpg"
+      },
+      {
+        "timestamp": 38.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0038.0.jpg"
+      },
+      {
+        "timestamp": 41.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0041.0.jpg"
+      },
+      {
+        "timestamp": 45.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0045.0.jpg"
+      },
+      {
+        "timestamp": 49.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0049.0.jpg"
+      },
+      {
+        "timestamp": 53.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0053.0.jpg"
+      },
+      {
+        "timestamp": 57.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0057.0.jpg"
+      },
+      {
+        "timestamp": 60.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/09354c9c0dec47cf/frames_dense/t0060.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "end": 10.0,
+        "t_mid": 5.0,
+        "scene_id": 0,
+        "filename": "scene_0000.jpg",
+        "start": 0.0,
+        "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge.",
+        "score": 0.5147524476051331
+      },
+      {
+        "end": 20.0,
+        "filename": "scene_0001.jpg",
+        "t_mid": 15.0,
+        "start": 10.0,
+        "scene_id": 1,
+        "caption": "A black and white cat leans over a kitchen sink, drinking from a stream of water flowing from a faucet.",
+        "score": 0.5245813131332397
+      },
+      {
+        "caption": "A black and white cat drinks from a running faucet in a kitchen sink, with a towel draped over the edge of the sink.",
+        "t_mid": 35.0,
+        "filename": "scene_0003.jpg",
+        "end": 40.0,
+        "start": 30.0,
+        "scene_id": 3,
+        "score": 0.5134286880493164
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 4,
+      "planner_notes": "Focus on paw shaking immediately after movement, especially near water source."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "frame_count": 4,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 3.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "[t=11.0s] 黑白猫位于水槽左侧，身体朝向右侧，正对着正在流水的水龙头，其前爪可见但未明显动作。\n[t=12.0s] 猫保持相同位置，头部转向水龙头方向，前爪抬起并靠近水龙头下方水流处，似乎在试探或准备接触水流。\n[t=13.0s] 猫前爪已伸入水流中，爪子在水中晃动，水槽底部可见水花溅起。\n[t=14.0s] 猫前爪持续在水流中晃动，爪子明显在水中来回摆动，水槽底部水花更明显。",
+        "timestamps": [
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ],
+        "window": {
+          "start": 10.5,
+          "end": 14.5,
+          "center_t": 12.5
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [
+      {
+        "id": "cat",
+        "label": "黑白猫",
+        "first_seen_t": 11.0,
+        "last_seen_t": 11.0,
+        "attributes": [
+          "位于水槽中",
+          "面对水龙头"
+        ],
+        "evidence_frames": [
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ]
+      }
+    ],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "1717db63472f8bd0b66d7f11941fae0060fff295"
+}

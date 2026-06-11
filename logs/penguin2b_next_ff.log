@@ -1,0 +1,14 @@
+=== Penguin gate: penguin2b / next n=47 ===
+/home/gpus/anaconda3/envs/penguin/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:631: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/home/gpus/anaconda3/envs/penguin/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+/home/gpus/anaconda3/envs/penguin/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `20` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+  warnings.warn(
+Detected nested encoder keys in checkpoint, adding key mapping for vision_encoder
+  [free_form seed0] 10/47
+  [free_form seed0] 20/47
+  [free_form seed0] 30/47
+  [free_form seed0] 40/47
+[penguin2b/next/free_form seed0] free=0.000 method=0.000 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0
+  free_form              net_mean=+0.000 ± 0.000 (k=1)

@@ -1,0 +1,66 @@
+{
+  "schema_version": "cot_v1",
+  "video_id": "a62fd13f690cb40b",
+  "case_id": "nextgqa-3376544720-9",
+  "question": "how does the bull move\n\nCandidates:\nA) galloping\nB) turning in circle\nC) jump up\nD) spin and  up and down\nE) run in circle\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+  "shown_frames": [
+    5.0,
+    11.0,
+    16.0,
+    21.0,
+    26.0,
+    32.0,
+    37.0,
+    42.0,
+    48.0,
+    53.0,
+    58.0,
+    64.0,
+    69.0,
+    74.0,
+    79.0,
+    85.0
+  ],
+  "frame_paths": [
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0005.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0011.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0016.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0021.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0026.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0032.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0037.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0042.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0048.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0053.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0058.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0064.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0069.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0074.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0079.0.jpg",
+    "/home/gpus/mbe_data/cache/a62fd13f690cb40b/frames_dense/t0085.0.jpg"
+  ],
+  "cot": "At [FRAME:t=69.0], the mechanical bull is in a low, crouched position and begins to lift its front end while rotating. At [FRAME:t=69.0], the bull is spinning clockwise and rising, with the rider raising one arm. At [FRAME:t=69.0], the bull reaches a peak in its spin, body tilted upward, rider leaning back. At [FRAME:t=69.0], the bull is fully upright and spinning, confirming upward motion. At [FRAME:t=69.0], the bull starts descending while continuing to spin, indicating downward movement. At [FRAME:t=74.0], the bull is again crouched, completing the cycle of spinning and vertical motion. The visual sequence confirms continuous spinning and up-and-down motion.",
+  "answer": "D",
+  "gold_timestamps": [
+    72.0
+  ],
+  "gold_scenes": [
+    {
+      "start": 57.5,
+      "end": 86.5
+    }
+  ],
+  "source_traj_hash": "1af80036876be6b01dfe66acc83be1ae4437109a",
+  "validation_report": {
+    "ok": true,
+    "errors": [],
+    "frame_markers": [
+      69.0,
+      69.0,
+      69.0,
+      69.0,
+      69.0,
+      74.0
+    ]
+  }
+}

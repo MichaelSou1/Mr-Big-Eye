@@ -1,0 +1,39 @@
+=== Penguin gate: penguin8b / chartqa n=60 ===
+Detected nested encoder keys in checkpoint, adding key mapping for vision_encoder
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:06,  2.23s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:04<00:03,  1.96s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:06<00:02,  2.03s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:07<00:00,  1.61s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:07<00:00,  1.77s/it]
+/home/gpus/anaconda3/envs/penguin/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:631: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/home/gpus/anaconda3/envs/penguin/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+/home/gpus/anaconda3/envs/penguin/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `20` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+  warnings.warn(
+  [free_form seed0] 10/60
+  [free_form seed0] 20/60
+  [free_form seed0] 30/60
+  [free_form seed0] 40/60
+  [free_form seed0] 50/60
+  [free_form seed0] 60/60
+[penguin8b/chartqa/free_form seed0] free=0.800 method=0.800 net=+0.000 CI[+0.000,+0.000] gain=0 lost=0
+  free_form              net_mean=+0.000 ± 0.000 (k=1)
+  [orch_reflect_blind seed0] 10/60
+  [orch_reflect_blind seed0] 20/60
+  [orch_reflect_blind seed0] 30/60
+  [orch_reflect_blind seed0] 40/60
+  [orch_reflect_blind seed0] 50/60
+  [orch_reflect_blind seed0] 60/60
+[penguin8b/chartqa/orch_reflect_blind seed0] free=0.800 method=0.783 net=-0.017 CI[-0.100,+0.067] gain=3 lost=4
+  [orch_reflect_blind seed1] 10/60
+  [orch_reflect_blind seed1] 20/60
+  [orch_reflect_blind seed1] 30/60
+  [orch_reflect_blind seed1] 40/60
+  [orch_reflect_blind seed1] 50/60
+  [orch_reflect_blind seed1] 60/60
+[penguin8b/chartqa/orch_reflect_blind seed1] free=0.800 method=0.783 net=-0.017 CI[-0.100,+0.067] gain=3 lost=4
+  [orch_reflect_blind seed2] 10/60
+  [orch_reflect_blind seed2] 20/60
+  [orch_reflect_blind seed2] 30/60
+  [orch_reflect_blind seed2] 40/60
+  [orch_reflect_blind seed2] 50/60
+  [orch_reflect_blind seed2] 60/60
+[penguin8b/chartqa/orch_reflect_blind seed2] free=0.800 method=0.817 net=+0.017 CI[-0.050,+0.083] gain=3 lost=2
+  orch_reflect_blind     net_mean=-0.006 ± 0.019 (k=3)

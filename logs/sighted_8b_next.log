@@ -1,0 +1,9 @@
+=== variance gate: model=8b n=47 cases (EVIDENCE_IN∩CLEAN) ===
+[8b/next/orch_reflect_sighted seed0] free=0.660 method=0.723 net=+0.064 CI[-0.064,+0.191] gain=6 lost=3
+[8b/next/orch_reflect_sighted seed1] free=0.660 method=0.702 net=+0.043 CI[-0.085,+0.170] gain=5 lost=3
+[8b/next/orch_reflect_sighted seed2] free=0.660 method=0.638 net=-0.021 CI[-0.106,+0.064] gain=2 lost=3
+[8b/next/orch_reflect_sighted seed3] free=0.660 method=0.745 net=+0.085 CI[+0.000,+0.191] gain=5 lost=1
+[8b/next/orch_reflect_sighted seed4] free=0.660 method=0.787 net=+0.128 CI[+0.043,+0.234] gain=6 lost=0
+
+=== SUMMARY (NExT CLEAN∩EVIDENCE_IN) ===
+  orch_reflect_sighted   net_mean=+0.060 ± seedstd 0.055 (k=5)  verdict=within-variance  per_seed=['+0.06', '+0.04', '-0.02', '+0.09', '+0.13']

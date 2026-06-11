@@ -1,0 +1,963 @@
+{
+  "schema_version": "distill_v1",
+  "train_modality": "frames_only",
+  "case": {
+    "case_id": "nextgqa-5056964274-5",
+    "video_id": "be2e3b43165e0587",
+    "question": "what did the boy do after he drink from the green pack\n\nCandidates:\nA) said something\nB) eats the food\nC) the case on his left\nD) drink more\nE) standing still\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+    "reference_answer": "eats the food",
+    "required_keywords": [
+      "eats",
+      "food"
+    ],
+    "forbidden_keywords": [],
+    "gold_timestamps": [
+      27.45
+    ],
+    "gold_scenes": [
+      {
+        "start": 24.4,
+        "end": 30.5
+      }
+    ],
+    "question_type": "tn"
+  },
+  "run_meta": {
+    "timestamp": "2026-06-08T16:02:26",
+    "agent_vlm_backend": "local",
+    "agent_vlm": "local:Qwen3-VL-8B-Instruct@http://127.0.0.1:30002/v1",
+    "orchestrator_model": "Qwen3-30B-A3B-Instruct",
+    "orchestrator_base_url": "http://127.0.0.1:30001/v1",
+    "prompt_fingerprint": "c5ac1a812757",
+    "agent_code_version": "v22",
+    "train_modality": "frames_only"
+  },
+  "messages": [
+    {
+      "type": "human",
+      "content": "what did the boy do after he drink from the green pack\n\nCandidates:\nA) said something\nB) eats the food\nC) the case on his left\nD) drink more\nE) standing still\n\nAnswer the question and reference key frames with [FRAME:t=...] markers.",
+      "role": "user"
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Identify the action immediately after the boy drinks from the green pack using visual evidence. Classify as visual_detail with focused retrieval.  \n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "segment_focus",
+          "args": {
+            "question": "what did the boy do after he drink from the green pack",
+            "center_t": 12.5,
+            "half_window_sec": 3.0,
+            "fps": 1.0
+          },
+          "id": "chatcmpl-tool-9b92a5d0616ab6b1",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"segment_focus\", \"window\": {\"start\": 9.5, \"end\": 15.5, \"center_t\": 12.5, \"frame_count\": 6}, \"observation\": \"该窗口内看不清男孩在喝完绿色包装饮品后做了什么。所有帧都显示男孩正在通过吸管饮用绿色包装盒内的液体，未显示其停止饮用后的动作。\", \"subject_deltas\": [], \"required_next_action\": \"answer_with_evidence\", \"note_for_orchestrator\": \"This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'.\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9b92a5d0616ab6b1",
+      "name": "segment_focus",
+      "payload": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5,
+          "frame_count": 6
+        },
+        "observation": "该窗口内看不清男孩在喝完绿色包装饮品后做了什么。所有帧都显示男孩正在通过吸管饮用绿色包装盒内的液体，未显示其停止饮用后的动作。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Assess whether the current evidence is sufficient to answer the question. Classify as general with sufficient assessment.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "what did the boy do after he drink from the green pack",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused"
+          },
+          "id": "chatcmpl-tool-bdac7fbc8f0f21aa",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 6, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 5.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bdac7fbc8f0f21aa",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Expand the visual search window around the drinking moment to capture post-drinking actions. Use expand_temporal_evidence for dense frame sampling.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "expand_temporal_evidence",
+          "args": {
+            "timestamps": [
+              12.5
+            ],
+            "window_sec": 6.0,
+            "max_frames": 12
+          },
+          "id": "chatcmpl-tool-9642e0f61ba105b5",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"expand_temporal_evidence\", \"expanded_around\": [12.5], \"added_frames\": [{\"timestamp\": 7.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 8.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 9.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 10.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 11.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 12.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 13.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 14.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 15.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 16.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 17.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 18.0, \"source\": \"temporal_expand\"}], \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9642e0f61ba105b5",
+      "name": "expand_temporal_evidence",
+      "payload": {
+        "tool": "expand_temporal_evidence",
+        "expanded_around": [
+          12.5
+        ],
+        "added_frames": [
+          {
+            "timestamp": 7.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 8.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 9.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "temporal_expand"
+          }
+        ],
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Reassess evidence sufficiency after expanding the frame window. Classify as visual_detail with balanced retrieval.  \n\n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "assess_evidence_sufficiency",
+          "args": {
+            "question": "what did the boy do after he drink from the green pack",
+            "question_type": "visual_detail",
+            "retrieval_profile": "balanced"
+          },
+          "id": "chatcmpl-tool-8ad70eb151132b94",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"balanced\", \"frame_count\": 12, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 11.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8ad70eb151132b94",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "balanced",
+        "frame_count": 12,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 11.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Perform a focused visual search around the moment after drinking ends, specifically checking for actions like speaking, eating, or moving. Use retrieve_video_evidence with focused profile.  \n\n",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "retrieve_video_evidence",
+          "args": {
+            "question": "What did the boy do immediately after drinking from the green pack?",
+            "question_type": "visual_detail",
+            "retrieval_profile": "focused",
+            "top_k_frames": 10,
+            "planner_notes": "Focus on actions right after drinking ends, especially gestures or speech."
+          },
+          "id": "chatcmpl-tool-9a3b1ba26e8dccf1",
+          "type": "tool_call"
+        }
+      ]
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"retrieve_video_evidence\", \"frames\": [{\"timestamp\": 7.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 8.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 9.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 10.0, \"source\": \"segment_focus\"}, {\"timestamp\": 11.0, \"source\": \"segment_focus\"}, {\"timestamp\": 12.0, \"source\": \"segment_focus\"}, {\"timestamp\": 13.0, \"source\": \"segment_focus\"}, {\"timestamp\": 14.0, \"source\": \"segment_focus\"}, {\"timestamp\": 15.0, \"source\": \"segment_focus\"}, {\"timestamp\": 16.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 17.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 18.0, \"source\": \"temporal_expand\"}, {\"timestamp\": 19.0, \"source\": \"retrieval\"}, {\"timestamp\": 24.0, \"source\": \"retrieval\"}, {\"timestamp\": 25.0, \"source\": \"retrieval\"}, {\"timestamp\": 26.0, \"source\": \"retrieval\"}, {\"timestamp\": 27.0, \"source\": \"retrieval\"}, {\"timestamp\": 30.0, \"source\": \"retrieval\"}], \"scene_hits\": [{\"caption\": \"A child in a dark jacket with a cartoon dog patch holds a white straw inserted into a green juice box, while an adult's hand steadies the box.\", \"start\": 0.0, \"end\": 10.0, \"scene_id\": 0, \"filename\": \"scene_0000.jpg\", \"t_mid\": 5.0, \"score\": 0.4808313846588135}, {\"caption\": \"A young child in a dark jacket sips from a green juice box using a white straw, while an adult's hand holds the box steady. In the background, a stroller is parked on a paved surface.\", \"start\": 10.0, \"t_mid\": 15.0, \"end\": 20.0, \"filename\": \"scene_0001.jpg\", \"scene_id\": 1, \"score\": 0.5481865406036377}, {\"filename\": \"scene_0003.jpg\", \"end\": 30.8308, \"caption\": \"A toddler in a dark jacket holds a partially eaten sandwich, looking directly at the camera with a focused expression, while a stroller and chain-link fence are visible in the background.\", \"scene_id\": 3, \"start\": 30.0, \"t_mid\": 30.4154, \"score\": 0.44317853450775146}], \"retrieval_plan\": {\"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"top_n_scenes\": 3, \"top_k_frames\": 10, \"planner_notes\": \"Focus on actions right after drinking ends, especially gestures or speech.\"}, \"next\": \"assess_evidence_sufficiency\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9a3b1ba26e8dccf1",
+      "name": "retrieve_video_evidence",
+      "payload": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 7.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 8.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 9.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 19.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 24.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 25.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 26.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 27.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 30.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "caption": "A child in a dark jacket with a cartoon dog patch holds a white straw inserted into a green juice box, while an adult's hand steadies the box.",
+            "start": 0.0,
+            "end": 10.0,
+            "scene_id": 0,
+            "filename": "scene_0000.jpg",
+            "t_mid": 5.0,
+            "score": 0.4808313846588135
+          },
+          {
+            "caption": "A young child in a dark jacket sips from a green juice box using a white straw, while an adult's hand holds the box steady. In the background, a stroller is parked on a paved surface.",
+            "start": 10.0,
+            "t_mid": 15.0,
+            "end": 20.0,
+            "filename": "scene_0001.jpg",
+            "scene_id": 1,
+            "score": 0.5481865406036377
+          },
+          {
+            "filename": "scene_0003.jpg",
+            "end": 30.8308,
+            "caption": "A toddler in a dark jacket holds a partially eaten sandwich, looking directly at the camera with a focused expression, while a stroller and chain-link fence are visible in the background.",
+            "scene_id": 3,
+            "start": 30.0,
+            "t_mid": 30.4154,
+            "score": 0.44317853450775146
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 10,
+          "planner_notes": "Focus on actions right after drinking ends, especially gestures or speech."
+        },
+        "next": "assess_evidence_sufficiency"
+      }
+    },
+    {
+      "type": "ai",
+      "content": "PLAN: Reassess evidence sufficiency after retrieving video frames. Classify as visual_detail with focused retrieval.  \n\n\n",
+      "role": "assistant",
+      "tool_calls": []
+    },
+    {
+      "type": "tool",
+      "content": "{\"tool\": \"assess_evidence_sufficiency\", \"sufficient\": false, \"confidence\": 0.35, \"question_type\": \"visual_detail\", \"retrieval_profile\": \"focused\", \"frame_count\": 6, \"scene_count\": 0, \"text_evidence_count\": 0, \"time_span_sec\": 5.0, \"missing_evidence\": [\"No caption-level scene or text evidence has been retrieved.\"], \"recommended_next_action\": \"retrieve_video_evidence\"}",
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b6b3c3707d29935d",
+      "name": "assess_evidence_sufficiency",
+      "payload": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      }
+    }
+  ],
+  "tool_steps": [
+    {
+      "index": 2,
+      "tool_name": "segment_focus",
+      "tool_args": {
+        "question": "what did the boy do after he drink from the green pack",
+        "center_t": 12.5,
+        "half_window_sec": 3.0,
+        "fps": 1.0
+      },
+      "tool_result": {
+        "tool": "segment_focus",
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5,
+          "frame_count": 6
+        },
+        "observation": "该窗口内看不清男孩在喝完绿色包装饮品后做了什么。所有帧都显示男孩正在通过吸管饮用绿色包装盒内的液体，未显示其停止饮用后的动作。",
+        "subject_deltas": [],
+        "required_next_action": "answer_with_evidence",
+        "note_for_orchestrator": "This is an Observer sub-call's intermediate observation, NOT the final user answer. Do NOT emit the `observation` field to the user. You MUST call `answer_with_evidence` (then `verify_grounding`) before producing the final answer. For MCQ questions, the final answer MUST be in the form 'The correct answer is X) <option>'."
+      },
+      "tool_call_id": "chatcmpl-tool-9b92a5d0616ab6b1",
+      "internalizability": "type1"
+    },
+    {
+      "index": 4,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "what did the boy do after he drink from the green pack",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-bdac7fbc8f0f21aa",
+      "internalizability": "type2"
+    },
+    {
+      "index": 6,
+      "tool_name": "expand_temporal_evidence",
+      "tool_args": {
+        "timestamps": [
+          12.5
+        ],
+        "window_sec": 6.0,
+        "max_frames": 12
+      },
+      "tool_result": {
+        "tool": "expand_temporal_evidence",
+        "expanded_around": [
+          12.5
+        ],
+        "added_frames": [
+          {
+            "timestamp": 7.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 8.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 9.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "temporal_expand"
+          }
+        ],
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-9642e0f61ba105b5",
+      "internalizability": "type2"
+    },
+    {
+      "index": 8,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {
+        "question": "what did the boy do after he drink from the green pack",
+        "question_type": "visual_detail",
+        "retrieval_profile": "balanced"
+      },
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "balanced",
+        "frame_count": 12,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 11.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-8ad70eb151132b94",
+      "internalizability": "type2"
+    },
+    {
+      "index": 10,
+      "tool_name": "retrieve_video_evidence",
+      "tool_args": {
+        "question": "What did the boy do immediately after drinking from the green pack?",
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "top_k_frames": 10,
+        "planner_notes": "Focus on actions right after drinking ends, especially gestures or speech."
+      },
+      "tool_result": {
+        "tool": "retrieve_video_evidence",
+        "frames": [
+          {
+            "timestamp": 7.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 8.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 9.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 10.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 11.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 12.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 13.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 14.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 15.0,
+            "source": "segment_focus"
+          },
+          {
+            "timestamp": 16.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 17.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 18.0,
+            "source": "temporal_expand"
+          },
+          {
+            "timestamp": 19.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 24.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 25.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 26.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 27.0,
+            "source": "retrieval"
+          },
+          {
+            "timestamp": 30.0,
+            "source": "retrieval"
+          }
+        ],
+        "scene_hits": [
+          {
+            "caption": "A child in a dark jacket with a cartoon dog patch holds a white straw inserted into a green juice box, while an adult's hand steadies the box.",
+            "start": 0.0,
+            "end": 10.0,
+            "scene_id": 0,
+            "filename": "scene_0000.jpg",
+            "t_mid": 5.0,
+            "score": 0.4808313846588135
+          },
+          {
+            "caption": "A young child in a dark jacket sips from a green juice box using a white straw, while an adult's hand holds the box steady. In the background, a stroller is parked on a paved surface.",
+            "start": 10.0,
+            "t_mid": 15.0,
+            "end": 20.0,
+            "filename": "scene_0001.jpg",
+            "scene_id": 1,
+            "score": 0.5481865406036377
+          },
+          {
+            "filename": "scene_0003.jpg",
+            "end": 30.8308,
+            "caption": "A toddler in a dark jacket holds a partially eaten sandwich, looking directly at the camera with a focused expression, while a stroller and chain-link fence are visible in the background.",
+            "scene_id": 3,
+            "start": 30.0,
+            "t_mid": 30.4154,
+            "score": 0.44317853450775146
+          }
+        ],
+        "retrieval_plan": {
+          "question_type": "visual_detail",
+          "retrieval_profile": "focused",
+          "top_n_scenes": 3,
+          "top_k_frames": 10,
+          "planner_notes": "Focus on actions right after drinking ends, especially gestures or speech."
+        },
+        "next": "assess_evidence_sufficiency"
+      },
+      "tool_call_id": "chatcmpl-tool-9a3b1ba26e8dccf1",
+      "internalizability": "type2"
+    },
+    {
+      "index": 12,
+      "tool_name": "assess_evidence_sufficiency",
+      "tool_args": {},
+      "tool_result": {
+        "tool": "assess_evidence_sufficiency",
+        "sufficient": false,
+        "confidence": 0.35,
+        "question_type": "visual_detail",
+        "retrieval_profile": "focused",
+        "frame_count": 6,
+        "scene_count": 0,
+        "text_evidence_count": 0,
+        "time_span_sec": 5.0,
+        "missing_evidence": [
+          "No caption-level scene or text evidence has been retrieved."
+        ],
+        "recommended_next_action": "retrieve_video_evidence"
+      },
+      "tool_call_id": "chatcmpl-tool-b6b3c3707d29935d",
+      "internalizability": "type2"
+    }
+  ],
+  "state": {
+    "retrieved_frames": [
+      {
+        "timestamp": 7.0,
+        "source": "temporal_expand",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 8.0,
+        "source": "temporal_expand",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0008.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "temporal_expand",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 10.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0010.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 12.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0012.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 15.0,
+        "source": "segment_focus",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0015.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "temporal_expand",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 17.0,
+        "source": "temporal_expand",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0017.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "temporal_expand",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 19.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0019.0.jpg"
+      },
+      {
+        "timestamp": 24.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0024.0.jpg"
+      },
+      {
+        "timestamp": 25.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0025.0.jpg"
+      },
+      {
+        "timestamp": 26.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0026.0.jpg"
+      },
+      {
+        "timestamp": 27.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0027.0.jpg"
+      },
+      {
+        "timestamp": 30.0,
+        "source": "retrieval",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0030.0.jpg"
+      }
+    ],
+    "sampler_frames": [
+      {
+        "timestamp": 2.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0002.0.jpg"
+      },
+      {
+        "timestamp": 4.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0004.0.jpg"
+      },
+      {
+        "timestamp": 5.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0005.0.jpg"
+      },
+      {
+        "timestamp": 7.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0007.0.jpg"
+      },
+      {
+        "timestamp": 9.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0009.0.jpg"
+      },
+      {
+        "timestamp": 11.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0011.0.jpg"
+      },
+      {
+        "timestamp": 13.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0013.0.jpg"
+      },
+      {
+        "timestamp": 14.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0014.0.jpg"
+      },
+      {
+        "timestamp": 16.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0016.0.jpg"
+      },
+      {
+        "timestamp": 18.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0018.0.jpg"
+      },
+      {
+        "timestamp": 20.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0020.0.jpg"
+      },
+      {
+        "timestamp": 22.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0022.0.jpg"
+      },
+      {
+        "timestamp": 24.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0024.0.jpg"
+      },
+      {
+        "timestamp": 25.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0025.0.jpg"
+      },
+      {
+        "timestamp": 27.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0027.0.jpg"
+      },
+      {
+        "timestamp": 29.0,
+        "source": "uniform",
+        "path": "/home/gpus/mbe_data/cache/be2e3b43165e0587/frames_dense/t0029.0.jpg"
+      }
+    ],
+    "retrieved_scene_hits": [
+      {
+        "caption": "A child in a dark jacket with a cartoon dog patch holds a white straw inserted into a green juice box, while an adult's hand steadies the box.",
+        "start": 0.0,
+        "end": 10.0,
+        "scene_id": 0,
+        "filename": "scene_0000.jpg",
+        "t_mid": 5.0,
+        "score": 0.4808313846588135
+      },
+      {
+        "caption": "A young child in a dark jacket sips from a green juice box using a white straw, while an adult's hand holds the box steady. In the background, a stroller is parked on a paved surface.",
+        "start": 10.0,
+        "t_mid": 15.0,
+        "end": 20.0,
+        "filename": "scene_0001.jpg",
+        "scene_id": 1,
+        "score": 0.5481865406036377
+      },
+      {
+        "filename": "scene_0003.jpg",
+        "end": 30.8308,
+        "caption": "A toddler in a dark jacket holds a partially eaten sandwich, looking directly at the camera with a focused expression, while a stroller and chain-link fence are visible in the background.",
+        "scene_id": 3,
+        "start": 30.0,
+        "t_mid": 30.4154,
+        "score": 0.44317853450775146
+      }
+    ],
+    "retrieved_transcripts": [],
+    "retrieved_slides": [],
+    "retrieval_plan": {
+      "question_type": "visual_detail",
+      "retrieval_profile": "focused",
+      "top_n_scenes": 3,
+      "top_k_frames": 10,
+      "planner_notes": "Focus on actions right after drinking ends, especially gestures or speech."
+    },
+    "timeline": [],
+    "candidate_timeline": [],
+    "audiovisual_candidate_matrix": [],
+    "hypotheses": [],
+    "evidence_sufficiency": {
+      "sufficient": false,
+      "confidence": 0.35,
+      "question_type": "visual_detail",
+      "retrieval_profile": "balanced",
+      "frame_count": 12,
+      "scene_count": 0,
+      "text_evidence_count": 0,
+      "time_span_sec": 11.0,
+      "missing_evidence": [
+        "No caption-level scene or text evidence has been retrieved."
+      ],
+      "recommended_next_action": "retrieve_video_evidence"
+    },
+    "draft_answer": "",
+    "observer_notes": [
+      {
+        "tool": "segment_focus",
+        "observation": "该窗口内看不清男孩在喝完绿色包装饮品后做了什么。所有帧都显示男孩正在通过吸管饮用绿色包装盒内的液体，未显示其停止饮用后的动作。",
+        "timestamps": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0
+        ],
+        "window": {
+          "start": 9.5,
+          "end": 15.5,
+          "center_t": 12.5
+        }
+      }
+    ],
+    "grounding_report": {},
+    "subject_registry": [],
+    "agent_terminated": null
+  },
+  "source_traj_hash": "80806cc9610bf4b67638be37c7d6fd633d9447f2"
+}

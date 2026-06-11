@@ -1,0 +1,180 @@
+
+ _   .-')                _ .-') _     ('-.             .-')                              _ (`-.    ('-.
+( '.( OO )_             ( (  OO) )  _(  OO)           ( OO ).                           ( (OO  ) _(  OO)
+ ,--.   ,--.).-'),-----. \     .'_ (,------.,--.     (_)---\_)   .-----.  .-'),-----.  _.`     \(,------.
+ |   `.'   |( OO'  .-.  ',`'--..._) |  .---'|  |.-') /    _ |   '  .--./ ( OO'  .-.  '(__...--'' |  .---'
+ |         |/   |  | |  ||  |  \  ' |  |    |  | OO )\  :` `.   |  |('-. /   |  | |  | |  /  | | |  |
+ |  |'.'|  |\_) |  |\|  ||  |   ' |(|  '--. |  |`-' | '..`''.) /_) |OO  )\_) |  |\|  | |  |_.' |(|  '--.
+ |  |   |  |  \ |  | |  ||  |   / : |  .--'(|  '---.'.-._)   \ ||  |`-'|   \ |  | |  | |  .___.' |  .--'
+ |  |   |  |   `'  '-'  '|  '--'  / |  `---.|      | \       /(_'  '--'\    `'  '-'  ' |  |      |  `---.
+ `--'   `--'     `-----' `-------'  `------'`------'  `-----'    `-----'      `-----'  `--'      `------'
+
+Downloading Model from https://www.modelscope.cn to directory: /home/gpus/models/Penguin-Encoder
+Processing 9 items:   0%|          | 0.00/9.00 [00:00<?, ?it/s]
+Downloading [config.json]:   0%|          | 0.00/0.98k [00:00<?, ?B/s][A
+
+Downloading [configuration.json]:   0%|          | 0.00/76.0 [00:00<?, ?B/s][A[A
+
+
+Downloading [configuration_penguinvl_encoder.py]:   0%|          | 0.00/963 [00:00<?, ?B/s][A[A[A
+
+
+
+Downloading [image_processing_penguinvl.py]:   0%|          | 0.00/24.9k [00:00<?, ?B/s][A[A[A[A
+
+
+
+
+Downloading [LICENSE.txt]:   0%|          | 0.00/22.3k [00:00<?, ?B/s][A[A[A[A[A
+
+
+
+
+
+
+Downloading [modeling_penguinvl_encoder.py]:   0%|          | 0.00/23.8k [00:00<?, ?B/s][A[A[A[A[A[A[A
+
+
+
+
+
+Downloading [model.safetensors]:   0%|          | 0.00/841M [00:00<?, ?B/s][A[A[A[A[A[A
+
+
+
+
+
+
+
+Downloading [preprocessor_config.json]:   0%|          | 0.00/467 [00:00<?, ?B/s][A[A[A[A[A[A[A[A
+
+
+
+
+
+
+
+Downloading [preprocessor_config.json]: 100%|██████████| 467/467 [00:01<00:00, 460B/s][A[A[A[A[A[A[A[ADownloading [preprocessor_config.json]: 100%|██████████| 467/467 [00:01<00:00, 460B/s]
+
+
+
+
+Downloading [image_processing_penguinvl.py]:  15%|█▌        | 3.81k/24.9k [00:01<00:05, 3.78kB/s][A[A[A[A
+
+
+
+
+
+
+
+Downloading [README.md]:   0%|          | 0.00/4.26k [00:00<?, ?B/s][A[A[A[A[A[A[A[AProcessing 9 items:  11%|█         | 1.00/9.00 [00:01<00:08, 1.04s/it]Downloading [image_processing_penguinvl.py]: 100%|██████████| 24.9k/24.9k [00:01<00:00, 24.6kB/s]
+
+
+
+Downloading [configuration_penguinvl_encoder.py]: 100%|██████████| 963/963 [00:01<00:00, 786B/s][A[A[ADownloading [configuration_penguinvl_encoder.py]: 100%|██████████| 963/963 [00:01<00:00, 785B/s]
+Processing 9 items:  33%|███▎      | 3.00/9.00 [00:01<00:02, 2.93it/s]
+
+
+
+
+
+
+Downloading [modeling_penguinvl_encoder.py]:  16%|█▌        | 3.81k/23.8k [00:01<00:06, 3.19kB/s][A[A[A[A[A[A[A
+
+Downloading [configuration.json]: 100%|██████████| 76.0/76.0 [00:01<00:00, 60.6B/s][A[ADownloading [configuration.json]: 100%|██████████| 76.0/76.0 [00:01<00:00, 60.6B/s]
+
+Downloading [config.json]: 100%|██████████| 0.98k/0.98k [00:01<00:00, 779B/s][ADownloading [config.json]: 100%|██████████| 0.98k/0.98k [00:01<00:00, 779B/s]
+
+
+
+
+
+Downloading [LICENSE.txt]:  17%|█▋        | 3.81k/22.3k [00:01<00:06, 3.06kB/s][A[A[A[A[A
+
+
+
+
+
+
+Downloading [modeling_penguinvl_encoder.py]:  66%|██████▋   | 15.8k/23.8k [00:01<00:00, 14.3kB/s][A[A[A[A[A[A[A
+
+
+
+
+Downloading [LICENSE.txt]:  35%|███▌      | 7.81k/22.3k [00:01<00:02, 6.52kB/s][A[A[A[A[A
+
+
+
+
+
+
+Downloading [modeling_penguinvl_encoder.py]:  83%|████████▎ | 19.8k/23.8k [00:01<00:00, 16.5kB/s][A[A[A[A[A[A[ADownloading [modeling_penguinvl_encoder.py]: 100%|██████████| 23.8k/23.8k [00:01<00:00, 15.6kB/s]
+Processing 9 items:  67%|██████▋   | 6.00/9.00 [00:01<00:00, 4.88it/s]
+
+
+
+
+Downloading [LICENSE.txt]:  71%|███████   | 15.8k/22.3k [00:01<00:00, 9.95kB/s][A[A[A[A[A
+
+
+
+
+Downloading [LICENSE.txt]: 100%|██████████| 22.3k/22.3k [00:02<00:00, 14.2kB/s][A[A[A[A[ADownloading [LICENSE.txt]: 100%|██████████| 22.3k/22.3k [00:02<00:00, 10.4kB/s]
+Processing 9 items:  78%|███████▊  | 7.00/9.00 [00:02<00:00, 3.34it/s]
+
+
+
+
+
+
+
+Downloading [README.md]:  89%|████████▉ | 3.81k/4.26k [00:01<00:00, 3.25kB/s][A[A[A[A[A[A[A[ADownloading [README.md]: 100%|██████████| 4.26k/4.26k [00:01<00:00, 3.63kB/s]
+
+
+
+
+
+
+Downloading [model.safetensors]:   0%|          | 1.00M/841M [00:25<5:51:42, 41.8kB/s][A[A[A[A[A[A
+
+
+
+
+
+Downloading [model.safetensors]:   0%|          | 1.00M/841M [00:39<5:51:42, 41.8kB/s][A[A[A[A[A[A
+
+
+
+
+
+Downloading [model.safetensors]:   0%|          | 2.00M/841M [00:44<5:02:51, 48.4kB/s][A[A[A[A[A[A
+
+
+
+
+
+Downloading [model.safetensors]:   0%|          | 3.00M/841M [00:58<4:13:15, 57.8kB/s][A[A[A[A[A[A
+
+
+
+
+
+Downloading [model.safetensors]:   0%|          | 3.00M/841M [01:09<4:13:15, 57.8kB/s][A[A[A[A[A[A
+
+
+
+
+
+Downloading [model.safetensors]:   0%|          | 4.00M/841M [01:18<4:25:37, 55.1kB/s][A[A[A[A[A[A
+
+
+
+
+
+Downloading [model.safetensors]:   0%|          | 4.00M/841M [01:29<4:25:37, 55.1kB/s][A[A[A[A[A[A
+
+
+
+
+
+Downloading [model.safetensors]:   1%|          | 5.00M/841M [01:38<4:29:45, 54.2kB/s][A[A[A[A[A[A
