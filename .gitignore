@@ -29,3 +29,7 @@ debug_input/
 
 # large reference PDFs — keep plan.md, exclude binary papers
 paper_references/*.pdf
+
+# 32B QLoRA adapters (513M/epoch, >GitHub limit); re-create via scripts/poc_sft_32b_qlora.py
+data/distill/poc/lora_32b_chartqa/epoch_*/adapter_model.safetensors
+wandb/

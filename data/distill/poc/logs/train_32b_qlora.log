@@ -1,0 +1,187 @@
+loaded 32B in 29s
+trainable params: 134,217,728 || all params: 33,491,607,792 || trainable%: 0.4008
+train items (<= 2048 tok): 150
+eval cases: 60
+=== eval BASE (adapter disabled) ===
+BASE acc = 0.700 (42/60)
+[epoch 1] train_loss=0.3415 test_acc=0.767 gain=4 lost=0 net=+0.067  (eval 787s)
+[epoch 2] train_loss=0.1289 test_acc=0.767 gain=4 lost=0 net=+0.067  (eval 851s)
+[epoch 3] train_loss=0.0797 test_acc=0.733 gain=3 lost=1 net=+0.033  (eval 860s)
+[epoch 4] train_loss=0.0540 test_acc=0.717 gain=3 lost=2 net=+0.017  (eval 848s)
+[epoch 5] train_loss=0.0397 test_acc=0.733 gain=3 lost=1 net=+0.033  (eval 862s)
+
+=== SUMMARY ===
+base_acc=0.700
+  epoch 1: loss=0.3415 test_acc=0.767 net=+0.067 gain=4 lost=0  <-- PEAK
+  epoch 2: loss=0.1289 test_acc=0.767 net=+0.067 gain=4 lost=0
+  epoch 3: loss=0.0797 test_acc=0.733 net=+0.033 gain=3 lost=1
+  epoch 4: loss=0.0540 test_acc=0.717 net=+0.017 gain=3 lost=2
+  epoch 5: loss=0.0397 test_acc=0.733 net=+0.033 gain=3 lost=1
+SELECTED checkpoint: epoch_1 (test_acc=0.767, net=+0.067) -> data/distill/poc/lora_32b_chartqa/epoch_1
+
+wandb: Tracking run with wandb version 0.27.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /home/gpus/Mr-Big-Eye-internalization/wandb/offline-run-20260611_184325-sg2aq247
+
+Loading weights:   0%|          | 0/1058 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/1058 [00:00<10:53,  1.62it/s]
+Loading weights:   0%|          | 2/1058 [00:01<08:46,  2.00it/s]
+Loading weights:   0%|          | 4/1058 [00:01<04:03,  4.33it/s]
+Loading weights:   1%|          | 6/1058 [00:01<02:45,  6.36it/s]
+Loading weights:   1%|▏         | 15/1058 [00:01<00:52, 19.78it/s]
+Loading weights:   2%|▏         | 18/1058 [00:01<00:52, 19.75it/s]
+Loading weights:   2%|▏         | 26/1058 [00:01<00:34, 29.79it/s]
+Loading weights:   3%|▎         | 30/1058 [00:01<00:35, 28.96it/s]
+Loading weights:   3%|▎         | 37/1058 [00:02<00:29, 35.12it/s]
+Loading weights:   4%|▍         | 41/1058 [00:02<00:31, 32.25it/s]
+Loading weights:   5%|▍         | 48/1058 [00:02<00:28, 34.89it/s]
+Loading weights:   5%|▍         | 52/1058 [00:02<00:34, 29.34it/s]
+Loading weights:   6%|▌         | 59/1058 [00:02<00:31, 32.14it/s]
+Loading weights:   6%|▌         | 63/1058 [00:02<00:35, 27.95it/s]
+Loading weights:   7%|▋         | 70/1058 [00:03<00:30, 32.17it/s]
+Loading weights:   7%|▋         | 74/1058 [00:03<00:33, 29.68it/s]
+Loading weights:   8%|▊         | 81/1058 [00:03<00:28, 34.43it/s]
+Loading weights:   8%|▊         | 85/1058 [00:03<00:32, 30.21it/s]
+Loading weights:   9%|▊         | 92/1058 [00:03<00:28, 34.06it/s]
+Loading weights:   9%|▉         | 96/1058 [00:03<00:32, 30.05it/s]
+Loading weights:  10%|▉         | 103/1058 [00:04<00:28, 33.89it/s]
+Loading weights:  10%|█         | 107/1058 [00:04<00:30, 30.86it/s]
+Loading weights:  11%|█         | 114/1058 [00:04<00:27, 34.76it/s]
+Loading weights:  11%|█         | 118/1058 [00:04<00:31, 29.91it/s]
+Loading weights:  12%|█▏        | 125/1058 [00:04<00:27, 33.66it/s]
+Loading weights:  12%|█▏        | 129/1058 [00:04<00:30, 30.44it/s]
+Loading weights:  13%|█▎        | 136/1058 [00:05<00:26, 34.71it/s]
+Loading weights:  13%|█▎        | 140/1058 [00:05<00:29, 31.13it/s]
+Loading weights:  14%|█▍        | 147/1058 [00:05<00:25, 35.72it/s]
+Loading weights:  14%|█▍        | 151/1058 [00:05<00:28, 32.19it/s]
+Loading weights:  15%|█▍        | 158/1058 [00:05<00:24, 36.65it/s]
+Loading weights:  15%|█▌        | 162/1058 [00:05<00:27, 32.83it/s]
+Loading weights:  16%|█▌        | 169/1058 [00:06<00:23, 37.17it/s]
+Loading weights:  16%|█▋        | 173/1058 [00:06<00:26, 33.12it/s]
+Loading weights:  17%|█▋        | 180/1058 [00:06<00:23, 37.38it/s]
+Loading weights:  17%|█▋        | 184/1058 [00:06<00:26, 33.07it/s]
+Loading weights:  18%|█▊        | 191/1058 [00:06<00:23, 37.32it/s]
+Loading weights:  18%|█▊        | 195/1058 [00:06<00:26, 32.99it/s]
+Loading weights:  19%|█▉        | 202/1058 [00:07<00:23, 37.11it/s]
+Loading weights:  19%|█▉        | 206/1058 [00:07<00:25, 32.90it/s]
+Loading weights:  20%|██        | 213/1058 [00:07<00:22, 37.11it/s]
+Loading weights:  21%|██        | 217/1058 [00:07<00:25, 33.12it/s]
+Loading weights:  21%|██        | 224/1058 [00:07<00:22, 37.17it/s]
+Loading weights:  22%|██▏       | 228/1058 [00:07<00:25, 33.13it/s]
+Loading weights:  22%|██▏       | 235/1058 [00:07<00:21, 37.41it/s]
+Loading weights:  23%|██▎       | 239/1058 [00:08<00:24, 33.25it/s]
+Loading weights:  23%|██▎       | 246/1058 [00:08<00:22, 36.25it/s]
+Loading weights:  24%|██▎       | 250/1058 [00:08<00:24, 32.48it/s]
+Loading weights:  24%|██▍       | 257/1058 [00:08<00:21, 36.58it/s]
+Loading weights:  25%|██▍       | 261/1058 [00:08<00:24, 32.67it/s]
+Loading weights:  25%|██▌       | 268/1058 [00:08<00:21, 36.95it/s]
+Loading weights:  26%|██▌       | 272/1058 [00:09<00:23, 32.80it/s]
+Loading weights:  26%|██▋       | 279/1058 [00:09<00:20, 37.14it/s]
+Loading weights:  27%|██▋       | 283/1058 [00:09<00:23, 33.00it/s]
+Loading weights:  27%|██▋       | 290/1058 [00:09<00:20, 37.43it/s]
+Loading weights:  28%|██▊       | 294/1058 [00:09<00:22, 33.37it/s]
+Loading weights:  28%|██▊       | 301/1058 [00:09<00:20, 37.40it/s]
+Loading weights:  29%|██▉       | 305/1058 [00:10<00:22, 33.30it/s]
+Loading weights:  29%|██▉       | 312/1058 [00:10<00:19, 37.58it/s]
+Loading weights:  30%|██▉       | 316/1058 [00:10<00:22, 32.95it/s]
+Loading weights:  31%|███       | 323/1058 [00:10<00:19, 37.03it/s]
+Loading weights:  31%|███       | 327/1058 [00:10<00:22, 32.91it/s]
+Loading weights:  32%|███▏      | 334/1058 [00:10<00:19, 36.68it/s]
+Loading weights:  32%|███▏      | 338/1058 [00:10<00:22, 31.83it/s]
+Loading weights:  33%|███▎      | 345/1058 [00:11<00:20, 35.32it/s]
+Loading weights:  33%|███▎      | 349/1058 [00:11<00:22, 31.03it/s]
+Loading weights:  34%|███▎      | 356/1058 [00:11<00:20, 34.00it/s]
+Loading weights:  34%|███▍      | 360/1058 [00:11<00:23, 29.47it/s]
+Loading weights:  35%|███▍      | 367/1058 [00:11<00:20, 32.94it/s]
+Loading weights:  35%|███▌      | 371/1058 [00:12<00:23, 28.91it/s]
+Loading weights:  36%|███▌      | 378/1058 [00:12<00:21, 32.34it/s]
+Loading weights:  36%|███▌      | 382/1058 [00:12<00:23, 28.29it/s]
+Loading weights:  37%|███▋      | 389/1058 [00:12<00:20, 32.34it/s]
+Loading weights:  37%|███▋      | 393/1058 [00:12<00:22, 29.63it/s]
+Loading weights:  38%|███▊      | 400/1058 [00:12<00:19, 33.35it/s]
+Loading weights:  38%|███▊      | 404/1058 [00:13<00:22, 28.67it/s]
+Loading weights:  39%|███▉      | 411/1058 [00:13<00:20, 32.07it/s]
+Loading weights:  39%|███▉      | 415/1058 [00:13<00:22, 29.00it/s]
+Loading weights:  40%|███▉      | 422/1058 [00:13<00:19, 32.56it/s]
+Loading weights:  40%|████      | 426/1058 [00:13<00:21, 28.80it/s]
+Loading weights:  41%|████      | 433/1058 [00:14<00:19, 32.16it/s]
+Loading weights:  41%|████▏     | 437/1058 [00:14<00:21, 28.97it/s]
+Loading weights:  42%|████▏     | 444/1058 [00:14<00:18, 32.36it/s]
+Loading weights:  42%|████▏     | 448/1058 [00:14<00:21, 28.20it/s]
+Loading weights:  43%|████▎     | 455/1058 [00:14<00:19, 30.82it/s]
+Loading weights:  43%|████▎     | 459/1058 [00:14<00:22, 27.11it/s]
+Loading weights:  44%|████▍     | 466/1058 [00:15<00:19, 30.20it/s]
+Loading weights:  44%|████▍     | 470/1058 [00:15<00:21, 27.26it/s]
+Loading weights:  45%|████▌     | 477/1058 [00:15<00:18, 31.05it/s]
+Loading weights:  45%|████▌     | 481/1058 [00:15<00:20, 28.03it/s]
+Loading weights:  46%|████▌     | 488/1058 [00:15<00:17, 33.02it/s]
+Loading weights:  47%|████▋     | 492/1058 [00:16<00:19, 29.54it/s]
+Loading weights:  47%|████▋     | 499/1058 [00:16<00:17, 31.86it/s]
+Loading weights:  48%|████▊     | 503/1058 [00:16<00:19, 28.01it/s]
+Loading weights:  48%|████▊     | 510/1058 [00:16<00:17, 31.04it/s]
+Loading weights:  49%|████▊     | 514/1058 [00:16<00:19, 27.31it/s]
+Loading weights:  49%|████▉     | 521/1058 [00:16<00:17, 31.33it/s]
+Loading weights:  50%|████▉     | 525/1058 [00:17<00:19, 27.26it/s]
+Loading weights:  50%|█████     | 532/1058 [00:17<00:17, 30.48it/s]
+Loading weights:  51%|█████     | 536/1058 [00:17<00:19, 26.62it/s]
+Loading weights:  51%|█████▏    | 543/1058 [00:17<00:17, 30.24it/s]
+Loading weights:  52%|█████▏    | 547/1058 [00:17<00:18, 27.52it/s]
+Loading weights:  52%|█████▏    | 554/1058 [00:18<00:16, 30.92it/s]
+Loading weights:  53%|█████▎    | 558/1058 [00:18<00:18, 27.03it/s]
+Loading weights:  53%|█████▎    | 565/1058 [00:18<00:16, 30.60it/s]
+Loading weights:  54%|█████▍    | 569/1058 [00:18<00:17, 27.58it/s]
+Loading weights:  54%|█████▍    | 576/1058 [00:18<00:15, 31.31it/s]
+Loading weights:  55%|█████▍    | 580/1058 [00:19<00:17, 27.55it/s]
+Loading weights:  55%|█████▌    | 587/1058 [00:19<00:15, 30.59it/s]
+Loading weights:  56%|█████▌    | 591/1058 [00:19<00:17, 27.12it/s]
+Loading weights:  57%|█████▋    | 598/1058 [00:19<00:14, 30.82it/s]
+Loading weights:  57%|█████▋    | 602/1058 [00:19<00:17, 26.74it/s]
+Loading weights:  58%|█████▊    | 609/1058 [00:20<00:14, 30.64it/s]
+Loading weights:  58%|█████▊    | 613/1058 [00:20<00:16, 27.16it/s]
+Loading weights:  59%|█████▊    | 620/1058 [00:20<00:14, 30.78it/s]
+Loading weights:  59%|█████▉    | 624/1058 [00:20<00:15, 27.29it/s]
+Loading weights:  60%|█████▉    | 631/1058 [00:20<00:13, 30.57it/s]
+Loading weights:  60%|██████    | 635/1058 [00:21<00:15, 27.07it/s]
+Loading weights:  61%|██████    | 642/1058 [00:21<00:13, 30.46it/s]
+Loading weights:  61%|██████    | 646/1058 [00:21<00:15, 26.83it/s]
+Loading weights:  62%|██████▏   | 653/1058 [00:21<00:13, 30.44it/s]
+Loading weights:  62%|██████▏   | 657/1058 [00:21<00:14, 27.26it/s]
+Loading weights:  63%|██████▎   | 664/1058 [00:21<00:13, 29.58it/s]
+Loading weights:  63%|██████▎   | 667/1058 [00:22<00:16, 24.43it/s]
+Loading weights:  64%|██████▍   | 675/1058 [00:22<00:12, 29.85it/s]
+Loading weights:  64%|██████▍   | 679/1058 [00:22<00:14, 26.37it/s]
+Loading weights:  65%|██████▍   | 686/1058 [00:22<00:12, 29.73it/s]
+Loading weights:  65%|██████▌   | 690/1058 [00:22<00:13, 26.36it/s]
+Loading weights:  66%|██████▌   | 697/1058 [00:23<00:11, 30.41it/s]
+Loading weights:  66%|██████▋   | 701/1058 [00:23<00:13, 27.28it/s]
+Loading weights:  69%|██████▉   | 735/1058 [00:23<00:03, 84.18it/s]
+Loading weights:  79%|███████▊  | 831/1058 [00:23<00:00, 263.69it/s]
+Loading weights:  87%|████████▋ | 919/1058 [00:23<00:00, 401.13it/s]
+Loading weights:  96%|█████████▌| 1015/1058 [00:23<00:00, 535.69it/s]
+Loading weights: 100%|██████████| 1058/1058 [00:23<00:00, 44.32it/s] 
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+wandb: 
+wandb: Run history:
+wandb:   base_acc ▁
+wandb:       gain ██▁▁▁
+wandb:       lost ▁▁▅█▅
+wandb:        net ██▃▁▃
+wandb:   test_acc ██▃▁▃
+wandb: train_loss █▃▂▁▁
+wandb: 
+wandb: Run summary:
+wandb:      base_acc 0.7
+wandb:    best_epoch 1
+wandb:      best_net 0.06667
+wandb: best_test_acc 0.76667
+wandb:          gain 3
+wandb:          lost 1
+wandb:           net 0.03333
+wandb:      test_acc 0.73333
+wandb:    train_loss 0.03972
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /home/gpus/Mr-Big-Eye-internalization/wandb/offline-run-20260611_184325-sg2aq247
+wandb: Find logs at: ./wandb/offline-run-20260611_184325-sg2aq247/logs
+

@@ -1,0 +1,84 @@
+[0] no healthy proxy, wait 20s
+[1] no healthy proxy, wait 20s
+[2] no healthy proxy, wait 20s
+[3] http://127.0.0.1:7890 model-00013-of-00014.safetensors: 000 0 0 -> 0.00GB partial
+[3] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 0.00GB partial
+[4] no healthy proxy, wait 20s
+[5] no healthy proxy, wait 20s
+[6] http://127.0.0.1:7890 model-00013-of-00014.safetensors: 200 4875990584 21609357 -> 4.88GB OK
+[6] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 200 3270697008 21206748 -> 3.27GB partial
+[7] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 52 -> 3.27GB partial
+[8] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 55 -> 3.27GB partial
+[9] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[10] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[11] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[12] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 54 -> 3.27GB partial
+[13] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[14] no healthy proxy, wait 20s
+[15] no healthy proxy, wait 20s
+[16] no healthy proxy, wait 20s
+[17] no healthy proxy, wait 20s
+[18] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[19] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[20] no healthy proxy, wait 20s
+[21] no healthy proxy, wait 20s
+[22] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[23] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 55 -> 3.27GB partial
+[24] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[25] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 0 0 -> 3.27GB partial
+[26] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 55 -> 3.27GB partial
+[27] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[28] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[29] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[30] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[31] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 55 -> 3.27GB partial
+[32] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[33] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 55 -> 3.27GB partial
+[34] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 55 -> 3.27GB partial
+[35] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 55 -> 3.27GB partial
+[36] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[37] no healthy proxy, wait 20s
+[38] no healthy proxy, wait 20s
+[39] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[40] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 55 -> 3.27GB partial
+[41] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[42] no healthy proxy, wait 20s
+[43] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[44] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[45] no healthy proxy, wait 20s
+[46] no healthy proxy, wait 20s
+[47] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[48] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[49] no healthy proxy, wait 20s
+[50] no healthy proxy, wait 20s
+[51] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[52] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[53] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 53 -> 3.27GB partial
+[54] no healthy proxy, wait 20s
+[55] no healthy proxy, wait 20s
+[56] no healthy proxy, wait 20s
+[57] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[58] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[59] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 11 -> 3.27GB partial
+[60] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[61] no healthy proxy, wait 20s
+[62] no healthy proxy, wait 20s
+[63] no healthy proxy, wait 20s
+[64] no healthy proxy, wait 20s
+[65] no healthy proxy, wait 20s
+[66] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[67] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[68] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[69] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 000 0 0 -> 3.27GB partial
+[70] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 0 0 -> 3.27GB partial
+[71] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 44 -> 3.27GB partial
+[72] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[73] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[74] no healthy proxy, wait 20s
+[75] no healthy proxy, wait 20s
+[76] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 55 -> 3.27GB partial
+[77] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 53 -> 3.27GB partial
+[78] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 56 -> 3.27GB partial
+[79] http://127.0.0.1:7890 model-00014-of-00014.safetensors: 416 49 55 -> 3.27GB partial
+FINISHED {13: True, 14: False}
+

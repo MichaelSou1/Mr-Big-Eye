@@ -1,0 +1,44 @@
+[chat_template.json] 200 5499B 6702B/s
+[config.json] 200 1474B 2607B/s
+[generation_config.json] 200 269B 451B/s
+[merges.txt] 200 1671839B 2016652B/s
+[model-00001-of-00014.safetensors] 200 4932328944B 21210371B/s
+[model-00002-of-00014.safetensors] 200 4875990528B 21615236B/s
+[model-00003-of-00014.safetensors] 200 4875990552B 20894969B/s
+[model-00004-of-00014.safetensors] 200 4875990584B 20599062B/s
+[model-00005-of-00014.safetensors] 200 4875990584B 20546557B/s
+[model-00006-of-00014.safetensors] 200 4875990584B 21862626B/s
+[model-00007-of-00014.safetensors] 200 4875990584B 19096318B/s
+[model-00008-of-00014.safetensors] 200 4875990584B 20548955B/s
+[model-00009-of-00014.safetensors] 200 4875990584B 21256029B/s
+[model-00010-of-00014.safetensors] 200 4875990584B 21177017B/s
+[model-00011-of-00014.safetensors] 200 4875990584B 20977515B/s
+[model-00012-of-00014.safetensors] 200 4875990584B 21471507B/s
+[model-00013-of-00014.safetensors] 000 0B 0B/s
+  retry 1 for model-00013-of-00014.safetensors
+[model-00013-of-00014.safetensors] 000 0B 0B/s
+  retry 2 for model-00013-of-00014.safetensors
+[model-00013-of-00014.safetensors] 000 0B 0B/s
+  retry 3 for model-00013-of-00014.safetensors
+[model-00013-of-00014.safetensors] 000 0B 0B/s
+  retry 4 for model-00013-of-00014.safetensors
+[model-00013-of-00014.safetensors] 000 0B 0B/s
+  retry 5 for model-00013-of-00014.safetensors
+[model-00014-of-00014.safetensors] 000 0B 0B/s
+  retry 1 for model-00014-of-00014.safetensors
+[model-00014-of-00014.safetensors] 000 0B 0B/s
+  retry 2 for model-00014-of-00014.safetensors
+[model-00014-of-00014.safetensors] 000 0B 0B/s
+  retry 3 for model-00014-of-00014.safetensors
+[model-00014-of-00014.safetensors] 000 0B 0B/s
+  retry 4 for model-00014-of-00014.safetensors
+[model-00014-of-00014.safetensors] 000 0B 0B/s
+  retry 5 for model-00014-of-00014.safetensors
+[model.safetensors.index.json] 200 97831B 146495B/s
+[preprocessor_config.json] 200 390B 440B/s
+[tokenizer.json] 200 7032403B 8526160B/s
+[tokenizer_config.json] 200 10868B 18596B/s
+[video_preprocessor_config.json] 200 385B 664B/s
+ALL_DONE
+55G	/home/gpus/models/Qwen3-VL-32B-Instruct
+12

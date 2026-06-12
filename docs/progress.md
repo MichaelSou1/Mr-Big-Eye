@@ -6,10 +6,17 @@
 > [RESEARCH_SPEC_trajectory_to_cot.md](RESEARCH_SPEC_trajectory_to_cot.md)
 > (see their §15 / delta sections for the design revisions this log acts on).
 > Newest entries at the bottom of each section. Dates are absolute.
+>
+> **Document structure (two numbering schemes — read this first):** the top-level
+> `## 0–6` are *this log's own* sections (thesis & status, infra, code, the exploratory
+> Exp-0..8 sweep, decisions, open questions, repro). `## 7` is the **supplementary-spec
+> execution**; its subsections are numbered **7.1–7.16 in reading order**, each tagged with its
+> original **spec §** for cross-reference to the SPEC doc (e.g. `7.3 … (spec §1)` is the variance
+> gate). Inline "§X" references in the prose mean those spec numbers.
 
 ---
 
-## 0. Thesis (current, narrowed)
+## 0. Thesis & current status
 
 When the relevant frames are visible (short-video regime, fixed uniform sample),
 can tool-scaffolded multi-step visual reasoning be compressed into a **single
@@ -22,18 +29,32 @@ inference; (2) causal verification. Two hard constraints: (1) **self-improvement
 may be larger text-only); (2) only internalize **type-1** (single-forward-doable)
 steps. Scope: **vision-only** (frames only).
 
-**STATUS (2026-06-11): the full supplementary spec is COMPLETE — see §7.** Exp-0..8 (below)
-were the exploratory sweep; §7 turns them into a defensible, statistically-gated
-**boundary + 2-regime map**, and — updating the earlier "training never run" note —
-**the §11 SFT PoC was run and is a significant POSITIVE result** (8B ChartQA .617→.733,
-+0.117, CI excludes 0; with a causal probe). Headline: internalizing agentic/reflective
-reasoning into a small VLM has **no statistically reliable headroom** in the frames-visible
-video regime (perception/selection-bound across 4B/8B/32B + a non-Qwen InternVL3-8B; agentic
-nets within-variance, the only reliable effects *negative*); the **reasoning-bound** regime
-appears only once a strong base (32B) solves perception (static charts), where internalization
-is demonstrated to work. All variance-gate numbers regenerate from
-`data/distill/results/results.jsonl`. (Exp-0..8 and the 2026-06-08 reflection pivot are kept
-below for the record; the §1 multi-seed gate *retracted* the Exp-5 "8B +8%" as run-variance.)
+**STATUS (current, 2026-06-12).** The supplementary spec (`## 7`) is COMPLETE and turns the
+exploratory Exp-0..8 sweep into a defensible, statistically-gated **boundary + 2-regime map**.
+
+- **Headline (the boundary):** internalizing agentic/reflective reasoning into a small VLM has
+  **no statistically reliable headroom** in the frames-visible *video* regime — perception/
+  selection-bound across 4B/8B/32B and three vision-encoder paradigms (Qwen tiling-ViT,
+  InternVL3-8B fixed-res ViT, Penguin LLM-encoder). Agentic nets are within-variance; the only
+  reliable effects are *negative*. The **reasoning-bound** regime appears only once a strong base
+  (32B) solves perception (static charts).
+- **Two SFT PoCs in the reasoning-bound regime:**
+  - **§11 (8B ChartQA):** base .617 → SFT .733, **+0.117, CI [+.050,+.200] excludes 0, McNemar
+    p=.023** — a real single-forward internalization gain.
+  - **§11.4 (32B ChartQA, QLoRA — the regime-2 "pure-reasoning" target):** base .700 → peak .767,
+    net **+.067** (gain 4/lost 0) but **underpowered** (McNemar p=.125).
+- **The causal probe is the key result (§11.4):** a full 2×2 {8B,32B}×{image-present,masked} probe
+  shows the internalized gain is **perception/reading transfer, NOT a load-bearing reasoning
+  chain** — with the chart visible (real inference) corrupting a CoT intermediate ≈ shuffling it
+  (32B 2.2%≈2.2%; 8B 17%≤27%); a latent chain surfaces only when the image is masked, and the
+  *stronger* base is *more* perception-reliant (independently reproducing Lanham "bigger ⇒ less
+  faithful CoT"). So the hoped-for pure-reasoning internalization does NOT robustly materialize
+  even at 32B. Positioning vs prior work (closest = CodeV; gap = causal CoT-probe of an
+  internalized no-tool VLM) in §11.5.
+
+All variance-gate numbers regenerate from `data/distill/results/results.jsonl`. (Exp-0..8 and the
+2026-06-08 reflection pivot are kept below for the record; the §1 multi-seed gate *retracted* the
+Exp-5 "8B +8%" as run-variance.)
 
 ---
 
@@ -463,7 +484,7 @@ tables regen via `scripts/regen_tables.py`. Orchestrator = **DeepSeek API**
 **Throughput fix:** `seed_runner` got a `--concurrency` thread-pool (DeepSeek + vllm
 both serve concurrent requests) — cut orch from ~4 h/gate to ~30 min.
 
-### §0.5 label/grader floor (the floor under the floor)
+### 7.1 Label/grader floor (spec §0.5) — the floor under the floor
 - **§0.5.1 text-aware re-grade of all 9 dumps → 0 letter-luck cases** (free.L==free.T
   everywhere). The feared ~4% grader artifact does not exist here.
 - **§0.5.2 label audit (DeepSeek judge, text-only, option-separability):** NExT 50 →
@@ -471,11 +492,11 @@ both serve concurrent requests) — cut orch from ~4 h/gate to ~30 min.
   the spec's feared 10–15%. CLEAN = 47. (The old `label_audit_chartqa.json` with 48%
   "wrong-gold" is a discarded artifact of the earlier judge-sees-VLM-reading method.)
 
-### §3.0 frames-visible partition
+### 7.2 Frames-visible partition (spec §3.0)
 - All 50 NExT cases are **EVIDENCE_IN** (uniform-16 hits the GT window). CLEAN∩EVIDENCE_IN
   = **47**. `data/distill/analysis/partition_next.json`.
 
-### §1 variance gate — NExT CLEAN∩EVIDENCE_IN (n=47, K=10 seeds, paired bootstrap)
+### 7.3 Variance gate (spec §1) — NExT CLEAN∩EVIDENCE_IN (n=47, K=10 seeds, paired bootstrap)
 | model | method | free | net | 95% CI (pooled) | verdict |
 |---|---|---|---|---|---|
 | 8B | self_reflect | .660 | **+0.060** | [+0.000,+0.128] | within-variance (borderline) |
@@ -492,34 +513,25 @@ both serve concurrent requests) — cut orch from ~4 h/gate to ~30 min.
   variance is in **orch** (DeepSeek critic's stochastic sub-questions) — exactly the
   +8% retraction's source. orch churn for 8B ≈ gain 5–9 / lost 2–8 per seed.
 
-### §2 power (honest limitation)
+### 7.4 Power — honest limitation (spec §2)
 - At n=47, **minimum detectable net @80% power ≈ 25%** (4B .252, 8B .274); n=300→~10%,
   n=500→~8%. All observed |net|<9% are below detectable → "no reliable effect **but
   underpowered**." The **sign-flip across seeds** is the power-independent evidence.
   Scaling n needs the GPU-ingest fix (still blocked). `data/distill/results/power_table.json`.
 
-### §3 perception-headroom probe — 8B NExT free-wrong (n=18)
+### 7.5 Perception-headroom probe (spec §3) — 8B NExT free-wrong (n=18)
 - recovered correct: control 0 → uniform-hi 2 (11%) → GT-local-hi **4 (22%)**.
 - **78% (14/18) stay wrong even with perfect frame selection at max res** = visual
   "fundamental wall"; 22% are perception/selection-limited (type-2, non-internalizable).
   Oracle (§3.1b) will split the 78% into reasoning-bound vs fundamental.
 
-### §3.1b near-oracle perception (32B caption of GT frames → DeepSeek reasons, no 8B eyes)
+### 7.6 Near-oracle perception (spec §3.1b) — 32B caption of GT frames → DeepSeek reasons, no 8B eyes
 - 8B NExT free-wrong (n=18): **near-oracle recovers 6/18 = 33%**. Perfect perception +
   reasoning fixes only a third; 67% stay wrong (label-ambiguous / unanswerable-from-frames /
   fundamental). With the probe (22% recover via better perception), this places **NExT-8B in
   regime 1**: the residual is NOT a recoverable reasoning headroom. `oracle_perception_8b_next.json`.
 
-### §5 ChartQA full ladder (free / self_reflect / orch, multi-seed)
-| model | free | self_reflect net | orch net | verdict |
-|---|---|---|---|---|
-| 4B | .667 | +0.023 | **−0.122** | within / **effect (reliable NEGATIVE)** |
-| 8B | .617 | +0.012 | −0.028 | within / within |
-| 32B | **.800** | +0.017 | −0.044 | within / within |
-- 4B/8B = regime 1 (perception-bound: read-values failure; orch corrupts, −12% at 4B).
-  **32B = regime 2** (perception solved .80; residual = multi-step arithmetic per Exp-8).
-
-### §4 sighted-critic ablation — TWO datasets (the missing control), 8B base + 32B sighted critic
+### 7.7 Sighted-critic ablation (spec §4) — TWO datasets (the missing control), 8B base + 32B sighted critic
 | dataset | blind orch net | sighted orch net (k=5) | verdict |
 |---|---|---|---|
 | NExT | +0.009 [−0.170,+0.191] | **+0.060 ± 0.055** [−0.085,+0.191] | within-variance |
@@ -533,50 +545,16 @@ both serve concurrent requests) — cut orch from ~4 h/gate to ~30 min.
   bottleneck is perception-you-can-re-read (charts) than where it is temporal localization (video).**
   This two-dataset contrast is the clean §4 result.
 
-### §8 THE MAP (regen: `scripts/{regen_tables,build_map}.py` → `results/{tables,map}.json`)
-| dataset × model | free | best agentic net | regime |
-|---|---|---|---|
-| NExT 4B / 8B / 32B | .74 / .66 / .70 | −.045 / +.060 / +.039 (all within-var, k=10/10/6) | **1** perception/selection-bound |
-| NExT InternVL3-8B (off-Qwen) | .57 | orch **−.163** (k=3, *effect/negative*) | **1** (cross-family confirm) |
-| NExT Penguin-VL 2B / 8B (new LLM-encoder) | .53 / .43† | +.050 / +.128 (within-var, k=3) | **1** (new-encoder confirm) |
-| ChartQA 4B / 8B | .67 / .62 | +.023 / +.012 (4B orch −.122 *effect/neg*) | **1** perception-bound |
-| ChartQA Penguin-VL 2B / 8B (new LLM-encoder) | **.82 / .80** | −.078 / −.006 (within-var, k=3) | **1** (perception solved, no residual probe) |
-| **ChartQA 32B** | **.80** | +.017 | **2** reasoning-bound |
-| ChartQA 8B-SFT (§11) | **.73** | — | (R1 base, +.117 from internalization) |
-- †Penguin-8B-NExT ran at **2 frames** (16-frame dense-video tokens OOM the 20GB cards even split);
-  not directly comparable to the 16-frame .53/.66 cells — the .43 is frame-starved, and the
-  consistent-but-within-variance orch +0.128 is blind re-asking recovering a starved 2-frame read.
-- Clean 2-regime decomposition: **video is uniformly perception/selection-bound at every scale
-  AND across THREE vision-encoder paradigms (Qwen tiling-ViT 4B/8B/32B + InternVL3-8B fixed-res ViT
-  + Penguin LLM-based encoder); static charts flip to reasoning-bound only once a strong base solves
-  perception.** No agentic/reflective method reliably beats single-forward in ANY cell (all
-  within-variance); the only reliable agentic effects are *negative* (4B-ChartQA orch −12%,
-  InternVL-NExT orch −16%, Penguin-2B-ChartQA orch −8%).
-- **New result from the Penguin encoder:** the R1 *chart-perception* wall on small contrastive-encoder
-  models is an **encoder-paradigm property, not fundamental** — Penguin's LLM-based encoder lifts
-  ChartQA reading to **.82 (2B) / .80 (8B)**, matching Qwen-**32B** (.80) and ≫ Qwen-8B (.62). But the
-  *temporal-video* wall is unmoved (Penguin-2B NExT .53, still R1) — better static-OCR perception
-  doesn't buy temporal grounding.
+### 7.8 ChartQA full ladder (spec §5) — free / self_reflect / orch, multi-seed
+| model | free | self_reflect net | orch net | verdict |
+|---|---|---|---|---|
+| 4B | .667 | +0.023 | **−0.122** | within / **effect (reliable NEGATIVE)** |
+| 8B | .617 | +0.012 | −0.028 | within / within |
+| 32B | **.800** | +0.017 | −0.044 | within / within |
+- 4B/8B = regime 1 (perception-bound: read-values failure; orch corrupts, −12% at 4B).
+  **32B = regime 2** (perception solved .80; residual = multi-step arithmetic per Exp-8).
 
-### §11 PoC — RAN, and it is a statistically significant POSITIVE internalization result
-Pipeline (`scripts/poc_{gen_cot,sft,merge,eval,causal_probe}.py`): the **32B teacher** generated
-step-by-step chart-solving CoTs on ChartQA TRAIN; kept **150** whose final answer matched gold
-(consistency filter). LoRA-SFT the **bf16 8B** (peft, r=16, vision tower frozen, 2-GPU bf16,
-3 epochs, train_loss 0.30→0.17). Merge → serve → eval single-forward on the **60 held-out test**
-cases (train/test disjoint):
-- **base-8B .617 → SFT-8B .733; paired bootstrap net +0.117, 95% CI [+0.050, +0.200] (EXCLUDES 0);
-  gain 7 / lost 0; McNemar p=0.023.** Internalizing the teacher's chart-solving trajectory into a
-  single forward pass works.
-- **§11.3 causal probe (2a counterfactual, n=33 correct-with-CoT):** corrupting one numeric CoT
-  intermediate flips the answer **3%**; shuffling the CoT flips **15%**. The answer is *robust* to
-  corrupting intermediates → the gain is **perception/reading transfer, not a load-bearing internal
-  arithmetic chain** (the model re-reads the chart). Honest reading: in this perception-bound cell
-  (ChartQA-8B, R1) the SFT internalized the teacher's *reading*; the **pure-reasoning**
-  internalization the probe would light up is the **regime-2 (32B-charts) cell** — the documented
-  next target (needs bf16-32B; only AWQ-4bit is local). Either way §11 demonstrates a real,
-  significant, single-forward internalization gain with an honest mechanism characterization.
-
-### §6 cross-family (InternVL3-8B) — DONE (regime-1 reproduces off-Qwen)
+### 7.9 Cross-family: InternVL3-8B (spec §6) — regime-1 reproduces off-Qwen
 Model acquisition was the hard part: ModelScope ~360 MB/h (unusable), HF/hf-mirror lacked LFS; the
 working path was **HF-direct via the clash proxy, downloaded sequentially one shard at a time**
 (concurrent multi-shard stalls the proxy). Served TP=2 on GPU2,3 :30003, vLLM resolves
@@ -596,7 +574,7 @@ concatenate a system *string* with list-content → fold system into the user me
 - **Cross-family verdict:** the map's regime-1 finding (perception/selection-bound video; agentic
   reasoning net ≤ 0, reliably negative for orchestration) reproduces on a non-Qwen vision encoder.
 
-### §6b cross-ENCODER (Penguin-VL 2B/8B — a NEW vision-encoder paradigm) — DONE
+### 7.10 Cross-encoder: Penguin-VL 2B/8B (spec §6b) — a NEW vision-encoder paradigm
 Penguin-VL replaces the contrastive CLIP/SigLIP ViT with an **LLM-based vision encoder** (init from
 Qwen3-0.6B, bidirectional attention + 2D-RoPE) plus TRA temporal token compression — the cleanest
 test of whether the perception-bound regime is a property of the *encoder paradigm* or of the *task*.
@@ -623,7 +601,152 @@ unsliced → empty strings). GPUs per the run plan: 2B on GPU1, 8B on GPU2,3, GP
   intact** — video stays perception/selection-bound, agentic net stays ≤ 0. The boundary result is
   robust across three encoder paradigms.
 
-### Status: ALL spec sections COMPLETE (§0.5 … §11)
+### 7.11 THE MAP (spec §8) — regen: `scripts/{regen_tables,build_map}.py` → `results/{tables,map}.json`
+| dataset × model | free | best agentic net | regime |
+|---|---|---|---|
+| NExT 4B / 8B / 32B | .74 / .66 / .70 | −.045 / +.060 / +.039 (all within-var, k=10/10/6) | **1** perception/selection-bound |
+| NExT InternVL3-8B (off-Qwen) | .57 | orch **−.163** (k=3, *effect/negative*) | **1** (cross-family confirm) |
+| NExT Penguin-VL 2B / 8B (new LLM-encoder) | .53 / .43† | +.050 / +.128 (within-var, k=3) | **1** (new-encoder confirm) |
+| ChartQA 4B / 8B | .67 / .62 | +.023 / +.012 (4B orch −.122 *effect/neg*) | **1** perception-bound |
+| ChartQA Penguin-VL 2B / 8B (new LLM-encoder) | **.82 / .80** | −.078 / −.006 (within-var, k=3) | **1** (perception solved, no residual probe) |
+| **ChartQA 32B** | **.80** | +.017 | **2** reasoning-bound |
+| ChartQA 8B-SFT (§11) | **.73** | — | (R1 base, +.117 from internalization) |
+| ChartQA 32B-SFT (§11.4, QLoRA) | **.767** | — | (peak ep1, net +.067 gain4/lost0, McNemar p=.125; causal probe shows perception-transfer, NOT load-bearing reasoning) |
+- †Penguin-8B-NExT ran at **2 frames** (16-frame dense-video tokens OOM the 20GB cards even split);
+  not directly comparable to the 16-frame .53/.66 cells — the .43 is frame-starved, and the
+  consistent-but-within-variance orch +0.128 is blind re-asking recovering a starved 2-frame read.
+- Clean 2-regime decomposition: **video is uniformly perception/selection-bound at every scale
+  AND across THREE vision-encoder paradigms (Qwen tiling-ViT 4B/8B/32B + InternVL3-8B fixed-res ViT
+  + Penguin LLM-based encoder); static charts flip to reasoning-bound only once a strong base solves
+  perception.** No agentic/reflective method reliably beats single-forward in ANY cell (all
+  within-variance); the only reliable agentic effects are *negative* (4B-ChartQA orch −12%,
+  InternVL-NExT orch −16%, Penguin-2B-ChartQA orch −8%).
+- **New result from the Penguin encoder:** the R1 *chart-perception* wall on small contrastive-encoder
+  models is an **encoder-paradigm property, not fundamental** — Penguin's LLM-based encoder lifts
+  ChartQA reading to **.82 (2B) / .80 (8B)**, matching Qwen-**32B** (.80) and ≫ Qwen-8B (.62). But the
+  *temporal-video* wall is unmoved (Penguin-2B NExT .53, still R1) — better static-OCR perception
+  doesn't buy temporal grounding.
+
+### 7.12 SFT PoC: 8B ChartQA (spec §11) — a statistically significant POSITIVE internalization result
+Pipeline (`scripts/poc_{gen_cot,sft,merge,eval,causal_probe}.py`): the **32B teacher** generated
+step-by-step chart-solving CoTs on ChartQA TRAIN; kept **150** whose final answer matched gold
+(consistency filter). LoRA-SFT the **bf16 8B** (peft, r=16, vision tower frozen, 2-GPU bf16,
+3 epochs, train_loss 0.30→0.17). Merge → serve → eval single-forward on the **60 held-out test**
+cases (train/test disjoint):
+- **base-8B .617 → SFT-8B .733; paired bootstrap net +0.117, 95% CI [+0.050, +0.200] (EXCLUDES 0);
+  gain 7 / lost 0; McNemar p=0.023.** Internalizing the teacher's chart-solving trajectory into a
+  single forward pass works.
+- **§11.3 causal probe (2a counterfactual, n=33 correct-with-CoT):** corrupting one numeric CoT
+  intermediate flips the answer **3%**; shuffling the CoT flips **15%**. The answer is *robust* to
+  corrupting intermediates → the gain is **perception/reading transfer, not a load-bearing internal
+  arithmetic chain** (the model re-reads the chart). Honest reading: in this perception-bound cell
+  (ChartQA-8B, R1) the SFT internalized the teacher's *reading*; the **pure-reasoning**
+  internalization the probe would light up is the **regime-2 (32B-charts) cell** — the documented
+  next target (needs bf16-32B; only AWQ-4bit is local). Either way §11 demonstrates a real,
+  significant, single-forward internalization gain with an honest mechanism characterization.
+
+### 7.13 32B-charts internalization + causal probe (spec §11.4, 2026-06-12) — the regime-2 pure-reasoning target
+The §11.3 "documented next target" (internalize into the strong base where the residual is
+*arithmetic*, not reading, then see if the causal probe lights up) is now executed. The
+bf16-32B blocker was solved with **QLoRA** (the probe of "is the chain load-bearing?" doesn't
+need an unquantized base): downloaded bf16 Qwen3-VL-32B (HF-direct/clash, ModelScope was
+0.4 MB/s), and **NF4 4-bit base + r=16 LoRA fits 4×20 GB with headroom** (dry-run peak 10.8 G
+busiest GPU / 26.9 G total; `scripts/poc_sft_qlora_dryrun.py`). Teacher CoT = the **same 150
+consistency-filtered ChartQA-train rationales** from §11 (AWQ-32B teacher, vision-capable —
+DeepSeek is the text orchestrator, NOT the §11 teacher).
+
+**Training with per-epoch held-out eval (`scripts/poc_sft_32b_qlora.py`)** — the key method
+upgrade vs §11: eval the 60 train/test-disjoint cases EVERY epoch and select the **test-acc
+inflection**, because train_loss is monotone-meaningless for a 150-ex LoRA and the failure mode
+is overfit/memorization. The curve confirms it exactly:
+
+| epoch | train_loss | test_acc | gain | lost | net |
+|---|---|---|---|---|---|
+| base (adapter-off, same CoT prompt, NF4) | — | **.700** | — | — | — |
+| **1 (PEAK)** | .342 | **.767** | 4 | 0 | **+.067** |
+| 2 | .129 | .767 | 4 | 0 | +.067 |
+| 3 | .080 | .733 | 3 | 1 | +.033 |
+| 4 | .054 | .717 | 3 | 2 | +.017 |
+| 5 | .040 | .733 | 3 | 1 | +.033 |
+
+train_loss falls monotonically to .04 while **test-acc peaks at epoch 1–2 (.767) then declines**
+(epoch 4 .717, losses climb 0→2). A blind 3-epoch run (the original §11 recipe) would have
+picked the strictly-worse epoch_3 (+.033). Per-epoch selection is load-bearing methodology here.
+- **Peak (epoch_1): net +.067, gain 4 / lost 0** (clean, no breakage). Paired bootstrap 95% CI
+  **[+.017, +.133] excludes 0**, BUT **McNemar exact p = 0.125** (only 4 discordant pairs, all
+  one-sided). Honest reading: positive & clean but **underpowered** — the bootstrap CI is
+  optimistic at 0 losses; lead with McNemar (not significant at n=60).
+- **Magnitude caveat:** base free-form (no CoT prompt) is .80; base+CoT-prompt (adapter-off) is
+  .70 — the CoT prompt itself *costs* the untrained base ~10%. SFT .767 mostly recovers that
+  penalty; the clean ±adapter +6.7% is the correct causal isolation of the LoRA, but the SFT has
+  **not exceeded the base's best free-form .80**.
+
+**§11.4 causal probe — the decisive reasoning-vs-perception test, run on a full 2×2 of
+{8B, 32B} × {image-present, image-masked} under ONE in-process harness (`poc_causal_probe_32b.py`,
+NF4 base + adapter; n = correct-with-CoT cases). The image-masked control is the key methodological
+add — it disambiguates "CoT non-load-bearing" from "model re-reads the chart and ignores the CoT".**
+
+| base | force-continue condition | n | corrupt-flip | shuffle-flip | reading |
+|---|---|---|---|---|---|
+| **8B** | image present (real inference) | 48 | 16.7% | **27.1%** | shuffle ≥ corrupt → NOT arithmetic |
+| **8B** | image MASKED (CoT = only info) | 48 | **37.5%** | 27.1% | corrupt > shuffle → latent load-bearing |
+| **32B** | image present (real inference) | 46 | **2.2%** | 2.2% | both ≈0 → CoT IGNORED (re-reads chart) |
+| **32B** | image MASKED (CoT = only info) | 46 | **10.9%** | 6.5% | corrupt > shuffle → latent load-bearing |
+
+(This is a fresh same-harness re-measurement; the §11 8B reference numbers 3%/15% were the older
+vLLM-served-merged-bf16 path. Direction matches — shuffle ≥ corrupt with the image present.)
+
+- **Image present (= how the model is ACTUALLY used at inference): no load-bearing arithmetic at
+  EITHER scale.** 8B: shuffle (27%) ≥ corrupt (17%) — sensitive to scrambled CoT *prose* but NOT to
+  a corrupted *number*, so the answer is not riding on the arithmetic. 32B: corrupt ≈ shuffle ≈ 2% —
+  it ignores the CoT **entirely** and re-derives from the chart. **The internalized gain is
+  perception/reading transfer, not a load-bearing reasoning chain — robust across scale.**
+- **Stronger base ⇒ MORE perception-reliant / LESS faithful CoT:** the 32B (better perception)
+  bypasses the CoT far more than the 8B (corrupt-flip 2% vs 17%). This **independently reproduces
+  Lanham et al.'s "larger models produce less faithful CoT"** — here via the perceptual re-read
+  shortcut a stronger VLM can lean on.
+- **Image masked (stress test): a latent load-bearing chain exists but is weak and only surfaces
+  when the perceptual shortcut is removed** — both scales flip to corrupt > shuffle (8B 37.5%>27.1%,
+  Δ10; 32B 10.9%>6.5%, Δ4). The CoT *does* encode usable reasoning the model *can* use when forced,
+  but **does not use under normal inference**.
+- **Verdict:** even in the regime-2 cell engineered to make *arithmetic reasoning* the residual, the
+  internalized CoT is **not a load-bearing reasoning chain under real inference** — the model
+  re-reads the chart. The image-masked control is essential: without it you would both miss the
+  latent structure AND mis-read the present-condition ~0% as "no reasoning learned" (it is "reasoning
+  learned but bypassed"). **Boundary thesis, sharpened across scale: an agentic teacher's CoT
+  transfers reading, not load-bearing reasoning, into a VLM — and the stronger the base, the more it
+  bypasses the chain.**
+
+### 7.14 Related-work positioning (spec §11.5, 2026-06-12) — from two deep-research sweeps' adversarially-verified claims
+Two `deep-research` workflow runs (each ~62 min, both timed out in the Verify phase before the final
+synthesis — a background-workflow wall-clock limit, NOT a network/proxy issue: the web tools are
+server-side) yielded an adversarially-verified claim set. Synthesis below is hand-assembled from
+those verified claims (URLs captured), not a fully-automated cited report.
+
+| work | internalize→single-forward? | causal verification? | how it differs from this result |
+|---|---|---|---|
+| **CodeV** (arXiv:2511.19661v2, Mar-2026) | ✗ keeps tools at inference | ✓ causal perturbation probe | probes **tool-OUTPUT images** (Mask/Noise/Random/Empty) on V*, i.e. **perception inputs**, not CoT intermediates — closest competitor, orthogonal axis |
+| **VPD** (Visual Program Distillation) | ✓ | ✗ accuracy only (yet claims "faithful") | exactly the "faithful distillation" claim this result causally challenges |
+| **PEARL** | ✓ tool-trajectory internalization | ✗ | explicitly perception-oriented |
+| **DualDistill / STAR** | ✓ agentic/multi-teacher reasoning | ✗ | accuracy-based |
+| **Agentic-R1 / Agent0-VL / Pixel-Reasoner / DeepEyes** | ✗ tools at inference | partial | not single-forward internalization |
+| **Lanham et al.** "Measuring Faithfulness in CoT" | — (text LLMs) | ✓ corrupt/truncate CoT | foundational method; finding "bigger ⇒ less faithful" — which §11.4 reproduces in a VLM |
+
+- **The gap (apparently unoccupied as of 2026-06):** a causal **CoT-intermediate** probe
+  (corrupt-vs-shuffle, Lanham-style) of an **internalized, no-tool, single-forward VLM**, plus a
+  **perception-vs-reasoning regime boundary** and the **image-masked control** — delivering a
+  **negative/boundary** result (the distilled gain is perception-transfer, not load-bearing reasoning,
+  at every scale and regime). CodeV occupies "causal probe" but on perception inputs of a tool-using
+  agent; VPD occupies "internalization" but with no causal verification. The intersection is this work.
+
+Artifacts: `data/distill/poc/{lora_32b_chartqa/{base_eval.json,epoch_*/,train_summary.json},
+causal_probe_32b{,_maskimg}.json, causal_probe_8b_inproc.json, causal_probe_8b_maskimg.json}`;
+logs in `data/distill/poc/logs/`. Stack: `vlm_dapo` env (bnb 0.49.2 / peft 0.19.1 / tf 5.5.0); eval
+batched (left-pad, bs=8) to fill the 4-GPU pipeline (~44 s/case→~15 min/round); wandb offline
+(no-proxy net is blocked). Probe scripts/args: `poc_causal_probe_32b.py --base <8B|32B> --adapter
+<lora dir> [--mask-image]` (avoid `--n`: conda-run swallows it as `--name`).
+
+### 7.15 Status: ALL spec sections COMPLETE (§0.5 … §11.5)
 §0.5 clean labels + §3.0 frames-visible + §1 variance gate (**4B/8B 10-seed + 32B 6-seed**) + §2
 power + §3 perception probe + §3.1b oracle + **§4 sighted critic on 2 datasets** + §5 ChartQA
 ladder + **§6 cross-family InternVL + §6b cross-ENCODER Penguin-VL 2B/8B (free + 3-seed orch on
@@ -651,7 +774,7 @@ power-independent evidence behind the +8% retraction.
 probe (mechanism already established on Qwen) and the pure-reasoning §11 on bf16-32B (only AWQ-4bit
 local). Everything in SPEC §0–§11 that is runnable on this hardware has been run.
 
-### §7 reproducibility quick-ref
+### 7.16 Reproducibility quick-ref (supplementary spec)
 - Env: `conda activate mbe-ingest` (gates/SFT/eval); serving in `vllm-qwen`. Orchestrator = DeepSeek
   API (`.env` `ORCHESTRATOR_*`); localhost VLM calls bypass the clash proxy (`NO_PROXY=*`).
 - Serve: `serve_vlm_4b.sh` (:30000), 8B TP=2 (:30002), `serve_vlm_32b.sh` (:30001),
