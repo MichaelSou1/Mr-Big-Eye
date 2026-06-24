@@ -5,12 +5,20 @@ import json
 from pathlib import Path
 from typing import Any
 
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+try:
+    from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+except ModuleNotFoundError:  # langchain not installed in the upgrade env (mbe-up)
+    # The trajectory helpers below isinstance()-check these and already fall back to a
+    # message.type string, so absent classes (sentinels that match nothing) are harmless.
+    # The ChartQA/TabMWP gate harness only uses read_json/write_json from this module.
+    class _AbsentMessage:  # sentinel: isinstance(x, _AbsentMessage) is always False
+        pass
+
+    AIMessage = HumanMessage = ToolMessage = _AbsentMessage  # type: ignore[assignment,misc]
 
 from app.cache import video_cache_dir
 from app.distill import DISTILL_SCHEMA_VERSION, TRAIN_MODALITY
 from app.distill.frames import uniform_frame_manifest
-from app.preprocess import dense_frame_filename
 
 
 TEXT_EVIDENCE_TOOLS = {
@@ -75,6 +83,11 @@ def stable_hash(payload: Any) -> str:
 
 
 def dense_frame_path(video_id: str, timestamp: float) -> str:
+    # Lazy import: app.preprocess pulls the video stack (chromadb/decord/scenedetect)
+    # that the upgrade env (mbe-up) deliberately omits. Only the video-trajectory path
+    # reaches here, never the ChartQA/TabMWP gate harness.
+    from app.preprocess import dense_frame_filename
+
     name = dense_frame_filename(float(timestamp))
     path = video_cache_dir(video_id) / "frames_dense" / name
     return str(path) if path.exists() else ""

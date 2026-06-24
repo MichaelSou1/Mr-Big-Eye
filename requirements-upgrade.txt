@@ -1,0 +1,39 @@
+# Upgrade-work env (`mbe-up`) — everything WU-1..6 of todo/0622.md needs EXCEPT serving
+# (serving stays in `vllm-qwen`, untouched). torch is installed SEPARATELY with the cu124
+# index (see todo §0.1) — do NOT add it here.
+#
+# Deliberately DROPS the product/ingest stack: FlagEmbedding, chromadb, funasr, soundfile,
+# rapidocr_onnxruntime, decord, scenedetect, imageio-ffmpeg, modelscope, langgraph, langchain*,
+# langmem, trustcall, fastapi, uvicorn, aiofiles, python-multipart. The upgrade pipeline has
+# no video ingest, no agent product, and no web server. Dropping FlagEmbedding is what lets the
+# harness AND the training/probe share ONE transformers (5.5.0) in a single env — that pin is
+# why mbe-ingest and vlm_dapo used to be separate.
+
+# --- training + causal probe (LoRA/QLoRA SFT + in-process generate) ---
+transformers==5.5.0          # has Qwen3VLForConditionalGeneration (per vlm_dapo record)
+peft==0.19.1
+bitsandbytes==0.49.2         # CUDA 12.x binaries — needs the cu124 torch below
+accelerate>=1.0.0
+
+# --- harness / gates (HTTP to the served VLM) + app.config / app.vqa ---
+httpx>=0.27.0
+openai>=1.40.0               # DeepSeek orchestrator + OpenAI-compatible served-VLM calls
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# --- data build (pull ChartQA / TabMWP test splits from HF) ---
+datasets>=2.18.0
+huggingface_hub>=0.24.0
+pyarrow>=14.0.0              # parquet read for the build scripts
+
+# --- stats / tables / figures (WU-1.5 power, WU-5 figures) ---
+numpy>=1.24.0
+scipy>=1.11.0               # exact McNemar / binomtest at the scaled n
+pandas>=2.0.0
+matplotlib>=3.7.0          # WU-5 MAP heatmap + faithfulness scatter (paper has no figures yet)
+Pillow>=10.0.0
+
+# --- tests ---
+pytest>=8.0.0
+pytest-asyncio>=0.23.0

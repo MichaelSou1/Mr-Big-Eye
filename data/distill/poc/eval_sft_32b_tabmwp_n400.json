@@ -1,0 +1,30 @@
+{
+  "tag": "tabmwp_32b",
+  "base": "/home/gpus/models/Qwen3-VL-32B-Instruct",
+  "quant": "nf4",
+  "n_eval": 400,
+  "base_acc": 0.835,
+  "per_adapter": [
+    {
+      "adapter": "data/distill/poc/lora_32b_tabmwp/epoch_4",
+      "test_acc": 0.9725,
+      "base_acc": 0.835,
+      "net": 0.13750000000000007,
+      "gain": 57,
+      "lost": 2,
+      "boot_ci": [
+        0.1025,
+        0.1725
+      ],
+      "boot_net": 0.1375,
+      "mcnemar_b": 57,
+      "mcnemar_c": 2,
+      "mcnemar_p": 2.0623593774682207e-12,
+      "n": 400
+    }
+  ],
+  "best_adapter": "data/distill/poc/lora_32b_tabmwp/epoch_4",
+  "best_test_acc": 0.9725,
+  "best_net": 0.13750000000000007,
+  "best_mcnemar_p": 2.0623593774682207e-12
+}

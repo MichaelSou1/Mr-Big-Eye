@@ -40,6 +40,12 @@ NOTE = {
     ("chartqa", "32b"): "perception solved (.80); residual 12 fails = multi-step arithmetic",
     ("chartqa", "8b"): "fails on reading values/rankings (perception)",
     ("chartqa", "4b"): "fails on reading values/rankings (perception)",
+    # TabMWP (WU-3): rendered tables are highly re-readable, so table reading is solved even at
+    # small scale (free_acc high); the residual difficulty is the multi-step arithmetic word
+    # problem. -> reasoning-bound (regime 2) wherever free_acc clears the perception bar.
+    ("tabmwp", "32b"): "table reading solved; residual = multi-step arithmetic word problem",
+    ("tabmwp", "8b"): "table reading solved; residual = multi-step arithmetic word problem",
+    ("tabmwp", "4b"): "table reading solved; residual = multi-step arithmetic word problem",
     ("next", "4b"): "reads scene, misses brief/specific action; ~40% label-ambiguous",
     ("next", "8b"): "perception/temporal localization wall; oracle recovers only 1/3",
     ("clevrer", "*"): "pure perception/tracking wall (~chance all scales)",

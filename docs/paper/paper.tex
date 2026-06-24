@@ -89,6 +89,13 @@ $K$ seeds per cell ($K{=}10$ for 4B/8B NExT, 6 for 32B, 3--5 elsewhere); paired 
 \section{Result I: The Two-Regime Map}
 \label{sec:map}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/fig_map.pdf}
+\caption{\textbf{The map.} Variance-gated agentic-reasoning headroom per (dataset $\times$ model); cell colour encodes regime. Only 32B-on-ChartQA is reasoning-bound (\regimetwo{}); every other cell is perception/selection-bound (\regimeone{}). Annotations are free-form accuracy, best-agentic net and its paired-bootstrap CI. Regenerated from the result store by \texttt{scripts/build\_faithfulness\_axis.py}.}
+\label{fig:map}
+\end{figure}
+
 \begin{table}[t]
 \centering
 \footnotesize
@@ -142,6 +149,13 @@ Two methodological notes generalize. (i) Train loss is monotone-meaningless for 
 
 \section{Result III: The Causal Probe---the Gain Is Reading, Not Reasoning}
 \label{sec:probe}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_decoupling.pdf}
+\caption{\textbf{Accuracy $\perp$ faithfulness.} CoT distillation lifts ChartQA accuracy by $+6.5$--$7.0\%$ (McNemar $p\!\le\!.002$; horizontal arrows), yet the internalized CoT stays on the $F\!\approx\!0$ band ($F=\text{flip}_{\corrupt}-\text{flip}_{\shuffle}$): corrupting a numeric intermediate flips the answer no more than shuffling the CoT. A latent chain surfaces only when the image is masked (hollow markers). $F$ is measured on the base model; error bars are $95\%$ binomial CIs. Regenerated from the result store by \texttt{scripts/build\_faithfulness\_axis.py}.}
+\label{fig:decoupling}
+\end{figure}
 
 For every test case the student answers correctly with an emitted CoT, we intervene Lanham-style: \corrupt{} one numeric intermediate (a targeted hit on the arithmetic chain) vs.\ \shuffle{} the CoT sentences (a control that destroys prose coherence but no specific value), then force-continue to a final answer. If the chain is load-bearing, \corrupt-flips $\gg$ \shuffle-flips. We run the full $2{\times}2$ of $\{$8B, 32B$\} \times \{$image present = real inference, image masked = CoT is the only information$\}$ in one in-process harness (Table~\ref{tab:probe}).
 

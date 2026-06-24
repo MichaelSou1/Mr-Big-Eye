@@ -792,3 +792,22 @@ local). Everything in SPEC §0–§11 that is runnable on this hardware has been
   TP=2) → `run_chartqa_gate.py --model-id 8b_sft --seeds 0` (free_form eval) → `poc_causal_probe.py`.
 - vLLM-child orphans hold GPU memory after a server is killed — kill the `VLLM::Worker_TP` /
   `EngineCore` PIDs explicitly (not just the api_server) before re-serving.
+
+### 7.17 WU-2 faithfulness battery (upgrade, 2026-06-24) — 5 interventions + N2 re-perception
+- Extends the WU-1.4 corrupt-vs-shuffle probe into a full battery in **`scripts/battery_n400.py`**
+  (one model load, all interventions batched): corrupt, shuffle, **N2 re_perception** (snap-to-true
+  vs follow-injected, present-only, derived from corrupt), truncate@{.25,.5,.75} (early-answering),
+  delete-k@{1,2,3}, **paraphrase** (DeepSeek `orch()`, number-multiset guard + on-disk cache), filler
+  (Pfau length-matched `...`). Every flip-rate carries an accuracy-after vs gold.
+- Run: `bash scripts/run_battery_grid.sh` ({8B,32B}×{present,masked}, 8B@GPU0 ∥ 32B@GPU1-3, present→
+  masked per scale, per-scale paraphrase caches). Aggregate: `python scripts/battery_table.py` →
+  `data/distill/poc/battery_table.{md,json}` (no hand-copied numbers). Env: `mbe-up` (NOT serving —
+  probes load base+adapter in-proc via PeftModel nf4); only paraphrase hits DeepSeek (clash proxy).
+- Result (n_eval 321/318): **F=corrupt−shuffle ≤0 in all 4 cells** (32B present +.003, matches WU-1.4
+  exactly), **re-perception snap_rate .981(32B)/.816(8B)** with follow-injected ≤.031, corrupt ≈
+  paraphrase (32B .051≈.053; 8B .150<.212<shuffle .302 — corrupting a number flips no more than
+  rewording, the two-sided control), early-answering monotone. → "reading-not-
+  reasoning / CoT not load-bearing" multiply confirmed at n≥300. Full numbers + the paraphrase
+  number-fidelity caveat (69%/74%, conservative upper bound): `docs/snapshots/wu2_complete_0624.md`.
+- NB: DeepSeek balance restored (no longer 402, cf. [[deepseek-402-local-orchestrator]]); paraphrase
+  ran on DeepSeek v4-flash as planned.

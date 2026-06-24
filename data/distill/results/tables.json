@@ -4,87 +4,87 @@
       "dataset": "chartqa",
       "model_id": "32b",
       "method": "orch_reflect_blind",
-      "free_acc": 0.8,
-      "net": -0.044444444444444446,
+      "free_acc": 0.7975,
+      "net": -0.062424242424242424,
       "ci": [
-        -0.13333333333333333,
-        0.03333333333333333
+        -0.12,
+        0.016666666666666666
       ],
-      "seed_std": 0.02721655269759087,
-      "k": 6,
+      "seed_std": 0.028793938756115134,
+      "k": 11,
       "gain": 0,
-      "lost": 3,
+      "lost": 17,
       "verdict": "within-variance"
     },
     {
       "dataset": "chartqa",
       "model_id": "32b",
       "method": "self_reflect",
-      "free_acc": 0.8,
-      "net": 0.016666666666666666,
+      "free_acc": 0.7975,
+      "net": 0.012045454545454548,
       "ci": [
         -0.03333333333333333,
-        0.08333333333333333
+        0.06666666666666667
       ],
-      "seed_std": 0.010540925533894598,
-      "k": 6,
-      "gain": 1,
-      "lost": 0,
+      "seed_std": 0.009460177032960298,
+      "k": 11,
+      "gain": 3,
+      "lost": 1,
       "verdict": "within-variance"
     },
     {
       "dataset": "chartqa",
       "model_id": "4b",
       "method": "orch_reflect_blind",
-      "free_acc": 0.6666666666666666,
-      "net": -0.12166666666666666,
+      "free_acc": 0.685,
+      "net": -0.11727777777777779,
       "ci": [
-        -0.26666666666666666,
+        -0.25,
         0.0
       ],
-      "seed_std": 0.05214533346781029,
-      "k": 10,
-      "gain": 1,
-      "lost": 9,
+      "seed_std": 0.04285156489273891,
+      "k": 15,
+      "gain": 2,
+      "lost": 22,
       "verdict": "within-variance"
     },
     {
       "dataset": "chartqa",
       "model_id": "4b",
       "method": "self_reflect",
-      "free_acc": 0.6666666666666666,
-      "net": 0.023333333333333334,
+      "free_acc": 0.685,
+      "net": 0.018388888888888892,
       "ci": [
         -0.03333333333333333,
         0.08333333333333333
       ],
-      "seed_std": 0.016101529717988262,
-      "k": 10,
-      "gain": 2,
-      "lost": 0,
+      "seed_std": 0.014968441228271992,
+      "k": 15,
+      "gain": 3,
+      "lost": 1,
       "verdict": "within-variance"
     },
     {
       "dataset": "chartqa",
       "model_id": "8b",
       "method": "orch_reflect_blind",
-      "free_acc": 0.6166666666666667,
-      "net": -0.028333333333333332,
+      "free_acc": 0.7075,
+      "net": -0.049555555555555554,
       "ci": [
-        -0.15,
+        -0.13333333333333333,
         0.08333333333333333
       ],
-      "seed_std": 0.04086261232985176,
-      "k": 10,
-      "gain": 3,
-      "lost": 4,
+      "seed_std": 0.045380737936500944,
+      "k": 15,
+      "gain": 4,
+      "lost": 17,
       "verdict": "within-variance"
     },
     {
       "dataset": "chartqa",
       "model_id": "8b",
       "method": "orch_reflect_sighted",
-      "free_acc": 0.6166666666666667,
+      "free_acc": 0.7075,
       "net": 0.06999999999999999,
       "ci": [
         -0.03333333333333333,
@@ -100,16 +100,16 @@
       "dataset": "chartqa",
       "model_id": "8b",
       "method": "self_reflect",
-      "free_acc": 0.6166666666666667,
-      "net": 0.011666666666666667,
+      "free_acc": 0.7075,
+      "net": 0.0077777777777777776,
       "ci": [
-        0.0,
+        -0.01,
         0.05
       ],
-      "seed_std": 0.008050764858994131,
-      "k": 10,
-      "gain": 0,
-      "lost": 0,
+      "seed_std": 0.008658344600264604,
+      "k": 15,
+      "gain": 1,
+      "lost": 1,
       "verdict": "within-variance"
     },
     {
@@ -303,6 +303,38 @@
       "gain": 12,
       "lost": 6,
       "verdict": "within-variance"
+    },
+    {
+      "dataset": "tabmwp",
+      "model_id": "32b",
+      "method": "self_reflect",
+      "free_acc": 0.98,
+      "net": 0.0033333333333333335,
+      "ci": [
+        0.0,
+        0.01
+      ],
+      "seed_std": 0.0014433756729740645,
+      "k": 3,
+      "gain": 1,
+      "lost": 0,
+      "verdict": "within-variance"
+    },
+    {
+      "dataset": "tabmwp",
+      "model_id": "8b",
+      "method": "self_reflect",
+      "free_acc": 0.9275,
+      "net": -0.014166666666666668,
+      "ci": [
+        -0.0325,
+        -0.0025
+      ],
+      "seed_std": 0.006291528696058958,
+      "k": 3,
+      "gain": 0,
+      "lost": 6,
+      "verdict": "effect"
     }
   ],
   "retraction": [
@@ -311,10 +343,10 @@
       "model_id": "32b",
       "method": "self_reflect",
       "best_single_seed_net": 0.03333333333333333,
-      "pooled_net": 0.016666666666666666,
+      "pooled_net": 0.012045454545454548,
       "pooled_ci": [
         -0.03333333333333333,
-        0.08333333333333333
+        0.06666666666666667
       ]
     },
     {
@@ -322,7 +354,7 @@
       "model_id": "4b",
       "method": "self_reflect",
       "best_single_seed_net": 0.03333333333333333,
-      "pooled_net": 0.023333333333333334,
+      "pooled_net": 0.018388888888888892,
       "pooled_ci": [
         -0.03333333333333333,
         0.08333333333333333
@@ -333,9 +365,9 @@
       "model_id": "8b",
       "method": "orch_reflect_blind",
       "best_single_seed_net": 0.016666666666666666,
-      "pooled_net": -0.028333333333333332,
+      "pooled_net": -0.049555555555555554,
       "pooled_ci": [
-        -0.15,
+        -0.13333333333333333,
         0.08333333333333333
       ]
     },
@@ -355,9 +387,9 @@
       "model_id": "8b",
       "method": "self_reflect",
       "best_single_seed_net": 0.016666666666666666,
-      "pooled_net": 0.011666666666666667,
+      "pooled_net": 0.0077777777777777776,
       "pooled_ci": [
-        0.0,
+        -0.01,
         0.05
       ]
     },
@@ -448,20 +480,33 @@
         -0.06382978723404255,
         0.3191489361702128
       ]
+    },
+    {
+      "dataset": "tabmwp",
+      "model_id": "32b",
+      "method": "self_reflect",
+      "best_single_seed_net": 0.005,
+      "pooled_net": 0.0033333333333333335,
+      "pooled_ci": [
+        0.0,
+        0.01
+      ]
     }
   ],
   "free_acc": {
     "next/8b": 0.6595744680851063,
     "next/4b": 0.7446808510638298,
-    "chartqa/8b": 0.6166666666666667,
-    "chartqa/4b": 0.6666666666666666,
-    "chartqa/32b": 0.8,
+    "chartqa/8b": 0.7075,
+    "chartqa/4b": 0.685,
+    "chartqa/32b": 0.7975,
     "next/internvl": 0.7021276595744681,
     "next/32b": 0.7021276595744681,
     "chartqa/8b_sft": 0.7333333333333333,
     "next/penguin2b": 0.5319148936170213,
     "chartqa/penguin8b": 0.8,
     "chartqa/penguin2b": 0.8166666666666667,
-    "next/penguin8b": 0.425531914893617
+    "next/penguin8b": 0.425531914893617,
+    "tabmwp/8b": 0.9275,
+    "tabmwp/32b": 0.98
   }
 }

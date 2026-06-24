@@ -1,0 +1,58 @@
+{
+  "s00": {
+    "cls": "G3_ALIGNMENT_OFFSET",
+    "stratum": "rel·48px",
+    "unaided": "yes",
+    "note": "",
+    "aided": "yes"
+  },
+  "s01": {
+    "cls": "G3_ALIGNMENT_OFFSET",
+    "stratum": "rel·96px",
+    "unaided": "yes",
+    "note": "",
+    "aided": "yes"
+  },
+  "s02": {
+    "cls": "G3_ALIGNMENT_OFFSET",
+    "stratum": "rel·48px",
+    "unaided": "yes",
+    "note": "",
+    "aided": "yes"
+  },
+  "s03": {
+    "cls": "G3_ALIGNMENT_OFFSET",
+    "stratum": "rel·96px",
+    "unaided": "yes",
+    "note": "",
+    "aided": "yes"
+  },
+  "s04": {
+    "cls": "G3_ALIGNMENT_OFFSET",
+    "stratum": "rel·48px",
+    "unaided": "yes",
+    "note": "",
+    "aided": "yes"
+  },
+  "s05": {
+    "cls": "G3_ALIGNMENT_OFFSET",
+    "stratum": "rel·96px",
+    "unaided": "yes",
+    "note": "",
+    "aided": "yes"
+  },
+  "s06": {
+    "cls": "G3_ALIGNMENT_OFFSET",
+    "stratum": "rel·48px",
+    "unaided": "yes",
+    "note": "",
+    "aided": "yes"
+  },
+  "s07": {
+    "cls": "G3_ALIGNMENT_OFFSET",
+    "stratum": "rel·96px",
+    "unaided": "yes",
+    "note": "",
+    "aided": "yes"
+  }
+}

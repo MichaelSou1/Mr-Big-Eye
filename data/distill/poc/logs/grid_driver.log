@@ -1,0 +1,9 @@
+[32b] present start 01:30:53 gpus=1,2,3
+[8b] present start 01:30:53 gpus=0
+[8b] present done 03:53:53 rc=0
+[8b] masked start 03:53:53
+[32b] present done 05:34:23 rc=0
+[32b] masked start 05:34:23
+[8b] masked done 05:47:29 rc=0
+[32b] masked done 08:31:46 rc=0
+GRID DONE 08:31:46

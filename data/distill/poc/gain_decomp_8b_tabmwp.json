@@ -1,0 +1,25 @@
+{
+  "label": "8B TabMWP",
+  "partitions": {
+    "GAINED": {
+      "n": 40,
+      "flip": 0,
+      "flip_rate": 0.0,
+      "follow": 1,
+      "follow_rate": 0.025,
+      "follow_ci95_hi": 0.1288165948800778,
+      "snap": 40,
+      "snap_rate": 1.0
+    },
+    "RETAINED": {
+      "n": 345,
+      "flip": 13,
+      "flip_rate": 0.03768115942028986,
+      "follow": 12,
+      "follow_rate": 0.034782608695652174,
+      "follow_ci95_hi": 0.05980467243863086,
+      "snap": 334,
+      "snap_rate": 0.9681159420289855
+    }
+  }
+}

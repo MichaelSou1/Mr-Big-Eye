@@ -8,13 +8,18 @@ to the result store keyed by a config fingerprint. Tables regenerate from the st
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any, Callable
 
 from app.distill.eval_common import case_set_hash, config_fingerprint, grade_textaware
 from app.distill.eval_stats import agg_seed_nets, paired_bootstrap_net
 
-RESULTS_PATH = Path("data/distill/results/results.jsonl")
+# Default store path; overridable via MBE_RESULTS_PATH so two gate processes (e.g. a 4B run on
+# one GPU and an 8B run on another) can write to separate files concurrently without racing on
+# append (the per-case rows exceed PIPE_BUF, so concurrent appends to one file could interleave).
+# Merge the side files back into the canonical store afterwards (cat — fingerprints disambiguate).
+RESULTS_PATH = Path(os.environ.get("MBE_RESULTS_PATH", "data/distill/results/results.jsonl"))
 
 
 def append_result(row: dict[str, Any], path: Path = RESULTS_PATH) -> None:

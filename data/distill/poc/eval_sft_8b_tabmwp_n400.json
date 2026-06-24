@@ -1,0 +1,30 @@
+{
+  "tag": "tabmwp_8b",
+  "base": "/home/gpus/models/Qwen3-VL-8B-Instruct",
+  "quant": "none",
+  "n_eval": 400,
+  "base_acc": 0.865,
+  "per_adapter": [
+    {
+      "adapter": "data/distill/poc/lora_8b_tabmwp",
+      "test_acc": 0.9625,
+      "base_acc": 0.865,
+      "net": 0.09750000000000003,
+      "gain": 40,
+      "lost": 1,
+      "boot_ci": [
+        0.07,
+        0.1275
+      ],
+      "boot_net": 0.0975,
+      "mcnemar_b": 40,
+      "mcnemar_c": 1,
+      "mcnemar_p": 2.9455745330990598e-09,
+      "n": 400
+    }
+  ],
+  "best_adapter": "data/distill/poc/lora_8b_tabmwp",
+  "best_test_acc": 0.9625,
+  "best_net": 0.09750000000000003,
+  "best_mcnemar_p": 2.9455745330990598e-09
+}

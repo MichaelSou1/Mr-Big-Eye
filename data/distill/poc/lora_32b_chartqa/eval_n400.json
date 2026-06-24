@@ -1,0 +1,30 @@
+{
+  "tag": "sft32b_n400",
+  "base": "/home/gpus/models/Qwen3-VL-32B-Instruct",
+  "quant": "nf4",
+  "n_eval": 400,
+  "base_acc": 0.725,
+  "per_adapter": [
+    {
+      "adapter": "data/distill/poc/lora_32b_chartqa/epoch_1",
+      "test_acc": 0.795,
+      "base_acc": 0.725,
+      "net": 0.07000000000000006,
+      "gain": 37,
+      "lost": 9,
+      "boot_ci": [
+        0.0375,
+        0.1025
+      ],
+      "boot_net": 0.07,
+      "mcnemar_b": 37,
+      "mcnemar_c": 9,
+      "mcnemar_p": 6.864535076836442e-05,
+      "n": 400
+    }
+  ],
+  "best_adapter": "data/distill/poc/lora_32b_chartqa/epoch_1",
+  "best_test_acc": 0.795,
+  "best_net": 0.07000000000000006,
+  "best_mcnemar_p": 6.864535076836442e-05
+}

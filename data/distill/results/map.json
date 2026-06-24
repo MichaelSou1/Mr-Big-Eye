@@ -3,9 +3,9 @@
     {
       "dataset": "chartqa",
       "model_id": "32b",
-      "free_acc": 0.8,
+      "free_acc": 0.7975,
       "best_method": "self_reflect",
-      "best_net": 0.016666666666666666,
+      "best_net": 0.012045454545454548,
       "net_verdict": "within-variance",
       "perception_recovery": null,
       "oracle_recovery": null,
@@ -16,9 +16,9 @@
     {
       "dataset": "chartqa",
       "model_id": "4b",
-      "free_acc": 0.6666666666666666,
+      "free_acc": 0.685,
       "best_method": "self_reflect",
-      "best_net": 0.023333333333333334,
+      "best_net": 0.018388888888888892,
       "net_verdict": "within-variance",
       "perception_recovery": null,
       "oracle_recovery": null,
@@ -29,7 +29,7 @@
     {
       "dataset": "chartqa",
       "model_id": "8b",
-      "free_acc": 0.6166666666666667,
+      "free_acc": 0.7075,
       "best_method": "orch_reflect_sighted",
       "best_net": 0.06999999999999999,
       "net_verdict": "within-variance",
@@ -155,6 +155,32 @@
       "regime": 1,
       "rationale": "perception/selection-bound (no internalizable reasoning headroom)",
       "note": null
+    },
+    {
+      "dataset": "tabmwp",
+      "model_id": "32b",
+      "free_acc": 0.98,
+      "best_method": "self_reflect",
+      "best_net": 0.0033333333333333335,
+      "net_verdict": "within-variance",
+      "perception_recovery": null,
+      "oracle_recovery": null,
+      "regime": 2,
+      "rationale": "reasoning-bound (perception solved; residual = multi-step reasoning)",
+      "note": "table reading solved; residual = multi-step arithmetic word problem"
+    },
+    {
+      "dataset": "tabmwp",
+      "model_id": "8b",
+      "free_acc": 0.9275,
+      "best_method": "self_reflect",
+      "best_net": -0.014166666666666668,
+      "net_verdict": "effect",
+      "perception_recovery": null,
+      "oracle_recovery": null,
+      "regime": 2,
+      "rationale": "reasoning-bound (perception solved; residual = multi-step reasoning)",
+      "note": "table reading solved; residual = multi-step arithmetic word problem"
     }
   ]
 }

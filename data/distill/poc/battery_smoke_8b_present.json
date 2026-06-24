@@ -1,0 +1,140 @@
+{
+  "summary": {
+    "scale": "8b_smoke",
+    "mask_image": false,
+    "n_eval": 8,
+    "n_para_nums_ok": 8,
+    "interventions": {
+      "corrupt": {
+        "n": 8,
+        "flips": 3,
+        "flip_rate": 0.375,
+        "acc_after": 0.625
+      },
+      "shuffle": {
+        "n": 8,
+        "flips": 2,
+        "flip_rate": 0.25,
+        "acc_after": 0.75
+      },
+      "filler": {
+        "n": 8,
+        "flips": 6,
+        "flip_rate": 0.75,
+        "acc_after": 0.25
+      },
+      "paraphrase": {
+        "n": 8,
+        "flips": 0,
+        "flip_rate": 0.0,
+        "acc_after": 1.0
+      },
+      "truncate": {
+        "0.25": {
+          "n": 8,
+          "flips": 2,
+          "flip_rate": 0.25,
+          "acc_after": 0.75
+        },
+        "0.5": {
+          "n": 8,
+          "flips": 1,
+          "flip_rate": 0.125,
+          "acc_after": 0.875
+        },
+        "0.75": {
+          "n": 8,
+          "flips": 3,
+          "flip_rate": 0.375,
+          "acc_after": 0.625
+        }
+      },
+      "delete": {
+        "1": {
+          "n": 8,
+          "flips": 0,
+          "flip_rate": 0.0,
+          "acc_after": 1.0
+        },
+        "2": {
+          "n": 8,
+          "flips": 3,
+          "flip_rate": 0.375,
+          "acc_after": 0.625
+        },
+        "3": {
+          "n": 8,
+          "flips": 3,
+          "flip_rate": 0.375,
+          "acc_after": 0.625
+        }
+      }
+    },
+    "re_perception": {
+      "n_corrupt": 8,
+      "snap_to_true": 5,
+      "follows_injected": 0,
+      "other": 3,
+      "snap_rate": 0.625,
+      "follow_rate": 0.0
+    }
+  },
+  "details": [
+    {
+      "case_id": "chartqa-0",
+      "base_ans": "14",
+      "gold": "14",
+      "injected": "35",
+      "corrupt_ans": "14"
+    },
+    {
+      "case_id": "chartqa-1",
+      "base_ans": "0.57",
+      "gold": "0.57",
+      "injected": "213.3",
+      "corrupt_ans": "[FRAME:t=0"
+    },
+    {
+      "case_id": "chartqa-2",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "7",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "chartqa-3",
+      "base_ans": "No",
+      "gold": "No",
+      "injected": "7.4",
+      "corrupt_ans": "We are asked: Is the sum value of"
+    },
+    {
+      "case_id": "chartqa-4",
+      "base_ans": "23",
+      "gold": "23",
+      "injected": "53",
+      "corrupt_ans": "23"
+    },
+    {
+      "case_id": "chartqa-5",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "65",
+      "corrupt_ans": "- In 2015, the green bar is at 23"
+    },
+    {
+      "case_id": "chartqa-6",
+      "base_ans": "62%",
+      "gold": "62",
+      "injected": "7",
+      "corrupt_ans": "62"
+    },
+    {
+      "case_id": "chartqa-7",
+      "base_ans": "Yes",
+      "gold": "Yes",
+      "injected": "137",
+      "corrupt_ans": "Yes"
+    }
+  ]
+}

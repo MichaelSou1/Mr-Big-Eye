@@ -20,13 +20,24 @@ def prompt_fingerprint() -> str:
     therefore invalidates affected prediction-cache entries automatically.
     """
     from app.vqa import QA_SYSTEM_PROMPT
-    from app.graph import _orchestrator_prompt
+    try:
+        from app.graph import _orchestrator_prompt
+
+        orch_video = _orchestrator_prompt(has_video=True)
+        orch_novideo = _orchestrator_prompt(has_video=False)
+    except Exception:
+        # The video-agent orchestrator (app.graph) drags in the langgraph/langchain stack,
+        # which the upgrade env (mbe-up) deliberately omits. The ChartQA/probe harness uses
+        # the DeepSeek critic in app.distill.methods, not this graph, so its prompt is not
+        # part of those runs — fall back to a stable placeholder so the fingerprint stays
+        # deterministic without that stack (product env keeps the original hash).
+        orch_video = orch_novideo = "<orchestrator-prompt-unavailable>"
 
     payload = "\x1e".join(
         [
             QA_SYSTEM_PROMPT,
-            _orchestrator_prompt(has_video=True),
-            _orchestrator_prompt(has_video=False),
+            orch_video,
+            orch_novideo,
             AGENT_CODE_VERSION,
         ]
     )

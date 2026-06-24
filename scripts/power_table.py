@@ -20,16 +20,18 @@ from app.distill.seed_runner import load_results
 
 
 def free_acc_for(rows, model_id, dataset):
-    accs = [r["free_acc"] for r in rows
+    """free_form baseline accuracy + n for a cell, at the LARGEST available n.
+
+    The WU-1 scaled (n=400) runs share (model_id, dataset) keys with the original n=60 runs,
+    so we report the highest-n run per cell — the post-upgrade power numbers — averaging
+    free_acc only over the free_form rows at that n (more than one if a seed was re-run)."""
+    free = [r for r in rows
             if r["model_id"] == model_id and r["dataset"] == dataset and r["method"] == "free_form"]
-    return (sum(accs) / len(accs), rows_n(rows, model_id, dataset)) if accs else (None, None)
-
-
-def rows_n(rows, model_id, dataset):
-    for r in rows:
-        if r["model_id"] == model_id and r["dataset"] == dataset:
-            return r["n"]
-    return None
+    if not free:
+        return (None, None)
+    n_max = max(r["n"] for r in free)
+    accs = [r["free_acc"] for r in free if r["n"] == n_max]
+    return (sum(accs) / len(accs), n_max)
 
 
 def main() -> int:

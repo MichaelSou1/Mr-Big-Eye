@@ -58,3 +58,33 @@
 58/60 chartqa-57 SKIP (wrong/no-cot) n_eval=46 elapsed=1948s
 59/60 chartqa-58 corrupt_flip=False shuffle_flip=False n_eval=47 corrupt=18 shuffle=12 elapsed=1974s
 60/60 chartqa-59 corrupt_flip=False shuffle_flip=True n_eval=48 corrupt=18 shuffle=13 elapsed=2005s
+1/6 chartqa-0 corrupt_flip=False shuffle_flip=False n_eval=1 corrupt=0 shuffle=0 elapsed=33s
+2/6 chartqa-1 corrupt_flip=True shuffle_flip=True n_eval=2 corrupt=1 shuffle=1 elapsed=69s
+3/6 chartqa-2 corrupt_flip=False shuffle_flip=False n_eval=3 corrupt=1 shuffle=1 elapsed=78s
+4/6 chartqa-3 corrupt_flip=False shuffle_flip=True n_eval=4 corrupt=1 shuffle=2 elapsed=107s
+5/6 chartqa-4 corrupt_flip=False shuffle_flip=True n_eval=5 corrupt=1 shuffle=3 elapsed=148s
+6/6 chartqa-5 corrupt_flip=False shuffle_flip=False n_eval=6 corrupt=1 shuffle=3 elapsed=165s
+1/24 chartqa-0 corrupt_flip=False shuffle_flip=False n_eval=1 corrupt=0 shuffle=0 elapsed=32s
+2/24 chartqa-1 corrupt_flip=True shuffle_flip=True n_eval=2 corrupt=1 shuffle=1 elapsed=67s
+3/24 chartqa-2 corrupt_flip=False shuffle_flip=False n_eval=3 corrupt=1 shuffle=1 elapsed=76s
+4/24 chartqa-3 corrupt_flip=False shuffle_flip=True n_eval=4 corrupt=1 shuffle=2 elapsed=105s
+5/24 chartqa-4 corrupt_flip=False shuffle_flip=True n_eval=5 corrupt=1 shuffle=3 elapsed=145s
+6/24 chartqa-5 corrupt_flip=False shuffle_flip=False n_eval=6 corrupt=1 shuffle=3 elapsed=163s
+7/24 chartqa-6 corrupt_flip=False shuffle_flip=False n_eval=7 corrupt=1 shuffle=3 elapsed=181s
+8/24 chartqa-7 corrupt_flip=False shuffle_flip=False n_eval=8 corrupt=1 shuffle=3 elapsed=205s
+9/24 chartqa-8 corrupt_flip=False shuffle_flip=True n_eval=9 corrupt=1 shuffle=4 elapsed=247s
+10/24 chartqa-9 SKIP (wrong/no-cot) n_eval=9 elapsed=260s
+11/24 chartqa-10 corrupt_flip=False shuffle_flip=False n_eval=10 corrupt=1 shuffle=4 elapsed=275s
+12/24 chartqa-11 corrupt_flip=False shuffle_flip=True n_eval=11 corrupt=1 shuffle=5 elapsed=297s
+13/24 chartqa-12 corrupt_flip=False shuffle_flip=False n_eval=12 corrupt=1 shuffle=5 elapsed=334s
+14/24 chartqa-13 corrupt_flip=True shuffle_flip=True n_eval=13 corrupt=2 shuffle=6 elapsed=381s
+15/24 chartqa-14 corrupt_flip=True shuffle_flip=False n_eval=14 corrupt=3 shuffle=6 elapsed=404s
+16/24 chartqa-15 corrupt_flip=False shuffle_flip=False n_eval=15 corrupt=3 shuffle=6 elapsed=431s
+17/24 chartqa-16 corrupt_flip=False shuffle_flip=False n_eval=16 corrupt=3 shuffle=6 elapsed=480s
+18/24 chartqa-17 corrupt_flip=True shuffle_flip=True n_eval=17 corrupt=4 shuffle=7 elapsed=545s
+19/24 chartqa-18 corrupt_flip=True shuffle_flip=True n_eval=18 corrupt=5 shuffle=8 elapsed=590s
+20/24 chartqa-19 corrupt_flip=False shuffle_flip=True n_eval=19 corrupt=5 shuffle=9 elapsed=641s
+21/24 chartqa-20 SKIP (wrong/no-cot) n_eval=19 elapsed=675s
+22/24 chartqa-21 corrupt_flip=False shuffle_flip=False n_eval=20 corrupt=5 shuffle=9 elapsed=733s
+23/24 chartqa-22 SKIP (wrong/no-cot) n_eval=20 elapsed=778s
+24/24 chartqa-23 SKIP (wrong/no-cot) n_eval=20 elapsed=803s

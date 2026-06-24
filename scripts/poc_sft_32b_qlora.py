@@ -164,8 +164,9 @@ def main() -> int:
     eval_cases = []
     for r in test_rows:
         cid = r.get("case_id", "")
-        idx = cid.split("-")[-1]
-        img_p = Path(args.test_img_dir) / f"chartqa_{idx}.png"
+        idx = cid.rsplit("-", 1)[-1]
+        prefix = cid.rsplit("-", 1)[0] or "chartqa"
+        img_p = Path(args.test_img_dir) / f"{prefix}_{idx}.png"
         if not img_p.exists():
             continue
         eval_cases.append({"cid": cid, "question": str(r.get("question") or ""),

@@ -1,0 +1,308 @@
+{
+  "8b_present": {
+    "scale": "8b",
+    "mask_image": false,
+    "n_eval": 321,
+    "n_para_nums_ok": 223,
+    "interventions": {
+      "corrupt": {
+        "n": 321,
+        "flips": 68,
+        "flip_rate": 0.2118380062305296,
+        "acc_after": 0.8161993769470405
+      },
+      "shuffle": {
+        "n": 321,
+        "flips": 97,
+        "flip_rate": 0.30218068535825543,
+        "acc_after": 0.735202492211838
+      },
+      "filler": {
+        "n": 321,
+        "flips": 186,
+        "flip_rate": 0.5794392523364486,
+        "acc_after": 0.4485981308411215
+      },
+      "paraphrase": {
+        "n": 321,
+        "flips": 48,
+        "flip_rate": 0.14953271028037382,
+        "acc_after": 0.8847352024922118
+      },
+      "truncate": {
+        "0.25": {
+          "n": 320,
+          "flips": 134,
+          "flip_rate": 0.41875,
+          "acc_after": 0.615625
+        },
+        "0.5": {
+          "n": 320,
+          "flips": 98,
+          "flip_rate": 0.30625,
+          "acc_after": 0.725
+        },
+        "0.75": {
+          "n": 312,
+          "flips": 57,
+          "flip_rate": 0.18269230769230768,
+          "acc_after": 0.8397435897435898
+        }
+      },
+      "delete": {
+        "1": {
+          "n": 320,
+          "flips": 43,
+          "flip_rate": 0.134375,
+          "acc_after": 0.90625
+        },
+        "2": {
+          "n": 318,
+          "flips": 54,
+          "flip_rate": 0.16981132075471697,
+          "acc_after": 0.8742138364779874
+        },
+        "3": {
+          "n": 312,
+          "flips": 69,
+          "flip_rate": 0.22115384615384615,
+          "acc_after": 0.8173076923076923
+        }
+      }
+    },
+    "re_perception": {
+      "n_corrupt": 321,
+      "snap_to_true": 262,
+      "follows_injected": 10,
+      "other": 49,
+      "snap_rate": 0.8161993769470405,
+      "follow_rate": 0.03115264797507788
+    }
+  },
+  "8b_masked": {
+    "scale": "8b",
+    "mask_image": true,
+    "n_eval": 321,
+    "n_para_nums_ok": 223,
+    "interventions": {
+      "corrupt": {
+        "n": 321,
+        "flips": 107,
+        "flip_rate": 0.3333333333333333,
+        "acc_after": 0.7102803738317757
+      },
+      "shuffle": {
+        "n": 321,
+        "flips": 131,
+        "flip_rate": 0.40809968847352024,
+        "acc_after": 0.632398753894081
+      },
+      "filler": {
+        "n": 321,
+        "flips": 305,
+        "flip_rate": 0.9501557632398754,
+        "acc_after": 0.06230529595015576
+      },
+      "paraphrase": {
+        "n": 321,
+        "flips": 58,
+        "flip_rate": 0.1806853582554517,
+        "acc_after": 0.8785046728971962
+      },
+      "truncate": {
+        "0.25": {
+          "n": 320,
+          "flips": 224,
+          "flip_rate": 0.7,
+          "acc_after": 0.3375
+        },
+        "0.5": {
+          "n": 320,
+          "flips": 154,
+          "flip_rate": 0.48125,
+          "acc_after": 0.565625
+        },
+        "0.75": {
+          "n": 312,
+          "flips": 87,
+          "flip_rate": 0.27884615384615385,
+          "acc_after": 0.7724358974358975
+        }
+      },
+      "delete": {
+        "1": {
+          "n": 320,
+          "flips": 58,
+          "flip_rate": 0.18125,
+          "acc_after": 0.875
+        },
+        "2": {
+          "n": 318,
+          "flips": 79,
+          "flip_rate": 0.24842767295597484,
+          "acc_after": 0.8144654088050315
+        },
+        "3": {
+          "n": 312,
+          "flips": 140,
+          "flip_rate": 0.44871794871794873,
+          "acc_after": 0.6153846153846154
+        }
+      }
+    },
+    "re_perception": null
+  },
+  "32b_present": {
+    "scale": "32b",
+    "mask_image": false,
+    "n_eval": 318,
+    "n_para_nums_ok": 234,
+    "interventions": {
+      "corrupt": {
+        "n": 316,
+        "flips": 16,
+        "flip_rate": 0.05063291139240506,
+        "acc_after": 0.9810126582278481
+      },
+      "shuffle": {
+        "n": 318,
+        "flips": 15,
+        "flip_rate": 0.04716981132075472,
+        "acc_after": 0.9874213836477987
+      },
+      "filler": {
+        "n": 318,
+        "flips": 115,
+        "flip_rate": 0.36163522012578614,
+        "acc_after": 0.6792452830188679
+      },
+      "paraphrase": {
+        "n": 318,
+        "flips": 17,
+        "flip_rate": 0.05345911949685535,
+        "acc_after": 0.9685534591194969
+      },
+      "truncate": {
+        "0.25": {
+          "n": 317,
+          "flips": 84,
+          "flip_rate": 0.26498422712933756,
+          "acc_after": 0.7823343848580442
+        },
+        "0.5": {
+          "n": 317,
+          "flips": 54,
+          "flip_rate": 0.17034700315457413,
+          "acc_after": 0.8643533123028391
+        },
+        "0.75": {
+          "n": 311,
+          "flips": 19,
+          "flip_rate": 0.06109324758842444,
+          "acc_after": 0.9742765273311897
+        }
+      },
+      "delete": {
+        "1": {
+          "n": 317,
+          "flips": 11,
+          "flip_rate": 0.03470031545741325,
+          "acc_after": 0.9936908517350158
+        },
+        "2": {
+          "n": 315,
+          "flips": 15,
+          "flip_rate": 0.047619047619047616,
+          "acc_after": 0.9809523809523809
+        },
+        "3": {
+          "n": 311,
+          "flips": 23,
+          "flip_rate": 0.07395498392282958,
+          "acc_after": 0.9646302250803859
+        }
+      }
+    },
+    "re_perception": {
+      "n_corrupt": 316,
+      "snap_to_true": 310,
+      "follows_injected": 5,
+      "other": 1,
+      "snap_rate": 0.9810126582278481,
+      "follow_rate": 0.015822784810126583
+    }
+  },
+  "32b_masked": {
+    "scale": "32b",
+    "mask_image": true,
+    "n_eval": 318,
+    "n_para_nums_ok": 234,
+    "interventions": {
+      "corrupt": {
+        "n": 316,
+        "flips": 38,
+        "flip_rate": 0.12025316455696203,
+        "acc_after": 0.9082278481012658
+      },
+      "shuffle": {
+        "n": 318,
+        "flips": 41,
+        "flip_rate": 0.1289308176100629,
+        "acc_after": 0.9025157232704403
+      },
+      "filler": {
+        "n": 318,
+        "flips": 306,
+        "flip_rate": 0.9622641509433962,
+        "acc_after": 0.03773584905660377
+      },
+      "paraphrase": {
+        "n": 318,
+        "flips": 19,
+        "flip_rate": 0.059748427672955975,
+        "acc_after": 0.9654088050314465
+      },
+      "truncate": {
+        "0.25": {
+          "n": 317,
+          "flips": 193,
+          "flip_rate": 0.6088328075709779,
+          "acc_after": 0.42586750788643535
+        },
+        "0.5": {
+          "n": 317,
+          "flips": 83,
+          "flip_rate": 0.2618296529968454,
+          "acc_after": 0.7697160883280757
+        },
+        "0.75": {
+          "n": 311,
+          "flips": 19,
+          "flip_rate": 0.06109324758842444,
+          "acc_after": 0.9678456591639871
+        }
+      },
+      "delete": {
+        "1": {
+          "n": 317,
+          "flips": 14,
+          "flip_rate": 0.04416403785488959,
+          "acc_after": 0.9842271293375394
+        },
+        "2": {
+          "n": 315,
+          "flips": 20,
+          "flip_rate": 0.06349206349206349,
+          "acc_after": 0.9650793650793651
+        },
+        "3": {
+          "n": 311,
+          "flips": 78,
+          "flip_rate": 0.2508038585209003,
+          "acc_after": 0.7942122186495176
+        }
+      }
+    },
+    "re_perception": null
+  }
+}

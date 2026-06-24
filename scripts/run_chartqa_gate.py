@@ -31,15 +31,17 @@ from app.distill.seed_runner import run_method_over_seeds
 
 
 def load_cases(dump_path, img_dir, keep_ids):
-    """Each dump row: {case_id 'chartqa-N', question, gold}. Image = <img_dir>/chartqa_N.png."""
+    """Each dump row: {case_id '<tag>-N', question, gold}. Image = <img_dir>/<tag>_N.png
+    (prefix derived from the case_id, so chartqa-N -> chartqa_N.png and tabmwp-N -> tabmwp_N.png)."""
     rows = [json.loads(l) for l in open(dump_path) if l.strip()]
     cases = []
     for r in rows:
         cid = r.get("case_id", "")
         if keep_ids is not None and cid not in keep_ids:
             continue
-        idx = cid.split("-")[-1]
-        img = Path(img_dir) / f"chartqa_{idx}.png"
+        idx = cid.rsplit("-", 1)[-1]
+        prefix = cid.rsplit("-", 1)[0] or "chartqa"
+        img = Path(img_dir) / f"{prefix}_{idx}.png"
         if not img.exists():
             continue
         cases.append({"case_id": cid, "question": str(r.get("question") or ""),
@@ -52,6 +54,8 @@ def main() -> int:
     load_dotenv()
     ap = argparse.ArgumentParser()
     ap.add_argument("--model-id", required=True)
+    ap.add_argument("--dataset", default="chartqa",
+                    help="dataset tag written to the result store (chartqa | tabmwp)")
     ap.add_argument("--dump", default="data/distill/analysis/dump_8b_chartqa.jsonl",
                     help="source of cases (question+gold); image resolved from img-dir")
     ap.add_argument("--img-dir", default="/home/gpus/mbe_data/chartqa_images")
@@ -70,7 +74,7 @@ def main() -> int:
     if args.clean and Path(args.clean).exists():
         keep = set(json.load(open(args.clean))["clean_ids"])
     cases = load_cases(args.dump, args.img_dir, keep)
-    print(f"=== ChartQA gate: model={args.model_id} n={len(cases)} cases"
+    print(f"=== {args.dataset} gate: model={args.model_id} n={len(cases)} cases"
           f"{' (CLEAN)' if args.clean else ''} ===", flush=True)
 
     def wrap(name):
@@ -81,16 +85,16 @@ def main() -> int:
 
     decode = {"temperature": 0.7, "top_p": 1.0, "max_tokens": 512}
     if not args.no_free_form:
-        run_method_over_seeds(dataset="chartqa", model_id=args.model_id, method="free_form",
+        run_method_over_seeds(dataset=args.dataset, model_id=args.model_id, method="free_form",
                               cases=cases, method_fn=wrap("free_form"), seeds=[0],
                               decode={"temperature": 0.0, "top_p": 1.0, "max_tokens": 512},
                               n_frames=1, concurrency=args.concurrency)
     results = []
     for m in args.methods:
-        results.append(run_method_over_seeds(dataset="chartqa", model_id=args.model_id, method=m,
+        results.append(run_method_over_seeds(dataset=args.dataset, model_id=args.model_id, method=m,
                                              cases=cases, method_fn=wrap(m), seeds=list(range(args.seeds)),
                                              decode=decode, n_frames=1, concurrency=args.concurrency))
-    print("\n=== SUMMARY (ChartQA) ===")
+    print(f"\n=== SUMMARY ({args.dataset}) ===")
     for r in results:
         print(f"  {r['method']:22s} net_mean={r['net_mean']:+.3f} ± {r['net_std']:.3f} "
               f"(k={r['k']}) verdict={r['verdict']}")

@@ -1,0 +1,67 @@
+{
+  "definition": "F = flip_corrupt - flip_shuffle (present); SE = binomial sqrt(pc(1-pc)/nc + ps(1-ps)/ns)",
+  "cells": [
+    {
+      "dataset": "chartqa",
+      "model_id": "8b",
+      "n_eval_present": 321,
+      "flip_corrupt_present": 0.2118380062305296,
+      "flip_shuffle_present": 0.30218068535825543,
+      "F_present": -0.09034267912772584,
+      "F_present_se": 0.03430803217859062,
+      "acc_after_corrupt_present": 0.8161993769470405,
+      "snap_rate": 0.8161993769470405,
+      "follow_rate": 0.03115264797507788,
+      "n_eval_masked": 321,
+      "flip_corrupt_masked": 0.3333333333333333,
+      "flip_shuffle_masked": 0.40809968847352024,
+      "F_masked": -0.07476635514018692,
+      "F_masked_se": 0.03801035090060876,
+      "masked_minus_present_gap": 0.12149532710280372,
+      "sft": {
+        "base_acc": 0.7125,
+        "sft_acc": 0.7775,
+        "net": 0.06499999999999995,
+        "ci": [
+          0.025,
+          0.105
+        ],
+        "mcnemar_b": 46,
+        "mcnemar_c": 20,
+        "mcnemar_p": 0.002088938772152058,
+        "n_eval": 400
+      }
+    },
+    {
+      "dataset": "chartqa",
+      "model_id": "32b",
+      "n_eval_present": 318,
+      "flip_corrupt_present": 0.05063291139240506,
+      "flip_shuffle_present": 0.04716981132075472,
+      "F_present": 0.003463100071650342,
+      "F_present_se": 0.01713049025654659,
+      "acc_after_corrupt_present": 0.9810126582278481,
+      "snap_rate": 0.9810126582278481,
+      "follow_rate": 0.015822784810126583,
+      "n_eval_masked": 318,
+      "flip_corrupt_masked": 0.12025316455696203,
+      "flip_shuffle_masked": 0.1289308176100629,
+      "F_masked": -0.008677653053100864,
+      "F_masked_se": 0.026228889362695112,
+      "masked_minus_present_gap": 0.06962025316455697,
+      "sft": {
+        "base_acc": 0.725,
+        "sft_acc": 0.795,
+        "net": 0.07000000000000006,
+        "ci": [
+          0.0375,
+          0.1025
+        ],
+        "mcnemar_b": 37,
+        "mcnemar_c": 9,
+        "mcnemar_p": 6.864535076836442e-05,
+        "n_eval": 400
+      }
+    }
+  ]
+}

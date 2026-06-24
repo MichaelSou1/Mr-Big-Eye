@@ -33,3 +33,13 @@ paper_references/*.pdf
 # 32B QLoRA adapters (513M/epoch, >GitHub limit); re-create via scripts/poc_sft_32b_qlora.py
 data/distill/poc/lora_32b_chartqa/epoch_*/adapter_model.safetensors
 wandb/
+
+# WU-3 TabMWP LoRA adapters (regenerable, >GitHub limit); re-create via scripts/run_wu3_stage2.sh
+data/distill/poc/lora_8b_tabmwp/adapter_model.safetensors
+data/distill/poc/lora_8b_tabmwp/tokenizer.json
+data/distill/poc/lora_32b_tabmwp/epoch_*/adapter_model.safetensors
+data/distill/poc/lora_32b_tabmwp/epoch_*/tokenizer.json
+
+# agent-local state + regenerable session backups
+.claude/
+data/distill/results/results.bak.*.jsonl

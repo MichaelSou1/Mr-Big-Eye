@@ -1,0 +1,30 @@
+{
+  "tag": "sft8b_n400",
+  "base": "/home/gpus/models/Qwen3-VL-8B-Instruct",
+  "quant": "none",
+  "n_eval": 400,
+  "base_acc": 0.7125,
+  "per_adapter": [
+    {
+      "adapter": "data/distill/poc/lora_8b_chartqa",
+      "test_acc": 0.7775,
+      "base_acc": 0.7125,
+      "net": 0.06499999999999995,
+      "gain": 46,
+      "lost": 20,
+      "boot_ci": [
+        0.025,
+        0.105
+      ],
+      "boot_net": 0.065,
+      "mcnemar_b": 46,
+      "mcnemar_c": 20,
+      "mcnemar_p": 0.002088938772152058,
+      "n": 400
+    }
+  ],
+  "best_adapter": "data/distill/poc/lora_8b_chartqa",
+  "best_test_acc": 0.7775,
+  "best_net": 0.06499999999999995,
+  "best_mcnemar_p": 0.002088938772152058
+}

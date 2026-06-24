@@ -1,0 +1,1920 @@
+{
+  "summary": {
+    "n_eval": 318,
+    "mask_image": false,
+    "flip_rate_corrupt": 0.050314465408805034,
+    "flip_rate_shuffle": 0.04716981132075472,
+    "flips_corrupt": 16,
+    "flips_shuffle": 15
+  },
+  "details": [
+    {
+      "case_id": "chartqa-0",
+      "base_ans": "14",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-1",
+      "base_ans": "0.57",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-2",
+      "base_ans": "3",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-3",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-4",
+      "base_ans": "23",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-5",
+      "base_ans": "6%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-6",
+      "base_ans": "62%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-7",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-8",
+      "base_ans": "Inspired",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-10",
+      "base_ans": "1.0",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-11",
+      "base_ans": "0.08",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-12",
+      "base_ans": "17",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-13",
+      "base_ans": "21.7",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-14",
+      "base_ans": "2%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-15",
+      "base_ans": "2%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-16",
+      "base_ans": "2014",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-17",
+      "base_ans": "2010 to 2011",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-19",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-21",
+      "base_ans": "2008",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-22",
+      "base_ans": "29",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-24",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-25",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-26",
+      "base_ans": "80%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-27",
+      "base_ans": "77%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-29",
+      "base_ans": "61%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-30",
+      "base_ans": "13",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-33",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-34",
+      "base_ans": "Italy",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-36",
+      "base_ans": "33%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-37",
+      "base_ans": "Over 30 mins",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-38",
+      "base_ans": "4",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-39",
+      "base_ans": "22%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-40",
+      "base_ans": "92",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-41",
+      "base_ans": "96",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-42",
+      "base_ans": "21",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-43",
+      "base_ans": "12%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-44",
+      "base_ans": "2009",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-45",
+      "base_ans": "28.7",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-46",
+      "base_ans": "68",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-47",
+      "base_ans": "2019",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-48",
+      "base_ans": "83%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-50",
+      "base_ans": "Simulation",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-51",
+      "base_ans": "4",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-53",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-54",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-58",
+      "base_ans": "Libya",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-59",
+      "base_ans": "0.23",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-62",
+      "base_ans": "UK",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-67",
+      "base_ans": "Median = 14",
+      "flip_corrupt": true,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-68",
+      "base_ans": "175",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-69",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-70",
+      "base_ans": "93.45%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-71",
+      "base_ans": "51.045",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-72",
+      "base_ans": "Yes",
+      "flip_corrupt": true,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-76",
+      "base_ans": "52",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-77",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-78",
+      "base_ans": "U.S.",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-79",
+      "base_ans": "UK",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-80",
+      "base_ans": "67%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-82",
+      "base_ans": "55",
+      "flip_corrupt": true,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-83",
+      "base_ans": "Poll workers in your community",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-84",
+      "base_ans": "Rep/Lean Rep",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-85",
+      "base_ans": "0.484375",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-86",
+      "base_ans": "77 in 2006 and 77 in 2007",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-87",
+      "base_ans": "141",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-88",
+      "base_ans": "41%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-90",
+      "base_ans": "Nicaragua",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-91",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-93",
+      "base_ans": "99",
+      "flip_corrupt": true,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-95",
+      "base_ans": "Jamaica",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-96",
+      "base_ans": "50",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-97",
+      "base_ans": "35",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-98",
+      "base_ans": "977,633 t",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-99",
+      "base_ans": "1.60 million t",
+      "flip_corrupt": true,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-100",
+      "base_ans": "4",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-103",
+      "base_ans": "65%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-104",
+      "base_ans": "25",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-105",
+      "base_ans": "2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-106",
+      "base_ans": "28%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-108",
+      "base_ans": "4",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-109",
+      "base_ans": "37",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-110",
+      "base_ans": "The tiniest segment is the medium gray one labeled \"No choice\".",
+      "flip_corrupt": true,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-111",
+      "base_ans": "8%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-112",
+      "base_ans": "1.4 billion",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-113",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-114",
+      "base_ans": "2.42",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-115",
+      "base_ans": "0.77",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-116",
+      "base_ans": "12",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-117",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-118",
+      "base_ans": "3",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-122",
+      "base_ans": "PP (Polypropylene)",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-123",
+      "base_ans": "3",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-124",
+      "base_ans": "71",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-125",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-126",
+      "base_ans": "30%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-127",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-128",
+      "base_ans": "Saudi Arabia",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-130",
+      "base_ans": "30%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-131",
+      "base_ans": "light gray",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-132",
+      "base_ans": "83",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-134",
+      "base_ans": "57",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-136",
+      "base_ans": "61",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-138",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-140",
+      "base_ans": "2013",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-141",
+      "base_ans": "1",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-144",
+      "base_ans": "red",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-146",
+      "base_ans": "92",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-148",
+      "base_ans": "Favorable",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-150",
+      "base_ans": "54",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-151",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-152",
+      "base_ans": "2014",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-153",
+      "base_ans": "- 1984: Illegal=70 (approx), Legal=25 (approx) → gap≈45 (but chart doesn't label 1984 for Legal — wait, chart shows 16 at 1989, so 1984",
+      "flip_corrupt": true,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-154",
+      "base_ans": "Orange",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-156",
+      "base_ans": "29",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-157",
+      "base_ans": "- **2014**: China = 49, U.S. = 34 →",
+      "flip_corrupt": true,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-158",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-161",
+      "base_ans": "Favor",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-162",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-163",
+      "base_ans": "2210",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-165",
+      "base_ans": "47%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-166",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-167",
+      "base_ans": "13",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-168",
+      "base_ans": "dark blue",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-169",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-170",
+      "base_ans": "Don't know",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-171",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-174",
+      "base_ans": "41%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-175",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-176",
+      "base_ans": "67%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-177",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-178",
+      "base_ans": "Bad",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-179",
+      "base_ans": "54%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-180",
+      "base_ans": "Better off",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-181",
+      "base_ans": "Better off",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-182",
+      "base_ans": "Important, but lower priority",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-183",
+      "base_ans": "75%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-184",
+      "base_ans": "Dissatisfied",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-185",
+      "base_ans": "3.9",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-186",
+      "base_ans": "76%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-187",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-188",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-189",
+      "base_ans": "30",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-190",
+      "base_ans": "16%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-191",
+      "base_ans": "65+",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-192",
+      "base_ans": "11",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-193",
+      "base_ans": "60",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-194",
+      "base_ans": "No role",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-195",
+      "base_ans": "15",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-196",
+      "base_ans": "Japan",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-197",
+      "base_ans": "36",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-198",
+      "base_ans": "5.32%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-201",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-203",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-204",
+      "base_ans": "Heart disease",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-205",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-206",
+      "base_ans": "North America",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-207",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-208",
+      "base_ans": "Obesity",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-209",
+      "base_ans": "203",
+      "flip_corrupt": true,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-210",
+      "base_ans": "2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-211",
+      "base_ans": "51.33",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-212",
+      "base_ans": "2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-213",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-214",
+      "base_ans": "0.1%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-215",
+      "base_ans": "5",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-217",
+      "base_ans": "2.88",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-218",
+      "base_ans": "Low bone mineral density",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-219",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-220",
+      "base_ans": "27.5%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-221",
+      "base_ans": "10.2%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-222",
+      "base_ans": "16",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-223",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-224",
+      "base_ans": "2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-225",
+      "base_ans": "3.24%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-226",
+      "base_ans": "Burkina Faso",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-227",
+      "base_ans": "5%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-228",
+      "base_ans": "Lithuania",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-229",
+      "base_ans": "28.3",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-230",
+      "base_ans": "0.6",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-232",
+      "base_ans": "0.01%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-233",
+      "base_ans": "0.02%",
+      "flip_corrupt": false,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-234",
+      "base_ans": "1.6",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-235",
+      "base_ans": "3.2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-236",
+      "base_ans": "Mutton & Goat Meat (non-organic): 20.98 m², Mutton & Goat Meat (organic): 4.64 m²",
+      "flip_corrupt": true,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-237",
+      "base_ans": "0.20 m²",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-238",
+      "base_ans": "41%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-239",
+      "base_ans": "5.4%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-240",
+      "base_ans": "Nepal",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-241",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-242",
+      "base_ans": "5.25 trillion",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-245",
+      "base_ans": "1.6%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-246",
+      "base_ans": "96.4%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-247",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-249",
+      "base_ans": "38",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-250",
+      "base_ans": "Mexico",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-251",
+      "base_ans": "1.35",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-252",
+      "base_ans": "40.7%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-254",
+      "base_ans": "2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-255",
+      "base_ans": "41.935",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-256",
+      "base_ans": "Belarus",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-257",
+      "base_ans": "0.08",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-258",
+      "base_ans": "Mongolia",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-259",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-260",
+      "base_ans": "9.29%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-262",
+      "base_ans": "5",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-263",
+      "base_ans": "2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-264",
+      "base_ans": "6.85%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-265",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-266",
+      "base_ans": "4",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-267",
+      "base_ans": "47.6%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-269",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-270",
+      "base_ans": "Greece",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-271",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-272",
+      "base_ans": "Dark gray or slate blue",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-273",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-274",
+      "base_ans": "Human capital",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-276",
+      "base_ans": "2015",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-277",
+      "base_ans": "143 million tonnes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-278",
+      "base_ans": "48.01",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-279",
+      "base_ans": "32.115",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-280",
+      "base_ans": "0.04",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-281",
+      "base_ans": "0.11",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-282",
+      "base_ans": "56.6%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-283",
+      "base_ans": "13.5%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-284",
+      "base_ans": "0.69",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-285",
+      "base_ans": "0.235",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-286",
+      "base_ans": "24%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-287",
+      "base_ans": "6.2%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-288",
+      "base_ans": "Switzerland",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-289",
+      "base_ans": "1,541.08",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-290",
+      "base_ans": "Alcohol",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-291",
+      "base_ans": "60",
+      "flip_corrupt": true,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-292",
+      "base_ans": "Philippines",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-293",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-294",
+      "base_ans": "Brazil",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-295",
+      "base_ans": "3.4%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-296",
+      "base_ans": "United States",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-297",
+      "base_ans": "4.19 million tonnes",
+      "flip_corrupt": false,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-298",
+      "base_ans": "95%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-299",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-300",
+      "base_ans": "Deaths from HIV/AIDS",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-302",
+      "base_ans": "Samoa",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-304",
+      "base_ans": "24688.3",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-305",
+      "base_ans": "82.2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-306",
+      "base_ans": "13",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-307",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-310",
+      "base_ans": "Medium car (petrol)",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-311",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-312",
+      "base_ans": "Malawi",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-313",
+      "base_ans": "1.90",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-314",
+      "base_ans": "Italy, 22%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-315",
+      "base_ans": "2.55",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-316",
+      "base_ans": "27.22%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-317",
+      "base_ans": "389.82",
+      "flip_corrupt": false,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-319",
+      "base_ans": "0.08%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-320",
+      "base_ans": "8.5",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-321",
+      "base_ans": "10.2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-322",
+      "base_ans": "3.88",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-323",
+      "base_ans": "3",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-324",
+      "base_ans": "9546.35",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-325",
+      "base_ans": "14153.35",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-326",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-327",
+      "base_ans": "50",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-328",
+      "base_ans": "28",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-329",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-330",
+      "base_ans": "Argentina",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-331",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-332",
+      "base_ans": "Chemistry",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-333",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-334",
+      "base_ans": "Venezuela's share of global forest area in 2012, which is 1.15%.",
+      "flip_corrupt": true,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-335",
+      "base_ans": "0.02%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-337",
+      "base_ans": "1.0156",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-339",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-340",
+      "base_ans": "53.9 hours",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-341",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-342",
+      "base_ans": "8.87%",
+      "flip_corrupt": true,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-343",
+      "base_ans": "32.43",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-344",
+      "base_ans": "7.54%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-345",
+      "base_ans": "1.88",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-346",
+      "base_ans": "Myanmar",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-347",
+      "base_ans": "Zambia",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-349",
+      "base_ans": "2015",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-350",
+      "base_ans": "Georgia",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-351",
+      "base_ans": "Spain",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-352",
+      "base_ans": "Belize",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-353",
+      "base_ans": "Thus, only Papua New Guinea has three data points in the same place (value ~38) between 2010 and 2014 — specifically at 20",
+      "flip_corrupt": true,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-354",
+      "base_ans": "Benin",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-355",
+      "base_ans": "Sudan",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-356",
+      "base_ans": "Mongolia",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-358",
+      "base_ans": "North America",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-360",
+      "base_ans": "1",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-361",
+      "base_ans": "The line remains constant (neither increases nor decreases).",
+      "flip_corrupt": true,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-362",
+      "base_ans": "Hong Kong",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-364",
+      "base_ans": "Cameroon",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-365",
+      "base_ans": "Pink",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-366",
+      "base_ans": "Estonia",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-367",
+      "base_ans": "No",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-368",
+      "base_ans": "1960",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-370",
+      "base_ans": "4",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-372",
+      "base_ans": "2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-373",
+      "base_ans": "Yes",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-374",
+      "base_ans": "Purple",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-375",
+      "base_ans": "6 years",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-377",
+      "base_ans": "Germany, Bolivia, Dominican Republic",
+      "flip_corrupt": false,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-378",
+      "base_ans": "2",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-380",
+      "base_ans": "1992",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-381",
+      "base_ans": "3%",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-384",
+      "base_ans": "2014",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-385",
+      "base_ans": "6",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-386",
+      "base_ans": "4",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-388",
+      "base_ans": "Burundi",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-390",
+      "base_ans": "2004",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-392",
+      "base_ans": "Gabon",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-393",
+      "base_ans": "18",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-395",
+      "base_ans": "2005",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-397",
+      "base_ans": "- In 2004: Netherlands ≈ $23,500, Poland ≈ $8,",
+      "flip_corrupt": true,
+      "flip_shuffle": true
+    },
+    {
+      "case_id": "chartqa-398",
+      "base_ans": "Belize",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    },
+    {
+      "case_id": "chartqa-400",
+      "base_ans": "Asia",
+      "flip_corrupt": false,
+      "flip_shuffle": false
+    }
+  ]
+}
