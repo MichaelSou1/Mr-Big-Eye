@@ -1,0 +1,25 @@
+{
+  "label": "32B TabMWP",
+  "partitions": {
+    "GAINED": {
+      "n": 57,
+      "flip": 1,
+      "flip_rate": 0.017543859649122806,
+      "follow": 0,
+      "follow_rate": 0.0,
+      "follow_ci95_hi": 0.06314100878346394,
+      "snap": 56,
+      "snap_rate": 0.9824561403508771
+    },
+    "RETAINED": {
+      "n": 332,
+      "flip": 12,
+      "flip_rate": 0.03614457831325301,
+      "follow": 14,
+      "follow_rate": 0.04216867469879518,
+      "follow_ci95_hi": 0.06952901428576015,
+      "snap": 321,
+      "snap_rate": 0.9668674698795181
+    }
+  }
+}

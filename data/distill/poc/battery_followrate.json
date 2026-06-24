@@ -1,0 +1,54 @@
+[
+  {
+    "cell": "tabmwp8b",
+    "cond": "present",
+    "n": 385,
+    "flip": 13,
+    "snap": 374,
+    "follow": 3,
+    "other": 8,
+    "flip_rate": 0.033766233766233764,
+    "snap_rate": 0.9714285714285714,
+    "follow_rate": 0.007792207792207792,
+    "other_rate": 0.02077922077922078
+  },
+  {
+    "cell": "tabmwp8b",
+    "cond": "masked",
+    "n": 385,
+    "flip": 107,
+    "snap": 278,
+    "follow": 34,
+    "other": 73,
+    "flip_rate": 0.2779220779220779,
+    "snap_rate": 0.7220779220779221,
+    "follow_rate": 0.08831168831168831,
+    "other_rate": 0.18961038961038962
+  },
+  {
+    "cell": "tabmwp32b",
+    "cond": "present",
+    "n": 389,
+    "flip": 13,
+    "snap": 377,
+    "follow": 6,
+    "other": 6,
+    "flip_rate": 0.033419023136246784,
+    "snap_rate": 0.9691516709511568,
+    "follow_rate": 0.015424164524421594,
+    "other_rate": 0.015424164524421594
+  },
+  {
+    "cell": "tabmwp32b",
+    "cond": "masked",
+    "n": 389,
+    "flip": 29,
+    "snap": 361,
+    "follow": 15,
+    "other": 13,
+    "flip_rate": 0.07455012853470437,
+    "snap_rate": 0.9280205655526992,
+    "follow_rate": 0.038560411311053984,
+    "other_rate": 0.033419023136246784
+  }
+]
