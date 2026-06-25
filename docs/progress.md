@@ -811,3 +811,26 @@ local). Everything in SPEC §0–§11 that is runnable on this hardware has been
   number-fidelity caveat (69%/74%, conservative upper bound): `docs/snapshots/wu2_complete_0624.md`.
 - NB: DeepSeek balance restored (no longer 402, cf. [[deepseek-402-local-orchestrator]]); paraphrase
   ran on DeepSeek v4-flash as planned.
+
+### 7.18 WU-6 writing/N4 reframe (upgrade, 2026-06-26) — canonical LaTeX updated
+
+- Canonical manuscript source is now `docs/paper/paper.tex`; `docs/paper.md` is an older Markdown
+  convenience draft and is marked as stale at the top.
+- WU-6/N4 reframed the paper around **reading-not-reasoning + regime-dependent answer source**:
+  accuracy gains are real, but answer-time evidence is read from pixels (ChartQA/TabMWP), redundant
+  text (natural-image counting), or the chain's final conclusion (FinQA curriculum), rather than from
+  load-bearing written arithmetic.
+- `paper.tex` now uses the high-power numbers: ChartQA n=400 (32B .725→.795, p=6.9e-5; 8B
+  .713→.778, p=.0021), TabMWP n=400 (8B .865→.963, p=2.9e-9; 32B .835→.973, p=2.1e-12), N3
+  follow 0/345 present and 1/345 masked, and N1 operand-follow 0/172 (8B) / 0/175 (32B).
+- Related Work now includes the WU-6 defense set: visual-thinking 2510.23482, CapImagine
+  2602.22766, CodeV 2511.19661, Lanham/Turpin/Pfau/Lyu, 2502.14829, 2402.14897, VPD,
+  Zooming-without-Zooming, PEARL, ChartPaLI, Chart-R1, LOCUS, ChartMuseum,
+  PerceptionBottleneck, CharXiv, and CHART-NOISe.
+- Redlines are explicitly honored: the abstract does not make "internalized reasoning is not
+  load-bearing" the main clause, and the method section states that `corrupt` itself is not the
+  novelty; the claim rests on the controlled battery and snap/follow/other classification.
+- Static checks passed: no missing citation keys, LaTeX begin/end and brace balance OK, old n=60
+  headline numbers removed from `paper.tex`, and `git diff --check` clean. PDF rebuilt with
+  `conda run -n texlive tectonic paper.tex` (11 pages). Note: `pdflatex/latexmk` exist in the same
+  env but the `pdflatex.fmt` format path is broken; use `tectonic` unless the env is repaired.

@@ -1,5 +1,10 @@
 # Reading, Not Reasoning: A Causal Audit of Internalizing Agentic Visual Reasoning into Single-Forward VLMs
 
+> **Stale convenience draft.** The canonical upgraded manuscript is
+> [`docs/paper/paper.tex`](paper/paper.tex), updated on 2026-06-26 for WU-6/N4.
+> This Markdown file still preserves the 2026-06-12 pre-upgrade n=60 narrative and should not be used
+> as the submission source without regeneration from the LaTeX.
+
 **Ruihan Su** · Sun Yat-sen University · surh6@mail2.sysu.edu.cn
 
 *Short paper draft — 2026-06-12. All numbers regenerate from `data/distill/results/results.jsonl` via `scripts/{regen_tables,build_map,power_table}.py`; probe artifacts in `data/distill/poc/`.*
