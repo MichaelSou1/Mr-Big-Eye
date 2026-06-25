@@ -203,15 +203,41 @@ _TEACHER_SYS = (
 )
 
 
-def deepseek_cot(table_text, question):
-    from app.distill.methods import orch
-    msg = [{"role": "system", "content": _TEACHER_SYS},
-           {"role": "user", "content": f"Table:\n{table_text}\n\nQuestion: {question}"}]
-    out = orch(msg, temp=0.2, max_tokens=512)
+_TEACHER_HINT_SYS = (
+    "You are given a data table (as text), a question, and the CORRECT final answer. Write a "
+    "concise, natural step-by-step calculation that reads the needed values from the table and "
+    "arrives at exactly that answer, showing each arithmetic operation and its intermediate result. "
+    "Do NOT mention that the answer was given; present it as your own derivation. "
+    "End with a line exactly 'ANSWER: <the given answer>'."
+)
+
+
+def _parse_cot_ans(out):
     m = re.search(r"ANSWER:\s*(.+)", out, re.IGNORECASE)
     ans = m.group(1).strip().splitlines()[0].strip() if m else ""
     cot = out[:m.start()].strip() if m else out.strip()
     return cot, ans
+
+
+def deepseek_cot(table_text, question):
+    """Unconditioned text-reasoner teacher (reads table-as-text, must compute correctly)."""
+    from app.distill.methods import orch
+    msg = [{"role": "system", "content": _TEACHER_SYS},
+           {"role": "user", "content": f"Table:\n{table_text}\n\nQuestion: {question}"}]
+    return _parse_cot_ans(orch(msg, temp=0.2, max_tokens=512))
+
+
+def deepseek_hint_cot(table_text, question, gold, lb_values):
+    """Answer-conditioned rationalization: the teacher is told the gold answer (and the
+    load-bearing operand values, to anchor the chain on real table cells) and writes a FLUENT
+    load-bearing chain reaching it. Removes the teacher-quality confound (the gold-program arm's
+    purpose) while staying naturalistic — isolates 'does a fluent, correct, load-bearing teacher
+    chain transfer load-bearing-ness?'. No probe leakage: the student gets no privileged info at test."""
+    from app.distill.methods import orch
+    hint = (f"Table:\n{table_text}\n\nQuestion: {question}\n\nCorrect final answer: {gold}"
+            + (f"\nKey table values to use: {', '.join(str(v) for v in lb_values)}" if lb_values else ""))
+    return _parse_cot_ans(orch([{"role": "system", "content": _TEACHER_HINT_SYS},
+                                {"role": "user", "content": hint}], temp=0.2, max_tokens=512))
 
 
 # ----------------------- table -> image -----------------------
@@ -240,7 +266,8 @@ def main() -> int:
     ap.add_argument("--raw", default="data/distill/finqa/raw")
     ap.add_argument("--filter", choices=["strict", "none"], default="strict",
                     help="strict = ③ curriculum; none = matched random vanilla control")
-    ap.add_argument("--teacher", choices=["gold_program", "deepseek"], default="gold_program")
+    ap.add_argument("--teacher", choices=["gold_program", "deepseek", "deepseek_hint"],
+                    default="gold_program")
     ap.add_argument("--min-ops", type=int, default=2)
     ap.add_argument("--target", type=int, default=180, help="max kept examples")
     ap.add_argument("--img-dir", default=None, help="default: finqa_<split>_images")
@@ -301,7 +328,11 @@ def main() -> int:
                 cot, ans = gold_program_cot(steps)
             else:
                 try:
-                    cot, ans = deepseek_cot(table_to_text(rec.get("table", [])), q)
+                    if args.teacher == "deepseek_hint":
+                        cot, ans = deepseek_hint_cot(table_to_text(rec.get("table", [])), q,
+                                                     gold, info["load_bearing_values"])
+                    else:
+                        cot, ans = deepseek_cot(table_to_text(rec.get("table", [])), q)
                 except Exception as e:
                     print(f"  teacher err {str(e)[:50]}", flush=True); continue
                 if not (cot and ans and close(ans, gold)):

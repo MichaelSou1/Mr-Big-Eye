@@ -1,0 +1,32 @@
+{
+  "base_acc": 0.125,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.29261969587920855,
+      "test_acc": 0.625,
+      "gain": 22,
+      "lost": 2,
+      "net": 0.5
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.0376335225989654,
+      "test_acc": 0.625,
+      "gain": 21,
+      "lost": 1,
+      "net": 0.5
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.0256443811952421,
+      "test_acc": 0.6,
+      "gain": 21,
+      "lost": 2,
+      "net": 0.475
+    }
+  ],
+  "best_epoch": 1,
+  "best_test_acc": 0.625,
+  "best_net": 0.5
+}

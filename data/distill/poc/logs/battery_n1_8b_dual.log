@@ -1,0 +1,79 @@
+
+Loading weights:   0%|          | 0/750 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/750 [00:00<05:35,  2.23it/s]
+Loading weights:   1%|          | 9/750 [00:00<00:35, 20.98it/s]
+Loading weights:   2%|▏         | 16/750 [00:00<00:22, 33.03it/s]
+Loading weights:   4%|▎         | 27/750 [00:00<00:14, 48.53it/s]
+Loading weights:   5%|▍         | 37/750 [00:00<00:11, 59.49it/s]
+Loading weights:   6%|▌         | 45/750 [00:01<00:11, 60.52it/s]
+Loading weights:   7%|▋         | 52/750 [00:01<00:12, 56.53it/s]
+Loading weights:   8%|▊         | 60/750 [00:01<00:11, 58.70it/s]
+Loading weights:   9%|▉         | 70/750 [00:01<00:10, 65.58it/s]
+Loading weights:  10%|█         | 77/750 [00:01<00:10, 65.06it/s]
+Loading weights:  11%|█         | 84/750 [00:01<00:11, 57.57it/s]
+Loading weights:  12%|█▏        | 93/750 [00:01<00:10, 60.55it/s]
+Loading weights:  14%|█▎        | 103/750 [00:01<00:09, 65.35it/s]
+Loading weights:  15%|█▍        | 111/750 [00:02<00:09, 66.93it/s]
+Loading weights:  16%|█▌        | 118/750 [00:02<00:10, 61.23it/s]
+Loading weights:  17%|█▋        | 126/750 [00:02<00:09, 63.47it/s]
+Loading weights:  18%|█▊        | 136/750 [00:02<00:09, 67.32it/s]
+Loading weights:  19%|█▉        | 143/750 [00:02<00:09, 67.04it/s]
+Loading weights:  20%|██        | 150/750 [00:02<00:09, 61.21it/s]
+Loading weights:  21%|██▏       | 160/750 [00:02<00:08, 65.98it/s]
+Loading weights:  23%|██▎       | 170/750 [00:02<00:07, 72.82it/s]
+Loading weights:  24%|██▍       | 180/750 [00:03<00:07, 77.27it/s]
+Loading weights:  25%|██▌       | 188/750 [00:03<00:07, 73.67it/s]
+Loading weights:  26%|██▌       | 196/750 [00:03<00:07, 69.89it/s]
+Loading weights:  27%|██▋       | 204/750 [00:03<00:08, 63.41it/s]
+Loading weights:  29%|██▊       | 214/750 [00:03<00:07, 70.90it/s]
+Loading weights:  30%|██▉       | 224/750 [00:03<00:06, 76.01it/s]
+Loading weights:  31%|███       | 232/750 [00:03<00:06, 75.55it/s]
+Loading weights:  32%|███▏      | 240/750 [00:03<00:07, 71.35it/s]
+Loading weights:  33%|███▎      | 248/750 [00:04<00:07, 68.80it/s]
+Loading weights:  34%|███▍      | 258/750 [00:04<00:06, 75.05it/s]
+Loading weights:  36%|███▌      | 268/750 [00:04<00:06, 78.91it/s]
+Loading weights:  37%|███▋      | 276/750 [00:04<00:06, 76.48it/s]
+Loading weights:  38%|███▊      | 284/750 [00:04<00:06, 72.19it/s]
+Loading weights:  39%|███▉      | 292/750 [00:04<00:07, 64.92it/s]
+Loading weights:  40%|████      | 302/750 [00:04<00:06, 70.51it/s]
+Loading weights:  42%|████▏     | 312/750 [00:04<00:05, 75.08it/s]
+Loading weights:  43%|████▎     | 320/750 [00:05<00:05, 71.68it/s]
+Loading weights:  44%|████▎     | 328/750 [00:05<00:06, 68.27it/s]
+Loading weights:  45%|████▍     | 335/750 [00:05<00:06, 64.33it/s]
+Loading weights:  46%|████▌     | 345/750 [00:05<00:05, 70.59it/s]
+Loading weights:  47%|████▋     | 353/750 [00:05<00:05, 71.16it/s]
+Loading weights:  48%|████▊     | 361/750 [00:05<00:05, 68.11it/s]
+Loading weights:  49%|████▉     | 368/750 [00:05<00:05, 67.38it/s]
+Loading weights:  50%|█████     | 378/750 [00:05<00:05, 73.18it/s]
+Loading weights:  51%|█████▏    | 386/750 [00:05<00:05, 68.88it/s]
+Loading weights:  52%|█████▏    | 393/750 [00:06<00:05, 61.45it/s]
+Loading weights:  59%|█████▉    | 443/750 [00:06<00:01, 168.45it/s]
+Loading weights:  69%|██████▊   | 515/750 [00:06<00:00, 311.27it/s]
+Loading weights:  78%|███████▊  | 588/750 [00:06<00:00, 422.92it/s]
+Loading weights:  88%|████████▊ | 659/750 [00:06<00:00, 500.67it/s]
+Loading weights:  96%|█████████▋| 723/750 [00:06<00:00, 519.56it/s]
+Loading weights: 100%|██████████| 750/750 [00:06<00:00, 110.30it/s]
+loaded base + 2 adapters (none) in 13s
+probe cases (with >=1 flippable table literal): 261
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+
+=== [base] base_acc=0.080 n_eval=21 n_targeted=21 ===
+  operand   : snap=0.952 follow=0.000 other=0.048 flip=0.095 (follow 0/21, CI[0.000,0.155])
+  consistent: snap=0.095 follow=0.857 other=0.048 flip=0.905 (follow 18/21, CI[0.654,0.950])
+  shuffle   : snap=0.905 follow=0.000 other=0.095 flip=0.143 (follow 0/21, CI[0.000,0.155])
+
+=== [b2] base_acc=0.674 n_eval=176 n_targeted=172 ===
+  operand   : snap=1.000 follow=0.000 other=0.000 flip=0.000 (follow 0/172, CI[0.000,0.022])
+  consistent: snap=0.023 follow=0.959 other=0.017 flip=0.977 (follow 165/172, CI[0.918,0.980])
+  shuffle   : snap=0.622 follow=0.006 other=0.372 flip=0.378 (follow 1/172, CI[0.001,0.032])
+
+=== [vanilla] base_acc=0.582 n_eval=152 n_targeted=147 ===
+  operand   : snap=1.000 follow=0.000 other=0.000 flip=0.000 (follow 0/147, CI[0.000,0.025])
+  consistent: snap=0.020 follow=0.980 other=0.000 flip=0.980 (follow 144/147, CI[0.942,0.993])
+  shuffle   : snap=0.626 follow=0.014 other=0.361 flip=0.374 (follow 2/147, CI[0.004,0.048])
+
+=== N1 TARGETED PROBE SUMMARY -> data/distill/poc/battery_n1_8b.json ===
+mode        acc  n_ev n_tgt |  op_snap op_foll  op_oth |  co_snap co_foll  co_oth |  sh_foll
+base      0.080    21    21 |    0.952   0.000   0.048 |    0.095   0.857   0.048 |    0.000
+b2        0.674   176   172 |    1.000   0.000   0.000 |    0.023   0.959   0.017 |    0.006
+vanilla   0.582   152   147 |    1.000   0.000   0.000 |    0.020   0.980   0.000 |    0.014

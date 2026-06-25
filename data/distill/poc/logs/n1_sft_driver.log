@@ -1,0 +1,5 @@
+[vanilla] SFT start 16:08:07 gpus=2,3 -> data/distill/poc/lora_8b_finqa_vanilla
+[b2] SFT start 16:08:07 gpus=0,1 -> data/distill/poc/lora_8b_finqa_b2
+[vanilla] SFT done 16:16:17 rc=0
+[b2] SFT done 16:16:34 rc=0
+N1 SFT BOTH DONE 16:16:34

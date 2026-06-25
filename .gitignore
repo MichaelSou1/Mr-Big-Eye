@@ -40,6 +40,12 @@ data/distill/poc/lora_8b_tabmwp/tokenizer.json
 data/distill/poc/lora_32b_tabmwp/epoch_*/adapter_model.safetensors
 data/distill/poc/lora_32b_tabmwp/epoch_*/tokenizer.json
 
+# N1 FinQA LoRA adapters (regenerable, >GitHub limit); re-create via scripts/run_n1_sft*.sh
+data/distill/poc/lora_8b_finqa_*/adapter_model.safetensors
+data/distill/poc/lora_8b_finqa_*/tokenizer.json
+data/distill/poc/lora_32b_finqa_*/epoch_*/adapter_model.safetensors
+data/distill/poc/lora_32b_finqa_*/epoch_*/tokenizer.json
+
 # agent-local state + regenerable session backups
 .claude/
 data/distill/results/results.bak.*.jsonl
