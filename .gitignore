@@ -43,3 +43,4 @@ data/distill/poc/lora_32b_tabmwp/epoch_*/tokenizer.json
 # agent-local state + regenerable session backups
 .claude/
 data/distill/results/results.bak.*.jsonl
+data/distill/finqa/raw/
