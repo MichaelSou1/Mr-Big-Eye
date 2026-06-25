@@ -211,7 +211,9 @@ def build_paraphrase_cache(kept, scale_tag, cache_path, workers=8):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", required=True)
-    ap.add_argument("--adapter", required=True)
+    ap.add_argument("--adapter", default=None,
+                    help="LoRA adapter dir. Omit (or 'none') for a BASE-MODEL probe (N3: "
+                         "general base on natural images, no chart-SFT student).")
     ap.add_argument("--scale-tag", required=True, help="e.g. 8b / 32b (paraphrase cache key + output label)")
     ap.add_argument("--quant", choices=["nf4", "none"], default="nf4")
     ap.add_argument("--dump", default="data/distill/chartqa/test_cases_400.jsonl")
@@ -244,10 +246,13 @@ def main() -> int:
     model = Qwen3VLForConditionalGeneration.from_pretrained(
         args.base, quantization_config=quant_cfg, torch_dtype=torch.bfloat16,
         device_map="auto", trust_remote_code=True)
-    model = PeftModel.from_pretrained(model, args.adapter)
+    use_adapter = bool(args.adapter) and str(args.adapter).lower() != "none"
+    if use_adapter:
+        model = PeftModel.from_pretrained(model, args.adapter)
     model.eval(); model.config.use_cache = True
     dev0 = torch.device("cuda:0")
-    print(f"loaded base+adapter ({args.quant}) in {time.time()-t0:.0f}s", flush=True)
+    print(f"loaded {'base+adapter' if use_adapter else 'BASE-ONLY'} ({args.quant}) "
+          f"in {time.time()-t0:.0f}s", flush=True)
 
     prog = Path("data/distill/poc/logs/battery_progress.txt"); prog.parent.mkdir(parents=True, exist_ok=True)
 
@@ -317,12 +322,17 @@ def main() -> int:
                                {"type": "text", "text": USER_INSTR + c["q"]}]} for c in cases]
     base_out = run_batched(base_items, args.max_new, "base")
     kept = []
+    base_correct = 0
     for c, out in zip(cases, base_out):
         base_cot = out.split("ANSWER:")[0].strip()
         base_ans = extract_answer(out)
+        if relaxed_match(base_ans, c["gold"]):
+            base_correct += 1
         if base_cot and relaxed_match(base_ans, c["gold"]):
             kept.append({**c, "base_cot": base_cot, "base_ans": base_ans})
     n_eval = len(kept)
+    base_acc = base_correct / len(cases) if cases else 0.0
+    print(f"base free-form acc (image present): {base_correct}/{len(cases)} = {base_acc:.3f}", flush=True)
     print(f"n_eval (correct + CoT): {n_eval}", flush=True)
 
     # ---- build edits (rng order = kept order; deterministic) ----
@@ -392,6 +402,8 @@ def main() -> int:
                          "follow_rate": inj_follow / n_corr if n_corr else 0.0}
 
     summary = {"scale": args.scale_tag, "mask_image": bool(args.mask_image), "n_eval": n_eval,
+               "n_cases": len(cases), "base_correct": base_correct, "base_acc": base_acc,
+               "adapter": args.adapter if use_adapter else None,
                "n_para_nums_ok": sum(1 for k in kept if k.get("_para_nums_ok")),
                "interventions": interventions, "re_perception": re_perception}
     details = [{"case_id": k["cid"], "base_ans": k["base_ans"], "gold": k["gold"],
