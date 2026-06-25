@@ -67,6 +67,10 @@
 | table 8b | masked | 385 | — | .278 | .722 | .088 | **.190** | — |
 | **nat 8b** | **present** | 166 | **.415** | .030 | .988 | **.000** | .012 | **bypass** |
 | **nat 8b** | **masked** | 166 | .415 | .036 | .982 | **.000** | .018 | — |
+| chart 32b | present | 316 | — | .051 | .981 | .016 | .003 | bypass |
+| table 32b | present | 389 | — | .033 | .969 | .015 | .015 | bypass |
+| **nat 32b** | **present** | 179 | **.448** | .022 | .978 | **.000** | .022 | **bypass** |
+| **nat 32b** | **masked** | — | — | — | — | — | — | (跑完追加, §6) |
 
 \* chart-8B-present 的 `other`=.15 偏高(8B 在 ChartQA 上即便有图也偶发幻觉);32B/table 在场都是干净 bypass。
 
@@ -104,9 +108,11 @@
   可直接插入的 §5.2 草稿(见 §7),**不**单独把 N3 数字塞进尚未对账的 tex。
 
 ## 6. 32B 复现(prereg「if feasible」)
-- 状态:`run_n3.sh` 的 32B 链在跑(present→masked)。跑完把两行 `nat 32b` 追加进 §3 表 +
-  `n3_regime.json`,并核对是否逐格复现 8B(预期同向:图表/表格 32B 已逐格复现 8B)。
-- 命令现成:`python scripts/n3_report.py` 会在 `battery_natcount32b_*.json` 出现后自动带出 32B 行。
+- **present ✅ 逐格复现 8B**(n_eval=179,base acc .448):**corrupt .022 = shuffle .022 → F=0**、
+  **follow 0/179**、snap .978、other .022;**count-token 诊断 follow 0/60**(直接改错计数也 0 跟随)。
+  → 两个尺度都否 H_pole / H_collapse,头条结论跨尺度成立。
+- **masked**:32B 链在跑(2×3080 上 32B-nf4 phase-1 较慢),跑完追加本节 + §3 表 `nat 32b masked` 行 +
+  `n3_regime.json`。命令现成:`python scripts/n3_report.py` 会自动带出。预期:同 8B 近乎不动(other 平)。
 
 ## 7. 可插入论文的 §5.2 草稿(留给 WU-6,勿现在塞进未对账 tex)
 > **Natural-image pole (preregistered).** To test whether the masked-chart fabrication is an artifact
