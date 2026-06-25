@@ -1,0 +1,1244 @@
+{
+  "summary": {
+    "scale": "natcount8b",
+    "mask_image": false,
+    "n_eval": 166,
+    "n_cases": 400,
+    "base_correct": 166,
+    "base_acc": 0.415,
+    "adapter": null,
+    "n_para_nums_ok": 0,
+    "interventions": {
+      "corrupt": {
+        "n": 166,
+        "flips": 5,
+        "flip_rate": 0.030120481927710843,
+        "acc_after": 0.9879518072289156
+      },
+      "shuffle": {
+        "n": 166,
+        "flips": 5,
+        "flip_rate": 0.030120481927710843,
+        "acc_after": 0.9879518072289156
+      },
+      "filler": {
+        "n": 166,
+        "flips": 62,
+        "flip_rate": 0.37349397590361444,
+        "acc_after": 0.6385542168674698
+      },
+      "truncate": {
+        "0.25": {
+          "n": 166,
+          "flips": 62,
+          "flip_rate": 0.37349397590361444,
+          "acc_after": 0.6385542168674698
+        },
+        "0.5": {
+          "n": 166,
+          "flips": 41,
+          "flip_rate": 0.2469879518072289,
+          "acc_after": 0.7710843373493976
+        },
+        "0.75": {
+          "n": 166,
+          "flips": 16,
+          "flip_rate": 0.0963855421686747,
+          "acc_after": 0.9156626506024096
+        }
+      },
+      "delete": {
+        "1": {
+          "n": 166,
+          "flips": 6,
+          "flip_rate": 0.03614457831325301,
+          "acc_after": 0.9819277108433735
+        },
+        "2": {
+          "n": 166,
+          "flips": 7,
+          "flip_rate": 0.04216867469879518,
+          "acc_after": 0.9759036144578314
+        },
+        "3": {
+          "n": 166,
+          "flips": 11,
+          "flip_rate": 0.06626506024096386,
+          "acc_after": 0.9518072289156626
+        }
+      }
+    },
+    "re_perception": {
+      "n_corrupt": 166,
+      "snap_to_true": 164,
+      "follows_injected": 0,
+      "other": 2,
+      "snap_rate": 0.9879518072289156,
+      "follow_rate": 0.0
+    }
+  },
+  "details": [
+    {
+      "case_id": "natcount-0",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-4",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-5",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "25",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "natcount-9",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-11",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-14",
+      "base_ans": "- Person 2: Sm",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "natcount-16",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-19",
+      "base_ans": "4 (foreground) + 4 (",
+      "gold": "4",
+      "injected": "15",
+      "corrupt_ans": "12"
+    },
+    {
+      "case_id": "natcount-22",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "77",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-23",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-24",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-26",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-28",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-29",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "9",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "natcount-30",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-32",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-33",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-50",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-51",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-52",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "17",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-54",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "17",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-55",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-57",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-61",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "15",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-65",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-68",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-73",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "11",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "natcount-75",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-78",
+      "base_ans": "Therefore, there are 2 people",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-80",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-85",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-87",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "11",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "natcount-91",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-92",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-95",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-96",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "17",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-100",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "15",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "natcount-102",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-104",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-105",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-106",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-108",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "51",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-111",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-112",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-113",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-115",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-118",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-120",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-122",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-123",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "11",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-125",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-127",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-128",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-129",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "13",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "natcount-133",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-134",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "9",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-139",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "9",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-142",
+      "base_ans": "6. Counting the people to the left holding white cups: 2 people",
+      "gold": "2",
+      "injected": "17",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-145",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "9",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-146",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "9",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-147",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-149",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "17",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-151",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-152",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-160",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-161",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-168",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-171",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-172",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-175",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-177",
+      "base_ans": "There are 2 green buses parked next to each other.",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-180",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-182",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-186",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "15",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-190",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-192",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-194",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-195",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-198",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "9",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "natcount-199",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-200",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "9",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "natcount-202",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "11",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-203",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "11",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-204",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-207",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "17",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-208",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-212",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-213",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-215",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-217",
+      "base_ans": "12",
+      "gold": "12",
+      "injected": "19",
+      "corrupt_ans": "12"
+    },
+    {
+      "case_id": "natcount-223",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-227",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-230",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-231",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-232",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-233",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-236",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "15",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-237",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-240",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-242",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-243",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "11",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-249",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-254",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-255",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "15",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-257",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-258",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-259",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "27",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-260",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-264",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "15",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "natcount-269",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-273",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-275",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-278",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "9",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-279",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-280",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-282",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-284",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-294",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-300",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "15",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "natcount-302",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "15",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "natcount-303",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-305",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "17",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-306",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-307",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-308",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-312",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-314",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-316",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-317",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-323",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "11",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-328",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-330",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-331",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-335",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-336",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-337",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "17",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-338",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-339",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "17",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "natcount-340",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-341",
+      "base_ans": "10",
+      "gold": "10",
+      "injected": "13",
+      "corrupt_ans": "10"
+    },
+    {
+      "case_id": "natcount-347",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-350",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "11",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-353",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-355",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-357",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-358",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-359",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-360",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-361",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-363",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-364",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-371",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-372",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-373",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-374",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-380",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-381",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-384",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-385",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-386",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-388",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "17",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-389",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "13",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-391",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "9",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "natcount-393",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-396",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "natcount-397",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "15",
+      "corrupt_ans": "3"
+    }
+  ]
+}

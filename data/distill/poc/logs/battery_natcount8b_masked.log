@@ -1,0 +1,79 @@
+Loading weights:   0%|          | 0/750 [00:00<?, ?it/s]Loading weights:   0%|          | 1/750 [00:00<04:42,  2.65it/s]Loading weights:   0%|          | 2/750 [00:00<04:41,  2.66it/s]Loading weights:   1%|          | 5/750 [00:00<01:42,  7.26it/s]Loading weights:   2%|▏         | 16/750 [00:01<00:28, 26.05it/s]Loading weights:   4%|▎         | 27/750 [00:01<00:17, 41.30it/s]Loading weights:   5%|▌         | 38/750 [00:01<00:13, 53.04it/s]Loading weights:   7%|▋         | 49/750 [00:01<00:11, 61.94it/s]Loading weights:   8%|▊         | 60/750 [00:01<00:10, 68.68it/s]Loading weights:   9%|▉         | 71/750 [00:01<00:09, 72.90it/s]Loading weights:  11%|█         | 82/750 [00:01<00:08, 77.06it/s]Loading weights:  12%|█▏        | 92/750 [00:01<00:07, 82.57it/s]Loading weights:  13%|█▎        | 101/750 [00:01<00:07, 83.89it/s]Loading weights:  15%|█▍        | 110/750 [00:02<00:07, 81.46it/s]Loading weights:  16%|█▌        | 119/750 [00:02<00:08, 78.80it/s]Loading weights:  17%|█▋        | 128/750 [00:02<00:08, 75.45it/s]Loading weights:  18%|█▊        | 137/750 [00:02<00:07, 78.85it/s]Loading weights:  20%|█▉        | 147/750 [00:02<00:07, 83.46it/s]Loading weights:  21%|██        | 156/750 [00:02<00:07, 83.36it/s]Loading weights:  22%|██▏       | 165/750 [00:02<00:07, 80.08it/s]Loading weights:  23%|██▎       | 174/750 [00:02<00:07, 76.10it/s]Loading weights:  24%|██▍       | 182/750 [00:03<00:07, 71.21it/s]Loading weights:  26%|██▌       | 193/750 [00:03<00:07, 74.85it/s]Loading weights:  27%|██▋       | 204/750 [00:03<00:07, 77.33it/s]Loading weights:  29%|██▊       | 215/750 [00:03<00:06, 78.81it/s]Loading weights:  30%|███       | 226/750 [00:03<00:06, 79.95it/s]Loading weights:  31%|███▏      | 236/750 [00:03<00:06, 84.02it/s]Loading weights:  33%|███▎      | 246/750 [00:03<00:05, 88.07it/s]Loading weights:  34%|███▍      | 255/750 [00:03<00:05, 88.25it/s]Loading weights:  35%|███▌      | 264/750 [00:04<00:05, 83.88it/s]Loading weights:  36%|███▋      | 273/750 [00:04<00:05, 81.15it/s]Loading weights:  38%|███▊      | 282/750 [00:04<00:06, 77.25it/s]Loading weights:  39%|███▉      | 292/750 [00:04<00:05, 76.96it/s]Loading weights:  40%|████      | 303/750 [00:04<00:05, 79.93it/s]Loading weights:  42%|████▏     | 314/750 [00:04<00:05, 82.96it/s]Loading weights:  43%|████▎     | 325/750 [00:04<00:04, 85.07it/s]Loading weights:  45%|████▍     | 336/750 [00:04<00:04, 86.49it/s]Loading weights:  46%|████▋     | 347/750 [00:05<00:04, 87.20it/s]Loading weights:  48%|████▊     | 358/750 [00:05<00:04, 88.04it/s]Loading weights:  49%|████▉     | 369/750 [00:05<00:04, 88.43it/s]Loading weights:  51%|█████     | 380/750 [00:05<00:04, 89.01it/s]Loading weights:  52%|█████▏    | 391/750 [00:05<00:04, 89.10it/s]Loading weights:  62%|██████▏   | 465/750 [00:05<00:01, 255.26it/s]Loading weights:  75%|███████▍  | 559/750 [00:05<00:00, 437.56it/s]Loading weights:  87%|████████▋ | 655/750 [00:05<00:00, 577.35it/s]Loading weights:  97%|█████████▋| 731/750 [00:05<00:00, 606.79it/s]Loading weights: 100%|██████████| 750/750 [00:06<00:00, 124.94it/s]
+loaded BASE-ONLY (nf4) in 10s
+battery cases: 400 (mask_image=True, scale=natcount8b)
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+base free-form acc (image present): 166/400 = 0.415
+n_eval (correct + CoT): 166
+
+=== WU-2 BATTERY [natcount8b mask=True] n_eval=166 ===
+{
+  "scale": "natcount8b",
+  "mask_image": true,
+  "n_eval": 166,
+  "n_cases": 400,
+  "base_correct": 166,
+  "base_acc": 0.415,
+  "adapter": null,
+  "n_para_nums_ok": 0,
+  "interventions": {
+    "corrupt": {
+      "n": 166,
+      "flips": 6,
+      "flip_rate": 0.03614457831325301,
+      "acc_after": 0.9819277108433735
+    },
+    "shuffle": {
+      "n": 166,
+      "flips": 6,
+      "flip_rate": 0.03614457831325301,
+      "acc_after": 0.9819277108433735
+    },
+    "filler": {
+      "n": 166,
+      "flips": 166,
+      "flip_rate": 1.0,
+      "acc_after": 0.0
+    },
+    "truncate": {
+      "0.25": {
+        "n": 166,
+        "flips": 132,
+        "flip_rate": 0.7951807228915663,
+        "acc_after": 0.21084337349397592
+      },
+      "0.5": {
+        "n": 166,
+        "flips": 56,
+        "flip_rate": 0.3373493975903614,
+        "acc_after": 0.6807228915662651
+      },
+      "0.75": {
+        "n": 166,
+        "flips": 22,
+        "flip_rate": 0.13253012048192772,
+        "acc_after": 0.8795180722891566
+      }
+    },
+    "delete": {
+      "1": {
+        "n": 166,
+        "flips": 8,
+        "flip_rate": 0.04819277108433735,
+        "acc_after": 0.9698795180722891
+      },
+      "2": {
+        "n": 166,
+        "flips": 9,
+        "flip_rate": 0.05421686746987952,
+        "acc_after": 0.963855421686747
+      },
+      "3": {
+        "n": 166,
+        "flips": 13,
+        "flip_rate": 0.0783132530120482,
+        "acc_after": 0.9397590361445783
+      }
+    }
+  },
+  "re_perception": null
+}

@@ -1,0 +1,5 @@
+[natcount8b] present start 08:36:00 gpus=0
+[natcount32b] present start 08:36:00 gpus=1,2,3
+[natcount8b] present done 09:14:21 rc=0
+[natcount8b] masked start 09:14:21
+[natcount8b] masked done 09:51:54 rc=0
