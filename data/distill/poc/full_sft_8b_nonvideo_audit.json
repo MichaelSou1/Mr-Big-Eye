@@ -1,22 +1,17 @@
 {
   "objective": "Qwen3-VL-8B dense/full-SFT replicas for all non-video LoRA SFT arms, with matching causal probes.",
-  "complete": false,
-  "missing_requirements": [
-    "lora_to_full_sft_8b_coverage",
-    "tabmwp_full_battery",
-    "tabmwp_full_battery_has_answers",
-    "tabmwp_posthoc_ready"
-  ],
+  "complete": true,
+  "missing_requirements": [],
   "required": {
     "training_all_arms": true,
     "source_lora_8b_arms_found": true,
-    "lora_to_full_sft_8b_coverage": false,
+    "lora_to_full_sft_8b_coverage": true,
     "chartqa_eval": true,
     "chartqa_full_battery": true,
     "tabmwp_eval": true,
-    "tabmwp_full_battery": false,
-    "tabmwp_full_battery_has_answers": false,
-    "tabmwp_posthoc_ready": false,
+    "tabmwp_full_battery": true,
+    "tabmwp_full_battery_has_answers": true,
+    "tabmwp_posthoc_ready": true,
     "finqa_targeted_all_arms": true,
     "tabmwp_weight_retained_until_battery_done": true,
     "tabmwp_weight_clean_after_battery_done": true
@@ -37,10 +32,10 @@
       "source_lora_train": true,
       "source_lora_eval": true,
       "source_lora_probe": true,
-      "full_sft_complete": false,
+      "full_sft_complete": true,
       "full_sft_train": true,
       "full_sft_eval": true,
-      "full_sft_probe": false
+      "full_sft_probe": true
     },
     "finqa_b2": {
       "source_lora_complete": true,
@@ -266,9 +261,15 @@
     },
     "tabmwp_present": {
       "path": "data/distill/poc/battery_full8b_tabmwp_present.json",
-      "exists": false,
-      "complete": false,
-      "missing_interventions": [
+      "exists": true,
+      "complete": true,
+      "scale": "full8b_tabmwp",
+      "mask_image": false,
+      "n_cases": 400,
+      "n_eval": 387,
+      "base_acc": 0.9675,
+      "n_para_nums_ok": 222,
+      "interventions": [
         "corrupt",
         "delete",
         "filler",
@@ -276,22 +277,34 @@
         "shuffle",
         "truncate"
       ],
-      "has_per_case_answers": false,
-      "answer_variants": [],
-      "missing_answer_variants": [
+      "missing_interventions": [],
+      "corrupt_flip": 0.05167958656330749,
+      "shuffle_flip": 0.15503875968992248,
+      "paraphrase_flip": 0.07235142118863049,
+      "snap_rate": 0.9715762273901809,
+      "follow_rate": 0.015503875968992248,
+      "has_per_case_answers": true,
+      "answer_variants": [
         "corrupt",
         "delete",
         "filler",
         "paraphrase",
         "shuffle",
         "truncate"
-      ]
+      ],
+      "missing_answer_variants": []
     },
     "tabmwp_masked": {
       "path": "data/distill/poc/battery_full8b_tabmwp_masked.json",
-      "exists": false,
-      "complete": false,
-      "missing_interventions": [
+      "exists": true,
+      "complete": true,
+      "scale": "full8b_tabmwp",
+      "mask_image": true,
+      "n_cases": 400,
+      "n_eval": 387,
+      "base_acc": 0.9675,
+      "n_para_nums_ok": 222,
+      "interventions": [
         "corrupt",
         "delete",
         "filler",
@@ -299,16 +312,22 @@
         "shuffle",
         "truncate"
       ],
-      "has_per_case_answers": false,
-      "answer_variants": [],
-      "missing_answer_variants": [
+      "missing_interventions": [],
+      "corrupt_flip": 0.22739018087855298,
+      "shuffle_flip": 0.29457364341085274,
+      "paraphrase_flip": 0.082687338501292,
+      "snap_rate": null,
+      "follow_rate": null,
+      "has_per_case_answers": true,
+      "answer_variants": [
         "corrupt",
         "delete",
         "filler",
         "paraphrase",
         "shuffle",
         "truncate"
-      ]
+      ],
+      "missing_answer_variants": []
     },
     "tabmwp_present_core": {
       "path": "data/distill/poc/battery_full8b_tabmwp_present_core.json",
@@ -424,10 +443,10 @@
   "posthoc": {
     "path": "data/distill/poc/full8b_tabmwp_battery_posthoc.json",
     "exists": true,
-    "complete": false,
+    "complete": true,
     "cells": {
-      "tabmwp_present": "PENDING",
-      "tabmwp_masked": "PENDING"
+      "tabmwp_present": "PASS",
+      "tabmwp_masked": "PASS"
     },
     "stale_cells": []
   },
@@ -438,20 +457,20 @@
     },
     "tabmwp_mimo_paraphrase": {
       "path": "data/distill/poc/paraphrase_cache_full8b_tabmwp_mimo.jsonl",
-      "lines": 370,
+      "lines": 387,
       "expected_after_present": 387
     },
     "tabmwp_base_cot": {
       "path": "data/distill/poc/paraphrase_cache_full8b_tabmwp_mimo_base_cot.jsonl",
-      "lines": null,
+      "lines": 400,
       "expected_after_present": 400
     }
   },
   "checkpoint": {
     "tabmwp_weight_path": "data/distill/poc/full_8b_tabmwp/model.safetensors",
-    "tabmwp_weight_exists": true,
-    "tabmwp_weight_size_gb": 16.33,
-    "tabmwp_full_battery_done": false,
+    "tabmwp_weight_exists": false,
+    "tabmwp_weight_size_gb": null,
+    "tabmwp_full_battery_done": true,
     "policy": "retain until full battery is complete; then remove large weight shards"
   },
   "precheck_command": "PRECHECK_ONLY=1 bash scripts/resume_full_sft_8b_tabmwp_battery.sh",

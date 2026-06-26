@@ -1,6 +1,6 @@
 # Full-SFT 8B Non-Video Audit
 
-Overall: INCOMPLETE
+Overall: COMPLETE
 
 ## Requirement Status
 
@@ -8,13 +8,13 @@ Overall: INCOMPLETE
 |---|---|
 | training_all_arms | PASS |
 | source_lora_8b_arms_found | PASS |
-| lora_to_full_sft_8b_coverage | MISSING |
+| lora_to_full_sft_8b_coverage | PASS |
 | chartqa_eval | PASS |
 | chartqa_full_battery | PASS |
 | tabmwp_eval | PASS |
-| tabmwp_full_battery | MISSING |
-| tabmwp_full_battery_has_answers | MISSING |
-| tabmwp_posthoc_ready | MISSING |
+| tabmwp_full_battery | PASS |
+| tabmwp_full_battery_has_answers | PASS |
+| tabmwp_posthoc_ready | PASS |
 | finqa_targeted_all_arms | PASS |
 | tabmwp_weight_retained_until_battery_done | PASS |
 | tabmwp_weight_clean_after_battery_done | PASS |
@@ -24,7 +24,7 @@ Overall: INCOMPLETE
 | arm | source LoRA train | source LoRA eval | source LoRA probe | Full-SFT train | Full-SFT eval | Full-SFT probe | Full-SFT coverage |
 |---|---|---|---|---|---|---|---|
 | chartqa | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
-| tabmwp | PASS | PASS | PASS | PASS | PASS | MISSING | MISSING |
+| tabmwp | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
 | finqa_b2 | PASS | NA | PASS | PASS | NA | PASS | PASS |
 | finqa_vanilla | PASS | NA | PASS | PASS | NA | PASS | PASS |
 | finqa_b2_text | PASS | NA | PASS | PASS | NA | PASS | PASS |
@@ -54,8 +54,8 @@ Overall: INCOMPLETE
 |---|---|---:|---:|---|---|---|---|---:|---:|---:|---:|---:|
 | chartqa_present | PASS | 305 | 76.2% | corrupt,delete,filler,paraphrase,shuffle,truncate | NO | NA | NA | 10.0% | 25.9% | 4.9% | 91.7% | 3.0% |
 | chartqa_masked | PASS | 305 | 76.2% | corrupt,delete,filler,paraphrase,shuffle,truncate | NO | NA | NA | 24.9% | 38.0% | 9.5% | NA | NA |
-| tabmwp_present | MISSING | NA | NA | NA | NO | NA | corrupt,delete,filler,paraphrase,shuffle,truncate | NA | NA | NA | NA | NA |
-| tabmwp_masked | MISSING | NA | NA | NA | NO | NA | corrupt,delete,filler,paraphrase,shuffle,truncate | NA | NA | NA | NA | NA |
+| tabmwp_present | PASS | 387 | 96.8% | corrupt,delete,filler,paraphrase,shuffle,truncate | YES | corrupt,delete,filler,paraphrase,shuffle,truncate | NA | 5.2% | 15.5% | 7.2% | 97.2% | 1.6% |
+| tabmwp_masked | PASS | 387 | 96.8% | corrupt,delete,filler,paraphrase,shuffle,truncate | YES | corrupt,delete,filler,paraphrase,shuffle,truncate | NA | 22.7% | 29.5% | 8.3% | NA | NA |
 | tabmwp_present_core | PASS | 385 | 96.2% | corrupt,shuffle | NO | NA | NA | 4.9% | 16.1% | NA | 97.1% | 1.6% |
 | tabmwp_masked_core | PASS | 385 | 96.2% | corrupt,shuffle | NO | NA | NA | 25.5% | 29.9% | NA | NA | NA |
 
@@ -75,23 +75,18 @@ Overall: INCOMPLETE
 
 ## TabMWP Posthoc
 
-- status: MISSING
+- status: PASS
 - path: `data/distill/poc/full8b_tabmwp_battery_posthoc.json`
-- cells: {'tabmwp_present': 'PENDING', 'tabmwp_masked': 'PENDING'}
+- cells: {'tabmwp_present': 'PASS', 'tabmwp_masked': 'PASS'}
 
 ## Resume Readiness
 
 | item | current | expected/notes |
 |---|---:|---|
-| tabmwp_mimo_paraphrase | 370 | 387 after present run; data/distill/poc/paraphrase_cache_full8b_tabmwp_mimo.jsonl |
-| tabmwp_base_cot | MISSING | 400 after present run; data/distill/poc/paraphrase_cache_full8b_tabmwp_mimo_base_cot.jsonl |
-| tabmwp_weight | present | 16.33 GB; retain until full battery is complete; then remove large weight shards |
+| tabmwp_mimo_paraphrase | 387 | 387 after present run; data/distill/poc/paraphrase_cache_full8b_tabmwp_mimo.jsonl |
+| tabmwp_base_cot | 400 | 400 after present run; data/distill/poc/paraphrase_cache_full8b_tabmwp_mimo_base_cot.jsonl |
+| tabmwp_weight | absent | None GB; retain until full battery is complete; then remove large weight shards |
 
 ## Remaining Work
 
-- lora_to_full_sft_8b_coverage
-- tabmwp_full_battery
-- tabmwp_full_battery_has_answers
-- tabmwp_posthoc_ready
-- Precheck command: `PRECHECK_ONLY=1 bash scripts/resume_full_sft_8b_tabmwp_battery.sh`
-- Resume GPU command: `bash scripts/resume_full_sft_8b_tabmwp_battery.sh`
+- None.

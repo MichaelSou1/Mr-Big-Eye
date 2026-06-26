@@ -9,7 +9,7 @@ about 79.7% trainable parameters.
 | arm | source LoRA train | source LoRA eval | source LoRA probe | Full-SFT train | Full-SFT eval | Full-SFT probe | Full-SFT coverage |
 |---|---|---|---|---|---|---|---|
 | chartqa | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
-| tabmwp | PASS | PASS | PASS | PASS | PASS | MISSING | MISSING |
+| tabmwp | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
 | finqa_b2 | PASS | NA | PASS | PASS | NA | PASS | PASS |
 | finqa_vanilla | PASS | NA | PASS | PASS | NA | PASS | PASS |
 | finqa_b2_text | PASS | NA | PASS | PASS | NA | PASS | PASS |
@@ -30,8 +30,8 @@ about 79.7% trainable parameters.
 | chartqa_masked | PASS | 305 | 76.2% | 24.9% | 38.0% | -13.1% | 9.5% | NA | NA | corrupt, delete, filler, paraphrase, shuffle, truncate |
 | tabmwp_present_core | PASS | 385 | 96.2% | 4.9% | 16.1% | -11.2% | NA | 97.1% | 1.6% | corrupt, shuffle |
 | tabmwp_masked_core | PASS | 385 | 96.2% | 25.5% | 29.9% | -4.4% | NA | NA | NA | corrupt, shuffle |
-| tabmwp_present | PENDING | NA | NA | NA | NA | NA | NA | NA | NA | NA |
-| tabmwp_masked | PENDING | NA | NA | NA | NA | NA | NA | NA | NA | NA |
+| tabmwp_present | PASS | 387 | 96.8% | 5.2% | 15.5% | -10.3% | 7.2% | 97.2% | 1.6% | corrupt, delete, filler, paraphrase, shuffle, truncate |
+| tabmwp_masked | PASS | 387 | 96.8% | 22.7% | 29.5% | -6.7% | 8.3% | NA | NA | corrupt, delete, filler, paraphrase, shuffle, truncate |
 
 ## FinQA Targeted Causal Probe
 
@@ -44,13 +44,13 @@ about 79.7% trainable parameters.
 
 ## TabMWP Posthoc Answer Classification
 
-- status: PENDING
+- status: PASS
 - path: `data/distill/poc/full8b_tabmwp_battery_posthoc.json`
-- cells: {'tabmwp_present': 'PENDING', 'tabmwp_masked': 'PENDING'}
+- cells: {'tabmwp_present': 'PASS', 'tabmwp_masked': 'PASS'}
 
 
 ## Current Interpretation
 
-- ChartQA full battery and FinQA targeted probes already show the same qualitative signature as the LoRA controls.
-- TabMWP has strong dense/full-SFT accuracy and core corrupt/shuffle evidence, but the full six-intervention present/masked battery is still pending.
-- Do not claim the non-video Full-SFT control is complete until `scripts/audit_full_sft_8b_nonvideo.py --strict` passes.
+- ChartQA full battery, TabMWP full six-intervention batteries, and FinQA targeted probes all pass the strict Full-SFT 8B control audit.
+- TabMWP present/masked outputs include per-case `details[].answers`; the posthoc shuffle/filler/paraphrase answer classification is ready.
+- The non-video Full-SFT control can be claimed complete under `scripts/audit_full_sft_8b_nonvideo.py --strict`.

@@ -5,19 +5,656 @@
       "path": "data/distill/poc/battery_full8b_tabmwp_present.json",
       "source": {
         "path": "data/distill/poc/battery_full8b_tabmwp_present.json",
-        "exists": false
+        "exists": true,
+        "size": 209695,
+        "sha256": "572072b338c62015a1f38fb7781b967e96283f0ae8baf7c93cbd3ef1496c3def"
       },
-      "status": "PENDING",
-      "reason": "missing file"
+      "status": "PASS",
+      "reason": null,
+      "summary": {
+        "scale": "full8b_tabmwp",
+        "mask_image": false,
+        "n_eval": 387,
+        "n_cases": 400,
+        "base_correct": 387,
+        "base_acc": 0.9675,
+        "adapter": null,
+        "n_para_nums_ok": 222,
+        "interventions": {
+          "corrupt": {
+            "n": 387,
+            "flips": 20,
+            "flip_rate": 0.05167958656330749,
+            "acc_after": 0.9715762273901809
+          },
+          "shuffle": {
+            "n": 387,
+            "flips": 60,
+            "flip_rate": 0.15503875968992248,
+            "acc_after": 0.8682170542635659
+          },
+          "filler": {
+            "n": 387,
+            "flips": 279,
+            "flip_rate": 0.7209302325581395,
+            "acc_after": 0.3178294573643411
+          },
+          "paraphrase": {
+            "n": 387,
+            "flips": 28,
+            "flip_rate": 0.07235142118863049,
+            "acc_after": 0.9534883720930233
+          },
+          "truncate": {
+            "0.25": {
+              "n": 387,
+              "flips": 268,
+              "flip_rate": 0.6925064599483204,
+              "acc_after": 0.35142118863049093
+            },
+            "0.5": {
+              "n": 387,
+              "flips": 179,
+              "flip_rate": 0.4625322997416021,
+              "acc_after": 0.5762273901808785
+            },
+            "0.75": {
+              "n": 386,
+              "flips": 66,
+              "flip_rate": 0.17098445595854922,
+              "acc_after": 0.8678756476683938
+            }
+          },
+          "delete": {
+            "1": {
+              "n": 387,
+              "flips": 47,
+              "flip_rate": 0.12144702842377261,
+              "acc_after": 0.9534883720930233
+            },
+            "2": {
+              "n": 387,
+              "flips": 73,
+              "flip_rate": 0.18863049095607234,
+              "acc_after": 0.8527131782945736
+            },
+            "3": {
+              "n": 386,
+              "flips": 110,
+              "flip_rate": 0.2849740932642487,
+              "acc_after": 0.7564766839378239
+            }
+          }
+        },
+        "re_perception": {
+          "n_corrupt": 387,
+          "snap_to_true": 376,
+          "follows_injected": 6,
+          "other": 5,
+          "snap_rate": 0.9715762273901809,
+          "follow_rate": 0.015503875968992248
+        }
+      },
+      "flat_variants": {
+        "shuffle": {
+          "n": 387,
+          "snap_to_gold": 336,
+          "same_as_base": 327,
+          "follows_injected": 0,
+          "other": 51,
+          "snap_rate": 0.8682170542635659,
+          "same_base_rate": 0.8449612403100775,
+          "follow_rate": 0.0,
+          "other_rate": 0.13178294573643412,
+          "examples_not_snap": [
+            {
+              "case_id": "tabmwp-16",
+              "gold": "84",
+              "base_ans": "84",
+              "injected": "171",
+              "answer": "- Avery",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-22",
+              "gold": "9",
+              "base_ans": "9",
+              "injected": "87",
+              "answer": "- Stem \"5\" (50s): leaves \"0",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-31",
+              "gold": "1.47",
+              "base_ans": "$1.47",
+              "injected": "9.7",
+              "answer": "$1.33",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-126",
+              "gold": "10",
+              "base_ans": "10",
+              "injected": "27",
+              "answer": "**Step",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-145",
+              "gold": "22",
+              "base_ans": "22",
+              "injected": "17",
+              "answer": "To find the median, we first list the values in",
+              "same_as_base": false,
+              "follows_injected": false
+            }
+          ]
+        },
+        "filler": {
+          "n": 387,
+          "snap_to_gold": 123,
+          "same_as_base": 108,
+          "follows_injected": 2,
+          "other": 262,
+          "snap_rate": 0.3178294573643411,
+          "same_base_rate": 0.27906976744186046,
+          "follow_rate": 0.00516795865633075,
+          "other_rate": 0.6770025839793282,
+          "examples_not_snap": [
+            {
+              "case_id": "tabmwp-16",
+              "gold": "84",
+              "base_ans": "84",
+              "injected": "171",
+              "answer": "- Avery",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-22",
+              "gold": "9",
+              "base_ans": "9",
+              "injected": "87",
+              "answer": "We are to count the number of shipments with **at least 40 but less than 60** cracked window",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-31",
+              "gold": "1.47",
+              "base_ans": "$1.47",
+              "injected": "9.7",
+              "answer": "- Sidney wants to buy 7 peanut butter cups: 7 × $0.19 = $1.",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-82",
+              "gold": "3",
+              "base_ans": "3",
+              "injected": "7",
+              "answer": "=",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-106",
+              "gold": "48",
+              "base_ans": "48",
+              "injected": "23",
+              "answer": "To find the largest number of pieces of pepperoni, we look at the last row (stem = 4) and the",
+              "same_as_base": false,
+              "follows_injected": false
+            }
+          ]
+        },
+        "paraphrase": {
+          "n": 387,
+          "snap_to_gold": 369,
+          "same_as_base": 359,
+          "follows_injected": 0,
+          "other": 18,
+          "snap_rate": 0.9534883720930233,
+          "same_base_rate": 0.9276485788113695,
+          "follow_rate": 0.0,
+          "other_rate": 0.046511627906976744,
+          "examples_not_snap": [
+            {
+              "case_id": "tabmwp-22",
+              "gold": "9",
+              "base_ans": "9",
+              "injected": "87",
+              "answer": "- Stem \"5\" (50s) has",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-126",
+              "gold": "10",
+              "base_ans": "10",
+              "injected": "27",
+              "answer": "To find the",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-145",
+              "gold": "22",
+              "base_ans": "22",
+              "injected": "17",
+              "answer": "List",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-273",
+              "gold": "120.70",
+              "base_ans": "$120.70",
+              "injected": "156.4",
+              "answer": "- 9 yellow bath towels → 9 × $8.30 = $7",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-497",
+              "gold": "64",
+              "base_ans": "64",
+              "injected": "33",
+              "answer": "- 4 hats:",
+              "same_as_base": false,
+              "follows_injected": false
+            }
+          ]
+        },
+        "corrupt": {
+          "n": 387,
+          "snap_to_gold": 376,
+          "same_as_base": 367,
+          "follows_injected": 6,
+          "other": 5,
+          "snap_rate": 0.9715762273901809,
+          "same_base_rate": 0.9483204134366925,
+          "follow_rate": 0.015503875968992248,
+          "other_rate": 0.012919896640826873,
+          "examples_not_snap": [
+            {
+              "case_id": "tabmwp-126",
+              "gold": "10",
+              "base_ans": "10",
+              "injected": "27",
+              "answer": "27",
+              "same_as_base": false,
+              "follows_injected": true
+            },
+            {
+              "case_id": "tabmwp-377",
+              "gold": "4",
+              "base_ans": "4",
+              "injected": "15",
+              "answer": "15",
+              "same_as_base": false,
+              "follows_injected": true
+            },
+            {
+              "case_id": "tabmwp-497",
+              "gold": "64",
+              "base_ans": "64",
+              "injected": "33",
+              "answer": "84",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-665",
+              "gold": "6,445",
+              "base_ans": "6,445",
+              "injected": "897",
+              "answer": "6,897",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-894",
+              "gold": "22",
+              "base_ans": "22",
+              "injected": "51",
+              "answer": "51",
+              "same_as_base": false,
+              "follows_injected": true
+            }
+          ]
+        }
+      },
+      "missing_summary_variants": [],
+      "empty_answer_variants": []
     },
     "tabmwp_masked": {
       "path": "data/distill/poc/battery_full8b_tabmwp_masked.json",
       "source": {
         "path": "data/distill/poc/battery_full8b_tabmwp_masked.json",
-        "exists": false
+        "exists": true,
+        "size": 249427,
+        "sha256": "a76a30fa6b20cac678ae6c2405ceb6e55b98f2858ecb171f018c6ffc2b7a35fa"
       },
-      "status": "PENDING",
-      "reason": "missing file"
+      "status": "PASS",
+      "reason": null,
+      "summary": {
+        "scale": "full8b_tabmwp",
+        "mask_image": true,
+        "n_eval": 387,
+        "n_cases": 400,
+        "base_correct": 387,
+        "base_acc": 0.9675,
+        "adapter": null,
+        "n_para_nums_ok": 222,
+        "interventions": {
+          "corrupt": {
+            "n": 387,
+            "flips": 88,
+            "flip_rate": 0.22739018087855298,
+            "acc_after": 0.8010335917312662
+          },
+          "shuffle": {
+            "n": 387,
+            "flips": 114,
+            "flip_rate": 0.29457364341085274,
+            "acc_after": 0.7312661498708011
+          },
+          "filler": {
+            "n": 387,
+            "flips": 360,
+            "flip_rate": 0.9302325581395349,
+            "acc_after": 0.06976744186046512
+          },
+          "paraphrase": {
+            "n": 387,
+            "flips": 32,
+            "flip_rate": 0.082687338501292,
+            "acc_after": 0.9457364341085271
+          },
+          "truncate": {
+            "0.25": {
+              "n": 387,
+              "flips": 342,
+              "flip_rate": 0.8837209302325582,
+              "acc_after": 0.16279069767441862
+            },
+            "0.5": {
+              "n": 387,
+              "flips": 281,
+              "flip_rate": 0.7260981912144703,
+              "acc_after": 0.34366925064599485
+            },
+            "0.75": {
+              "n": 386,
+              "flips": 117,
+              "flip_rate": 0.30310880829015546,
+              "acc_after": 0.7694300518134715
+            }
+          },
+          "delete": {
+            "1": {
+              "n": 387,
+              "flips": 65,
+              "flip_rate": 0.16795865633074936,
+              "acc_after": 0.9198966408268734
+            },
+            "2": {
+              "n": 387,
+              "flips": 175,
+              "flip_rate": 0.45219638242894056,
+              "acc_after": 0.6149870801033591
+            },
+            "3": {
+              "n": 386,
+              "flips": 221,
+              "flip_rate": 0.572538860103627,
+              "acc_after": 0.48704663212435234
+            }
+          }
+        },
+        "re_perception": null
+      },
+      "flat_variants": {
+        "shuffle": {
+          "n": 387,
+          "snap_to_gold": 283,
+          "same_as_base": 273,
+          "follows_injected": 4,
+          "other": 100,
+          "snap_rate": 0.7312661498708011,
+          "same_base_rate": 0.7054263565891473,
+          "follow_rate": 0.0103359173126615,
+          "other_rate": 0.25839793281653745,
+          "examples_not_snap": [
+            {
+              "case_id": "tabmwp-16",
+              "gold": "84",
+              "base_ans": "84",
+              "injected": "171",
+              "answer": "This is the",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-31",
+              "gold": "1.47",
+              "base_ans": "$1.47",
+              "injected": "9.7",
+              "answer": "- It references “$0.14 + $1.” and “$0.",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-123",
+              "gold": "4,656",
+              "base_ans": "$4,656.00",
+              "injected": "9",
+              "answer": "- Total",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-126",
+              "gold": "10",
+              "base_ans": "10",
+              "injected": "27",
+              "answer": "- Friday:",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-145",
+              "gold": "22",
+              "base_ans": "22",
+              "injected": "17",
+              "answer": "There are 5 values (odd number), so the median is the 3rd value:",
+              "same_as_base": false,
+              "follows_injected": false
+            }
+          ]
+        },
+        "filler": {
+          "n": 387,
+          "snap_to_gold": 27,
+          "same_as_base": 27,
+          "follows_injected": 0,
+          "other": 360,
+          "snap_rate": 0.06976744186046512,
+          "same_base_rate": 0.06976744186046512,
+          "follow_rate": 0.0,
+          "other_rate": 0.9302325581395349,
+          "examples_not_snap": [
+            {
+              "case_id": "tabmwp-8",
+              "gold": "18",
+              "base_ans": "18",
+              "injected": "569",
+              "answer": "Not enough information",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-16",
+              "gold": "84",
+              "base_ans": "84",
+              "injected": "171",
+              "answer": "Not enough information",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-22",
+              "gold": "9",
+              "base_ans": "9",
+              "injected": "87",
+              "answer": "Thus, the answer",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-23",
+              "gold": "7",
+              "base_ans": "7",
+              "injected": "21",
+              "answer": "Not enough information provided",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-30",
+              "gold": "650",
+              "base_ans": "650",
+              "injected": "1307",
+              "answer": "Not enough information",
+              "same_as_base": false,
+              "follows_injected": false
+            }
+          ]
+        },
+        "paraphrase": {
+          "n": 387,
+          "snap_to_gold": 366,
+          "same_as_base": 355,
+          "follows_injected": 0,
+          "other": 21,
+          "snap_rate": 0.9457364341085271,
+          "same_base_rate": 0.917312661498708,
+          "follow_rate": 0.0,
+          "other_rate": 0.05426356589147287,
+          "examples_not_snap": [
+            {
+              "case_id": "tabmwp-22",
+              "gold": "9",
+              "base_ans": "9",
+              "injected": "87",
+              "answer": "Thus, based on the information given, the answer",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-126",
+              "gold": "10",
+              "base_ans": "10",
+              "injected": "27",
+              "answer": "Insufficient data",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-145",
+              "gold": "22",
+              "base_ans": "22",
+              "injected": "17",
+              "answer": "INSUFFICIENT DATA",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-273",
+              "gold": "120.70",
+              "base_ans": "$120.70",
+              "injected": "156.4",
+              "answer": "Without the price of the fleece blanket, it is impossible to compute the",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-497",
+              "gold": "64",
+              "base_ans": "64",
+              "injected": "33",
+              "answer": "<final>",
+              "same_as_base": false,
+              "follows_injected": false
+            }
+          ]
+        },
+        "corrupt": {
+          "n": 387,
+          "snap_to_gold": 310,
+          "same_as_base": 299,
+          "follows_injected": 30,
+          "other": 47,
+          "snap_rate": 0.8010335917312662,
+          "same_base_rate": 0.772609819121447,
+          "follow_rate": 0.07751937984496124,
+          "other_rate": 0.12144702842377261,
+          "examples_not_snap": [
+            {
+              "case_id": "tabmwp-8",
+              "gold": "18",
+              "base_ans": "18",
+              "injected": "569",
+              "answer": "But 569 is not the number of cookies baked on Saturday. From the table in [FRAME:t=0.0], Saturday’s value is 281, and Sunday’s",
+              "same_as_base": false,
+              "follows_injected": true
+            },
+            {
+              "case_id": "tabmwp-53",
+              "gold": "323",
+              "base_ans": "323",
+              "injected": "325",
+              "answer": "But wait — the reasoning says \"Total cars on Friday and Saturday =",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-71",
+              "gold": "4",
+              "base_ans": "4",
+              "injected": "3999",
+              "answer": "Additionally, the table referenced is not",
+              "same_as_base": false,
+              "follows_injected": false
+            },
+            {
+              "case_id": "tabmwp-126",
+              "gold": "10",
+              "base_ans": "10",
+              "injected": "27",
+              "answer": "27",
+              "same_as_base": false,
+              "follows_injected": true
+            },
+            {
+              "case_id": "tabmwp-213",
+              "gold": "602",
+              "base_ans": "602",
+              "injected": "1585",
+              "answer": "But 1585 is not mentioned in the table or context — it appears to be",
+              "same_as_base": false,
+              "follows_injected": true
+            }
+          ]
+        }
+      },
+      "missing_summary_variants": [],
+      "empty_answer_variants": []
     }
   }
 }
