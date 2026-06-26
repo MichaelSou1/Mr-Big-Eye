@@ -109,7 +109,7 @@ def build_join():
 def fig_map(out_pdf, out_png):
     """Render the spec-§8 regime MAP (map.json) as a heatmap, annotated with free-acc,
     best-agentic net±CI and regime. Colour encodes regime (R1 perception/selection-bound vs
-    R2 reasoning-bound); cells with no agentic data are greyed."""
+    R2 reasoning-bound); unrun cross-products and cells without agentic runs are explicitly labelled."""
     mp = jget(RES / "map.json")
     tbl = jget(RES / "tables.json") or {"master": []}
     ci_by = {(m["dataset"], m["model_id"], m["method"]): m.get("ci") for m in tbl.get("master", [])}
@@ -121,7 +121,7 @@ def fig_map(out_pdf, out_png):
     models += sorted({c["model_id"] for c in cells} - set(models))
     by = {(c["dataset"], c["model_id"]): c for c in cells}
 
-    # colour: R2 = warm (reasoning-bound, the rare internalizable regime), R1 = cool, none = grey
+    # colour: R2 = warm (reasoning-bound, the rare internalizable regime), R1 = cool, none = grey.
     C = {1: "#cfe3f2", 2: "#f6c9a8", None: "#eeeeee"}
     fig, ax = plt.subplots(figsize=(1.7 * len(datasets) + 1.6, 0.92 * len(models) + 1.2))
     for yi, mid in enumerate(models):
@@ -131,6 +131,8 @@ def fig_map(out_pdf, out_png):
             ax.add_patch(plt.Rectangle((xi, yi), 1, 1, facecolor=C.get(reg, C[None]),
                                        edgecolor="white", linewidth=2))
             if not c:
+                ax.text(xi + 0.5, yi + 0.5, "NA", ha="center", va="center",
+                        fontsize=7.2, color="#9a9a9a")
                 continue
             fa = c.get("free_acc")
             net = c.get("best_net")
@@ -140,6 +142,8 @@ def fig_map(out_pdf, out_png):
                 lab += f"\nnet={net:+.02f}"
                 if ci:
                     lab += f"\n[{ci[0]:+.02f},{ci[1]:+.02f}]"
+            else:
+                lab += "\nno agentic"
             lab += f"\n{'R2' if reg == 2 else 'R1'}"
             ax.text(xi + 0.5, yi + 0.5, lab, ha="center", va="center", fontsize=7.5,
                     fontweight="bold" if reg == 2 else "normal")
@@ -154,8 +158,9 @@ def fig_map(out_pdf, out_png):
     for s in ax.spines.values():
         s.set_visible(False)
     ax.legend(handles=[Patch(facecolor=C[1], label="R1 perception/selection-bound"),
-                       Patch(facecolor=C[2], label="R2 reasoning-bound (internalizable)")],
-              loc="upper center", bbox_to_anchor=(0.5, -0.06), ncol=2, frameon=False, fontsize=8.5)
+                       Patch(facecolor=C[2], label="R2 reasoning-bound (internalizable)"),
+                       Patch(facecolor=C[None], label="NA / not run")],
+              loc="upper center", bbox_to_anchor=(0.5, -0.06), ncol=3, frameon=False, fontsize=8.5)
     fig.tight_layout()
     fig.savefig(out_pdf, bbox_inches="tight"); fig.savefig(out_png, dpi=160, bbox_inches="tight")
     plt.close(fig)
@@ -167,8 +172,9 @@ def fig_decoupling(cells, out_pdf, out_png):
     For each scale: F (present, filled; masked, hollow) with 95% binomial CI, plus a horizontal
     SFT accuracy-gain arrow (base→SFT, the measured Δacc) drawn at the present-F level — the
     accuracy axis moves +6.5–7.0%, statistically significant, while the model stays pinned on the
-    F≈0 (CoT-not-load-bearing) band. F is measured on the base model; the arrow shows distillation
-    buys reading accuracy, not a lift off the faithfulness floor."""
+    F≈0 (written-CoT-not-load-bearing) band. F is measured on the same SFT student used for the
+    corresponding probe; the arrow shows distillation buys reading accuracy, not a lift off the
+    faithfulness floor."""
     col = {"8b": "#1f77b4", "32b": "#d62728"}
     fig, ax = plt.subplots(figsize=(7.2, 4.6))
 
@@ -254,19 +260,21 @@ def write_tex_snippet():
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.6\textwidth]{figures/fig_map.pdf}
-  \caption{\textbf{The map.} Variance-gated agentic-reasoning headroom per (dataset $\times$ model).
-  Only 32B-on-ChartQA is reasoning-bound (R2); every other cell is perception/selection-bound (R1).}
+  \caption{\textbf{The map.} Variance-gated agentic-reasoning headroom per plotted (dataset $\times$ model) cell;
+  cell colour encodes regime. Table~\ref{tab:map} gives the full listed set, including 32B ChartQA
+  and 8B/32B TabMWP as reasoning-bound audit cells. Annotations are gate free-form accuracy,
+  best-agentic net and paired-bootstrap CI.}
   \label{fig:map}
 \end{figure}
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{figures/fig_decoupling.pdf}
-  \caption{\textbf{Accuracy $\perp$ faithfulness.} CoT distillation lifts ChartQA accuracy by
-  $+6.5$--$7.0\%$ (McNemar $p\!\le\!.002$; horizontal arrows), yet the internalized CoT stays on the
-  $F\!\approx\!0$ band: corrupting a CoT intermediate flips the answer no more than shuffling it.
-  A latent chain surfaces only when the image is masked (hollow markers). $F$ is measured on the base;
-  error bars are $95\%$ binomial CIs.}
+  \caption{\textbf{Accuracy $\perp$ written-chain faithfulness.} CoT distillation lifts ChartQA accuracy by
+  $+6.5$--$7.0\%$ (McNemar $p\!\le\!.002$; horizontal arrows), yet the causal CoT metric stays on the
+  $F\!\approx\!0$ band: corrupting a numeric intermediate flips the answer no more than shuffling the CoT.
+  Hollow markers show image-masked controls. $F$ is measured on the same SFT student used for the
+  corresponding probe; error bars are $95\%$ binomial CIs.}
   \label{fig:decoupling}
 \end{figure}
 """

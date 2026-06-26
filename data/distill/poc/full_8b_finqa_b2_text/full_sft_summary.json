@@ -1,0 +1,26 @@
+{
+  "base": "/home/gpus/models/Qwen3-VL-8B-Instruct",
+  "data": "data/distill/finqa/curriculum_dev_strict_text.jsonl",
+  "out": "data/distill/poc/full_8b_finqa_b2_text",
+  "epochs": 3.0,
+  "lr": 2e-05,
+  "max_len": 2048,
+  "max_target_len": 0,
+  "loss_chunk_tokens": 128,
+  "batch_size": 1,
+  "grad_accum": 8,
+  "optim": "paged_adamw_8bit",
+  "strategy": "device_map",
+  "fsdp": null,
+  "train_vision": false,
+  "freeze_embeddings": true,
+  "freeze_first_layers": 3,
+  "n_records": 173,
+  "n_usable": 173,
+  "train_metrics": {
+    "train_loss": 0.16450583050391288,
+    "train_micro_steps": 512,
+    "train_steps": 66,
+    "epoch": 3
+  }
+}

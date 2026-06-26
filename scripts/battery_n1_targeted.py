@@ -236,6 +236,9 @@ def wilson(k, n, z=1.96):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", required=True)
+    ap.add_argument("--base-mode-name", default="base",
+                    help="Label for the no-adapter mode. Use this when --base is itself a "
+                         "Full-SFT checkpoint, e.g. full_b2.")
     ap.add_argument("--adapters", nargs="*", default=[],
                     help="name=dir pairs, e.g. b2=.../lora_8b_finqa_b2 vanilla=.../lora_8b_finqa_vanilla")
     ap.add_argument("--quant", choices=["nf4", "none"], default="none")
@@ -426,12 +429,17 @@ def main() -> int:
                   f"(follow {m['follow']}/{nt}, CI[{m['follow_ci'][0]:.3f},{m['follow_ci'][1]:.3f}])", flush=True)
         return summ, details
 
-    modes = [("base", None)] + [(nm, nm) for nm, _ in names]
+    modes = [(args.base_mode_name, None)] + [(nm, nm) for nm, _ in names]
     results = {}
     all_details = {}
     for mode, nm in modes:
         if nm is None:
-            ctx = model.disable_adapter()
+            if names and hasattr(model, "disable_adapter"):
+                ctx = model.disable_adapter()
+            elif names and hasattr(model, "disable_adapters"):
+                ctx = model.disable_adapters()
+            else:
+                ctx = contextlib.nullcontext()
         else:
             model.set_adapter(nm); ctx = contextlib.nullcontext()
         with ctx:

@@ -2,18 +2,20 @@
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.6\textwidth]{figures/fig_map.pdf}
-  \caption{\textbf{The map.} Variance-gated agentic-reasoning headroom per (dataset $\times$ model).
-  Only 32B-on-ChartQA is reasoning-bound (R2); every other cell is perception/selection-bound (R1).}
+  \caption{\textbf{The map.} Variance-gated agentic-reasoning headroom per plotted (dataset $\times$ model) cell;
+  cell colour encodes regime. Table~\ref{tab:map} gives the full listed set, including 32B ChartQA
+  and 8B/32B TabMWP as reasoning-bound audit cells. Annotations are gate free-form accuracy,
+  best-agentic net and paired-bootstrap CI.}
   \label{fig:map}
 \end{figure}
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{figures/fig_decoupling.pdf}
-  \caption{\textbf{Accuracy $\perp$ faithfulness.} CoT distillation lifts ChartQA accuracy by
-  $+6.5$--$7.0\%$ (McNemar $p\!\le\!.002$; horizontal arrows), yet the internalized CoT stays on the
-  $F\!\approx\!0$ band: corrupting a CoT intermediate flips the answer no more than shuffling it.
-  A latent chain surfaces only when the image is masked (hollow markers). $F$ is measured on the base;
-  error bars are $95\%$ binomial CIs.}
+  \caption{\textbf{Accuracy $\perp$ written-chain faithfulness.} CoT distillation lifts ChartQA accuracy by
+  $+6.5$--$7.0\%$ (McNemar $p\!\le\!.002$; horizontal arrows), yet the causal CoT metric stays on the
+  $F\!\approx\!0$ band: corrupting a numeric intermediate flips the answer no more than shuffling the CoT.
+  Hollow markers show image-masked controls. $F$ is measured on the same SFT student used for the
+  corresponding probe; error bars are $95\%$ binomial CIs.}
   \label{fig:decoupling}
 \end{figure}

@@ -1,0 +1,2724 @@
+{
+  "summary": {
+    "scale": "full8b_tabmwp_core",
+    "mask_image": true,
+    "n_eval": 385,
+    "n_cases": 400,
+    "base_correct": 385,
+    "base_acc": 0.9625,
+    "adapter": null,
+    "n_para_nums_ok": 0,
+    "interventions": {
+      "corrupt": {
+        "n": 385,
+        "flips": 98,
+        "flip_rate": 0.2545454545454545,
+        "acc_after": 0.7714285714285715
+      },
+      "shuffle": {
+        "n": 385,
+        "flips": 115,
+        "flip_rate": 0.2987012987012987,
+        "acc_after": 0.7220779220779221
+      }
+    },
+    "re_perception": null
+  },
+  "details": [
+    {
+      "case_id": "tabmwp-8",
+      "base_ans": "18",
+      "gold": "18",
+      "injected": "569",
+      "corrupt_ans": "But 569 is not the number of cookies baked on Saturday. From the table in [FRAME:t=0.0], Saturday’s value is 281, and Sunday’s"
+    },
+    {
+      "case_id": "tabmwp-16",
+      "base_ans": "84",
+      "gold": "84",
+      "injected": "171",
+      "corrupt_ans": "84"
+    },
+    {
+      "case_id": "tabmwp-22",
+      "base_ans": "9",
+      "gold": "9",
+      "injected": "87",
+      "corrupt_ans": "9"
+    },
+    {
+      "case_id": "tabmwp-23",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "21",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-30",
+      "base_ans": "650",
+      "gold": "650",
+      "injected": "1307",
+      "corrupt_ans": "650"
+    },
+    {
+      "case_id": "tabmwp-31",
+      "base_ans": "$1.47",
+      "gold": "1.47",
+      "injected": "9.7",
+      "corrupt_ans": "1.47"
+    },
+    {
+      "case_id": "tabmwp-46",
+      "base_ans": "16",
+      "gold": "16",
+      "injected": "45",
+      "corrupt_ans": "16"
+    },
+    {
+      "case_id": "tabmwp-53",
+      "base_ans": "323",
+      "gold": "323",
+      "injected": "335",
+      "corrupt_ans": "Correct calculation should be:"
+    },
+    {
+      "case_id": "tabmwp-62",
+      "base_ans": "19",
+      "gold": "19",
+      "injected": "9",
+      "corrupt_ans": "19"
+    },
+    {
+      "case_id": "tabmwp-71",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "23",
+      "corrupt_ans": "19"
+    },
+    {
+      "case_id": "tabmwp-74",
+      "base_ans": "$0.58",
+      "gold": "0.58",
+      "injected": "8.2",
+      "corrupt_ans": "0.58"
+    },
+    {
+      "case_id": "tabmwp-82",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-106",
+      "base_ans": "48",
+      "gold": "48",
+      "injected": "23",
+      "corrupt_ans": "The reasoning provided contains an error. It states that the largest number is 48, but the stem-and-leaf plot row with stem = 4 and leaf = 23 would represent 423, not 48. The stem represents the tens digit, and the leaf represents the units digit —"
+    },
+    {
+      "case_id": "tabmwp-123",
+      "base_ans": "$4,656.00",
+      "gold": "4,656",
+      "injected": "7",
+      "corrupt_ans": "4656.00"
+    },
+    {
+      "case_id": "tabmwp-126",
+      "base_ans": "10",
+      "gold": "10",
+      "injected": "89",
+      "corrupt_ans": "10"
+    },
+    {
+      "case_id": "tabmwp-133",
+      "base_ans": "50.80",
+      "gold": "50.80",
+      "injected": "13",
+      "corrupt_ans": "50.80"
+    },
+    {
+      "case_id": "tabmwp-141",
+      "base_ans": "10",
+      "gold": "10",
+      "injected": "27",
+      "corrupt_ans": "10"
+    },
+    {
+      "case_id": "tabmwp-145",
+      "base_ans": "22",
+      "gold": "22",
+      "injected": "89",
+      "corrupt_ans": "- New Hamburg: 22"
+    },
+    {
+      "case_id": "tabmwp-163",
+      "base_ans": "$6.80",
+      "gold": "6.80",
+      "injected": "11",
+      "corrupt_ans": "Cost = 3"
+    },
+    {
+      "case_id": "tabmwp-169",
+      "base_ans": "19",
+      "gold": "19",
+      "injected": "47",
+      "corrupt_ans": "19"
+    },
+    {
+      "case_id": "tabmwp-175",
+      "base_ans": "$8.40",
+      "gold": "8.40",
+      "injected": "13",
+      "corrupt_ans": "$8.40"
+    },
+    {
+      "case_id": "tabmwp-180",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "27",
+      "corrupt_ans": "ANS"
+    },
+    {
+      "case_id": "tabmwp-187",
+      "base_ans": "0.07",
+      "gold": "0.07",
+      "injected": "7",
+      "corrupt_ans": "0.07"
+    },
+    {
+      "case_id": "tabmwp-212",
+      "base_ans": "$4.40",
+      "gold": "4.40",
+      "injected": "15",
+      "corrupt_ans": "Cost = $15 × 1."
+    },
+    {
+      "case_id": "tabmwp-213",
+      "base_ans": "602",
+      "gold": "602",
+      "injected": "381",
+      "corrupt_ans": "789 -"
+    },
+    {
+      "case_id": "tabmwp-217",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "4039",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-225",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "11",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-240",
+      "base_ans": "15",
+      "gold": "15",
+      "injected": "7",
+      "corrupt_ans": "15"
+    },
+    {
+      "case_id": "tabmwp-250",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "85",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-251",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "4033",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-256",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "187",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-273",
+      "base_ans": "$120.70",
+      "gold": "120.70",
+      "injected": "23",
+      "corrupt_ans": "120.70"
+    },
+    {
+      "case_id": "tabmwp-286",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "11",
+      "corrupt_ans": "- Smallest value = 4 ("
+    },
+    {
+      "case_id": "tabmwp-308",
+      "base_ans": "$23.00",
+      "gold": "23",
+      "injected": "33",
+      "corrupt_ans": "23.00"
+    },
+    {
+      "case_id": "tabmwp-310",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "11",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-316",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "31",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-324",
+      "base_ans": "17",
+      "gold": "17",
+      "injected": "19",
+      "corrupt_ans": "17"
+    },
+    {
+      "case_id": "tabmwp-333",
+      "base_ans": "94",
+      "gold": "94",
+      "injected": "199",
+      "corrupt_ans": "94"
+    },
+    {
+      "case_id": "tabmwp-334",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "15",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-352",
+      "base_ans": "77",
+      "gold": "77",
+      "injected": "161",
+      "corrupt_ans": "161"
+    },
+    {
+      "case_id": "tabmwp-353",
+      "base_ans": "$109.26",
+      "gold": "109.26",
+      "injected": "25",
+      "corrupt_ans": "109.26"
+    },
+    {
+      "case_id": "tabmwp-355",
+      "base_ans": "40",
+      "gold": "40",
+      "injected": "9",
+      "corrupt_ans": "40"
+    },
+    {
+      "case_id": "tabmwp-356",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "11",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-377",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "87",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-385",
+      "base_ans": "10",
+      "gold": "10",
+      "injected": "17",
+      "corrupt_ans": "The subtraction of $5 is incorrect — Eli’s donation is $17, not $5."
+    },
+    {
+      "case_id": "tabmwp-386",
+      "base_ans": "0",
+      "gold": "0",
+      "injected": "13",
+      "corrupt_ans": "0"
+    },
+    {
+      "case_id": "tabmwp-392",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "4031",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-400",
+      "base_ans": "9",
+      "gold": "9",
+      "injected": "25",
+      "corrupt_ans": "9"
+    },
+    {
+      "case_id": "tabmwp-405",
+      "base_ans": "14",
+      "gold": "14",
+      "injected": "27",
+      "corrupt_ans": "14"
+    },
+    {
+      "case_id": "tabmwp-418",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "41",
+      "corrupt_ans": "$17 (Wednesday) - $9 ("
+    },
+    {
+      "case_id": "tabmwp-437",
+      "base_ans": "1",
+      "gold": "1",
+      "injected": "23",
+      "corrupt_ans": "Since the reasoning does not address the actual question, and no valid"
+    },
+    {
+      "case_id": "tabmwp-452",
+      "base_ans": "18",
+      "gold": "18",
+      "injected": "4031",
+      "corrupt_ans": "18"
+    },
+    {
+      "case_id": "tabmwp-453",
+      "base_ans": "41",
+      "gold": "41",
+      "injected": "9",
+      "corrupt_ans": "41"
+    },
+    {
+      "case_id": "tabmwp-455",
+      "base_ans": "9",
+      "gold": "9",
+      "injected": "9",
+      "corrupt_ans": "9"
+    },
+    {
+      "case_id": "tabmwp-458",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "7",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-460",
+      "base_ans": "$3",
+      "gold": "3",
+      "injected": "7",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-462",
+      "base_ans": "$3.30",
+      "gold": "3.30",
+      "injected": "13",
+      "corrupt_ans": "Total cost = 1.1 × $13 = $14.30"
+    },
+    {
+      "case_id": "tabmwp-488",
+      "base_ans": "$4.54",
+      "gold": "4.54",
+      "injected": "9",
+      "corrupt_ans": "4.54"
+    },
+    {
+      "case_id": "tabmwp-493",
+      "base_ans": "58",
+      "gold": "58",
+      "injected": "23",
+      "corrupt_ans": "58"
+    },
+    {
+      "case_id": "tabmwp-497",
+      "base_ans": "64",
+      "gold": "64",
+      "injected": "33",
+      "corrupt_ans": "The reasoning contains an error: it incorrectly adds 10 + 16 + 33 + 4 + 20 + 1. The value \"33\" is not in the original data — it appears to be a miscalculation (16 + 13 = 29"
+    },
+    {
+      "case_id": "tabmwp-500",
+      "base_ans": "28",
+      "gold": "28",
+      "injected": "61",
+      "corrupt_ans": "28"
+    },
+    {
+      "case_id": "tabmwp-505",
+      "base_ans": "53",
+      "gold": "53",
+      "injected": "23",
+      "corrupt_ans": "53"
+    },
+    {
+      "case_id": "tabmwp-506",
+      "base_ans": "44",
+      "gold": "44",
+      "injected": "29",
+      "corrupt_ans": "44"
+    },
+    {
+      "case_id": "tabmwp-512",
+      "base_ans": "$1.13",
+      "gold": "1.13",
+      "injected": "7",
+      "corrupt_ans": "1.13"
+    },
+    {
+      "case_id": "tabmwp-514",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "85",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "tabmwp-516",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "17",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-528",
+      "base_ans": "223",
+      "gold": "223",
+      "injected": "13",
+      "corrupt_ans": "223"
+    },
+    {
+      "case_id": "tabmwp-535",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "87",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-536",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "21",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-552",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "9",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-564",
+      "base_ans": "0.21",
+      "gold": "0.21",
+      "injected": "7.6",
+      "corrupt_ans": "However, based strictly on the values"
+    },
+    {
+      "case_id": "tabmwp-571",
+      "base_ans": "$9.81",
+      "gold": "9.81",
+      "injected": "26.6",
+      "corrupt_ans": "$26.6"
+    },
+    {
+      "case_id": "tabmwp-574",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "11",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-576",
+      "base_ans": "21",
+      "gold": "21",
+      "injected": "11",
+      "corrupt_ans": "21"
+    },
+    {
+      "case_id": "tabmwp-577",
+      "base_ans": "18",
+      "gold": "18",
+      "injected": "11",
+      "corrupt_ans": "18"
+    },
+    {
+      "case_id": "tabmwp-584",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "97",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-594",
+      "base_ans": "1.57",
+      "gold": "1.57",
+      "injected": "8.5",
+      "corrupt_ans": "But the candle is listed as $8.5,"
+    },
+    {
+      "case_id": "tabmwp-603",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "13",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-604",
+      "base_ans": "268",
+      "gold": "268",
+      "injected": "87",
+      "corrupt_ans": "Correct total = $2"
+    },
+    {
+      "case_id": "tabmwp-607",
+      "base_ans": "147",
+      "gold": "147",
+      "injected": "1075",
+      "corrupt_ans": "147"
+    },
+    {
+      "case_id": "tabmwp-609",
+      "base_ans": "$80.69",
+      "gold": "80.69",
+      "injected": "101.5",
+      "corrupt_ans": "$127.92 - $4"
+    },
+    {
+      "case_id": "tabmwp-610",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "11",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-615",
+      "base_ans": "$9",
+      "gold": "9",
+      "injected": "25",
+      "corrupt_ans": "9"
+    },
+    {
+      "case_id": "tabmwp-619",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "39",
+      "corrupt_ans": "But $39 is not mentioned in the context of pepperoni or supreme sales — it appears to be"
+    },
+    {
+      "case_id": "tabmwp-624",
+      "base_ans": "-16",
+      "gold": "-16",
+      "injected": "85",
+      "corrupt_ans": "-16"
+    },
+    {
+      "case_id": "tabmwp-626",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "15",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-644",
+      "base_ans": "50",
+      "gold": "50",
+      "injected": "15",
+      "corrupt_ans": "50"
+    },
+    {
+      "case_id": "tabmwp-647",
+      "base_ans": "44.08",
+      "gold": "44.08",
+      "injected": "42.0",
+      "corrupt_ans": "$26.60 (black"
+    },
+    {
+      "case_id": "tabmwp-648",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "13",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-658",
+      "base_ans": "89",
+      "gold": "89",
+      "injected": "25",
+      "corrupt_ans": "89"
+    },
+    {
+      "case_id": "tabmwp-659",
+      "base_ans": "117",
+      "gold": "117",
+      "injected": "241",
+      "corrupt_ans": "241"
+    },
+    {
+      "case_id": "tabmwp-662",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "11",
+      "corrupt_ans": "The reasoning contains a critical error: it states that \"4 appears 11 times\" — but in the list [7, 4, 9, 7, 7, 9, 4], 4 appears only **2 times**, not 11. The list has only 7 values"
+    },
+    {
+      "case_id": "tabmwp-665",
+      "base_ans": "6,445",
+      "gold": "6,445",
+      "injected": "195",
+      "corrupt_ans": "6445"
+    },
+    {
+      "case_id": "tabmwp-666",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "21",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "tabmwp-674",
+      "base_ans": "$88.92",
+      "gold": "88.92",
+      "injected": "165.1",
+      "corrupt_ans": "Money left"
+    },
+    {
+      "case_id": "tabmwp-680",
+      "base_ans": "0.87",
+      "gold": "0.87",
+      "injected": "7.4",
+      "corrupt_ans": "The reasoning provided contains an error. The price of the bright yellow highlighter is listed as $7.4, but the addition performed is 0.69 + 0.18 = 0.87, which implies the highlighter price was mistakenly taken as $0.18 — this contrad"
+    },
+    {
+      "case_id": "tabmwp-681",
+      "base_ans": "$3.87",
+      "gold": "3.87",
+      "injected": "7.9",
+      "corrupt_ans": "The reasoning provided contains an inconsistency. It states that the price of one shell necklace is $0.43 (from the table), but then multiplies 9 × $7.9 = $3.87, which suggests a price of $7.9 per necklace — contradicting the earlier $0."
+    },
+    {
+      "case_id": "tabmwp-684",
+      "base_ans": "40",
+      "gold": "40",
+      "injected": "7",
+      "corrupt_ans": "40"
+    },
+    {
+      "case_id": "tabmwp-691",
+      "base_ans": "30",
+      "gold": "30",
+      "injected": "9",
+      "corrupt_ans": "30"
+    },
+    {
+      "case_id": "tabmwp-696",
+      "base_ans": "40",
+      "gold": "40",
+      "injected": "7",
+      "corrupt_ans": "40"
+    },
+    {
+      "case_id": "tabmwp-698",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "7",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-705",
+      "base_ans": "$3.90",
+      "gold": "3.90",
+      "injected": "13",
+      "corrupt_ans": "- Quantity = 1 + 3"
+    },
+    {
+      "case_id": "tabmwp-707",
+      "base_ans": "-6",
+      "gold": "-6",
+      "injected": "101",
+      "corrupt_ans": "-6"
+    },
+    {
+      "case_id": "tabmwp-708",
+      "base_ans": "$1,454.36",
+      "gold": "1,454.36",
+      "injected": "404.5",
+      "corrupt_ans": "1454.36"
+    },
+    {
+      "case_id": "tabmwp-710",
+      "base_ans": "0",
+      "gold": "0",
+      "injected": "21",
+      "corrupt_ans": "0"
+    },
+    {
+      "case_id": "tabmwp-716",
+      "base_ans": "12",
+      "gold": "12",
+      "injected": "15",
+      "corrupt_ans": "12"
+    },
+    {
+      "case_id": "tabmwp-729",
+      "base_ans": "$23",
+      "gold": "23",
+      "injected": "27",
+      "corrupt_ans": "> To find the total revenue from pizza sales for Taste of New York, we add these two values"
+    },
+    {
+      "case_id": "tabmwp-737",
+      "base_ans": "676",
+      "gold": "676",
+      "injected": "881",
+      "corrupt_ans": "881 (Whitney"
+    },
+    {
+      "case_id": "tabmwp-749",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "23",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-750",
+      "base_ans": "15",
+      "gold": "15",
+      "injected": "37",
+      "corrupt_ans": "15"
+    },
+    {
+      "case_id": "tabmwp-752",
+      "base_ans": "$4.89",
+      "gold": "4.89",
+      "injected": "12.6",
+      "corrupt_ans": "4.89"
+    },
+    {
+      "case_id": "tabmwp-758",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "29",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-759",
+      "base_ans": "20",
+      "gold": "20",
+      "injected": "17",
+      "corrupt_ans": "But the reasoning incorrectly uses 17 instead of 5. Despite this, the"
+    },
+    {
+      "case_id": "tabmwp-775",
+      "base_ans": "3,787",
+      "gold": "3,787",
+      "injected": "7",
+      "corrupt_ans": "3787"
+    },
+    {
+      "case_id": "tabmwp-792",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "17",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-793",
+      "base_ans": "14",
+      "gold": "14",
+      "injected": "25",
+      "corrupt_ans": "14"
+    },
+    {
+      "case_id": "tabmwp-794",
+      "base_ans": "4,988",
+      "gold": "4,988",
+      "injected": "7",
+      "corrupt_ans": "4988"
+    },
+    {
+      "case_id": "tabmwp-809",
+      "base_ans": "$3.20",
+      "gold": "3.20",
+      "injected": "15",
+      "corrupt_ans": "$3.20"
+    },
+    {
+      "case_id": "tabmwp-811",
+      "base_ans": "14",
+      "gold": "14",
+      "injected": "27",
+      "corrupt_ans": "14"
+    },
+    {
+      "case_id": "tabmwp-823",
+      "base_ans": "$8.80",
+      "gold": "8.80",
+      "injected": "15",
+      "corrupt_ans": "33.00"
+    },
+    {
+      "case_id": "tabmwp-852",
+      "base_ans": "60",
+      "gold": "60",
+      "injected": "191",
+      "corrupt_ans": "Total cost"
+    },
+    {
+      "case_id": "tabmwp-865",
+      "base_ans": "1,283.39",
+      "gold": "1,283.39",
+      "injected": "7",
+      "corrupt_ans": "1283.39"
+    },
+    {
+      "case_id": "tabmwp-868",
+      "base_ans": "12",
+      "gold": "12",
+      "injected": "45",
+      "corrupt_ans": "12"
+    },
+    {
+      "case_id": "tabmwp-870",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "15",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-891",
+      "base_ans": "41",
+      "gold": "41",
+      "injected": "13",
+      "corrupt_ans": "41"
+    },
+    {
+      "case_id": "tabmwp-893",
+      "base_ans": "19",
+      "gold": "19",
+      "injected": "7",
+      "corrupt_ans": "19"
+    },
+    {
+      "case_id": "tabmwp-894",
+      "base_ans": "22",
+      "gold": "22",
+      "injected": "51",
+      "corrupt_ans": "51"
+    },
+    {
+      "case_id": "tabmwp-900",
+      "base_ans": "-7",
+      "gold": "-7",
+      "injected": "4023",
+      "corrupt_ans": "-7"
+    },
+    {
+      "case_id": "tabmwp-909",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "19",
+      "corrupt_ans": "19"
+    },
+    {
+      "case_id": "tabmwp-911",
+      "base_ans": "$19.49",
+      "gold": "19.49",
+      "injected": "46.0",
+      "corrupt_ans": "46.0"
+    },
+    {
+      "case_id": "tabmwp-919",
+      "base_ans": "16",
+      "gold": "16",
+      "injected": "13",
+      "corrupt_ans": "16"
+    },
+    {
+      "case_id": "tabmwp-922",
+      "base_ans": "65",
+      "gold": "65",
+      "injected": "139",
+      "corrupt_ans": "65"
+    },
+    {
+      "case_id": "tabmwp-926",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "17",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-931",
+      "base_ans": "231",
+      "gold": "231",
+      "injected": "1397",
+      "corrupt_ans": "$5,"
+    },
+    {
+      "case_id": "tabmwp-940",
+      "base_ans": "11.43",
+      "gold": "11.43",
+      "injected": "25.6",
+      "corrupt_ans": "7.77 (sunscreen) + 1.55"
+    },
+    {
+      "case_id": "tabmwp-942",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-944",
+      "base_ans": "311",
+      "gold": "311",
+      "injected": "7",
+      "corrupt_ans": "311"
+    },
+    {
+      "case_id": "tabmwp-946",
+      "base_ans": "$3.40",
+      "gold": "3.40",
+      "injected": "10.4",
+      "corrupt_ans": "3.40"
+    },
+    {
+      "case_id": "tabmwp-953",
+      "base_ans": "$5,900",
+      "gold": "5,900",
+      "injected": "7",
+      "corrupt_ans": "5900"
+    },
+    {
+      "case_id": "tabmwp-954",
+      "base_ans": "25",
+      "gold": "25",
+      "injected": "13",
+      "corrupt_ans": "25"
+    },
+    {
+      "case_id": "tabmwp-958",
+      "base_ans": "9",
+      "gold": "9",
+      "injected": "7",
+      "corrupt_ans": "9"
+    },
+    {
+      "case_id": "tabmwp-963",
+      "base_ans": "21",
+      "gold": "21",
+      "injected": "9",
+      "corrupt_ans": "21"
+    },
+    {
+      "case_id": "tabmwp-968",
+      "base_ans": "14",
+      "gold": "14",
+      "injected": "81",
+      "corrupt_ans": "14"
+    },
+    {
+      "case_id": "tabmwp-974",
+      "base_ans": "$3,151.00",
+      "gold": "3,151",
+      "injected": "101",
+      "corrupt_ans": "3151.00"
+    },
+    {
+      "case_id": "tabmwp-979",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "23",
+      "corrupt_ans": "Therefore,"
+    },
+    {
+      "case_id": "tabmwp-985",
+      "base_ans": "318",
+      "gold": "318",
+      "injected": "331",
+      "corrupt_ans": "318"
+    },
+    {
+      "case_id": "tabmwp-998",
+      "base_ans": "60",
+      "gold": "60",
+      "injected": "127",
+      "corrupt_ans": "However, the question asks to state the final answer **based only on the reasoning above**, even if"
+    },
+    {
+      "case_id": "tabmwp-1000",
+      "base_ans": "13",
+      "gold": "13",
+      "injected": "71",
+      "corrupt_ans": "13"
+    },
+    {
+      "case_id": "tabmwp-1002",
+      "base_ans": "1",
+      "gold": "1",
+      "injected": "7",
+      "corrupt_ans": "1"
+    },
+    {
+      "case_id": "tabmwp-1006",
+      "base_ans": "8902",
+      "gold": "8,902",
+      "injected": "23",
+      "corrupt_ans": "8902"
+    },
+    {
+      "case_id": "tabmwp-1009",
+      "base_ans": "1.72",
+      "gold": "1.72",
+      "injected": "8.6",
+      "corrupt_ans": "0.94 (marker) + 0"
+    },
+    {
+      "case_id": "tabmwp-1019",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "29",
+      "corrupt_ans": "This is incorrect because $29 is not mentioned in the"
+    },
+    {
+      "case_id": "tabmwp-1029",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "47",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-1031",
+      "base_ans": "9",
+      "gold": "9",
+      "injected": "17",
+      "corrupt_ans": "Number"
+    },
+    {
+      "case_id": "tabmwp-1048",
+      "base_ans": "14",
+      "gold": "14",
+      "injected": "7",
+      "corrupt_ans": "14"
+    },
+    {
+      "case_id": "tabmwp-1092",
+      "base_ans": "45.50",
+      "gold": "45.50",
+      "injected": "7",
+      "corrupt_ans": "45.50"
+    },
+    {
+      "case_id": "tabmwp-1108",
+      "base_ans": "16",
+      "gold": "16",
+      "injected": "11",
+      "corrupt_ans": "16"
+    },
+    {
+      "case_id": "tabmwp-1117",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "19",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-1136",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "tabmwp-1142",
+      "base_ans": "55",
+      "gold": "55",
+      "injected": "117",
+      "corrupt_ans": "55"
+    },
+    {
+      "case_id": "tabmwp-1147",
+      "base_ans": "40",
+      "gold": "40",
+      "injected": "11",
+      "corrupt_ans": "40"
+    },
+    {
+      "case_id": "tabmwp-1151",
+      "base_ans": "32",
+      "gold": "32",
+      "injected": "61",
+      "corrupt_ans": "32"
+    },
+    {
+      "case_id": "tabmwp-1165",
+      "base_ans": "10",
+      "gold": "10",
+      "injected": "11",
+      "corrupt_ans": "ANSWER"
+    },
+    {
+      "case_id": "tabmwp-1168",
+      "base_ans": "12",
+      "gold": "12",
+      "injected": "45",
+      "corrupt_ans": "12"
+    },
+    {
+      "case_id": "tabmwp-1172",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "9",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-1174",
+      "base_ans": "44",
+      "gold": "44",
+      "injected": "95",
+      "corrupt_ans": "44"
+    },
+    {
+      "case_id": "tabmwp-1183",
+      "base_ans": "22",
+      "gold": "22",
+      "injected": "89",
+      "corrupt_ans": "22"
+    },
+    {
+      "case_id": "tabmwp-1186",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "85",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "tabmwp-1190",
+      "base_ans": "8,322",
+      "gold": "8,322",
+      "injected": "11",
+      "corrupt_ans": "Sandeep: 5,435"
+    },
+    {
+      "case_id": "tabmwp-1198",
+      "base_ans": "90",
+      "gold": "90",
+      "injected": "25",
+      "corrupt_ans": "90"
+    },
+    {
+      "case_id": "tabmwp-1206",
+      "base_ans": "$11.17",
+      "gold": "11.17",
+      "injected": "123.3",
+      "corrupt_ans": "11.17"
+    },
+    {
+      "case_id": "tabmwp-1223",
+      "base_ans": "140.00",
+      "gold": "140",
+      "injected": "7",
+      "corrupt_ans": "140.00"
+    },
+    {
+      "case_id": "tabmwp-1230",
+      "base_ans": "14",
+      "gold": "14",
+      "injected": "27",
+      "corrupt_ans": "14"
+    },
+    {
+      "case_id": "tabmwp-1244",
+      "base_ans": "7,859.00",
+      "gold": "7,859",
+      "injected": "15",
+      "corrupt_ans": "7859.00"
+    },
+    {
+      "case_id": "tabmwp-1245",
+      "base_ans": "$3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "Since the table in [FRAME:t=0.0] explicitly states $13 per pound, and no other information contradicts this"
+    },
+    {
+      "case_id": "tabmwp-1246",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "41",
+      "corrupt_ans": "31"
+    },
+    {
+      "case_id": "tabmwp-1255",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "17",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-1257",
+      "base_ans": "10",
+      "gold": "10",
+      "injected": "17",
+      "corrupt_ans": "10"
+    },
+    {
+      "case_id": "tabmwp-1259",
+      "base_ans": "0",
+      "gold": "0",
+      "injected": "91",
+      "corrupt_ans": "0"
+    },
+    {
+      "case_id": "tabmwp-1260",
+      "base_ans": "45",
+      "gold": "45",
+      "injected": "15",
+      "corrupt_ans": "45"
+    },
+    {
+      "case_id": "tabmwp-1274",
+      "base_ans": "$0.19",
+      "gold": "0.19",
+      "injected": "7.2",
+      "corrupt_ans": "- Thin blue marker: $"
+    },
+    {
+      "case_id": "tabmwp-1280",
+      "base_ans": "6962",
+      "gold": "6,962",
+      "injected": "1035",
+      "corrupt_ans": "The reasoning provided contains an inconsistency: it states the price of a pair of designer shoes as $1,1035 (which appears to be a typo or error, likely meant to be $1,514 based on the subtraction), but then subtracts $1,514 from $8,"
+    },
+    {
+      "case_id": "tabmwp-1286",
+      "base_ans": "60",
+      "gold": "60",
+      "injected": "11",
+      "corrupt_ans": "60"
+    },
+    {
+      "case_id": "tabmwp-1288",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "17",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-1290",
+      "base_ans": "$25.32",
+      "gold": "25.32",
+      "injected": "19.7",
+      "corrupt_ans": "The reasoning provided contains an inconsistency: it states the price of granulated sugar is $19.7 per lb in the first sentence, but then uses $6.33 per lb in the calculation. Since the calculation uses $6.33, and the problem asks for the total cost based on 4"
+    },
+    {
+      "case_id": "tabmwp-1294",
+      "base_ans": "20",
+      "gold": "20",
+      "injected": "15",
+      "corrupt_ans": "20"
+    },
+    {
+      "case_id": "tabmwp-1304",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "13",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-1305",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "53",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-1311",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "9",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-1312",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "21",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-1316",
+      "base_ans": "11",
+      "gold": "11",
+      "injected": "17",
+      "corrupt_ans": "11"
+    },
+    {
+      "case_id": "tabmwp-1334",
+      "base_ans": "1992",
+      "gold": "1,992",
+      "injected": "1181",
+      "corrupt_ans": "1992"
+    },
+    {
+      "case_id": "tabmwp-1341",
+      "base_ans": "0.18",
+      "gold": "0.18",
+      "injected": "7.2",
+      "corrupt_ans": "Correct"
+    },
+    {
+      "case_id": "tabmwp-1344",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "9",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-1375",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "17",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "tabmwp-1384",
+      "base_ans": "19",
+      "gold": "19",
+      "injected": "13",
+      "corrupt_ans": "19"
+    },
+    {
+      "case_id": "tabmwp-1401",
+      "base_ans": "$59,843.00",
+      "gold": "59,843",
+      "injected": "137",
+      "corrupt_ans": "59843"
+    },
+    {
+      "case_id": "tabmwp-1423",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "23",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-1428",
+      "base_ans": "34",
+      "gold": "34",
+      "injected": "11",
+      "corrupt_ans": "34"
+    },
+    {
+      "case_id": "tabmwp-1450",
+      "base_ans": "$26.57",
+      "gold": "26.57",
+      "injected": "27.9",
+      "corrupt_ans": "26.57"
+    },
+    {
+      "case_id": "tabmwp-1456",
+      "base_ans": "24",
+      "gold": "24",
+      "injected": "55",
+      "corrupt_ans": "The reasoning states that the first entry in the stem-and-leaf plot is \"Stem = 2, Leaf = 4 → This represents 55 broken lights.\" However, this is incorrect — a stem of 2 and leaf of 4 should represent 24, not 55. The reasoning"
+    },
+    {
+      "case_id": "tabmwp-1460",
+      "base_ans": "1",
+      "gold": "1",
+      "injected": "9",
+      "corrupt_ans": "1"
+    },
+    {
+      "case_id": "tabmwp-1463",
+      "base_ans": "1,956",
+      "gold": "1,956",
+      "injected": "9",
+      "corrupt_ans": "1956"
+    },
+    {
+      "case_id": "tabmwp-1476",
+      "base_ans": "$32.28",
+      "gold": "32.28",
+      "injected": "17.8",
+      "corrupt_ans": "Since the correct price per blue sweater is $1"
+    },
+    {
+      "case_id": "tabmwp-1483",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "tabmwp-1485",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "17",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-1488",
+      "base_ans": "$30.88",
+      "gold": "30.88",
+      "injected": "13.3",
+      "corrupt_ans": "30.88"
+    },
+    {
+      "case_id": "tabmwp-1502",
+      "base_ans": "12",
+      "gold": "12",
+      "injected": "19",
+      "corrupt_ans": "12"
+    },
+    {
+      "case_id": "tabmwp-1504",
+      "base_ans": "97",
+      "gold": "97",
+      "injected": "207",
+      "corrupt_ans": "97"
+    },
+    {
+      "case_id": "tabmwp-1515",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "11",
+      "corrupt_ans": "However, the final sentence says \"Thus"
+    },
+    {
+      "case_id": "tabmwp-1525",
+      "base_ans": "12",
+      "gold": "12",
+      "injected": "117",
+      "corrupt_ans": "12"
+    },
+    {
+      "case_id": "tabmwp-1531",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "9",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-1532",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "47",
+      "corrupt_ans": "But $47 is not mentioned in the table — it appears to be a mistake. The correct difference between $20"
+    },
+    {
+      "case_id": "tabmwp-1539",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "127",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-1549",
+      "base_ans": "2,982",
+      "gold": "2,982",
+      "injected": "667",
+      "corrupt_ans": "But then it subtracts 6,312 - 3,667 = 2,982 — which implies the September value used"
+    },
+    {
+      "case_id": "tabmwp-1551",
+      "base_ans": "38",
+      "gold": "38",
+      "injected": "79",
+      "corrupt_ans": "38"
+    },
+    {
+      "case_id": "tabmwp-1561",
+      "base_ans": "15",
+      "gold": "15",
+      "injected": "13",
+      "corrupt_ans": "15"
+    },
+    {
+      "case_id": "tabmwp-1566",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "21",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-1568",
+      "base_ans": "23",
+      "gold": "23",
+      "injected": "9",
+      "corrupt_ans": "- 21:"
+    },
+    {
+      "case_id": "tabmwp-1569",
+      "base_ans": "18",
+      "gold": "18",
+      "injected": "9",
+      "corrupt_ans": "18"
+    },
+    {
+      "case_id": "tabmwp-1572",
+      "base_ans": "$2,879.77",
+      "gold": "2,879.77",
+      "injected": "13",
+      "corrupt_ans": "2879.77"
+    },
+    {
+      "case_id": "tabmwp-1585",
+      "base_ans": "41",
+      "gold": "41",
+      "injected": "17",
+      "corrupt_ans": "**Total = 5 + 17 + 19 = 4"
+    },
+    {
+      "case_id": "tabmwp-1589",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "19",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-1592",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "15",
+      "corrupt_ans": "Assuming the table in [FRAME:t=0.0] is correct and says 6 boys and 15"
+    },
+    {
+      "case_id": "tabmwp-1603",
+      "base_ans": "$4.20",
+      "gold": "4.20",
+      "injected": "21",
+      "corrupt_ans": "$4.20"
+    },
+    {
+      "case_id": "tabmwp-1608",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "7",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-1611",
+      "base_ans": "10",
+      "gold": "10",
+      "injected": "67",
+      "corrupt_ans": "10"
+    },
+    {
+      "case_id": "tabmwp-1617",
+      "base_ans": "76",
+      "gold": "76",
+      "injected": "7",
+      "corrupt_ans": "76"
+    },
+    {
+      "case_id": "tabmwp-1620",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "27",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-1630",
+      "base_ans": "$15",
+      "gold": "15",
+      "injected": "37",
+      "corrupt_ans": "$15"
+    },
+    {
+      "case_id": "tabmwp-1635",
+      "base_ans": "16.38",
+      "gold": "16.38",
+      "injected": "21.9",
+      "corrupt_ans": "So the correct total"
+    },
+    {
+      "case_id": "tabmwp-1637",
+      "base_ans": "46",
+      "gold": "46",
+      "injected": "11",
+      "corrupt_ans": "46"
+    },
+    {
+      "case_id": "tabmwp-1649",
+      "base_ans": "0.46",
+      "gold": "0.46",
+      "injected": "9.2",
+      "corrupt_ans": "The reasoning provided contains an inconsistency: it states the price of green beans as $9.2 (which appears to be $9.20), but then subtracts $1.08 from $1.54 — which implies the green beans price was $1.08, not $9.2"
+    },
+    {
+      "case_id": "tabmwp-1660",
+      "base_ans": "$494.37",
+      "gold": "494.37",
+      "injected": "25",
+      "corrupt_ans": "Wait — that’s the same as the incorrect multiplication"
+    },
+    {
+      "case_id": "tabmwp-1663",
+      "base_ans": "30",
+      "gold": "30",
+      "injected": "57",
+      "corrupt_ans": "30"
+    },
+    {
+      "case_id": "tabmwp-1667",
+      "base_ans": "13.59",
+      "gold": "13.59",
+      "injected": "34.2",
+      "corrupt_ans": "13.59"
+    },
+    {
+      "case_id": "tabmwp-1681",
+      "base_ans": "9",
+      "gold": "9",
+      "injected": "25",
+      "corrupt_ans": "9"
+    },
+    {
+      "case_id": "tabmwp-1704",
+      "base_ans": "39",
+      "gold": "39",
+      "injected": "45",
+      "corrupt_ans": "39"
+    },
+    {
+      "case_id": "tabmwp-1709",
+      "base_ans": "14",
+      "gold": "14",
+      "injected": "9",
+      "corrupt_ans": "14"
+    },
+    {
+      "case_id": "tabmwp-1713",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "55",
+      "corrupt_ans": "But 55 - 22 = 33, not 2. Also, the values in the table are 22 ("
+    },
+    {
+      "case_id": "tabmwp-1715",
+      "base_ans": "79.99",
+      "gold": "79.99",
+      "injected": "43.9",
+      "corrupt_ans": "However, since the question asks for the"
+    },
+    {
+      "case_id": "tabmwp-1739",
+      "base_ans": "$1842",
+      "gold": "1,842",
+      "injected": "3691",
+      "corrupt_ans": "3691"
+    },
+    {
+      "case_id": "tabmwp-1741",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "11",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-1745",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "83",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "tabmwp-1751",
+      "base_ans": "67",
+      "gold": "67",
+      "injected": "157",
+      "corrupt_ans": "67"
+    },
+    {
+      "case_id": "tabmwp-1759",
+      "base_ans": "-3",
+      "gold": "-3",
+      "injected": "9",
+      "corrupt_ans": "-3"
+    },
+    {
+      "case_id": "tabmwp-1778",
+      "base_ans": "189.24",
+      "gold": "189.24",
+      "injected": "385.5",
+      "corrupt_ans": "189.24"
+    },
+    {
+      "case_id": "tabmwp-1781",
+      "base_ans": "35",
+      "gold": "35",
+      "injected": "223",
+      "corrupt_ans": "35"
+    },
+    {
+      "case_id": "tabmwp-1807",
+      "base_ans": "$18",
+      "gold": "18",
+      "injected": "43",
+      "corrupt_ans": "$18"
+    },
+    {
+      "case_id": "tabmwp-1809",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-1830",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "15",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-1838",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "111",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-1850",
+      "base_ans": "31",
+      "gold": "31",
+      "injected": "9",
+      "corrupt_ans": "31"
+    },
+    {
+      "case_id": "tabmwp-1852",
+      "base_ans": "1.33",
+      "gold": "1.33",
+      "injected": "8.1",
+      "corrupt_ans": "The reasoning provided contains an error. The price of the dark gray shell is listed as $8.1, but the addition uses $0.54, which is not mentioned in the table. Assuming the intended price for the dark gray shell is $8.10 (as implied by the decimal format), and"
+    },
+    {
+      "case_id": "tabmwp-1857",
+      "base_ans": "32",
+      "gold": "32",
+      "injected": "107",
+      "corrupt_ans": "32"
+    },
+    {
+      "case_id": "tabmwp-1862",
+      "base_ans": "20",
+      "gold": "20",
+      "injected": "47",
+      "corrupt_ans": "- 1 tool shed → 5 wheel"
+    },
+    {
+      "case_id": "tabmwp-1873",
+      "base_ans": "1",
+      "gold": "1",
+      "injected": "139",
+      "corrupt_ans": "1"
+    },
+    {
+      "case_id": "tabmwp-1884",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "17",
+      "corrupt_ans": "The reasoning contains an error in Step 1: the sorted list is incorrectly written as [1, 1, 3, 17, 6, 7, 7]. The value \"17\" is not in the original data — the original values are [3, 7, 1"
+    },
+    {
+      "case_id": "tabmwp-1891",
+      "base_ans": "$49,658",
+      "gold": "49,658",
+      "injected": "195",
+      "corrupt_ans": "49658"
+    },
+    {
+      "case_id": "tabmwp-1900",
+      "base_ans": "$87.13",
+      "gold": "87.13",
+      "injected": "39",
+      "corrupt_ans": "87.13"
+    },
+    {
+      "case_id": "tabmwp-1901",
+      "base_ans": "30",
+      "gold": "30",
+      "injected": "67",
+      "corrupt_ans": "However, since the question asks for the age of the youngest"
+    },
+    {
+      "case_id": "tabmwp-1905",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "21",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-1908",
+      "base_ans": "$35.64",
+      "gold": "35.64",
+      "injected": "78.3",
+      "corrupt_ans": "35.64"
+    },
+    {
+      "case_id": "tabmwp-1910",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "87",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-1911",
+      "base_ans": "1",
+      "gold": "1",
+      "injected": "9",
+      "corrupt_ans": "So the reasoning contains"
+    },
+    {
+      "case_id": "tabmwp-1922",
+      "base_ans": "$35,076.00",
+      "gold": "35,076",
+      "injected": "1545",
+      "corrupt_ans": "35076"
+    },
+    {
+      "case_id": "tabmwp-1930",
+      "base_ans": "0",
+      "gold": "0",
+      "injected": "4033",
+      "corrupt_ans": "0"
+    },
+    {
+      "case_id": "tabmwp-1932",
+      "base_ans": "4208",
+      "gold": "4,208",
+      "injected": "7",
+      "corrupt_ans": "4208"
+    },
+    {
+      "case_id": "tabmwp-1946",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "37",
+      "corrupt_ans": "The reasoning contains an error: it states \"entries in 2015: 37\" and \"entries in 2016: 19\", but then computes (19 - 15) — which implies 15 was the 2015 value, contradicting the"
+    },
+    {
+      "case_id": "tabmwp-1948",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "13",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-1952",
+      "base_ans": "30",
+      "gold": "30",
+      "injected": "45",
+      "corrupt_ans": "But $45 is not mentioned in the table — it appears to be a miscalculation or"
+    },
+    {
+      "case_id": "tabmwp-1958",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "25",
+      "corrupt_ans": "So the correct difference is:"
+    },
+    {
+      "case_id": "tabmwp-1973",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "17",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-1981",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "11",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-1986",
+      "base_ans": "9,581",
+      "gold": "9,581",
+      "injected": "9",
+      "corrupt_ans": "9,581"
+    },
+    {
+      "case_id": "tabmwp-1990",
+      "base_ans": "9",
+      "gold": "9",
+      "injected": "27",
+      "corrupt_ans": "The reasoning contains an error in Step 1: the sorted list is incorrectly written as [5, 5, 9, 27, 10]. The value \"27\" does not appear in the original data. The correct sorted list should be [5, 5, 9,"
+    },
+    {
+      "case_id": "tabmwp-1991",
+      "base_ans": "$7.40",
+      "gold": "7.40",
+      "injected": "7",
+      "corrupt_ans": "7.40"
+    },
+    {
+      "case_id": "tabmwp-1992",
+      "base_ans": "5,742",
+      "gold": "5,742",
+      "injected": "1063",
+      "corrupt_ans": "5742"
+    },
+    {
+      "case_id": "tabmwp-1996",
+      "base_ans": "15",
+      "gold": "15",
+      "injected": "37",
+      "corrupt_ans": "15"
+    },
+    {
+      "case_id": "tabmwp-2000",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "17",
+      "corrupt_ans": "The reasoning contains an error in Step 1: the sorted list is incorrectly written as [1, 17, 5, 6, 7, 7, 7]. The value \"17\" is not in the original data — the original values are [5, 5, 1"
+    },
+    {
+      "case_id": "tabmwp-2024",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "13",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-2033",
+      "base_ans": "6,148",
+      "gold": "6,148",
+      "injected": "21",
+      "corrupt_ans": "But 21,753 is"
+    },
+    {
+      "case_id": "tabmwp-2037",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "11",
+      "corrupt_ans": "Smallest value = 3 (Thursday)"
+    },
+    {
+      "case_id": "tabmwp-2039",
+      "base_ans": "12",
+      "gold": "12",
+      "injected": "15",
+      "corrupt_ans": "12"
+    },
+    {
+      "case_id": "tabmwp-2041",
+      "base_ans": "-11",
+      "gold": "-11",
+      "injected": "95",
+      "corrupt_ans": "-11"
+    },
+    {
+      "case_id": "tabmwp-2042",
+      "base_ans": "$6",
+      "gold": "6",
+      "injected": "19",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-2050",
+      "base_ans": "10",
+      "gold": "10",
+      "injected": "27",
+      "corrupt_ans": "27"
+    },
+    {
+      "case_id": "tabmwp-2066",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "7",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "tabmwp-2067",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "9",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-2085",
+      "base_ans": "-1",
+      "gold": "-1",
+      "injected": "39",
+      "corrupt_ans": "-1"
+    },
+    {
+      "case_id": "tabmwp-2091",
+      "base_ans": "38",
+      "gold": "38",
+      "injected": "41",
+      "corrupt_ans": "18 (1 trip) + 1 ("
+    },
+    {
+      "case_id": "tabmwp-2092",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-2099",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "13",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-2113",
+      "base_ans": "13",
+      "gold": "13",
+      "injected": "45",
+      "corrupt_ans": "13"
+    },
+    {
+      "case_id": "tabmwp-2125",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "15",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-2139",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "15",
+      "corrupt_ans": "- 3: appears 4 times ("
+    },
+    {
+      "case_id": "tabmwp-2154",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "15",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-2156",
+      "base_ans": "10.97",
+      "gold": "10.97",
+      "injected": "7",
+      "corrupt_ans": "10.97"
+    },
+    {
+      "case_id": "tabmwp-2158",
+      "base_ans": "23",
+      "gold": "23",
+      "injected": "37",
+      "corrupt_ans": "But 1"
+    },
+    {
+      "case_id": "tabmwp-2176",
+      "base_ans": "711.00",
+      "gold": "711",
+      "injected": "1429",
+      "corrupt_ans": "711"
+    },
+    {
+      "case_id": "tabmwp-2178",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "37",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "tabmwp-2180",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "13",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-2183",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "25",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-2191",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "17",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-2196",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "19",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-2198",
+      "base_ans": "18",
+      "gold": "18",
+      "injected": "19",
+      "corrupt_ans": "18"
+    },
+    {
+      "case_id": "tabmwp-2203",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "7",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-2217",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "13",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-2222",
+      "base_ans": "$17.00",
+      "gold": "17",
+      "injected": "17",
+      "corrupt_ans": "But the price per kilogram is given as **$5**, not $17. So the correct calculation should be"
+    },
+    {
+      "case_id": "tabmwp-2230",
+      "base_ans": "$546.00",
+      "gold": "546",
+      "injected": "7",
+      "corrupt_ans": "546.00"
+    },
+    {
+      "case_id": "tabmwp-2231",
+      "base_ans": "$1.20",
+      "gold": "1.20",
+      "injected": "13",
+      "corrupt_ans": "$1.20"
+    },
+    {
+      "case_id": "tabmwp-2235",
+      "base_ans": "13",
+      "gold": "13",
+      "injected": "61",
+      "corrupt_ans": "13"
+    },
+    {
+      "case_id": "tabmwp-2236",
+      "base_ans": "-7",
+      "gold": "-7",
+      "injected": "-7",
+      "corrupt_ans": "-7"
+    },
+    {
+      "case_id": "tabmwp-2250",
+      "base_ans": "$1",
+      "gold": "1",
+      "injected": "9",
+      "corrupt_ans": "9"
+    },
+    {
+      "case_id": "tabmwp-2254",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "23",
+      "corrupt_ans": "23 kg"
+    },
+    {
+      "case_id": "tabmwp-2259",
+      "base_ans": "90",
+      "gold": "90",
+      "injected": "187",
+      "corrupt_ans": "90"
+    },
+    {
+      "case_id": "tabmwp-2270",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "7",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-2291",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "17",
+      "corrupt_ans": "$5"
+    },
+    {
+      "case_id": "tabmwp-2293",
+      "base_ans": "38",
+      "gold": "38",
+      "injected": "17",
+      "corrupt_ans": "38"
+    },
+    {
+      "case_id": "tabmwp-2294",
+      "base_ans": "2,077",
+      "gold": "2,077",
+      "injected": "11",
+      "corrupt_ans": "11,077"
+    },
+    {
+      "case_id": "tabmwp-2295",
+      "base_ans": "30",
+      "gold": "30",
+      "injected": "15",
+      "corrupt_ans": "30"
+    },
+    {
+      "case_id": "tabmwp-2299",
+      "base_ans": "12",
+      "gold": "12",
+      "injected": "23",
+      "corrupt_ans": "12"
+    },
+    {
+      "case_id": "tabmwp-2328",
+      "base_ans": "2",
+      "gold": "2",
+      "injected": "9",
+      "corrupt_ans": "2"
+    },
+    {
+      "case_id": "tabmwp-2337",
+      "base_ans": "-8",
+      "gold": "-8",
+      "injected": "87",
+      "corrupt_ans": "-8"
+    },
+    {
+      "case_id": "tabmwp-2357",
+      "base_ans": "9",
+      "gold": "9",
+      "injected": "7",
+      "corrupt_ans": "9"
+    },
+    {
+      "case_id": "tabmwp-2358",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "9",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-2362",
+      "base_ans": "929",
+      "gold": "929",
+      "injected": "19",
+      "corrupt_ans": "929"
+    },
+    {
+      "case_id": "tabmwp-2365",
+      "base_ans": "$4.90",
+      "gold": "4.90",
+      "injected": "21",
+      "corrupt_ans": "$4.90"
+    },
+    {
+      "case_id": "tabmwp-2372",
+      "base_ans": "20",
+      "gold": "20",
+      "injected": "47",
+      "corrupt_ans": "47"
+    },
+    {
+      "case_id": "tabmwp-2385",
+      "base_ans": "$1,167.00",
+      "gold": "1,167",
+      "injected": "785",
+      "corrupt_ans": "However, since"
+    },
+    {
+      "case_id": "tabmwp-2404",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "141",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-2405",
+      "base_ans": "506",
+      "gold": "506",
+      "injected": "1019",
+      "corrupt_ans": "1019"
+    },
+    {
+      "case_id": "tabmwp-2420",
+      "base_ans": "16",
+      "gold": "16",
+      "injected": "63",
+      "corrupt_ans": "16"
+    },
+    {
+      "case_id": "tabmwp-2423",
+      "base_ans": "27",
+      "gold": "27",
+      "injected": "25",
+      "corrupt_ans": "27"
+    },
+    {
+      "case_id": "tabmwp-2441",
+      "base_ans": "19",
+      "gold": "19",
+      "injected": "9",
+      "corrupt_ans": "19"
+    },
+    {
+      "case_id": "tabmwp-2444",
+      "base_ans": "53",
+      "gold": "53",
+      "injected": "215",
+      "corrupt_ans": "53"
+    },
+    {
+      "case_id": "tabmwp-2447",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "13",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-2457",
+      "base_ans": "13",
+      "gold": "13",
+      "injected": "19",
+      "corrupt_ans": "-"
+    },
+    {
+      "case_id": "tabmwp-2473",
+      "base_ans": "10",
+      "gold": "10",
+      "injected": "17",
+      "corrupt_ans": "10"
+    },
+    {
+      "case_id": "tabmwp-2474",
+      "base_ans": "$1 per year",
+      "gold": "1",
+      "injected": "9",
+      "corrupt_ans": "= $1 / 1 year"
+    },
+    {
+      "case_id": "tabmwp-2499",
+      "base_ans": "0",
+      "gold": "0",
+      "injected": "4027",
+      "corrupt_ans": "0"
+    },
+    {
+      "case_id": "tabmwp-2503",
+      "base_ans": "39",
+      "gold": "39",
+      "injected": "11",
+      "corrupt_ans": "39"
+    },
+    {
+      "case_id": "tabmwp-2517",
+      "base_ans": "30",
+      "gold": "30",
+      "injected": "17",
+      "corrupt_ans": "30"
+    },
+    {
+      "case_id": "tabmwp-2524",
+      "base_ans": "20.52",
+      "gold": "20.52",
+      "injected": "18.9",
+      "corrupt_ans": "20.52"
+    },
+    {
+      "case_id": "tabmwp-2526",
+      "base_ans": "817",
+      "gold": "817",
+      "injected": "677",
+      "corrupt_ans": "677 (Monday)"
+    },
+    {
+      "case_id": "tabmwp-2531",
+      "base_ans": "10",
+      "gold": "10",
+      "injected": "7",
+      "corrupt_ans": "10"
+    },
+    {
+      "case_id": "tabmwp-2546",
+      "base_ans": "5,747",
+      "gold": "5,747",
+      "injected": "1501",
+      "corrupt_ans": "5747"
+    },
+    {
+      "case_id": "tabmwp-2549",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "59",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-2552",
+      "base_ans": "$685.02",
+      "gold": "685.02",
+      "injected": "7",
+      "corrupt_ans": "685.02"
+    },
+    {
+      "case_id": "tabmwp-2569",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "9",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-2573",
+      "base_ans": "3",
+      "gold": "3",
+      "injected": "27",
+      "corrupt_ans": "3"
+    },
+    {
+      "case_id": "tabmwp-2575",
+      "base_ans": "1.84",
+      "gold": "1.84",
+      "injected": "10.7",
+      "corrupt_ans": "1.84"
+    },
+    {
+      "case_id": "tabmwp-2596",
+      "base_ans": "107",
+      "gold": "107",
+      "injected": "769",
+      "corrupt_ans": "But according to the table in [FRAME:t=0.0], the number of birds seen in May is **769**, not 381. So the correct calculation should"
+    },
+    {
+      "case_id": "tabmwp-2616",
+      "base_ans": "22",
+      "gold": "22",
+      "injected": "13",
+      "corrupt_ans": "22"
+    },
+    {
+      "case_id": "tabmwp-2631",
+      "base_ans": "-7",
+      "gold": "-7",
+      "injected": "59",
+      "corrupt_ans": "-7"
+    },
+    {
+      "case_id": "tabmwp-2633",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "119",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-2642",
+      "base_ans": "30",
+      "gold": "30",
+      "injected": "27",
+      "corrupt_ans": "30"
+    },
+    {
+      "case_id": "tabmwp-2643",
+      "base_ans": "$3.13",
+      "gold": "3.13",
+      "injected": "13.3",
+      "corrupt_ans": "3.13"
+    },
+    {
+      "case_id": "tabmwp-2645",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "115",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-2647",
+      "base_ans": "50",
+      "gold": "50",
+      "injected": "17",
+      "corrupt_ans": "50"
+    },
+    {
+      "case_id": "tabmwp-2648",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "11",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-2652",
+      "base_ans": "34",
+      "gold": "34",
+      "injected": "47",
+      "corrupt_ans": "Correcting based on"
+    },
+    {
+      "case_id": "tabmwp-2662",
+      "base_ans": "$4",
+      "gold": "4",
+      "injected": "15",
+      "corrupt_ans": "Since the table is the authoritative source and the reasoning incorrectly states $4, we must"
+    },
+    {
+      "case_id": "tabmwp-2664",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "27",
+      "corrupt_ans": "Money left = $14 - $10"
+    },
+    {
+      "case_id": "tabmwp-2665",
+      "base_ans": "7",
+      "gold": "7",
+      "injected": "91",
+      "corrupt_ans": "7"
+    },
+    {
+      "case_id": "tabmwp-2670",
+      "base_ans": "56",
+      "gold": "56",
+      "injected": "43",
+      "corrupt_ans": "But 43 is not in the original data. The frequencies given are"
+    },
+    {
+      "case_id": "tabmwp-2671",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "21",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-2674",
+      "base_ans": "76",
+      "gold": "76",
+      "injected": "11",
+      "corrupt_ans": "-"
+    },
+    {
+      "case_id": "tabmwp-2684",
+      "base_ans": "69",
+      "gold": "69",
+      "injected": "145",
+      "corrupt_ans": "The reasoning provided contains an error. It states that \"Stem = 6, Leaf = 9 → 145 cm\", which is incorrect. In a stem-and-leaf plot, the stem represents the tens digit, and the leaf represents the units digit. So, stem 6 and leaf 9"
+    },
+    {
+      "case_id": "tabmwp-2686",
+      "base_ans": "$1.40",
+      "gold": "1.40",
+      "injected": "9.8",
+      "corrupt_ans": "$1.4"
+    },
+    {
+      "case_id": "tabmwp-2693",
+      "base_ans": "45",
+      "gold": "45",
+      "injected": "15",
+      "corrupt_ans": "45"
+    },
+    {
+      "case_id": "tabmwp-2709",
+      "base_ans": "92",
+      "gold": "92",
+      "injected": "191",
+      "corrupt_ans": "92"
+    },
+    {
+      "case_id": "tabmwp-2721",
+      "base_ans": "6",
+      "gold": "6",
+      "injected": "7",
+      "corrupt_ans": "6"
+    },
+    {
+      "case_id": "tabmwp-2727",
+      "base_ans": "4",
+      "gold": "4",
+      "injected": "13",
+      "corrupt_ans": "4"
+    },
+    {
+      "case_id": "tabmwp-2750",
+      "base_ans": "1.58",
+      "gold": "1.58",
+      "injected": "8.5",
+      "corrupt_ans": "This implies the soy sauce price was mistakenly"
+    },
+    {
+      "case_id": "tabmwp-2754",
+      "base_ans": "90",
+      "gold": "90",
+      "injected": "187",
+      "corrupt_ans": "90"
+    },
+    {
+      "case_id": "tabmwp-2793",
+      "base_ans": "$14",
+      "gold": "14",
+      "injected": "7",
+      "corrupt_ans": "14"
+    },
+    {
+      "case_id": "tabmwp-2800",
+      "base_ans": "0",
+      "gold": "0",
+      "injected": "9",
+      "corrupt_ans": "0"
+    },
+    {
+      "case_id": "tabmwp-2803",
+      "base_ans": "24",
+      "gold": "24",
+      "injected": "11",
+      "corrupt_ans": "24"
+    },
+    {
+      "case_id": "tabmwp-2805",
+      "base_ans": "5",
+      "gold": "5",
+      "injected": "105",
+      "corrupt_ans": "5"
+    },
+    {
+      "case_id": "tabmwp-2811",
+      "base_ans": "8",
+      "gold": "8",
+      "injected": "41",
+      "corrupt_ans": "8"
+    },
+    {
+      "case_id": "tabmwp-2815",
+      "base_ans": "0",
+      "gold": "0",
+      "injected": "15",
+      "corrupt_ans": "0"
+    },
+    {
+      "case_id": "tabmwp-2823",
+      "base_ans": "0",
+      "gold": "0",
+      "injected": "7",
+      "corrupt_ans": ""
+    },
+    {
+      "case_id": "tabmwp-2828",
+      "base_ans": "$100.80",
+      "gold": "100.80",
+      "injected": "7",
+      "corrupt_ans": "100.80"
+    },
+    {
+      "case_id": "tabmwp-2844",
+      "base_ans": "24",
+      "gold": "24",
+      "injected": "55",
+      "corrupt_ans": "55"
+    }
+  ]
+}

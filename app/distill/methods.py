@@ -67,17 +67,23 @@ def orch(messages: list[dict], *, temp=CRITIC_TEMP, seed=None, max_tokens=2048) 
     """Text orchestrator call with temp/seed control. max_tokens is generous because the
     orchestrator may be a REASONING model (e.g. deepseek-v4-flash) that emits a long
     reasoning_content before the answer lands in content; too small → empty content."""
-    payload = {"model": settings.orchestrator_model_name, "messages": messages,
+    base = settings.orchestrator_api_base_url or settings.vlm_api_base_url
+    key = settings.orchestrator_api_key or settings.vlm_api_key
+    model = settings.orchestrator_model_name or settings.vlm_model_name
+    timeout = settings.orchestrator_api_timeout or settings.vlm_api_timeout
+    if not base or not model:
+        raise RuntimeError("orchestrator API base URL/model is not configured")
+    payload = {"model": model, "messages": messages,
                "temperature": temp, "max_tokens": max_tokens}
     if seed is not None:
         payload["seed"] = int(seed)
     headers = {"Content-Type": "application/json"}
-    if settings.orchestrator_api_key:
-        headers["Authorization"] = f"Bearer {settings.orchestrator_api_key}"
-    base = settings.orchestrator_api_base_url
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
     is_local = ("127.0.0.1" in base) or ("localhost" in base)
-    ckw: dict[str, Any] = {"timeout": 300, "trust_env": False}
-    if not is_local:
+    ckw: dict[str, Any] = {"timeout": timeout, "trust_env": False}
+    direct_hosts = ("xiaomimimo.com",)
+    if not is_local and not any(host in base for host in direct_hosts):
         ckw["proxy"] = _CLASH_PROXY     # external API (DeepSeek) via clash
     import time
     last = None

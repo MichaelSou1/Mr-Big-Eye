@@ -26,9 +26,9 @@
 \title{\bf Reading, Not Reasoning: A Causal Faithfulness Audit of\\ Chain-of-Thought in Distilled Chart-and-Table VLMs}
 
 \author{%
-  Ruihan Su\thanks{Draft of 2026-06-26. All numbers regenerate from the project's append-only result store; see \S\ref{sec:repro}.}\\
-  Sun Yat-sen University\\
-  \texttt{surh6@mail2.sysu.edu.cn}
+  Anonymous Authors\thanks{Draft of 2026-06-26. All numbers regenerate from the project's append-only result store; see \S\ref{sec:repro}.}\\
+  Anonymous Institution\\
+  \texttt{anonymous}
 }
 \date{}
 
@@ -36,7 +36,7 @@
 \maketitle
 
 \begin{abstract}
-Many multimodal systems try to compress an agentic visual reasoning trajectory into a single tool-free VLM forward pass. We ask what such distillation actually transfers. Across chart and table QA, chain-of-thought (CoT) SFT reliably improves accuracy at high power (ChartQA 32B: $.725\!\to\!.795$, $p{=}6.9{\times}10^{-5}$; TabMWP 32B: $.835\!\to\!.973$, $p{=}2.1{\times}10^{-12}$). The headline figure, however, shows the accuracy gain moving horizontally while causal faithfulness stays pinned at $F\!\approx\!0$, where $F=\mathrm{flip}_{\corrupt}-\mathrm{flip}_{\shuffle}$. The answer-time information source is usually the easiest readable source, not the emitted arithmetic step: models re-read visible charts/tables (ChartQA snap-to-true .98/.82; TabMWP .97), reconstruct natural-image counts from redundant enumerations (follow 0/345 present, 1/345 masked), or copy the chain's final conclusion in a shortcut-removing FinQA curriculum (operand-follow 0/172 at 8B and 0/175 at 32B). We therefore frame the result as a regime-dependent audit of where the causal work sits: visual evidence, redundant text, or conclusion copying. Accuracy-only internalization claims conflate these regimes; causal probes separate reading from load-bearing reasoning.
+Many multimodal systems try to compress an agentic visual reasoning trajectory into a single tool-free VLM forward pass. We ask what such distillation actually transfers. Across chart and table QA, chain-of-thought (CoT) SFT reliably improves accuracy at high power (ChartQA 32B: $.725\!\to\!.795$, $p{=}6.9{\times}10^{-5}$; TabMWP 32B: $.835\!\to\!.973$, $p{=}2.1{\times}10^{-12}$). The headline figure, however, shows the accuracy gain moving horizontally while written-chain causal faithfulness stays pinned at $F\!\approx\!0$, where $F=\mathrm{flip}_{\corrupt}-\mathrm{flip}_{\shuffle}$. The answer-time information source is usually the easiest readable source, not the emitted arithmetic step: models re-read visible charts/tables (ChartQA snap-to-true .98/.82; TabMWP .97), reconstruct natural-image counts from redundant enumerations (follow 0/345 present, 1/345 masked), or copy the chain's final conclusion in a shortcut-removing FinQA curriculum (operand-follow 0/172 at 8B and 0/175 at 32B). We therefore frame the result as a regime-dependent audit of where the causal work sits: visual evidence, redundant text, or conclusion copying. Accuracy-only internalization claims conflate these regimes; causal probes separate reading from load-bearing emitted reasoning, without ruling out latent internal computation.
 \end{abstract}
 
 \section{Introduction}
@@ -49,14 +49,14 @@ Agentic VLM systems---iterative frame retrieval, self-reflection, critic-orchest
   \item[A2 (faithfulness).] When distillation lifts accuracy, the student's emitted CoT carries the causal work rather than merely recording, paraphrasing, or revealing an answer found elsewhere.
 \end{description}
 
-We test both. For A1 we run a multi-seed, paired-bootstrap \textbf{variance gate} over dataset $\times$ model $\times$ agentic-method cells, with label audit and power analysis. For A2 we adapt Lanham-style interventions \citep{lanham2023}: \corrupt{} one numeric intermediate, compare against \shuffle{} and other controls, force the model to answer, and record whether the final answer snaps back to the true value, follows the injected value, or goes elsewhere. The key distinction is not whether an intervention can ever perturb a model, but whether a falsified on-path value is more causal than controls under the same information regime.
+We test both. For A1 we run a multi-seed, paired-bootstrap \textbf{variance gate} over dataset $\times$ model $\times$ agentic-method cells, with label audit and power analysis. For A2 we adapt Lanham-style interventions \citep{lanham2023}: \corrupt{} one numeric intermediate, compare against \shuffle{} and other controls, force the model to answer, and record whether the final answer snaps back to the true value, follows the injected value, or goes elsewhere. The key distinction is not whether an intervention can ever perturb a model, but whether a falsified on-path value is more causal than controls under the same information regime. Throughout, the causal claim is about the emitted written chain; the probes do not falsify hidden-state or latent computation that never appears in the rationale.
 
 \paragraph{Contributions.}
 \begin{enumerate}[leftmargin=1.6em,itemsep=2pt]
   \item A variance-gated map over video, chart, and table regimes: agentic reflection over fixed evidence gives no reliable positive headroom, while static charts/tables provide high-power cells where CoT SFT truly improves single-pass accuracy.
   \item A causal faithfulness battery showing \textbf{accuracy--faithfulness decoupling}: ChartQA SFT gains of $+6.5$--$+7.0$ points and TabMWP gains of $+9.8$--$+13.8$ points coexist with $F\le 0$ and near-zero follow rates.
   \item A regime account of the answer-time information source: charts/tables are answered by re-reading visible evidence, natural-image counting by reconstructing from redundant enumerations, and shortcut-removing FinQA curricula by copying the chain's conclusion.
-  \item A preregistered constructive test: even gold-program and text-teacher curricula that remove single-cell shortcuts raise accuracy but do not install load-bearing input-operand computation.
+  \item A pre-specified constructive test: even gold-program and text-teacher curricula that remove single-cell shortcuts raise accuracy but do not install load-bearing input-operand computation.
 \end{enumerate}
 
 \section{Related Work}
@@ -75,7 +75,7 @@ Chart and table QA are useful because the same task mixes visual extraction and 
 \label{sec:setup}
 
 \paragraph{Tasks.}
-\emph{NExT-GQA} \citep{nextgqa} (short-video MCQ with grounding ground truth; 16 uniformly sampled frames; we verify 47 clean, evidence-visible pilot cases), \emph{CLEVRER} \citep{clevrer} (collision reasoning), \emph{ChartQA} \citep{chartqa} (400 held-out open numeric questions, image-disjoint from SFT train images), \emph{TabMWP} \citep{tabmwp} (400 rendered-table, free-response numeric cases), TallyQA-complex natural-image counting (400 open integer questions), and FinQA rendered tables for the preregistered curriculum probe.
+\emph{NExT-GQA} \citep{nextgqa} (short-video MCQ with grounding ground truth; 16 uniformly sampled frames; we verify 47 clean, evidence-visible pilot cases), \emph{CLEVRER} \citep{clevrer} (collision reasoning), \emph{ChartQA} \citep{chartqa} (400 held-out open numeric questions, image-disjoint from SFT train images), \emph{TabMWP} \citep{tabmwp} (400 rendered-table, free-response numeric cases), TallyQA-complex natural-image counting (400 open integer questions), and FinQA rendered tables for the pre-specified curriculum probe.
 
 \paragraph{Models.}
 Qwen3-VL 4B / 8B / 30B-A3B (MoE) / 32B (dense) \citep{qwen3vl}; InternVL3-8B \citep{internvl3} (fixed-resolution ViT; cross-family control); Penguin-VL 2B/8B \citep{penguinvl} (LLM-based vision encoder with temporal token compression; cross-\emph{paradigm} control). All models are served locally; the orchestrator/critic is a text-only LLM, never a stronger VLM teacher for the video gates.
@@ -84,10 +84,26 @@ Qwen3-VL 4B / 8B / 30B-A3B (MoE) / 32B (dense) \citep{qwen3vl}; InternVL3-8B \ci
 \textsc{self-reflect} (2-turn tool-free self-re-examination over the same frames); \textsc{orch-blind} (a text critic poses sub-questions, the VLM is the eyes, the critic integrates); \textsc{orch-sighted} (a 32B-VLM critic that can re-read the image). Frame retrieval is deliberately excluded: it changes the evidence (type-2) and cannot be internalized into a fixed-input forward pass.
 
 \paragraph{Statistics.}
-$K$ seeds per gate cell ($K{=}10$ for 4B/8B NExT, 6 for 32B, 3--5 elsewhere); paired bootstrap 95\% CIs on agentic net (gain $-$ loss); McNemar exact tests for paired SFT deltas; and an explicit power table. The original video pilot remains underpowered ($n{=}47$, minimum detectable net about 25 points at 80\% power), so video nulls are stated as no reliable fixed-evidence headroom. The ChartQA expansion closes the main power gap: at $n{=}400$, minimum detectable net is about 8--9 points, and the observed paired SFT gains have 66 and 46 discordant pairs at 8B/32B.
+$K$ seeds per gate cell ($K{=}10$ for 4B/8B NExT, 6 for 32B, 3--5 elsewhere); paired bootstrap 95\% CIs on agentic net (gain $-$ loss); McNemar exact tests for paired SFT deltas, using only discordant pairs; and an explicit power table. For the four headline ChartQA/TabMWP SFT deltas, Holm correction leaves all exact McNemar tests below $.01$. The original video pilot remains underpowered ($n{=}47$, minimum detectable net about 25 points at 80\% power), so video nulls are stated as no reliable fixed-evidence headroom. The ChartQA expansion closes the main power gap: at $n{=}400$, minimum detectable net is about 8--9 points, and the observed paired SFT gains have 66 and 46 discordant pairs at 8B/32B.
 
 \paragraph{Robustness to known confounds.}
 We do not claim the \corrupt{} intervention itself is new; it is useful only as part of a controlled battery. To address the ``contextual faithfulness'' concern \citep{tutek2025}, we compare \corrupt{} against \shuffle{}, paraphrase, filler-token, deletion, truncation, image-mask, and a snap/follow/other readout that asks whether the final answer follows the injected value. To address disguised-accuracy and option-bias concerns \citep{bentham2024}, the main faithfulness substrates are free-response numeric QA rather than multiple choice. To avoid reporting a probe artifact as mechanism, we treat a positive corruption flip as insufficient by itself; the headline evidence is convergence across controls and regimes.
+
+\paragraph{Probe quantities.}
+\corrupt{} replaces one on-path numeric intermediate or operand with a wrong value; \shuffle{} preserves the rationale tokens but disrupts their order as a format/control perturbation. ``Flip'' means the forced final answer changes relative to the unperturbed answer. ``Snap'' means the answer returns to the true chart/table value after \corrupt{}; ``follow'' means it follows the injected wrong value. We call a written chain load-bearing only when \corrupt{} flips substantially more than controls and follow is nontrivial.
+
+\begin{figure}[t]
+\centering
+\fbox{\begin{minipage}{0.93\textwidth}
+\small
+\textbf{Original CoT:} read value $a$, read value $b$, compute $a-b=c$, answer $c$.\\
+\textbf{\corrupt:} read value $a$, read value $b$, compute $a-b=\tilde{c}$, answer ?\\
+\textbf{\shuffle:} same rationale tokens, shuffled order, answer ?\\
+\textbf{Readout:} snap to true $c$ / follow injected $\tilde{c}$ / other.
+\end{minipage}}
+\caption{\textbf{Probe schematic.} \corrupt{} tests whether a falsified written intermediate is load-bearing; \shuffle{} is a format control with no injected target value.}
+\label{fig:probe_schematic}
+\end{figure}
 
 \section{Result I: The Two-Regime Map}
 \label{sec:map}
@@ -95,7 +111,7 @@ We do not claim the \corrupt{} intervention itself is new; it is useful only as 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.6\textwidth]{figures/fig_map.pdf}
-\caption{\textbf{The map.} Variance-gated agentic-reasoning headroom per (dataset $\times$ model); cell colour encodes regime. Reasoning-bound cells now include 32B ChartQA and 8B/32B TabMWP, where perception is largely solved and residual errors are arithmetic/table reasoning. Annotations are free-form accuracy, best-agentic net and paired-bootstrap CI. Regenerated from the result store by \texttt{scripts/build\_faithfulness\_axis.py}.}
+\caption{\textbf{The map.} Variance-gated agentic-reasoning headroom per plotted (dataset $\times$ model) cell; cell colour encodes regime. Table~\ref{tab:map} gives the full listed set, including 32B ChartQA and 8B/32B TabMWP as reasoning-bound audit cells. Annotations are gate free-form accuracy, best-agentic net and paired-bootstrap CI. Regenerated from the result store by \texttt{scripts/build\_faithfulness\_axis.py}.}
 \label{fig:map}
 \end{figure}
 
@@ -103,21 +119,27 @@ We do not claim the \corrupt{} intervention itself is new; it is useful only as 
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4.5pt}
-\caption{The variance-gated map. ``Best agentic net'' is the best available fixed-evidence agentic method vs.\ free-form, pooled over seeds. No cell shows reliable positive agentic headroom; reliably negative cells are \textbf{bold}. \regimeone{} = perception/selection-bound; \regimetwo{} = reasoning-bound for SFT/audit.}
+\caption{The variance-gated map. ``Best agentic net'' is the best available fixed-evidence agentic method vs.\ free-form, pooled over seeds. ``Gate free acc'' is the result-store free-form gate accuracy, not necessarily the paired SFT baseline/student evaluation reported in Result II. No cell shows reliable positive agentic headroom; reliably negative cells are \textbf{bold}. \regimeone{} = perception/selection-bound; \regimetwo{} = reasoning-bound for SFT/audit.}
 \label{tab:map}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}llllc@{}}
 \toprule
-Dataset $\times$ model & Free acc & Best agentic net & Verdict & Regime \\
+Dataset $\times$ model & Gate free acc & Best agentic net & Verdict & Regime \\
 \midrule
-NExT 4B / 8B / 32B & .74 / .66 / .70 & $-.045$ / $+.060$ / $+.039$ & within-var.\ ($K{=}10/10/6$) & \regimeone \\
+NExT Qwen3-VL-4B & .74 & $-.045$ & within-var.\ ($K{=}10$) & \regimeone \\
+NExT Qwen3-VL-8B & .66 & $+.060$ & within-var.\ ($K{=}10$) & \regimeone \\
+NExT Qwen3-VL-32B & .70 & $+.039$ & within-var.\ ($K{=}6$) & \regimeone \\
 NExT InternVL3-8B & .70 & orch $\mathbf{-.163}$ & \textbf{rel.\ neg.}\ (CI $[-.32,-.02]$) & \regimeone\ (family) \\
-NExT Penguin 2B / 8B & .53 / .43$^{\dagger}$ & $+.050$ / $+.128$ & within-var.\ ($K{=}3$) & \regimeone\ (paradigm) \\
-CLEVRER 4B--32B & .43--.50 & $\approx 0$ & $\approx$chance; tracking wall & \regimeone \\
-ChartQA 4B / 8B & .685 / .708 & $+.018$ / $+.070$ & within-var. & \regimeone\ (reading) \\
-ChartQA Penguin 2B / 8B & \textbf{.82} / \textbf{.80} & $-.078$ / $-.006$ & within-var.\ ($K{=}3$) & \regimeone\ (enc.\ solves) \\
+NExT Penguin-2B & .53 & $+.050$ & within-var.\ ($K{=}3$) & \regimeone\ (paradigm) \\
+NExT Penguin-8B$^{\dagger}$ & .43 & $+.128$ & within-var.\ ($K{=}3$) & \regimeone\ (paradigm) \\
+CLEVRER Qwen3-VL sweep & .43--.50 & $\approx 0$ & $\approx$chance; tracking wall & \regimeone \\
+ChartQA Qwen3-VL-4B & .685 & $+.018$ & within-var. & \regimeone\ (reading) \\
+ChartQA Qwen3-VL-8B & .708 & $+.070$ & within-var. & \regimeone\ (reading) \\
+ChartQA Penguin-2B & \textbf{.82} & $-.078$ & within-var.\ ($K{=}3$) & \regimeone\ (enc.\ solves) \\
+ChartQA Penguin-8B & \textbf{.80} & $-.006$ & within-var.\ ($K{=}3$) & \regimeone\ (enc.\ solves) \\
 \textbf{ChartQA 32B} & \textbf{.798} & $+.012$ & within-var. & \textbf{\regimetwo} \\
-\textbf{TabMWP 8B / 32B} & \textbf{.928 / .980} & $\mathbf{-.014}$ / $+.003$ & \textbf{rel.\ neg.} / within-var. & \textbf{\regimetwo} \\
+\textbf{TabMWP 8B} & \textbf{.928} & $\mathbf{-.014}$ & \textbf{rel.\ neg.} & \textbf{\regimetwo} \\
+\textbf{TabMWP 32B} & \textbf{.980} & $+.003$ & within-var. & \textbf{\regimetwo} \\
 \bottomrule
 \end{tabular}}
 
@@ -142,7 +164,7 @@ Penguin-VL's LLM-based encoder lifts small-model chart reading to \textbf{.82 (2
 \section{Result II: Internalization Works in Regime 2---by Accuracy}
 \label{sec:sft}
 
-In the reasoning-bound cells, we run the actual distillation. A Qwen3-VL teacher generates step-by-step rationales; answer-consistency filtering keeps high-quality traces; LoRA/QLoRA SFT trains a single-forward student. All reported evaluation sets are image-disjoint from training and use open numeric grading.
+In the reasoning-bound cells, we run the actual distillation. A Qwen3-VL teacher generates step-by-step rationales; answer-consistency filtering keeps high-quality traces; LoRA/QLoRA SFT trains a single-forward student. All reported evaluation sets are image-disjoint from training and use open numeric grading. These gains are best read as improved single-pass readout unless the causal probe shows that the emitted chain itself carries the answer.
 
 \begin{itemize}[leftmargin=1.6em,itemsep=2pt]
   \item \textbf{ChartQA, $n{=}400$:} 8B $.713 \to \mathbf{.778}$, net $+6.5$ points, CI $[+2.5,+10.5]$, McNemar $p{=}0.0021$; 32B $.725 \to \mathbf{.795}$, net $+7.0$ points, CI $[+3.8,+10.3]$, McNemar $p{=}6.9{\times}10^{-5}$. The original 32B $n{=}60$ pilot had only four discordant pairs; the expanded evaluation has 37 gains vs.\ 9 losses.
@@ -150,14 +172,18 @@ In the reasoning-bound cells, we run the actual distillation. A Qwen3-VL teacher
 \end{itemize}
 
 Thus the paper is not a null-result critique of SFT. The accuracy gains are real, paired, and adequately powered on static chart/table substrates. The remaining question is what mechanism those gains bought.
+For example, Table~\ref{tab:map}'s ChartQA-32B $.798$ is a gate free-form aggregate, while the paired SFT evaluation for the same scale is $.725\!\to\!.795$.
 
-\section{Result III: The Causal Probe---the Gain Is Reading, Not Reasoning}
+\paragraph{Dense 8B control.}
+To rule out a low-rank-capacity explanation, we repeat the non-video 8B arms with dense/full-SFT controls (vision tower, embeddings, and the first three language layers frozen; about 79.7\% trainable parameters for ChartQA/TabMWP). The accuracy deltas remain positive: ChartQA $.713\!\to\!.763$ (net $+5.0$ points, 39 gains/19 losses, $p{=}0.0126$) and TabMWP $.865\!\to\!.968$ (net $+10.3$ points, 42 gains/1 loss, $p{=}1.1{\times}10^{-9}$). Available dense probes keep the LoRA signature: ChartQA's completed six-intervention battery has present-image $\corrupt{}/\shuffle{}=.100/.259$, snap .917 and follow .030; TabMWP's completed core battery has present-table $\corrupt{}/\shuffle{}=.049/.161$, snap .971 and follow .016; FinQA dense targeted arms keep operand-follow near zero while consistent-conclusion follow remains .947--.982. The remaining dense-control gap is the full six-intervention TabMWP present/masked battery, so the dense control is evidence against the LoRA-capacity confound but not yet the final multi-cell table.
+
+\section{Result III: The Causal Probe---the Written Chain Is Not Load-Bearing}
 \label{sec:probe}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/fig_decoupling.pdf}
-\caption{\textbf{Accuracy $\perp$ faithfulness.} CoT distillation lifts ChartQA accuracy by $+6.5$--$7.0\%$ (McNemar $p\!\le\!.002$; horizontal arrows), yet the causal CoT metric stays on the $F\!\approx\!0$ band ($F=\text{flip}_{\corrupt}-\text{flip}_{\shuffle}$): corrupting a numeric intermediate flips the answer no more than shuffling the CoT. Hollow markers show image-masked controls. $F$ is measured on the base model; error bars are $95\%$ binomial CIs. Regenerated from the result store by \texttt{scripts/build\_faithfulness\_axis.py}.}
+\caption{\textbf{Accuracy $\perp$ written-chain faithfulness.} CoT distillation lifts ChartQA accuracy by $+6.5$--$7.0\%$ (McNemar $p\!\le\!.002$; horizontal arrows), yet the causal CoT metric stays on the $F\!\approx\!0$ band ($F=\text{flip}_{\corrupt}-\text{flip}_{\shuffle}$): corrupting a numeric intermediate flips the answer no more than shuffling the CoT. Hollow markers show image-masked controls. $F$ is measured on the same SFT student used for the corresponding probe; error bars are $95\%$ binomial CIs. Regenerated from the result store by \texttt{scripts/build\_faithfulness\_axis.py}.}
 \label{fig:decoupling}
 \end{figure}
 
@@ -187,16 +213,16 @@ Four findings follow.
 
 \begin{enumerate}[leftmargin=1.6em,itemsep=2pt]
   \item \textbf{ChartQA and TabMWP agree.} In every present-image/table cell, $\corrupt{}\leq\shuffle{}$ up to sampling noise. The model usually snaps back to the true value and almost never follows the injected value. TabMWP is the cleanest case: despite large SFT gains, follow is .008/.015 at 8B/32B.
-  \item \textbf{The gain subset itself is reading.} On TabMWP cases newly solved by SFT, corrupting the CoT flips 0/40 8B gains and 1/57 32B gains; follow is 1/40 and 0/57. The new correct answers are not being computed from the falsified written arithmetic.
+  \item \textbf{The gain subset itself is reading.} On TabMWP cases newly solved by SFT, corrupting the CoT flips 0/40 8B gains and 1/57 32B gains; follow is 1/40 at 8B (95\% upper bound 12.9\%) and 0/57 at 32B (95\% upper bound 6.3\%). The new correct answers are not being computed from the falsified written arithmetic.
   \item \textbf{Masking diagnoses the information source.} On tables, masking the image raises flip and ``other'' errors sharply, especially for 8B, but follow remains small. When the table is visible, the final answer step re-reads and recomputes from the table; when the table is removed, the model often fabricates rather than faithfully using the bad chain.
-  \item \textbf{Other interventions point the same way.} Paraphrase behaves like \corrupt{} (e.g., 32B ChartQA present .053 vs.\ .051), filler/truncation/deletion mainly test format and token-budget sensitivity, and early-answering curves are monotone. The conclusion is carried by the whole battery, not by a single corruption statistic.
+  \item \textbf{Other interventions point the same way.} Paraphrase behaves like \corrupt{} (e.g., 32B ChartQA present .053 vs.\ .051), while filler/truncation/deletion and \shuffle{} mainly test format and token-budget sensitivity. Because \shuffle{} injects no target value, its paper-facing readout is flip/snap/other rather than follow. Existing summaries show this is a harsh control rather than an injected-value test: present-image/table \shuffle{} accuracy-after is .735/.987 on ChartQA 8B/32B and .857/.936 on TabMWP 8B/32B. The conclusion is carried by the whole battery, not by a single corruption statistic.
 \end{enumerate}
 
 \section{Result IV: Regime Dependence and a Constructive Failure}
 \label{sec:regime}
 
 \paragraph{Natural-image counting.}
-To test whether the chart/table result is a chart artifact, we run a preregistered TallyQA-complex counting probe on base Qwen3-VL-8B/32B, with no chart adapter. This is a genuinely perception-bottlenecked natural-image regime (free-form accuracy .415/.448). Yet the emitted CoT's numeric content is again not load-bearing: across scales, follow is 0/345 with the image present and 1/345 when masked. Even when \corrupt{} hits the count token itself, follow is 0/103 present and 1/103 masked. The model reconstructs the answer from redundant enumeration in the text, so masking the image is almost inert. This is the same reading-not-reasoning pattern with a different readable source: not the image, but the redundant chain.
+To test whether the chart/table result is a chart artifact, we run a pre-specified TallyQA-complex counting probe on base Qwen3-VL-8B/32B, with no chart adapter. This is a genuinely perception-bottlenecked natural-image regime (free-form accuracy .415/.448). Yet the emitted CoT's numeric content is again not load-bearing: across scales, follow is 0/345 with the image present and 1/345 when masked. Even when \corrupt{} hits the count token itself, follow is 0/103 present and 1/103 masked. The model reconstructs the answer from redundant enumeration in the text, so masking the image is almost inert. This is the same reading-not-reasoning pattern with a different readable source: not the image, but the redundant chain.
 
 \paragraph{Shortcut-removing curriculum.}
 As a constructive counter-test, we train on rendered FinQA tables filtered to require multi-step, multi-cell arithmetic with a gold-program-verified flippable operand. The curriculum uses a deterministic gold-program teacher and a matched vanilla control; a text-teacher arm repeats the test with fluent answer-conditioned rationales. Accuracy rises substantially (8B: .080 base $\to$ .582 vanilla $\to$ .674 curriculum; 32B: .123 $\to$ .659 $\to$ .682). But the targeted probe still finds no load-bearing operand use: changing a verified on-path \emph{input} operand yields follow 0/172 for the 8B curriculum and 0/175 for the 32B curriculum. When the chain's final conclusion is consistently rewritten to the recomputed value, the model follows it in 96--97\% of cases. The mechanism is conclusion copying, not recomputation from operands. Thus even a shortcut-removing curriculum can improve accuracy without installing a load-bearing written chain.
@@ -208,12 +234,12 @@ As a constructive counter-test, we train on rendered FinQA tables filtered to re
 (i) Claims of ``internalizing agentic reasoning'' need causal audits. Significant accuracy gains are compatible with re-reading visual evidence, reconstructing from redundant rationale text, or copying the rationale's conclusion. (ii) The load-bearing locus is regime-dependent: answer-time evidence can live in pixels, in redundant text, or in a conclusion line. A single CoT faithfulness score without information-source controls is under-specified. (iii) Fixed-evidence reflection is a poor substitute for perception routing; if the agent's true advantage is frame/region selection, single-forward distillation must be evaluated as perceptual transfer rather than reasoning transfer.
 
 \paragraph{Limitations.}
-The video gate remains small ($n{=}47$) and is used only to motivate the fixed-evidence boundary; the high-power causal claims are on ChartQA/TabMWP/TallyQA/FinQA. The 32B students use QLoRA/NF4 rather than full bf16 fine-tuning. The main teacher family is Qwen3-VL, although the FinQA text-teacher arm reduces a format-specific teacher concern. Corrupting one numeric token is a sensitivity lower bound; we therefore report it only with shuffle/paraphrase/filler/truncation, image masking, snap/follow/other classification, and targeted gold-program operand tests.
+All causal claims are about emitted rationales, not a proof that the model lacks latent internal computation. The chart/table and FinQA operands are input-readable by design, which is exactly why these substrates can distinguish re-reading from written-chain use; the scope does not include tasks whose required operands are unavailable in the input. The video gate remains small ($n{=}47$) and is used only to motivate the fixed-evidence boundary; the high-power causal claims are on ChartQA/TabMWP/TallyQA/FinQA. The 32B students use QLoRA/NF4 rather than full bf16 fine-tuning. The main teacher family is Qwen3-VL, although the FinQA text-teacher arm reduces a format-specific teacher concern. Corrupting one numeric token is a sensitivity lower bound; we therefore report it only with shuffle/paraphrase/filler/truncation, image masking, snap/follow/other classification, and targeted gold-program operand tests.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-We set out to compress tool-scaffolded visual reasoning into one forward pass and to verify what moved. The answer is not a blanket dismissal of CoT or of distillation: SFT works, often strongly. The causal result is more specific. In these chart, table, natural-counting, and rendered-FinQA regimes, the answer reads from the easiest available source: pixels, redundant enumerations, or the chain's final conclusion. Accuracy can move while load-bearing CoT faithfulness does not. That is the audit lesson behind \emph{Reading, Not Reasoning}.
+We set out to compress tool-scaffolded visual reasoning into one forward pass and to verify what moved. The answer is not a blanket dismissal of CoT or of distillation: SFT works, often strongly. The causal result is more specific. In these chart, table, natural-counting, and rendered-FinQA regimes, the emitted answer reads from the easiest available source: pixels, redundant enumerations, or the chain's final conclusion. Accuracy can move while load-bearing written-chain faithfulness does not. That is the audit lesson behind \emph{Reading, Not Reasoning}.
 
 \section*{Reproducibility Statement}
 \label{sec:repro}

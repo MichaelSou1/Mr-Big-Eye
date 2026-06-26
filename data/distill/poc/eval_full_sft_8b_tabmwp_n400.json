@@ -1,0 +1,53 @@
+{
+  "tag": "full8b_tabmwp",
+  "base": "/home/gpus/models/Qwen3-VL-8B-Instruct",
+  "quant": "none",
+  "n_eval": 400,
+  "base_acc": 0.865,
+  "per_full_model": [
+    {
+      "name": "full8b_tabmwp",
+      "full_model": "data/distill/poc/full_8b_tabmwp",
+      "adapter": null,
+      "test_acc": 0.9675,
+      "base_acc": 0.865,
+      "net": 0.10250000000000004,
+      "gain": 42,
+      "lost": 1,
+      "boot_ci": [
+        0.0725,
+        0.135
+      ],
+      "boot_net": 0.1025,
+      "mcnemar_b": 42,
+      "mcnemar_c": 1,
+      "mcnemar_p": 1.0610641964594883e-09,
+      "n": 400
+    }
+  ],
+  "per_adapter": [
+    {
+      "name": "full8b_tabmwp",
+      "full_model": "data/distill/poc/full_8b_tabmwp",
+      "adapter": null,
+      "test_acc": 0.9675,
+      "base_acc": 0.865,
+      "net": 0.10250000000000004,
+      "gain": 42,
+      "lost": 1,
+      "boot_ci": [
+        0.0725,
+        0.135
+      ],
+      "boot_net": 0.1025,
+      "mcnemar_b": 42,
+      "mcnemar_c": 1,
+      "mcnemar_p": 1.0610641964594883e-09,
+      "n": 400
+    }
+  ],
+  "best_full_model": "data/distill/poc/full_8b_tabmwp",
+  "best_test_acc": 0.9675,
+  "best_net": 0.10250000000000004,
+  "best_mcnemar_p": 1.0610641964594883e-09
+}

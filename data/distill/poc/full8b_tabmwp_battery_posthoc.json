@@ -1,0 +1,23 @@
+{
+  "objective": "Posthoc answer classification for TabMWP Full-SFT full battery.",
+  "cells": {
+    "tabmwp_present": {
+      "path": "data/distill/poc/battery_full8b_tabmwp_present.json",
+      "source": {
+        "path": "data/distill/poc/battery_full8b_tabmwp_present.json",
+        "exists": false
+      },
+      "status": "PENDING",
+      "reason": "missing file"
+    },
+    "tabmwp_masked": {
+      "path": "data/distill/poc/battery_full8b_tabmwp_masked.json",
+      "source": {
+        "path": "data/distill/poc/battery_full8b_tabmwp_masked.json",
+        "exists": false
+      },
+      "status": "PENDING",
+      "reason": "missing file"
+    }
+  }
+}

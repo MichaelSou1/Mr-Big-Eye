@@ -24,6 +24,7 @@ parser eats --n): conda activate mbe-up && python scripts/battery_n400.py ...
 from __future__ import annotations
 
 import argparse
+import gc
 import hashlib
 import json
 import math
@@ -32,7 +33,7 @@ import random
 import re as _re
 import sys
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import torch
@@ -193,12 +194,18 @@ def build_paraphrase_cache(kept, scale_tag, cache_path, workers=8):
         print(f"paraphrase: {len(todo)} new (cache hit {len(kept)-len(todo)}/{len(kept)})", flush=True)
         results = []
         with ThreadPoolExecutor(max_workers=workers) as ex:
-            for r in ex.map(one, todo):
+            futs = [ex.submit(one, item) for item in todo]
+            done = 0
+            for fut in as_completed(futs):
+                r = fut.result()
                 results.append(r)
-        with cache_path.open("a") as f:
-            for key, h, para, ok in results:
-                f.write(json.dumps({"key": key, "base_md5": h, "para": para, "nums_ok": ok},
-                                   ensure_ascii=False) + "\n")
+                done += 1
+                key, h, para, ok = r
+                with cache_path.open("a") as f:
+                    f.write(json.dumps({"key": key, "base_md5": h, "para": para, "nums_ok": ok},
+                                       ensure_ascii=False) + "\n")
+                if done == 1 or done % 16 == 0 or done == len(todo):
+                    print(f"paraphrase progress: {done}/{len(todo)}", flush=True)
         by_key = {key: (para, ok) for key, h, para, ok in results}
         for k in kept:
             key = f"{scale_tag}:{k['cid']}"
@@ -226,6 +233,12 @@ def main() -> int:
     ap.add_argument("--mask-image", action="store_true")
     ap.add_argument("--interventions", nargs="+", default=ALL_INTERVENTIONS)
     ap.add_argument("--paraphrase-cache", default="data/distill/poc/paraphrase_cache.jsonl")
+    ap.add_argument("--paraphrase-workers", type=int,
+                    default=int(os.environ.get("PARAPHRASE_WORKERS", "8")))
+    ap.add_argument("--base-cache", default=None,
+                    help="Optional JSONL cache for Phase-1 base-CoT generations.")
+    ap.add_argument("--release-model-during-paraphrase", action="store_true",
+                    help="Unload the VLM while remote paraphrases are generated, then reload for probes.")
     args = ap.parse_args()
     rng = random.Random(0)
 
@@ -242,17 +255,22 @@ def main() -> int:
         quant_cfg = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
                                        bnb_4bit_use_double_quant=True,
                                        bnb_4bit_compute_dtype=torch.bfloat16)
-    t0 = time.time()
-    model = Qwen3VLForConditionalGeneration.from_pretrained(
-        args.base, quantization_config=quant_cfg, torch_dtype=torch.bfloat16,
-        device_map="auto", trust_remote_code=True)
     use_adapter = bool(args.adapter) and str(args.adapter).lower() != "none"
-    if use_adapter:
-        model = PeftModel.from_pretrained(model, args.adapter)
-    model.eval(); model.config.use_cache = True
     dev0 = torch.device("cuda:0")
-    print(f"loaded {'base+adapter' if use_adapter else 'BASE-ONLY'} ({args.quant}) "
-          f"in {time.time()-t0:.0f}s", flush=True)
+
+    def load_runtime_model():
+        t0 = time.time()
+        m = Qwen3VLForConditionalGeneration.from_pretrained(
+            args.base, quantization_config=quant_cfg, torch_dtype=torch.bfloat16,
+            device_map="auto", trust_remote_code=True)
+        if use_adapter:
+            m = PeftModel.from_pretrained(m, args.adapter)
+        m.eval(); m.config.use_cache = True
+        print(f"loaded {'base+adapter' if use_adapter else 'BASE-ONLY'} ({args.quant}) "
+              f"in {time.time()-t0:.0f}s", flush=True)
+        return m
+
+    model = load_runtime_model()
 
     prog = Path("data/distill/poc/logs/battery_progress.txt"); prog.parent.mkdir(parents=True, exist_ok=True)
 
@@ -320,7 +338,84 @@ def main() -> int:
     # ---- Phase 1: base-CoT gen (image present, batched) ----
     base_items = [{"content": [{"type": "image", "image": c["img"]},
                                {"type": "text", "text": USER_INSTR + c["q"]}]} for c in cases]
-    base_out = run_batched(base_items, args.max_new, "base")
+    base_out = [None] * len(cases)
+    base_cache_path = Path(args.base_cache) if args.base_cache else None
+    base_cache: dict[str, dict] = {}
+    if base_cache_path and base_cache_path.exists():
+        for line in base_cache_path.open():
+            if line.strip():
+                e = json.loads(line); base_cache[e["key"]] = e
+
+    def base_key(c):
+        return f"{args.scale_tag}:{c['cid']}"
+
+    def model_fingerprint():
+        base_path = Path(args.base)
+        parts = [f"base={base_path.resolve()}", f"adapter={args.adapter or 'none'}", f"quant={args.quant}"]
+        config_candidates = [
+            "config.json",
+            "generation_config.json",
+            "preprocessor_config.json",
+            "processor_config.json",
+            "tokenizer_config.json",
+        ]
+        for name in config_candidates:
+            p = base_path / name
+            if p.exists():
+                st = p.stat()
+                parts.append(f"{name}:{st.st_size}:{int(st.st_mtime)}")
+        weight_files = sorted(
+            list(base_path.glob("model*.safetensors"))
+            + list(base_path.glob("pytorch_model*.bin"))
+        )
+        for p in weight_files:
+            st = p.stat()
+            parts.append(f"{p.name}:{st.st_size}:{int(st.st_mtime)}")
+        if use_adapter:
+            adapter_path = Path(args.adapter)
+            for name in ["adapter_config.json"]:
+                p = adapter_path / name
+                if p.exists():
+                    st = p.stat()
+                    parts.append(f"adapter/{name}:{st.st_size}:{int(st.st_mtime)}")
+            adapter_weights = sorted(
+                list(adapter_path.glob("adapter_model*.safetensors"))
+                + list(adapter_path.glob("adapter_model*.bin"))
+            )
+            for p in adapter_weights:
+                st = p.stat()
+                parts.append(f"adapter/{p.name}:{st.st_size}:{int(st.st_mtime)}")
+        return hashlib.md5("\n".join(parts).encode("utf-8")).hexdigest()
+
+    model_fp = model_fingerprint()
+
+    def base_sig(c):
+        text = f"{c['q']}\n{c['gold']}\nmax_new={args.max_new}\nmodel_fp={model_fp}"
+        return hashlib.md5(text.encode("utf-8")).hexdigest()
+
+    missing = []
+    for i, c in enumerate(cases):
+        hit = base_cache.get(base_key(c))
+        if hit and hit.get("sig") == base_sig(c) and hit.get("model_fp") == model_fp:
+            base_out[i] = hit.get("out", "")
+        else:
+            missing.append(i)
+    if missing:
+        outs = run_batched([base_items[i] for i in missing], args.max_new, "base")
+        for i, out in zip(missing, outs):
+            base_out[i] = out
+        if base_cache_path:
+            base_cache_path.parent.mkdir(parents=True, exist_ok=True)
+            with base_cache_path.open("a") as f:
+                for i, out in zip(missing, outs):
+                    c = cases[i]
+                    f.write(json.dumps({"key": base_key(c), "sig": base_sig(c),
+                                        "model_fp": model_fp, "out": out},
+                                       ensure_ascii=False) + "\n")
+            print(f"base cache wrote {len(missing)} new (hit {len(cases)-len(missing)}/{len(cases)})",
+                  flush=True)
+    elif base_cache_path:
+        print(f"base cache hit {len(cases)}/{len(cases)}", flush=True)
     kept = []
     base_correct = 0
     for c, out in zip(cases, base_out):
@@ -345,7 +440,16 @@ def main() -> int:
         k["del"] = {kk: delete_steps(k["base_cot"], kk) for kk in DELETE_KS}
 
     if "paraphrase" in args.interventions:
-        build_paraphrase_cache(kept, args.scale_tag, args.paraphrase_cache)
+        if args.release_model_during_paraphrase:
+            print("releasing VLM before paraphrase", flush=True)
+            del model
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        build_paraphrase_cache(kept, args.scale_tag, args.paraphrase_cache,
+                               workers=max(1, args.paraphrase_workers))
+        if args.release_model_during_paraphrase:
+            model = load_runtime_model()
 
     # ---- generic force-continue + score for a variant ----
     def score_variant(edited_by_case):
@@ -362,24 +466,33 @@ def main() -> int:
 
     interventions: dict = {}
     per_case_corrupt_ans = {}
+    variant_answers: dict = {}
 
     if "corrupt" in args.interventions:
         m, ans = score_variant([k["corrupt"] for k in kept]); interventions["corrupt"] = m
         per_case_corrupt_ans = ans
+        variant_answers["corrupt"] = ans
     if "shuffle" in args.interventions:
-        m, _ = score_variant([k["shuffle"] for k in kept]); interventions["shuffle"] = m
+        m, ans = score_variant([k["shuffle"] for k in kept]); interventions["shuffle"] = m
+        variant_answers["shuffle"] = ans
     if "filler" in args.interventions:
-        m, _ = score_variant([k["filler"] for k in kept]); interventions["filler"] = m
+        m, ans = score_variant([k["filler"] for k in kept]); interventions["filler"] = m
+        variant_answers["filler"] = ans
     if "paraphrase" in args.interventions:
-        m, _ = score_variant([k.get("paraphrase") for k in kept]); interventions["paraphrase"] = m
+        m, ans = score_variant([k.get("paraphrase") for k in kept]); interventions["paraphrase"] = m
+        variant_answers["paraphrase"] = ans
     if "truncate" in args.interventions:
         interventions["truncate"] = {}
+        variant_answers["truncate"] = {}
         for f in TRUNC_FRACS:
-            m, _ = score_variant([k["trunc"][f] for k in kept]); interventions["truncate"][str(f)] = m
+            m, ans = score_variant([k["trunc"][f] for k in kept]); interventions["truncate"][str(f)] = m
+            variant_answers["truncate"][str(f)] = ans
     if "delete" in args.interventions:
         interventions["delete"] = {}
+        variant_answers["delete"] = {}
         for kk in DELETE_KS:
-            m, _ = score_variant([k["del"][kk] for k in kept]); interventions["delete"][str(kk)] = m
+            m, ans = score_variant([k["del"][kk] for k in kept]); interventions["delete"][str(kk)] = m
+            variant_answers["delete"][str(kk)] = ans
 
     # ---- N2 re-perception (derived from corrupt; present-only meaningful) ----
     re_perception = None
@@ -406,9 +519,21 @@ def main() -> int:
                "adapter": args.adapter if use_adapter else None,
                "n_para_nums_ok": sum(1 for k in kept if k.get("_para_nums_ok")),
                "interventions": interventions, "re_perception": re_perception}
+    def answers_for_case(i: int) -> dict:
+        out = {}
+        for name, ans in variant_answers.items():
+            if name in {"truncate", "delete"}:
+                nested = {sub: vals.get(i) for sub, vals in ans.items() if i in vals}
+                if nested:
+                    out[name] = nested
+            elif i in ans:
+                out[name] = ans.get(i)
+        return out
+
     details = [{"case_id": k["cid"], "base_ans": k["base_ans"], "gold": k["gold"],
                 "injected": k.get("injected"),
-                "corrupt_ans": per_case_corrupt_ans.get(i)} for i, k in enumerate(kept)]
+                "corrupt_ans": per_case_corrupt_ans.get(i),
+                "answers": answers_for_case(i)} for i, k in enumerate(kept)]
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text(json.dumps({"summary": summary, "details": details},
                                          ensure_ascii=False, indent=2))

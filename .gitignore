@@ -46,6 +46,11 @@ data/distill/poc/lora_8b_finqa_*/tokenizer.json
 data/distill/poc/lora_32b_finqa_*/epoch_*/adapter_model.safetensors
 data/distill/poc/lora_32b_finqa_*/epoch_*/tokenizer.json
 
+# Full-SFT 8B model artifacts (model.safetensors up to 17G + tokenizer copy, >GitHub
+# limit); re-create via scripts/poc_sft_full_8b.py. Keep the configs/eval/summary jsons.
+data/distill/poc/full_8b_*/model.safetensors
+data/distill/poc/full_8b_*/tokenizer.json
+
 # agent-local state + regenerable session backups
 .claude/
 data/distill/results/results.bak.*.jsonl

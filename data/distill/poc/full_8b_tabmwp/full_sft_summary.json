@@ -1,0 +1,29 @@
+{
+  "base": "/home/gpus/models/Qwen3-VL-8B-Instruct",
+  "data": "data/distill/poc/tabmwp_cot_train.jsonl",
+  "out": "data/distill/poc/full_8b_tabmwp",
+  "epochs": 2.0,
+  "lr": 2e-05,
+  "max_len": 2048,
+  "max_target_len": 0,
+  "loss_chunk_tokens": 128,
+  "batch_size": 1,
+  "grad_accum": 8,
+  "optim": "paged_adamw_8bit",
+  "strategy": "device_map",
+  "fsdp": null,
+  "train_vision": false,
+  "freeze_embeddings": true,
+  "freeze_first_layers": 3,
+  "trainable_params": 6989566208,
+  "total_params": 8767123696,
+  "trainable_pct": 0.7972473584682043,
+  "n_records": 160,
+  "n_usable": 160,
+  "train_metrics": {
+    "train_loss": 0.20648118865210563,
+    "train_micro_steps": 320,
+    "train_steps": 40,
+    "epoch": 2
+  }
+}
