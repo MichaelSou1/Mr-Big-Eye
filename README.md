@@ -2,11 +2,41 @@
 
 面向长视频音画问答 Agent 的 **训练、蒸馏、评测与推理系统**。
 
-项目当前重点是训练侧：把成熟的长视频 QA Agent 当作 teacher，采集它在评测集上的完整工具调用轨迹，再把这些轨迹整理成 Agentic SFT 数据，训练一个更便宜、可本地部署的 orchestrator student。推理侧仍然保留完整 Web 应用、离线视频索引、LangGraph Agent、工具调用和评测 harness。
+本分支（`distillation`）的主线是训练侧：把一个强力的专有 teacher（`deepseek-v4-pro` 编排整套多模态工具）当作老师，采集它在长视频 QA 评测集上的完整工具调用轨迹，整理成 Agentic SFT 数据，用 QLoRA 把它的**编排策略**蒸馏进一个可本地部署的 7B student（Qwen2.5-7B-Instruct）。推理侧保留完整 Web 应用、离线视频索引、LangGraph Agent、14 个工具和评测 harness。
 
 一句话说：
 
-> Mr. Big-Eye 不是把整段视频直接塞给一个大模型，而是先把长视频离线变成可检索证据库，再让 Agent 在线调工具查证、观察、对齐、回答；训练侧则蒸馏这个 Agent 的工具调用策略。
+> Mr. Big-Eye 不是把整段视频直接塞给一个大模型，而是先把长视频离线变成可检索证据库，再让 Agent 在线调工具查证、观察、对齐、回答；训练侧则蒸馏这个 Agent 的工具调用策略，让一个本地 7B 模型来当 orchestrator。
+
+整个蒸馏闭环已经跑通并完成最终评测（2026-06-04/05）。下面先给结论，再给可执行的全流程。
+
+---
+
+## 结论（最终 3-way 评测）
+
+在 **181 例无泄漏 hard held-out**（90 Video-MME + 91 WorldSense）上，同一套 VLM/judge、单 vLLM 热插 LoRA、apples-to-apples 对比 base / pilot / v2 三个 orchestrator：
+
+| pass_rate（n） | base | pilot | **v2** | v2−base | v2−pilot |
+| --- | --- | --- | --- | --- | --- |
+| **overall (181)** | 0.547 | 0.630 | **0.669** | **+12.2pp** | **+3.9pp** ✅ |
+| joint A/V+temporal (58) | 0.362 | 0.621 | 0.621 | **+25.9pp** | +0.0 |
+| audio (45) | 0.356 | 0.444 | 0.444 | +8.9pp | +0.0 |
+| visual (65) | 0.785 | 0.708 | **0.815** | +3.1pp | **+10.8pp** |
+| overview (13) | 0.846 | 0.923 | 0.923 | +7.7pp | +0.0 |
+| — Video-MME (90) | 0.700 | 0.722 | **0.800** | +10.0pp | +7.8pp |
+| — WorldSense (91) | 0.396 | 0.538 | 0.538 | +14.2pp | +0.0 |
+
+三条核心发现：
+
+1. **蒸馏在最难的模态上收益最大。** 两个蒸馏模型都把 base 在 `joint`（音画+时序）上从 0.362 抬到 **0.621（+25.9pp）**，`audio` +8.9pp——agentic 工具使用策略成功迁移，补上了 base 7B 的音画短板。
+2. **v2 是最佳模型且达标。** overall 0.547 → **0.669（+12.2pp over base）**，且 `v2 − pilot = +3.9pp ≥ +3pp` 主验收条件通过。
+3. **教师能力天花板（最重要的策略结论）。** v2 相对 pilot 的增益**全部来自 `visual`/Video-MME**；在 joint/audio/overview/WorldSense 上与 pilot 完全相同（通过的是同一批题）。WorldSense 音画增强**没有带来 joint/audio 上的额外收益**——因为 teacher 自己在 WorldSense 上就**错 56%**，SFT 模仿无法超越老师。这是一个干净的负结果：硬音画任务的瓶颈是 **teacher / 工具套件**，不是数据量或过滤。
+
+> 小样本提醒：分模态 n=13–65，overall 的 +3.9pp 等于 7 道题（121 vs 114 / 181）。方向明确（v2 在各模态 ≥ pilot，visual 上严格更优），但 <3pp 的差异按打平处理。
+
+数据 > 数量的量化教训：把训练集从 355 → 1618 样本（4.5×，靠加便宜的 short 视频）反而把 hard 集 pass_rate 从 0.708 **拉低 4.2pp**；v2 改为**恒定规模（~1.5k）下偏向更难、更多模态**的数据，才拿到最佳模型。
+
+完整记录见 [docs/distill_outcomes_and_learnings.md](docs/distill_outcomes_and_learnings.md)，评测报告见 [reports/eval3way/eval_3way.md](reports/eval3way/eval_3way.md)。
 
 ---
 
@@ -23,11 +53,11 @@
 完整路线：
 
 ```text
-Phase 0  数据与视频索引准备
+Phase 0  数据与视频索引准备（Video-MME + WorldSense 音画增强）
 Phase A  teacher 轨迹采集：跑现有 Agent，保存完整 messages / system_prompt / guards
-Phase B  过滤与格式化：Tier 分类、按视频切 train/val、切成每一步 SFT 样本
-Phase C  LoRA SFT：Qwen2.5-7B-Instruct + PEFT，completion-only loss
-Phase D  部署评测：vLLM serve LoRA，用 held-out 视频对比 teacher / baseline
+Phase B  过滤与格式化：tier 分类、按视频切 train/val、切成每一步 SFT 样本
+Phase C  QLoRA SFT：Qwen2.5-7B-Instruct + PEFT，completion-only loss，保留全部 checkpoint
+Phase D  部署评测：vLLM 热插 LoRA，用 held-out 视频对比 base / pilot / v2
 ```
 
 ### 推理侧：Long-video Multimodal QA Agent
@@ -46,17 +76,21 @@ Phase D  部署评测：vLLM serve LoRA，用 held-out 视频对比 teacher / ba
 
 | 项 | 状态 |
 | --- | --- |
-| Agent 版本 | `AGENT_CODE_VERSION = "v22"` |
+| Agent 版本 | `AGENT_CODE_VERSION = "v22"`（`app/eval_fingerprint.py`） |
 | 注册工具 | 14 个，见 `app/tools.py:TOOLS` |
-| 训练/蒸馏文档 | `distillation_spec.md` |
+| Teacher | `deepseek-v4-pro`，编排整套多模态工具 |
+| Student | Qwen2.5-7B-Instruct + QLoRA（r32/α64），shipped ckpt `ckpt-320`（epoch 2，eval_loss 0.4044） |
+| 蒸馏进度 | ✅ 全流程跑通；v2 已训练并完成 3-way 评测（见上方结论） |
+| 训练/蒸馏 spec | `distillation_spec.md`、`docs/distill_hard_rebalance_spec.md` |
+| 结果与复盘 | `docs/distill_outcomes_and_learnings.md`、`reports/eval3way/` |
+| HF 模型卡 | `docs/hf_model_card.md` |
 | Teacher 轨迹采集 | `scripts/eval_harness.py --save-full-trajectory` |
 | SFT 数据构建 | `scripts/distill_build_dataset.py` |
 | SFT 训练 | `scripts/distill_train.py` |
 | Student 部署 | `scripts/distill_serve_vllm.sh` |
-| Video-MME manifest | `eval/audiovisual/video_manifest.json`，当前 247 个视频 |
-| Eval cases | `questions.ready.jsonl` 199 题；`questions.new_short.jsonl` 594 题；`questions.jsonl` 741 题 |
+| 评测数据 | Video-MME `eval/audiovisual/`（manifest 263 视频）；v2 hard-rebalance `eval/audiovisual/v2/`；WorldSense `eval/audiovisual/worldsense/` |
 
-当前分支已经具备从 teacher 采集到 student 评测的闭环脚本。`distillation_spec.md` 是训练侧更细的工程说明；README 负责给出可执行主流程。
+`distillation_spec.md` 和 `docs/` 下的 spec 是训练侧更细的工程说明；本 README 负责给出可执行主流程与结论。
 
 ---
 
@@ -64,9 +98,9 @@ Phase D  部署评测：vLLM serve LoRA，用 held-out 视频对比 teacher / ba
 
 ### Teacher 和 Student
 
-Teacher 是当前线上 Agent：通常由远程 tool-call 文本模型做 orchestrator，远程 VLM 负责 caption、局部观察和最终视觉理解。
+Teacher 是当前线上 Agent：orchestrator 由远程 tool-call 文本模型（`deepseek-v4-pro`）担任，远程 VLM 负责 caption、局部观察和最终视觉理解。
 
-Student 是要训练出来的本地 orchestrator：它学习 teacher 何时调用哪个工具、带什么参数、何时认为证据足够、何时回答。Student 部署后，VLM 和检索栈可以保持不变，这样 Phase D 对比时只改变 orchestrator 这一项。
+Student 是要训练出来的本地 orchestrator：它学习 teacher 何时调用哪个工具、带什么参数、何时认为证据足够、何时回答。Student 部署后，VLM 和检索栈保持不变，这样 Phase D 对比时只改变 orchestrator 这一项（base 7B vs pilot LoRA vs v2 LoRA 热插在同一个 vLLM）。
 
 ### 为什么只蒸馏 Orchestrator
 
@@ -101,7 +135,7 @@ verify_grounding
 search_user_memories
 ```
 
-训练数据必须和这份 schema 同源。`scripts/distill_build_dataset.py` 会通过 `app.distill_format.export_tool_schemas()` 导出 `data/distillation/tool_schemas.json`。
+训练数据必须和这份 schema 同源。`scripts/distill_export_tool_schemas.py`（以及 `distill_build_dataset.py`）通过 `app.distill_format.export_tool_schemas()` 导出 `data/distillation/tool_schemas.json`，任何对 `app/tools.py:TOOLS` 的改动都能被检测到。
 
 ---
 
@@ -113,11 +147,9 @@ search_user_memories
 pip install -r requirements.txt
 ```
 
-如果要训练 LoRA，还需要 CUDA 版 PyTorch、`transformers`、`peft`、`bitsandbytes`，以及可选的 `liger-kernel`、`wandb`。如果要用 vLLM 部署 student，需要单独准备 vLLM 环境。
+ingest / harness 建议使用 `mbe-ingest` conda 环境（funasr/einops/modelscope 有锁版本）。如果要训练 LoRA，还需要 CUDA 版 PyTorch、`transformers`、`peft`、`bitsandbytes`，以及可选的 `liger-kernel`、`wandb`。如果要用 vLLM 部署 student，需要单独准备 vLLM 环境。
 
 ### 2. 配置 `.env`
-
-最少需要远程 VLM 配置：
 
 ```bash
 cp .env.example .env
@@ -138,6 +170,7 @@ cp .env.example .env
 | `JUDGE_API_KEY` | eval judge key |
 | `JUDGE_MODEL_NAME` | judge 模型名 |
 | `MODELS_DEVICE` | 本地 BGE/SigLIP 默认设备，如 `cuda:0` |
+| `HF_TOKEN` | 可选，上传 HF 模型卡 / adapter 用 |
 
 ### 3. 下载本地检索模型
 
@@ -149,7 +182,7 @@ python scripts/download_models.py
 
 - BGE-M3：caption、字幕、PPT/OCR 文本向量。
 - SigLIP2：图文帧检索。
-- SenseVoice + FSMN-VAD：ASR。
+- SenseVoice + FSMN-VAD：ASR（仅语音）。
 - RapidOCR：PPT、白板、屏幕文字识别。
 
 VLM 不在本地下载，由远程 API 提供。
@@ -163,28 +196,37 @@ VLM 不在本地下载，由远程 API 提供。
 完整 Video-MME 视频集约 100GB，脚本支持断点续传和解压：
 
 ```bash
-python scripts/download_videomme_full.py
-```
-
-如果已经下载 zip，只想解压：
-
-```bash
-python scripts/download_videomme_full.py --skip-download
+python scripts/download_videomme_full.py        # 全量
+python scripts/download_videomme_subset.py      # 仅下载 manifest 命中的子集
+python scripts/download_videomme_full.py --skip-download   # 已有 zip，仅解压
 ```
 
 ### 抽样构建训练候选视频
 
-从 Video-MME 中抽样目标视频集，保留已有 manifest 里的视频，继续补到目标数量：
+保留已有 manifest 里的视频，继续补到目标数量；按桶分层：
 
 ```bash
 python scripts/sample_videomme.py --target 250 --buckets short,medium,long
 ```
 
-偏低成本试跑可以只取短视频：
+**v2 hard-rebalance 用 modality-weighted 抽样**（贪心提升 `joint` 题占比，medium-only；spec 见 `docs/distill_hard_rebalance_spec.md`）：
 
 ```bash
-python scripts/sample_videomme.py --target 250 --buckets short
+python scripts/sample_videomme.py --modality-weighted --buckets medium
 ```
+
+> 数据约束（实测）：Video-MME 的 `long` 桶是 30–60 min（300 个里只有 1 个 ≤30 min），“≤30 min 长视频”不可行 → v2 走 medium-only；medium 约 **9.1 train 样本/视频**。
+
+### 外部音画数据：WorldSense
+
+为了把 `joint`（音画同步）训练占比从 ~14% 抬到 ~70%，引入外部基准 **WorldSense**（`honglyhly/WorldSense`，ModelScope，CC BY-NC，1662 音画视频 / 3172 MCQ）：
+
+```bash
+python scripts/download_worldsense.py
+python scripts/build_worldsense_eval.py
+```
+
+converter 把 `task_type → modality`（audio/joint/visual），carve 出一个 **150 视频 / 304 例** 的训练池（70% joint+audio）和一个**不相交的 40 视频 / 91 例** 音画 held-out（85% joint+audio）。
 
 ### 构建 audiovisual eval cases
 
@@ -196,25 +238,22 @@ python scripts/build_supplementary_eval.py
 关键产物：
 
 ```text
-eval/audiovisual/video_manifest.json
-eval/audiovisual/questions.jsonl
-eval/audiovisual/questions.ready.jsonl
-eval/audiovisual/questions.new_short.jsonl
+eval/audiovisual/video_manifest.json          # 263 视频
+eval/audiovisual/questions.jsonl              # 741 题
+eval/audiovisual/questions.ready.jsonl        # 199 题（主采集集）
+eval/audiovisual/questions.new_short.jsonl    # 594 题
+eval/audiovisual/v2/                          # v2 hard-rebalance（150 视频 / 450 题）
+eval/audiovisual/worldsense/                  # WorldSense（manifest 1662，used 190 视频 / 3172 题）
 ```
 
 ### 批量 ingest 视频
 
-单进程：
-
 ```bash
-python -m scripts.ingest_videomme
+python -m scripts.ingest_videomme               # 单进程
+scripts/run_ingest_4gpu.sh mbe-ingest 0,1,2,3   # 4 GPU 并行
 ```
 
-4 GPU 并行：
-
-```bash
-scripts/run_ingest_4gpu.sh mbe-ingest 0,1,2,3
-```
+> `run_ingest_4gpu.sh` / `run_teacher_4gpu.sh` 支持 `SHARD_DIR` / `MBE_MANIFEST` 覆盖，让新一轮不覆盖旧缓存。注意 ingest **不是 ASR-bound**：SenseVoice 已在 GPU 上 ~1.4 s/视频，真正瓶颈是 dense-frame embedding + slide/OCR（CPU），加 GPU 并行无效。
 
 ingest 会把每个视频变成离线缓存：
 
@@ -234,19 +273,17 @@ data/cache/{video_id}/
 └── slide_index/
 ```
 
+> 缓存默认在 `/home/gpus/mbe_data/cache`（非仓库内 `data/cache`）。
+
 ---
 
 ## Phase A：采集 Teacher 轨迹
 
 Teacher 轨迹来自 `scripts/eval_harness.py`。开启 `--save-full-trajectory` 后，每个 case 会保存：
 
-- `system_prompt`
-- 完整 `messages`
-- tool calls / tool results
-- `guards_triggered`
-- `agent_terminated`
-- judge 结果
-- retrieval / answer / agent 分项评分
+- `system_prompt`、完整 `messages`、tool calls / tool results
+- `guards_triggered`、`agent_terminated`
+- judge 结果，以及 retrieval / answer / agent 分项评分
 
 单进程采集：
 
@@ -261,30 +298,13 @@ python scripts/eval_harness.py \
   --prediction-cache data/distillation/pred_cache_teacher.jsonl
 ```
 
-4 GPU 并行采集需要先把 cases 切成：
-
-```text
-data/distillation/teacher_shards/cases_0.jsonl
-data/distillation/teacher_shards/cases_1.jsonl
-data/distillation/teacher_shards/cases_2.jsonl
-data/distillation/teacher_shards/cases_3.jsonl
-```
-
-然后运行：
+4 GPU 并行采集需要先把 cases 切成 `cases_0.jsonl … cases_3.jsonl`，放入 shard 目录后运行：
 
 ```bash
 scripts/run_teacher_4gpu.sh mbe-ingest 0,1,2,3 0.0
 ```
 
-每个 shard 会写：
-
-```text
-data/distillation/teacher_shards/traj_{i}.jsonl
-data/distillation/teacher_shards/report_{i}.json
-data/distillation/teacher_shards/log_{i}.log
-```
-
-合并轨迹：
+每个 shard 会写 `traj_{i}.jsonl` / `report_{i}.json` / `log_{i}.log`。合并轨迹：
 
 ```bash
 mkdir -p data/distillation/raw_trajectories
@@ -301,16 +321,18 @@ python scripts/distill_validate_phase_a.py \
   --out data/distillation/phase_a_report.md
 ```
 
+> v2 实际采集：**664 例**（360 Video-MME v2 + 304 WorldSense），4 GPU 约 **5.6 cases/min**。
+
 ---
 
 ## Phase B：过滤和构建 SFT 数据
 
 Phase B 做四件事：
 
-1. 重新计算 guards，避免旧采集逻辑影响分层。
-2. Tier 过滤：默认只保留 `tier_1` teacher 正例。
+1. 从 message stream **重新计算 guards**，避免旧采集逻辑影响分层。
+2. Tier 过滤：默认只保留 teacher 答对的正例（训练集 100% teacher-correct）。
 3. 按 `video_id` 切 train/val，避免同一视频泄漏到两个 split。
-4. 把一条完整轨迹切成多个“前缀 -> 下一条 assistant 决策”样本。
+4. 把一条完整轨迹切成多个“前缀 → 下一条 assistant 决策”样本。
 
 构建数据：
 
@@ -322,6 +344,11 @@ python scripts/distill_build_dataset.py \
   --val-ratio 0.2 \
   --seed 0
 ```
+
+常用约束选项：
+
+- `--holdout-videos`：把指定视频强制划到 val，保证 held-out 无泄漏。
+- `--max-train-samples`：C1 预算上限，**按整个视频丢弃，绝不切断一条轨迹**。
 
 输出：
 
@@ -343,17 +370,19 @@ python scripts/distill_validate_phase_b.py \
   --out data/distillation/phase_b_report.md
 ```
 
+> v2 build：863 轨迹 → **1499 train / 390 val**，0 泄漏。**40% 的 teacher 轨迹是 tier-3（老师答错）被排除**；保留的 tier-2 是 100% 良性 `dedup`（答对但有一次重复工具调用），过滤器标定良好。
+
 需要特别注意：
 
 - forced call target 会被排除，因为它们是 runtime 注入，不是 teacher 策略。
-- 原始 base64 图像会被截断或替换，避免训练样本爆长。
+- 原始 base64 图像会被截断或替换（`app/distill_truncate.py`），避免训练样本爆长。
 - 工具结果保留文本和结构信息，让 student 学会基于证据继续决策。
 
 ---
 
 ## Phase C：训练 Student Orchestrator
 
-训练脚本是自包含 PEFT trainer：
+训练脚本是自包含 PEFT trainer。**v2 冻结配置**（QLoRA r32/α64，lr 1e-4 cosine，bs1×grad-accum8，bf16 + Liger fused CE，**2 epochs**，cutoff 8192）：
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python scripts/distill_train.py \
@@ -361,37 +390,34 @@ CUDA_VISIBLE_DEVICES=0 python scripts/distill_train.py \
   --train data/distillation/train.jsonl \
   --val data/distillation/val.jsonl \
   --output-dir data/distillation/ckpt_mrbigeye_orch \
-  --epochs 3 \
+  --epochs 2 \
   --batch-size 1 \
-  --grad-accum 32 \
-  --cutoff-len 6144 \
+  --grad-accum 8 \
+  --cutoff-len 8192 \
   --lora-rank 32 \
   --lora-alpha 64 \
   --lora-dropout 0.05 \
   --lr 1e-4 \
   --load-4bit \
   --use-liger \
-  --wandb \
-  --run-name mrbigeye-orch-sft
+  --save-total-limit 0 \
+  --wandb --wandb-project mrbigeye-distill \
+  --run-name mrbigeye-orch-v2
 ```
 
-`scripts/distill_train.py` 使用模型自己的 chat template 渲染 tool calls，并且只对最后一条 assistant message 计算 loss。前缀里的 system、user、assistant 历史和 tool results 都被 mask 掉。
+`distill_train.py` 使用模型自己的 chat template 渲染 tool calls，并且**只对最后一条 assistant message 计算 loss**；前缀里的 system、user、assistant 历史和 tool results 都被 mask。没有用 LLaMA-Factory，是因为 orchestrator 可能在同一轮输出**并行** tool calls，而常见 function-call 数据格式只支持单个 function call。
 
-这里没有使用 LLaMA-Factory 的原因是：orchestrator 可能在同一轮输出并行 tool calls，而常见 function-call 数据格式只支持单个 function call。
+**诚实的 model selection 很关键。** `--save-total-limit 0` 保留**全部** 20-step checkpoint，配合 `load_best_model_at_end`（按 eval_loss）。但 **eval-loss 最小 ≠ pass_rate 最大**：实测 pass_rate 在 ~epoch 1.5 见顶后随 eval_loss 继续下降而 plateau/回落。所以最终 checkpoint 应按 hard-set pass_rate 选，而不是只看 eval_loss——shipped 的是 `ckpt-320`（epoch 2，eval_loss 0.4044）。大显存不足时用 `--no-eval`（fused CE 在长 val 序列上会 OOM）。
 
-训练成功后，checkpoint 目录应包含：
+> 反面教训：把 short 视频堆进去做 4.5× scaleup（355→1618 样本）反而 **regressed −4.2pp**，且 epoch-3 过拟合。v2 改为恒定规模、偏难、偏多模态。
 
-```text
-adapter_model.safetensors
-adapter_config.json
-tokenizer_config.json
-```
+训练成功后，checkpoint 目录应包含 `adapter_model.safetensors`、`adapter_config.json`、`tokenizer_config.json`。
 
 ---
 
 ## Phase D：部署和评测 Student
 
-用 vLLM 起本地 OpenAI-compatible orchestrator：
+用 vLLM 起本地 OpenAI-compatible orchestrator。serve 脚本默认 `--max-model-len 16384`、`--enable-lora`、`--max-lora-rank 32`、`--enable-auto-tool-choice --tool-call-parser hermes`，并把 adapter 挂成 `mrbigeye_orch`：
 
 ```bash
 scripts/distill_serve_vllm.sh \
@@ -400,6 +426,8 @@ scripts/distill_serve_vllm.sh \
   1 \
   8001
 ```
+
+> apples-to-apples：可以让**同一个 vLLM 同时热插 base + pilot LoRA + v2 LoRA**，评测时只切 `ORCHESTRATOR_MODEL_NAME`，保证 VLM 和 judge 完全一致，只有 orchestrator 在变。
 
 另一个终端里把 orchestrator 指向 student，VLM 和 judge 保持 teacher 时的配置：
 
@@ -415,18 +443,7 @@ python scripts/eval_harness.py \
   --prediction-cache data/distillation/pred_cache_student.jsonl
 ```
 
-同一 held-out 集再跑 teacher/baseline：
-
-```bash
-python scripts/eval_harness.py \
-  --cases data/distillation/eval_heldout.jsonl \
-  --output data/distillation/baseline_heldout.json \
-  --judge \
-  --judge-cache data/distillation/judge_cache_baseline.jsonl \
-  --prediction-cache data/distillation/pred_cache_baseline.jsonl
-```
-
-汇总对比：
+同一 held-out 集再跑 base/baseline（同样切 `ORCHESTRATOR_MODEL_NAME`），然后汇总对比：
 
 ```bash
 python scripts/distill_compare_runs.py \
@@ -437,10 +454,12 @@ python scripts/distill_compare_runs.py \
 
 主要看：
 
-- pass rate 是否接近 teacher。
+- pass_rate（overall 和**分模态** joint/audio/visual/overview、分 source）是否接近/超过 teacher。
 - tool calls / case 是否异常升高或降低。
 - guard 触发分布是否异常。
 - student 单 case orchestrator 成本是否显著下降。
+
+> harness 对单 case 错误有容错（一题崩了不拖垮整轮）。最终 3-way 报告见 `reports/eval3way/eval_3way.md`。
 
 ---
 
@@ -479,6 +498,8 @@ flowchart TB
 - transcript：找对白、讲解、声音事件。
 - slide/OCR：找标题、公式、屏幕文字、PPT 页面。
 
+> 健壮性：单帧 VLM 触发内容过滤被拒**不会再让整个视频失败**（`app/preprocess.py`），v2 期间因此救回 6 个视频（含 2 个 held-out）。
+
 用户提问时，`app/graph.py` 的 LangGraph orchestrator 会根据问题类型决定工具调用顺序。最终答案由 `answer_with_evidence` 生成，再由 `verify_grounding` 校验引用。
 
 ### 视觉和文本检索
@@ -501,12 +522,8 @@ flowchart TB
 启动：
 
 ```bash
-python scripts/launch_app.sh
-```
-
-或直接：
-
-```bash
+bash scripts/launch_app.sh
+# 或
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
@@ -542,22 +559,11 @@ python scripts/eval_harness.py \
 ```bash
 python scripts/eval_harness.py \
   --cases eval/audiovisual/questions.ready.jsonl \
-  --sample 20 \
-  --sample-seed 0 \
-  --output data/eval/smoke20.json \
-  --judge
+  --sample 20 --sample-seed 0 \
+  --output data/eval/smoke20.json --judge
 ```
 
-评测报告会写 JSON 和 Markdown，并追加 `data/eval/runs_index.csv`，方便横向比较不同 orchestrator、VLM、prompt fingerprint 和 Agent 版本。
-
-缓存 key 包含：
-
-- case id
-- orchestrator model
-- VLM model
-- prompt fingerprint
-- video id
-- `AGENT_CODE_VERSION`
+评测报告会写 JSON 和 Markdown，并追加 `data/eval/runs_index.csv`，方便横向比较不同 orchestrator、VLM、prompt fingerprint 和 Agent 版本。缓存 key 包含：case id、orchestrator model、VLM model、prompt fingerprint、video id、`AGENT_CODE_VERSION`。
 
 如果改了 prompt，fingerprint 会自动变化；如果改了 prompt 外的 runtime 行为，请手动 bump `app/eval_fingerprint.py` 里的版本。
 
@@ -573,36 +579,45 @@ app/
   preprocess.py            # 视频离线预处理
   retrieval.py             # caption/frame 检索
   text_assets.py           # transcript/slide FTS + dense index
-  distill_*.py             # 训练数据过滤、格式化、轨迹工具
+  eval_harness.py          # 评测核心逻辑
+  eval_fingerprint.py      # AGENT_CODE_VERSION + 缓存指纹
+  distill_format.py        # 轨迹 → SFT 样本 + tool schema 导出
+  distill_filter.py        # tier 分类 / guard 重算
+  distill_trajectory.py    # 轨迹切片
+  distill_truncate.py      # base64 图像截断
 
 scripts/
   eval_harness.py          # Agent 评测 + teacher 轨迹采集
   distill_build_dataset.py # Phase B
   distill_train.py         # Phase C
-  distill_serve_vllm.sh    # Phase D serve
+  distill_serve_vllm.sh    # Phase D serve（热插 LoRA）
   distill_compare_runs.py  # student vs baseline
-  run_ingest_4gpu.sh       # 多 GPU ingest
-  run_teacher_4gpu.sh      # 多 GPU teacher 采集
-  build_videomme_eval.py
-  build_supplementary_eval.py
+  distill_export_tool_schemas.py
+  distill_validate_phase_a.py / distill_validate_phase_b.py
+  sample_videomme.py       # 含 --modality-weighted
+  download_videomme_full.py / download_videomme_subset.py
+  download_worldsense.py / build_worldsense_eval.py
+  build_videomme_eval.py / build_supplementary_eval.py
+  run_ingest_4gpu.sh / run_teacher_4gpu.sh
+  wandb_eval_report.py     # 把评测结果汇总到 W&B
 
 eval/audiovisual/
-  video_manifest.json
-  questions.jsonl
-  questions.ready.jsonl
-  questions.new_short.jsonl
+  video_manifest.json / questions*.jsonl   # Video-MME 主集
+  v2/                                       # v2 hard-rebalance
+  worldsense/                               # WorldSense 音画
+
+docs/
+  distill_hard_rebalance_spec.md           # v2 设计 spec
+  distill_outcomes_and_learnings.md        # 量化复盘 + resume bullet
+  distill_v2_prep_status.md                # 运行手册 + 实时状态
+  hf_model_card.md                         # HF 模型卡
+
+reports/
+  eval3way/                                # base/pilot/v2 三方评测产物
+  distillation_eval_summary_2026-06-03.md
 
 data/
-  uploads/                 # 视频文件，按 video_id 命名
-  cache/                   # 预处理缓存和索引
-  distillation/            # teacher 轨迹、SFT 数据、训练/评测报告
-  eval/                    # 普通评测报告和缓存
-
-tests/
-  test_distill_*.py
-  test_eval_harness.py
-  test_graph_orchestrator.py
-  test_tools_planner.py
+  uploads/ cache/ distillation/ eval/      # 视频、缓存、轨迹/SFT、评测
 ```
 
 `data/`、`models/`、`wandb/` 默认不进 Git。
@@ -619,7 +634,8 @@ pytest \
   tests/test_distill_filter.py \
   tests/test_distill_truncate.py \
   tests/test_distill_trajectory.py \
-  tests/test_eval_harness.py
+  tests/test_eval_harness.py \
+  tests/test_eval_converters.py
 ```
 
 Agent / 推理侧关键测试：
@@ -629,6 +645,7 @@ pytest \
   tests/test_graph_orchestrator.py \
   tests/test_tools_planner.py \
   tests/test_retrieval.py \
+  tests/test_text_assets.py \
   tests/test_eval_harness.py \
   tests/test_main_stream_contract.py
 ```
@@ -643,56 +660,48 @@ pytest
 
 ## 常见坑
 
+### Teacher 能力天花板
+
+SFT 模仿无法超越老师。teacher（`deepseek-v4-pro`）在 WorldSense 音画上**错 56%**，所以再多音画数据也无法把 student 的 joint/audio 抬过 pilot。要继续往上，需要更强的 teacher、或一个**非语音的 audio 工具**（当前 ASR 只抓语音），而不是更多数据。
+
+### eval-loss 最小 ≠ pass_rate 最大
+
+不要只按 eval_loss 选 checkpoint。pass_rate 在 ~epoch 1.5 见顶后会随 eval_loss 继续下降而回落。保留全部 20-step checkpoint（`--save-total-limit 0`），最终按 hard-set pass_rate 选。
+
 ### Teacher 轨迹没有 messages
 
-如果 prediction cache 是旧的，里面可能没有完整 message stream。采集时打开 `--save-full-trajectory` 后，脚本会把这类 cache hit 当成 stale miss 重新跑。建议 distillation 用独立 cache：
-
-```text
-data/distillation/pred_cache_teacher.jsonl
-```
+如果 prediction cache 是旧的，里面可能没有完整 message stream。采集时打开 `--save-full-trajectory`，脚本会把这类 cache hit 当成 stale miss 重新跑。distillation 用独立 cache：`data/distillation/pred_cache_teacher.jsonl`。
 
 ### 同一视频泄漏到 train 和 eval
 
-不要随机按样本切分。必须按 `video_id` 切分，因为同一个视频通常有多道题。`scripts/distill_build_dataset.py` 已经按视频切 train/val，并输出 `eval_heldout.jsonl`。
+不要随机按样本切分。必须按 `video_id` 切，因为同一视频通常有多道题。`distill_build_dataset.py` 已按视频切 train/val 并输出 `eval_heldout.jsonl`；用 `--holdout-videos` 强制 held-out 入 val。
 
 ### Student 会学到 forced call
 
-不要把 runtime 注入的 `force_answer_with_evidence`、`force_verify_grounding` 当 teacher target。`app.distill_format` 已经排除这些 target。
+不要把 runtime 注入的 `force_answer_with_evidence`、`force_verify_grounding` 当 teacher target。`app.distill_format` 已排除这些 target。
 
 ### vLLM tool call 解析失败
 
-`scripts/distill_serve_vllm.sh` 使用：
-
-```text
---enable-auto-tool-choice
---tool-call-parser hermes
-```
-
-如果换 base model 或 chat template，先做小样本 smoke，确认它能输出合法 OpenAI tool calls。
+serve 用 `--enable-auto-tool-choice --tool-call-parser hermes`。换 base model 或 chat template 时，先做小样本 smoke，确认能输出合法 OpenAI tool calls。
 
 ### 低显存
 
-训练时优先使用：
-
-```text
---load-4bit --use-liger --batch-size 1 --grad-accum 32
-```
-
-评测或 Web 推理时，可以设置：
-
-```text
-LOAD_MODELS_ON_STARTUP=false
-UNLOAD_MODELS_AFTER_USE=true
-```
+训练优先 `--load-4bit --use-liger --batch-size 1 --grad-accum 8`，必要时 `--no-eval`。评测或 Web 推理时可设 `LOAD_MODELS_ON_STARTUP=false`、`UNLOAD_MODELS_AFTER_USE=true`。
 
 ### 改了工具 schema
 
-工具 schema 是训练数据的动作空间。修改 `app/tools.py:TOOLS` 后，旧的 `tool_schemas.json` 和旧 SFT 数据都需要重建。
+工具 schema 是训练数据的动作空间。修改 `app/tools.py:TOOLS` 后，旧的 `tool_schemas.json` 和旧 SFT 数据都需重建（`scripts/distill_export_tool_schemas.py` 可检测漂移）。
+
+### Long 视频 / ingest 优化
+
+Video-MME `long` 桶基本都是 30–60 min，“≤30 min 长视频”不可行，v2 走 medium-only。ingest 是 CPU-bound（dense-frame embedding + slide/OCR），不是 ASR-bound，加 GPU 并行无效——优化前先 profile。
 
 ---
 
 ## English TL;DR
 
-Mr. Big-Eye is a long-video audiovisual QA Agent and an orchestrator-distillation training pipeline. The inference system indexes videos into scene captions, dense frames, transcripts, and slide/OCR text, then lets a LangGraph Agent call 14 tools to retrieve evidence, inspect local windows, align audio with visuals, answer, and verify grounding.
+Mr. Big-Eye is a long-video audiovisual QA Agent **and** an orchestrator-distillation training pipeline. The inference system indexes videos into scene captions, dense frames, transcripts, and slide/OCR text, then lets a LangGraph Agent call 14 tools to retrieve evidence, inspect local windows, align audio with visuals, answer, and verify grounding.
 
-The training focus is Agentic SFT: collect full teacher trajectories with `scripts/eval_harness.py --save-full-trajectory`, filter and slice them with `scripts/distill_build_dataset.py`, train a Qwen2.5 LoRA orchestrator with `scripts/distill_train.py`, serve it through vLLM, and compare it against the teacher on held-out videos.
+On this `distillation` branch the pipeline is **complete**: collect full teacher trajectories (`deepseek-v4-pro`) with `eval_harness.py --save-full-trajectory`, filter/slice them with `distill_build_dataset.py`, train a Qwen2.5-7B QLoRA orchestrator with `distill_train.py`, serve it via vLLM (hot-swapping base + pilot + v2 LoRA), and compare on a leakage-free held-out set with `distill_compare_runs.py`.
+
+**Headline result** (181-case leakage-free heldout, 90 Video-MME + 91 WorldSense): judged pass_rate **0.547 (base) → 0.669 (v2), +12.2pp**, with the largest gain on audio-visual/temporal reasoning (**joint +25.9pp, 0.362 → 0.621**). Key lessons: data **quality/difficulty/modality ≫ quantity** (a 4.5× scaleup regressed −4.2pp), select checkpoints by **pass_rate not eval-loss**, and a hard **teacher-capacity ceiling** (teacher fails 56% on WorldSense) means the next lever is a stronger teacher / non-speech audio tool, not more data. Full write-up: `docs/distill_outcomes_and_learnings.md`; eval report: `reports/eval3way/eval_3way.md`.
