@@ -14,6 +14,8 @@
 
 如果你已经熟悉 VLM / Agent 的基本概念，但不熟 LangGraph、Chroma、BGE、SigLIP、ASR/OCR 这些具体技术栈，可以把这份 README 当成项目导览和术语翻译表。
 
+> **`internalization` 分支的定位**：这个分支在上面的 agent 之上做一件更窄的事——**探究 agent 的多步视觉推理轨迹能否被内化成小 VLM 的单次前向 CoT**，以及内化出来的是不是真推理而不是模板记忆。图表/表格论文（ChartQA/FinQA/TabMWP 的 reading-not-reasoning 因果探针）**不在这个分支**，在另一个仓库；这里只保留 video regime（NExT-GQA / CLEVRER）相关的代码和数据。详见下面「Video CoT 内化实验」一节。
+
 ---
 
 ## 当前实现状态
@@ -37,6 +39,62 @@
 | Agent 版本 | `AGENT_CODE_VERSION = "v22"`，见 `app/eval_fingerprint.py` |
 
 > 注意：旧资料里提到的早期工具数、早期 eval 主线和旧 Agent 版本信息已经过时。当前 `TOOLS` 注册表有 14 个工具，音频、PPT/OCR、MCQ 候选解析、temporal resolver 和 grounding 校验都已经进入主路径。
+
+---
+
+## Video CoT 内化实验（本分支的研究主线）
+
+### 研究问题
+
+小 VLM（Qwen3-VL-4B/8B-Instruct 量级）能不能把上面这套多步 agentic 视觉推理**内化成单次前向的 Chain-of-Thought**——微调后不再调用任何工具、不再多轮编排，一次前向就能做出和 agent 编排相当的推理，而且这个提升是**可泛化的推理能力**而不是对训练模板的记忆？
+
+对照的最近工作是 VideoTemp-o3（Kwai-Keye）：它把"何时/何处裁剪"内化进了模型的多轮自调度，但推理时仍然有外部 Crop 模块在跑，本质上是把多模型协作压成了一个模型的多轮工具调用。这个分支往前再走一层——**推理时不允许出现任何 `<tool_call>`，只给冻结的帧序列做单次前向**——并且用因果探针去验证内化出来的推理是不是真实的，而不是只看结果层面的准确率。
+
+**范围是 vision-only**：目标模型只吃 agent 检索到的帧，不吃字幕/OCR 文本/音频。凡是正确答案依赖字幕、OCR 文字或音画对齐的 case，整个丢弃，不做部分改写。
+
+### 工具的可内化性划分
+
+Agent 轨迹里的步骤分两类，只有 Type-1 允许进 CoT：
+
+| 类型 | 定义 | 对应工具 |
+| --- | --- | --- |
+| Type-1（可内化） | 单次前向 VLM 原则上能自己做的视觉判断——数可见物体、比颜色、看画面里的时钟、给看得到的事件排序 | `segment_focus`、`stitched_verify`、`answer_with_evidence` 的视觉推理部分 |
+| Type-2（工具依赖，必须剥离） | 结论来自目标 VLM 没有的外部工具——RRF 排序、FTS5 关键词命中、temporal resolver、grounding 校验、跨帧 re-ID 分数 | `retrieve_*_evidence`、`search_transcript_keyword`、`align_audiovisual_evidence`、`build_timeline`、`assess_evidence_sufficiency`、`verify_grounding`、`search_user_memories` |
+
+把 Type-2 步骤写进 CoT 等于在教模型幻觉，rewriter 和过滤器都必须强制这个划分。
+
+### Pipeline
+
+```
+Phase 0  本地 VLM backbone client（复用 app/vqa.py 的 client 层）
+Phase 1  轨迹生成（复用 app/graph.py 的 agent loop，backbone 换成待研究的小 VLM）
+Phase 2  严格过滤（复用 app/eval_harness.py 的判分逻辑，收紧准入门槛）
+Phase 3  轨迹 -> CoT 改写（只保留 Type-1 推理，剥离 Type-2 工具依赖）
+Phase 4  一致性过滤（复用 verify_grounding + replay 核对改写后的 CoT 是否仍然导向原答案）
+Phase 5  SFT（LoRA）：在 (frames, question, CoT, answer) 上微调
+Phase 6  因果探针评测：内化的是推理还是模板记忆
+```
+
+**方差门（variance gate）是先于 SFT 的必经关卡**：`scripts/run_variance_gate.py` 在 NExT-GQA（CLEAN ∩ EVIDENCE_IN）和 CLEVRER 上，对比 `free_form`（贪心单次前向）与 `self_reflect` / `orch_reflect_*`（多 seed、温度>0 的 agentic 编排）的净收益，配对 bootstrap 给出 CI。逻辑是：**如果 agent 编排相对 free-form 的收益本身就落在采样方差以内，那就没有稳定的、值得内化的推理增益**——SFT 只会去拟合噪声。
+
+### 目前的结论（regime 1：perception/selection-bound）
+
+`data/distill/results/` 和 `data/distill/analysis/` 里 4B/8B/32B 三个尺度在 NExT-GQA 和 CLEVRER 上的方差门结果一致落在 **within-variance**：agentic 编排相对 free-form 的净收益 CI 全部跨零。也就是说，在目前这两个视频集上，尚未观测到可稳定内化的推理 headroom——瓶颈更像是感知/选项定位（模型没看清/没定位到关键帧），而不是"看到了但推不出来"。这是继续往 SFT/因果探针（Phase 5-6）推进前必须正视的边界结果，具体每个 (model, dataset) 的 net/CI/verdict 见 `data/distill/results/tables.json`、`power_table.json` 和 `data/distill/analysis/regrade_summary.json`。
+
+### 代码落点
+
+| 内容 | 位置 |
+| --- | --- |
+| 方法实现（free_form / self_reflect / orch_reflect_*，显式温度和 seed 控制） | `app/distill/methods.py` |
+| 轨迹生成、去重、改写、SFT 数据构建 | `app/distill/{generate,dedup,rewrite,filter_strict,filter_consistency,build_sft_dataset,build_rl_prompts}.py` |
+| seed 循环、功效分析、评测统计 | `app/distill/{seed_runner,power_analysis,eval_stats,eval_common}.py` |
+| 因果探针（视觉/分布偏移/因果） | `app/eval_distill/{probes_visual,probes_distshift,probes_causal,probes_data}.py` |
+| 方差门 CLI | `scripts/run_variance_gate.py` |
+| CLEVRER / NExT-GQA / Video-MME 评测集构建 | `scripts/build_clevrer_eval.py`、`scripts/eval_convert_nextgqa.py`、`scripts/build_videomme_eval.py`、`scripts/build_supplementary_eval.py` |
+| 诊断脚本（感知 headroom、reflection gap、orchestrator reflection） | `scripts/diag_*.py` |
+| 单元测试 | `tests/test_distill.py` |
+| 实验产出（dump/regrade/结果表） | `data/distill/{analysis,results,clevrer,pilot,pilot_8b,pilot_smoke}/` |
+| 历次方差门运行日志 | `logs/*.log` |
 
 ---
 
@@ -779,10 +837,19 @@ AGENT_CODE_VERSION = "v22"
 │   ├── eval_fingerprint.py     # AGENT_CODE_VERSION + prompt hash
 │   ├── schemas.py              # FastAPI/Pydantic schema
 │   ├── usernames.py            # 本地随机用户名
-│   └── static/
-│       ├── index.html
-│       ├── style.css
-│       └── app.js              # 上传、聊天、citation 渲染
+│   ├── static/
+│   │   ├── index.html
+│   │   ├── style.css
+│   │   └── app.js              # 上传、聊天、citation 渲染
+│   ├── distill/                # Video CoT 内化：轨迹生成、过滤、改写、SFT 数据构建
+│   │   ├── methods.py          # free_form / self_reflect / orch_reflect_* 方法实现
+│   │   ├── generate.py、dedup.py、rewrite.py
+│   │   ├── filter_strict.py、filter_consistency.py
+│   │   ├── build_sft_dataset.py、build_rl_prompts.py
+│   │   └── seed_runner.py、power_analysis.py、eval_stats.py、eval_common.py
+│   └── eval_distill/           # 因果探针：验证内化的是推理还是模板记忆
+│       ├── probes_visual.py、probes_distshift.py
+│       └── probes_causal.py、probes_data.py
 ├── scripts/
 │   ├── launch_app.sh
 │   ├── download_models.py
@@ -793,7 +860,9 @@ AGENT_CODE_VERSION = "v22"
 │   ├── eval_prepare_datasets.py
 │   ├── eval_convert_nextgqa.py
 │   ├── eval_convert_longvideobench.py
-│   └── build_*_eval.py
+│   ├── build_*_eval.py         # clevrer / videomme / supplementary eval 集构建
+│   ├── run_variance_gate.py    # 方差门：agent 编排 vs free-form 的净收益 + CI
+│   └── diag_*.py               # 感知 headroom、reflection gap 等诊断脚本
 ├── eval/
 │   └── audiovisual/
 │       ├── README.md
@@ -808,9 +877,9 @@ AGENT_CODE_VERSION = "v22"
 │   ├── test_vqa.py
 │   ├── test_retrieval.py
 │   ├── test_eval_harness.py
+│   ├── test_distill.py         # Video CoT 内化 pipeline 单测
 │   └── fixtures/
 ├── docker/
-├── paper_references/
 ├── audio_adaption.md           # 音画升级路线和历史 handoff
 ├── requirements.txt
 ├── .env.example
@@ -827,14 +896,18 @@ data/
 ├── graph_checkpoints.sqlite3        # LangGraph thread 状态
 ├── langmem_store.sqlite3            # LangMem user memory
 ├── transcripts.sqlite3              # FTS5 transcript / slide chunks
-└── eval/
-    ├── prediction_cache.jsonl
-    ├── judge_cache.jsonl
-    ├── latest_report.json
-    └── runs/
+├── eval/
+│   ├── prediction_cache.jsonl
+│   ├── judge_cache.jsonl
+│   ├── latest_report.json
+│   └── runs/
+└── distill/                         # Video CoT 内化实验产出
+    ├── analysis/                    # dump / regrade / label_audit（按 model x dataset）
+    ├── results/                     # results.jsonl、map.json、tables.json、power_table.json
+    ├── clevrer/、pilot/、pilot_8b/、pilot_smoke/
 ```
 
-`data/`、`models/` 默认不进 Git。
+`data/`、`models/` 默认不进 Git；`data/distill/` 下的实验产出（jsonl/json/csv）例外，按 `.gitignore` 中的规则跟踪。
 
 ---
 
@@ -869,6 +942,7 @@ PYTHONPATH=. /home/user/miniconda3/envs/mbe-phase2/bin/python -m pytest \
 - MCQ candidate parsing、temporal recommended option、answer 后 runtime 收束
 - main SSE stream contract
 - eval converter、eval harness、prediction cache
+- `test_distill.py`：Video CoT 内化 pipeline（方法实现、过滤、seed runner）
 
 ---
 
@@ -947,6 +1021,15 @@ MODELS_DEVICE=cpu
 8. `app/vqa.py`：理解 VLM prompt、图片 payload、citation 协议。
 9. `app/static/app.js`：理解前端如何消费 SSE 和渲染引用。
 10. `tests/test_graph_orchestrator.py`、`tests/test_tools_planner.py`：看设计意图的最好补充。
+
+如果你关注的是本分支的研究主线（Video CoT 内化），在读完上面的 agent 基础后，建议接着读：
+
+1. `app/distill/methods.py`：free_form / self_reflect / orch_reflect_* 方法的温度/seed 控制，理解方差从哪来。
+2. `scripts/run_variance_gate.py`：方差门 CLI，理解 pilot gate 的判定逻辑和当前的 regime 1 结论怎么算出来的。
+3. `app/distill/{filter_strict,filter_consistency}.py`：Type-1/Type-2 工具划分如何落地成过滤规则。
+4. `app/eval_distill/probes_causal.py`：因果探针怎么判断内化的是推理还是模板记忆。
+5. `tests/test_distill.py`：pipeline 各阶段的行为契约。
+6. `data/distill/results/tables.json`、`power_table.json`：当前每个 (model, dataset, method) 的 net/CI/verdict 明细。
 
 ---
 
